@@ -35,10 +35,9 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
     val userAnswers =
       dateRanges.zipWithIndex
-        .foldLeft(defaultUserAnswers) {
-          case (userAnswers, (range, index)) =>
-            val refinedIndex = refineV[OneToThree](index + 1).toOption.value
-            userAnswers.set(AccountingPeriodPage(srn, refinedIndex, NormalMode), range).get
+        .foldLeft(defaultUserAnswers) { case (userAnswers, (range, index)) =>
+          val refinedIndex = refineV[OneToThree](index + 1).toOption.value
+          userAnswers.set(AccountingPeriodPage(srn, refinedIndex, NormalMode), range).get
         }
 
     val form = AccountingPeriodListController.form(new YesNoPageFormProvider())

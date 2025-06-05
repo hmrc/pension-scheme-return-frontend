@@ -65,10 +65,9 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
       .map(HowWasAssetDisposedOfPagesForEachAsset(srn, index))
       .keys
       .toList
-      .flatMap(
-        key =>
-          refineV[OneTo50](key.toInt + 1)
-            .fold(_ => Nil, ind => List(HowWasAssetDisposedOfPage(srn, index, ind)))
+      .flatMap(key =>
+        refineV[OneTo50](key.toInt + 1)
+          .fold(_ => Nil, ind => List(HowWasAssetDisposedOfPage(srn, index, ind)))
       )
 }
 

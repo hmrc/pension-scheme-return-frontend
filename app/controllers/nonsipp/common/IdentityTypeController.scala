@@ -46,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IdentityTypeController @Inject()(
+class IdentityTypeController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -68,9 +68,11 @@ class IdentityTypeController @Inject()(
       case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       case _ =>
         // If this page is reached in CheckMode, in Other Assets Journey, and there is no PointOfEntry set
-        if (mode == CheckMode && subject == IdentitySubject.OtherAssetSeller && request.userAnswers
+        if (
+          mode == CheckMode && subject == IdentitySubject.OtherAssetSeller && request.userAnswers
             .get(OtherAssetsCYAPointOfEntry(srn, index))
-            .contains(NoPointOfEntry)) {
+            .contains(NoPointOfEntry)
+        ) {
           // Set this page as the PointOfEntry
           saveService.save(
             request.userAnswers
@@ -102,14 +104,13 @@ class IdentityTypeController @Inject()(
         formWithErrors =>
           Future
             .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
-        answer => {
+        answer =>
           for {
             updatedAnswers <- request.userAnswers.set(IdentityTypePage(srn, index, subject), answer).mapK
             nextPage = navigator.nextPage(IdentityTypePage(srn, index, subject), mode, updatedAnswers)
             updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
             _ <- saveService.save(updatedProgressAnswers)
           } yield Redirect(nextPage)
-        }
       )
   }
 }

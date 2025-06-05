@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class DataRetrievalActionImpl @Inject()(
+class DataRetrievalActionImpl @Inject() (
   val sessionRepository: SessionRepository
 )(implicit val executionContext: ExecutionContext)
     extends DataRetrievalAction {

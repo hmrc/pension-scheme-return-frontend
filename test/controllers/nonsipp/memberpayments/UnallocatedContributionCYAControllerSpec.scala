@@ -98,10 +98,10 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetails())
           .withName(s"redirect to next page when in ${mode.toString} mode")
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
       )
 
       act.like(
@@ -233,9 +233,8 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only tasklist")
     )
 
   }

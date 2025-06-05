@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyPostcodeLookupController @Inject()(
+class LandOrPropertyPostcodeLookupController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -97,8 +97,8 @@ class LandOrPropertyPostcodeLookupController @Inject()(
     mode: Mode,
     value: PostcodeLookup,
     addresses: List[Address]
-  )(
-    implicit req: DataRequest[_]
+  )(implicit
+    req: DataRequest[_]
   ): Either[Result, Unit] =
     Option
       .when(addresses.isEmpty) {

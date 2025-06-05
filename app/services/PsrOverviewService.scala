@@ -27,9 +27,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PsrOverviewService @Inject()(psrConnector: PSRConnector) {
-  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn)(
-    implicit request: AllowedAccessRequest[_],
+class PsrOverviewService @Inject() (psrConnector: PSRConnector) {
+  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn)(implicit
+    request: AllowedAccessRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] =

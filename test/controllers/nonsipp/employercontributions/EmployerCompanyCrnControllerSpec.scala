@@ -27,7 +27,7 @@ import controllers.ControllerBaseSpec
 
 class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec {
 
-  private val memberIndex = refineMV[Max300.Refined](1) //memberIndex: Max300
+  private val memberIndex = refineMV[Max300.Refined](1) // memberIndex: Max300
   private val index = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =

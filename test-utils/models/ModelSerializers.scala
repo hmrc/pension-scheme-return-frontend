@@ -51,8 +51,8 @@ trait ModelSerializers {
     }) ++ Json.obj("establisherKind" -> establisher.kind.value)
 
   implicit val writeSchemeDetails: Writes[SchemeDetails] = { details =>
-    val authorisingPSAID: JsObject = details.authorisingPSAID.fold(Json.obj())(
-      psaId => Json.obj("pspDetails" -> Json.obj("authorisingPSAID" -> psaId))
+    val authorisingPSAID: JsObject = details.authorisingPSAID.fold(Json.obj())(psaId =>
+      Json.obj("pspDetails" -> Json.obj("authorisingPSAID" -> psaId))
     )
 
     Json.obj(

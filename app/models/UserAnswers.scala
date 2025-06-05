@@ -95,7 +95,8 @@ final case class UserAnswers(
 
   /**
    * Calls cleanup and then removes the page
-   * @param page Page to remove
+   * @param page
+   *   Page to remove
    * @return
    */
   def remove(page: Removable[_]): Try[UserAnswers] =
@@ -108,7 +109,8 @@ final case class UserAnswers(
 
   /**
    * Removes multiple pages without cleanup
-   * @param pages List of pages to remove
+   * @param pages
+   *   List of pages to remove
    * @return
    */
   def removeOnlyMultiplePages(pages: List[Removable[_]]): Try[UserAnswers] =
@@ -136,8 +138,10 @@ final case class UserAnswers(
 
   /**
    * Removes without cleanup if condition is true
-   * @param bool condition
-   * @param page page to remove
+   * @param bool
+   *   condition
+   * @param page
+   *   page to remove
    * @return
    */
   def removeOnlyWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
@@ -145,8 +149,10 @@ final case class UserAnswers(
 
   /**
    * Removes without cleanup if condition is true
-   * @param bool condition as function
-   * @param page page to remove
+   * @param bool
+   *   condition as function
+   * @param page
+   *   page to remove
    * @return
    */
   def removeOnlyWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
@@ -185,9 +191,9 @@ final case class UserAnswers(
   }
 
   /**
-   * - When soft deleting pages, the cleanup function is not called to stop accidentally hard deleting associated pages
-   *   as cleanup pages use remove rather than softRemove.
-   * */
+   *   - When soft deleting pages, the cleanup function is not called to stop accidentally hard deleting associated
+   *     pages as cleanup pages use remove rather than softRemove.
+   */
   def softRemove[A: Reads: Writes](page: Gettable[A] with Settable[A] with Removable[A]): Try[UserAnswers] =
     get(page).fold(Try(this)) { value =>
       for {
@@ -203,7 +209,7 @@ object UserAnswers {
 
   def compose(
     fs: (UserAnswers => Try[UserAnswers])*
-  ): UserAnswers => Try[UserAnswers] = ua => {
+  ): UserAnswers => Try[UserAnswers] = ua =>
     fs.toList match {
       case Nil => Try(ua)
       case head :: tail =>
@@ -211,7 +217,6 @@ object UserAnswers {
           acc.flatMap(curr)
         }
     }
-  }
 
   def get[A: Reads](page: Gettable[A]): UserAnswers => Option[A] = _.get(page)
 
@@ -251,7 +256,7 @@ object UserAnswers {
       .and(
         (__ \ "lastUpdated")
           .write(MongoJavatimeFormats.instantFormat)
-      )(unlift(UserAnswers.unapply))
+      )(unlift((x: UserAnswers) => Some((x.id, x.data, x.lastUpdated))))
   }
 
   implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = OFormat(reads, writes)

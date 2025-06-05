@@ -54,32 +54,31 @@ class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
       ("individual", individualUserAnswers),
       ("company", companyUserAnswers),
       ("partnership", partnershipUserAnswers)
-    ).foreach {
-      case (testScenario, userAnswers) =>
-        act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    ).foreach { case (testScenario, userAnswers) =>
+      act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+        injected[YesNoPageView]
+          .apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(srn, assetIndex, disposalIndex, buyerName, NormalMode)
+          )
+      }.updateName(_ + s" as $testScenario"))
+
+      act.like(
+        renderPrePopView(
+          onPageLoad,
+          IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex),
+          true,
+          userAnswers
+        ) { implicit app => implicit request =>
           injected[YesNoPageView]
             .apply(
-              form(injected[YesNoPageFormProvider]),
+              form(injected[YesNoPageFormProvider]).fill(true),
               viewModel(srn, assetIndex, disposalIndex, buyerName, NormalMode)
             )
-        }.updateName(_ + s" as $testScenario"))
+        }.updateName(_ + s" as $testScenario")
+      )
 
-        act.like(
-          renderPrePopView(
-            onPageLoad,
-            IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex),
-            true,
-            userAnswers
-          ) { implicit app => implicit request =>
-            injected[YesNoPageView]
-              .apply(
-                form(injected[YesNoPageFormProvider]).fill(true),
-                viewModel(srn, assetIndex, disposalIndex, buyerName, NormalMode)
-              )
-          }.updateName(_ + s" as $testScenario")
-        )
-
-        act.like(invalidForm(onSubmit, userAnswers).updateName(_ + s" as $testScenario"))
+      act.like(invalidForm(onSubmit, userAnswers).updateName(_ + s" as $testScenario"))
     }
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))

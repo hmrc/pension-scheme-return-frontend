@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Singleton
 
 @Singleton
-class IdentifyAndRequireData @Inject()(
+class IdentifyAndRequireData @Inject() (
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,
@@ -52,17 +52,17 @@ class IdentifyAndRequireData @Inject()(
   }
 
   /**
-   * Populates UserAnswers in the request context from Mongo
-   * If pure (Initial user answers / ETMP GET snapshot) and previous version are available, populate the request context with those too
-   **/
+   * Populates UserAnswers in the request context from Mongo If pure (Initial user answers / ETMP GET snapshot) and
+   * previous version are available, populate the request context with those too
+   */
   def apply(srn: Srn): ActionBuilder[DataRequest, AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData)
 
   /**
    * if mode is ViewOnlyMode
-   * - Populates UserAnswers and previous version UserAnswers in the request context from ETMP
-   * - if not: same as apply(srn: Srn)
-   **/
+   *   - Populates UserAnswers and previous version UserAnswers in the request context from ETMP
+   *   - if not: same as apply(srn: Srn)
+   */
   def apply(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): ActionBuilder[DataRequest, AnyContent] =
     if (mode == ViewOnlyMode) {
       if (previous == 0) {
@@ -84,7 +84,7 @@ class IdentifyAndRequireData @Inject()(
 
   /**
    * Populates UserAnswers and previous version UserAnswers in the request context from ETMP using the fbNumber
-   **/
+   */
   def apply(srn: Srn, fbNumber: String): ActionBuilder[DataRequest, AnyContent] =
     identify
       .andThen(allowAccess(srn))
@@ -93,8 +93,8 @@ class IdentifyAndRequireData @Inject()(
       .andThen(saveData)
 
   /**
-   * Populates UserAnswers in the request context from ETMP
-   * If current is greater than 1, also fetch the previous return and add it to the DataRequest context as previous version UserAnswers
+   * Populates UserAnswers in the request context from ETMP If current is greater than 1, also fetch the previous return
+   * and add it to the DataRequest context as previous version UserAnswers
    */
   def apply(srn: Srn, year: String, current: String): ActionBuilder[DataRequest, AnyContent] =
     current.toIntOption match {

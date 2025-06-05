@@ -127,9 +127,9 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
             when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(())))
           )
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -204,9 +204,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only ReportedOtherAssetsDisposalListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only ReportedOtherAssetsDisposalListController page")
     )
   }
 

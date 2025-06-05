@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveTransferOutController @Inject()(
+class RemoveTransferOutController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -62,15 +62,13 @@ class RemoveTransferOutController @Inject()(
           receivingSchemeName <- request.userAnswers
             .get(ReceivingSchemeNamePage(srn, memberIndex, index))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemoveTransferOutController
-                .viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, receivingSchemeName)
-            )
+        } yield Ok(
+          view(
+            form,
+            RemoveTransferOutController
+              .viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, receivingSchemeName)
           )
-        }
+        )
       ).merge
     }
 
@@ -79,7 +77,7 @@ class RemoveTransferOutController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
@@ -92,9 +90,8 @@ class RemoveTransferOutController @Inject()(
                   RemoveTransferOutController.viewModel(srn, memberIndex, index, nameDOB.fullName, receivingSchemeName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
@@ -110,12 +107,11 @@ class RemoveTransferOutController @Inject()(
                   fallbackCall = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveTransferOutPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveTransferOutPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -126,7 +122,6 @@ class RemoveTransferOutController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

@@ -44,8 +44,8 @@ object SurrenderedBenefitsCompleted {
     def surrenderedBenefitsCompleted(srn: Srn): List[Max300] =
       ua.map(SurrenderedBenefitsCompleted.all(srn))
         .toList
-        .collect {
-          case (index, _) => index
+        .collect { case (index, _) =>
+          index
         }
         .refine[Max300.Refined]
   }

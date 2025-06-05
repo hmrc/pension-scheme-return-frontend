@@ -59,7 +59,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
   )
 
   private val completedUserAnswers = defaultUserAnswers
-  // LOP 1 - Completed
+    // LOP 1 - Completed
     .unsafeSet(LandOrPropertyHeldPage(srn), true)
     .unsafeSet(LandPropertyInUKPage(srn, indexOne), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexOne), address1)
@@ -89,7 +89,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
 
   private val thirdIncompleteUserAnswers = completedUserAnswers
-  // LOP 1 - Completed
+    // LOP 1 - Completed
     .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexThree), address1)
     .unsafeSet(
@@ -352,9 +352,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only tasklist")
     )
 
     renderView(

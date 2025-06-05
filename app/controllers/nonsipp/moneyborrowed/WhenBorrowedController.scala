@@ -44,7 +44,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class WhenBorrowedController @Inject()(
+class WhenBorrowedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -66,9 +66,8 @@ class WhenBorrowedController @Inject()(
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
           request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-            val preparedForm = {
+            val preparedForm =
               request.userAnswers.fillForm(WhenBorrowedPage(srn, index), form(date.to, request))
-            }
             Ok(
               view(
                 preparedForm,

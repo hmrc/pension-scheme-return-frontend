@@ -26,8 +26,8 @@ object ViewUtils {
     form: Form[_],
     title: String,
     section: Option[String] = None
-  )(
-    implicit messages: Messages
+  )(implicit
+    messages: Messages
   ): String =
     titleNoForm(
       title = s"${errorPrefix(form)} ${messages(title)} ${paginationPostfix(paginationViewModel)}",
@@ -38,8 +38,8 @@ object ViewUtils {
     paginationViewModel: Option[PaginatedViewModel],
     title: String,
     section: Option[String] = None
-  )(
-    implicit messages: Messages
+  )(implicit
+    messages: Messages
   ): String =
     titleNoForm(
       title = s"${messages(title)} ${paginationPostfix(paginationViewModel)}",
@@ -59,16 +59,15 @@ object ViewUtils {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
 
   private def paginationPostfix(paginationViewModel: Option[PaginatedViewModel])(implicit messages: Messages): String =
-    paginationViewModel.fold("")(
-      paginatedViewModel =>
-        if (paginatedViewModel.pagination.totalPages > 1) {
-          messages(
-            "site.title.postfix",
-            paginatedViewModel.pagination.currentPage,
-            paginatedViewModel.pagination.totalPages
-          )
-        } else {
-          ""
-        }
+    paginationViewModel.fold("")(paginatedViewModel =>
+      if (paginatedViewModel.pagination.totalPages > 1) {
+        messages(
+          "site.title.postfix",
+          paginatedViewModel.pagination.currentPage,
+          paginatedViewModel.pagination.totalPages
+        )
+      } else {
+        ""
+      }
     )
 }

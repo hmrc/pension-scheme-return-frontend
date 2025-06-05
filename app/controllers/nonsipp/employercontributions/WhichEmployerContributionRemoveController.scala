@@ -43,7 +43,7 @@ import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
-class WhichEmployerContributionRemoveController @Inject()(
+class WhichEmployerContributionRemoveController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -56,8 +56,8 @@ class WhichEmployerContributionRemoveController @Inject()(
   def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max50] = request.userAnswers
       .map(EmployerContributionsProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -103,13 +103,13 @@ class WhichEmployerContributionRemoveController @Inject()(
       )
   }
 
-  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
-    implicit request: DataRequest[_]
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(implicit
+    request: DataRequest[_]
   ): Either[Result, List[(Max50, Money, String)]] =
     request.userAnswers
       .map(EmployerContributionsProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -133,14 +133,13 @@ object WhichEmployerContributionRemoveController {
     )
 
   private def buildRows(values: List[(Max50, Money, String)]): List[ListRadiosRow] =
-    values.flatMap {
-      case (index, total, employerName) =>
-        List(
-          ListRadiosRow(
-            index.value,
-            Message("whichEmployerContributionRemove.radio.label", total.displayAs, employerName)
-          )
+    values.flatMap { case (index, total, employerName) =>
+      List(
+        ListRadiosRow(
+          index.value,
+          Message("whichEmployerContributionRemove.radio.label", total.displayAs, employerName)
         )
+      )
     }
 
   def viewModel(

@@ -113,10 +113,10 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
       act.like(
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -182,9 +182,8 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
         controllers.nonsipp.bonds.routes.BondsListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to bond list page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to bond list page")
     )
   }
 }

@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalEmployerContributionController @Inject()(
+class TotalEmployerContributionController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -80,7 +80,7 @@ class TotalEmployerContributionController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 memberName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
@@ -93,8 +93,7 @@ class TotalEmployerContributionController @Inject()(
                   viewModel(srn, employerName, memberName.fullName, index, secondaryIndex, form, mode)
                 )
               )
-            ).merge.pure[Future]
-          },
+            ).merge.pure[Future],
           value =>
             for {
               updatedAnswers <- request.userAnswers

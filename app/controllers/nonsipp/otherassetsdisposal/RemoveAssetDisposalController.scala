@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveAssetDisposalController @Inject()(
+class RemoveAssetDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -66,9 +66,7 @@ class RemoveAssetDisposalController @Inject()(
           methodOfDisposal <- request.userAnswers
             .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)))
-        }
+        } yield Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)))
       ).merge
     }
 
@@ -112,8 +110,8 @@ class RemoveAssetDisposalController @Inject()(
                     controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                       .onPageLoad(srn, 1)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ => Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))
               )
             } else {
               Future.successful(

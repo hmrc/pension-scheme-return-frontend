@@ -35,18 +35,17 @@ import javax.inject.Inject
 @Singleton()
 class BorrowingTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, optMoneyWasBorrowed: Option[Boolean], initialUA: UserAnswers)(
-    implicit request: DataRequest[_]
+  def transformToEtmp(srn: Srn, optMoneyWasBorrowed: Option[Boolean], initialUA: UserAnswers)(implicit
+    request: DataRequest[_]
   ): Option[Borrowing] =
-    optMoneyWasBorrowed.map(
-      moneyWasBorrowed =>
-        Borrowing(
-          recordVersion = Option.when(request.userAnswers.get(borrowing) == initialUA.get(borrowing))(
-            request.userAnswers.get(BorrowingRecordVersionPage(srn)).get
-          ),
-          moneyWasBorrowed = moneyWasBorrowed,
-          moneyBorrowed = moneyBorrowedTransformToEtmp(srn)
-        )
+    optMoneyWasBorrowed.map(moneyWasBorrowed =>
+      Borrowing(
+        recordVersion = Option.when(request.userAnswers.get(borrowing) == initialUA.get(borrowing))(
+          request.userAnswers.get(BorrowingRecordVersionPage(srn)).get
+        ),
+        moneyWasBorrowed = moneyWasBorrowed,
+        moneyBorrowed = moneyBorrowedTransformToEtmp(srn)
+      )
     )
 
   private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
@@ -70,17 +69,15 @@ class BorrowingTransformer @Inject() extends Transformer {
                     ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)
                   )
                   whySchemeBorrowedMoney <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index))
-                } yield {
-                  MoneyBorrowed(
-                    dateOfBorrow = whenBorrowed,
-                    schemeAssetsValue = valueOfSchemeAssetsWhenMoneyBorrowed.value,
-                    amountBorrowed = borrowedAmountAndRate._1.value,
-                    interestRate = borrowedAmountAndRate._2.value,
-                    borrowingFromName = lenderName,
-                    connectedPartyStatus = isLenderConnectedParty,
-                    reasonForBorrow = whySchemeBorrowedMoney
-                  )
-                }
+                } yield MoneyBorrowed(
+                  dateOfBorrow = whenBorrowed,
+                  schemeAssetsValue = valueOfSchemeAssetsWhenMoneyBorrowed.value,
+                  amountBorrowed = borrowedAmountAndRate._1.value,
+                  interestRate = borrowedAmountAndRate._2.value,
+                  borrowingFromName = lenderName,
+                  connectedPartyStatus = isLenderConnectedParty,
+                  reasonForBorrow = whySchemeBorrowedMoney
+                )
             }
           }
       }
@@ -98,30 +95,30 @@ class BorrowingTransformer @Inject() extends Transformer {
 
     for {
       indexes <- buildIndexesForMax5000(moneyBorrowedList.size)
-      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
-        case (ua, index) =>
-          val moneyBorrowed = moneyBorrowedList(index.value - 1)
-          val whenBorrowed = WhenBorrowedPage(srn, index) -> moneyBorrowed.dateOfBorrow
-          val borrowedAmountAndRate = BorrowedAmountAndRatePage(srn, index) -> (Money(moneyBorrowed.amountBorrowed), Percentage(
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) { case (ua, index) =>
+        val moneyBorrowed = moneyBorrowedList(index.value - 1)
+        val whenBorrowed = WhenBorrowedPage(srn, index) -> moneyBorrowed.dateOfBorrow
+        val borrowedAmountAndRate =
+          BorrowedAmountAndRatePage(srn, index) -> (Money(moneyBorrowed.amountBorrowed), Percentage(
             moneyBorrowed.interestRate
           ))
-          val lenderName = LenderNamePage(srn, index) -> moneyBorrowed.borrowingFromName
-          val whySchemeBorrowedMoney = WhySchemeBorrowedMoneyPage(srn, index) -> moneyBorrowed.reasonForBorrow
-          val isLenderConnectedParty = IsLenderConnectedPartyPage(srn, index) -> moneyBorrowed.connectedPartyStatus
-          val valueOfSchemeAssetsWhenMoneyBorrowed = ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index) -> Money(
-            moneyBorrowed.schemeAssetsValue
-          )
+        val lenderName = LenderNamePage(srn, index) -> moneyBorrowed.borrowingFromName
+        val whySchemeBorrowedMoney = WhySchemeBorrowedMoneyPage(srn, index) -> moneyBorrowed.reasonForBorrow
+        val isLenderConnectedParty = IsLenderConnectedPartyPage(srn, index) -> moneyBorrowed.connectedPartyStatus
+        val valueOfSchemeAssetsWhenMoneyBorrowed = ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index) -> Money(
+          moneyBorrowed.schemeAssetsValue
+        )
 
-          for {
-            ua0 <- ua
-            ua1 <- ua0.set(whenBorrowed._1, whenBorrowed._2)
-            ua2 <- ua1.set(borrowedAmountAndRate._1, borrowedAmountAndRate._2)
-            ua3 <- ua2.set(lenderName._1, lenderName._2)
-            ua4 <- ua3.set(whySchemeBorrowedMoney._1, whySchemeBorrowedMoney._2)
-            ua5 <- ua4.set(isLenderConnectedParty._1, isLenderConnectedParty._2)
-            ua6 <- ua5.set(valueOfSchemeAssetsWhenMoneyBorrowed._1, valueOfSchemeAssetsWhenMoneyBorrowed._2)
-            ua7 <- ua6.set(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
-          } yield ua7
+        for {
+          ua0 <- ua
+          ua1 <- ua0.set(whenBorrowed._1, whenBorrowed._2)
+          ua2 <- ua1.set(borrowedAmountAndRate._1, borrowedAmountAndRate._2)
+          ua3 <- ua2.set(lenderName._1, lenderName._2)
+          ua4 <- ua3.set(whySchemeBorrowedMoney._1, whySchemeBorrowedMoney._2)
+          ua5 <- ua4.set(isLenderConnectedParty._1, isLenderConnectedParty._2)
+          ua6 <- ua5.set(valueOfSchemeAssetsWhenMoneyBorrowed._1, valueOfSchemeAssetsWhenMoneyBorrowed._2)
+          ua7 <- ua6.set(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
+        } yield ua7
       }
 
     } yield resultUA

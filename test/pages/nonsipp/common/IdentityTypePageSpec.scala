@@ -74,7 +74,10 @@ class IdentityTypePageSpec extends PageBehaviours {
                 CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LandOrPropertySeller),
                 ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
               )
-              .unsafeSet(IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
+              .unsafeSet(
+                IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient),
+                IdentityType.UKCompany
+              ) // part of loans journey
               .unsafeSet(LandPropertyInUKPage(srn, indexOne), true) // part of land or property journey
               .unsafeSet(LoansMadeOrOutstandingPage(srn), true) // part of loans journey
 
@@ -114,8 +117,14 @@ class IdentityTypePageSpec extends PageBehaviours {
             .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true) // part of land or property journey
             .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
             .unsafeSet(DatePeriodLoanPage(srn, indexTwo), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-            .unsafeSet(IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
-            .unsafeSet(IdentityTypePage(srn, indexTwo, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
+            .unsafeSet(
+              IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient),
+              IdentityType.UKCompany
+            ) // part of loans journey
+            .unsafeSet(
+              IdentityTypePage(srn, indexTwo, IdentitySubject.LoanRecipient),
+              IdentityType.UKCompany
+            ) // part of loans journey
             .unsafeSet(
               CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LoanRecipient),
               ConditionalYesNo.yes[String, Crn](crnGen.sample.value)

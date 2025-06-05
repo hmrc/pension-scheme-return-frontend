@@ -32,7 +32,7 @@ import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 
-class FileUploadTooManyRowsController @Inject()(
+class FileUploadTooManyRowsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,

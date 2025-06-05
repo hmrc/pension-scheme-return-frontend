@@ -154,9 +154,8 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only tasklist")
     )
   }
 }

@@ -18,7 +18,6 @@ package repositories
 
 import org.mongodb.scala.model.Updates.{combine, set}
 import uk.gov.hmrc.mongo.MongoComponent
-import repositories.UploadRepository.MongoUpload
 import uk.gov.hmrc.mongo.play.json.Codecs._
 import play.api.libs.json._
 import models._
@@ -44,7 +43,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class UploadRepository @Inject()(
+class UploadRepository @Inject() (
   mongoComponent: MongoComponent,
   clock: Clock,
   appConfig: FrontendAppConfig,
@@ -61,7 +60,7 @@ class UploadRepository @Inject()(
           Indexes.ascending("lastUpdated"),
           IndexOptions()
             .name("lastUpdatedIdx")
-            .expireAfter(appConfig.uploadTtl, TimeUnit.SECONDS)
+            .expireAfter(appConfig.uploadTtl.toLong, TimeUnit.SECONDS)
         )
       ),
       replaceIndexes = false
@@ -75,7 +74,7 @@ class UploadRepository @Inject()(
   def insert(details: UploadDetails): Future[Unit] =
     collection
       .insertOne(toMongoUpload(details))
-      .toFuture()
+      .head()
       .map(_ => ())
 
   def getUploadDetails(key: UploadKey): Future[Option[UploadDetails]] =
@@ -91,7 +90,7 @@ class UploadRepository @Inject()(
         ),
         options = FindOneAndUpdateOptions().upsert(false)
       )
-      .toFuture()
+      .head()
       .map(_ => ())
 
   def setUploadResult(key: UploadKey, result: Upload): Future[Unit] =
@@ -103,7 +102,7 @@ class UploadRepository @Inject()(
           set("lastUpdated", Instant.now(clock).toBson)
         )
       )
-      .toFuture()
+      .head()
       .map(_ => ())
 
   def getUploadResult(key: UploadKey): Future[Option[Upload]] =
@@ -115,7 +114,7 @@ class UploadRepository @Inject()(
   def remove(key: UploadKey): Future[Unit] =
     collection
       .deleteOne(equal("id", key.toBson))
-      .toFuture()
+      .head()
       .map(_ => ())
 
   private def toMongoUpload(details: UploadDetails): MongoUpload = MongoUpload(
@@ -171,7 +170,7 @@ object UploadRepository {
         .and((__ \ "status").write[SensitiveUploadStatus])
         .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))
         .and((__ \ "result").writeNullable[SensitiveUpload])(
-          unlift(MongoUpload.unapply)
+          unlift((x: MongoUpload) => Some(x._1, x._2, x._3, x._4, x._5))
         )
 
     implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[MongoUpload] = OFormat(reads, writes)

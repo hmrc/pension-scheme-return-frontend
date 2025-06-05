@@ -45,7 +45,7 @@ import play.api.data.Form
 
 import javax.inject.Named
 
-class BondsDisposalListController @Inject()(
+class BondsDisposalListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -99,8 +99,8 @@ class BondsDisposalListController @Inject()(
       )
   }
 
-  private def bondsData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
+  private def bondsData(srn: Srn, indexes: List[Max5000])(implicit
+    req: DataRequest[_]
   ): Either[Result, List[BondsData]] =
     indexes.map { index =>
       for {

@@ -44,7 +44,7 @@ import play.api.data.Form
 
 import javax.inject.Named
 
-class LandOrPropertyDisposalAddressListController @Inject()(
+class LandOrPropertyDisposalAddressListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -100,8 +100,8 @@ class LandOrPropertyDisposalAddressListController @Inject()(
       )
   }
 
-  private def landOrPropertyData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
+  private def landOrPropertyData(srn: Srn, indexes: List[Max5000])(implicit
+    req: DataRequest[_]
   ): Either[Result, List[LandOrPropertyData]] =
     indexes.map { index =>
       for {
@@ -134,9 +134,8 @@ object LandOrPropertyDisposalAddressListController {
           .map(_.toIntOption)
           .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
           .flatMap(
-            _.map(
-              disposalIndex =>
-                userAnswers.get(LandOrPropertyStillHeldPage(srn, landOrPropertyData.index, disposalIndex))
+            _.map(disposalIndex =>
+              userAnswers.get(LandOrPropertyStillHeldPage(srn, landOrPropertyData.index, disposalIndex))
             )
           )
           .exists(optValue => optValue.fold(false)(value => !value))

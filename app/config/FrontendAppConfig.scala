@@ -28,7 +28,7 @@ import java.time.LocalDate
 import java.net.URLEncoder
 
 @Singleton
-class FrontendAppConfig @Inject()(config: Configuration) { self =>
+class FrontendAppConfig @Inject() (config: Configuration) { self =>
 
   val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
@@ -84,18 +84,18 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     encryptedUserName: String
   ): String =
     s"${pensionSchemeReturn.baseUrl}${config
-      .get[String](path = "urls.emailCallback")
-      .format(
-        psaOrPsp,
-        requestId,
-        encryptedEmail,
-        encryptedPsaId,
-        encryptedPstr,
-        reportVersion,
-        encryptedSchemeName,
-        taxYear,
-        encryptedUserName
-      )}"
+        .get[String](path = "urls.emailCallback")
+        .format(
+          psaOrPsp,
+          requestId,
+          encryptedEmail,
+          encryptedPsaId,
+          encryptedPstr,
+          reportVersion,
+          encryptedSchemeName,
+          taxYear,
+          encryptedUserName
+        )}"
 
   object urls {
     val loginUrl: String = config.get[String]("urls.login")
@@ -123,17 +123,17 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
       def schemeSummaryDashboard(srn: Srn): String =
         s"$baseUrl${config
-          .get[String](path = "urls.manage-pension-schemes.schemeSummaryDashboard")
-          .format(
-            srn.value
-          )}"
+            .get[String](path = "urls.manage-pension-schemes.schemeSummaryDashboard")
+            .format(
+              srn.value
+            )}"
 
       def schemeSummaryPSPDashboard(srn: Srn): String =
         s"$baseUrl${config
-          .get[String](path = "urls.manage-pension-schemes.schemeSummaryPSPDashboard")
-          .format(
-            srn.value
-          )}"
+            .get[String](path = "urls.manage-pension-schemes.schemeSummaryPSPDashboard")
+            .format(
+              srn.value
+            )}"
     }
 
     object pensionAdministrator {

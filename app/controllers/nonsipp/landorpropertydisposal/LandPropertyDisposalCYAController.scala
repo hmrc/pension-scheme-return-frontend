@@ -47,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class LandPropertyDisposalCYAController @Inject()(
+class LandPropertyDisposalCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -81,12 +81,14 @@ class LandPropertyDisposalCYAController @Inject()(
       onPageLoadCommon(srn, landOrPropertyIndex, disposalIndex, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(LandOrPropertyDisposalProgress(srn, landOrPropertyIndex, disposalIndex))
-        .exists(_.completed))
+        .exists(_.completed)
+    )
       Future.successful(Redirect(routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1)))
     else
       (
@@ -603,20 +605,18 @@ object LandPropertyDisposalCYAController {
           SummaryAction("site.change", recipientNameUrl)
             .withVisuallyHiddenContent("landPropertyDisposalCYA.section1.recipientName.hidden")
         )
-    ) :?+ recipientDetails.map(
-      reason =>
-        CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
-          .withAction(
-            SummaryAction("site.change", recipientDetailsUrl)
-              .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
-          )
-    ) :?+ recipientReasonNoDetails.map(
-      noreason =>
-        CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
-          .withAction(
-            SummaryAction("site.change", recipientNoDetailsUrl)
-              .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
-          )
+    ) :?+ recipientDetails.map(reason =>
+      CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
+        .withAction(
+          SummaryAction("site.change", recipientDetailsUrl)
+            .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+        )
+    ) :?+ recipientReasonNoDetails.map(noreason =>
+      CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
+        .withAction(
+          SummaryAction("site.change", recipientNoDetailsUrl)
+            .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+        )
     ) :+
       CheckYourAnswersRowViewModel(
         Message("landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedParty", recipientName),

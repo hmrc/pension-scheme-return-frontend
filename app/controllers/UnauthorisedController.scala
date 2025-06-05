@@ -26,7 +26,7 @@ import viewmodels.models.{FormPageViewModel, UnauthorisedPageViewModel}
 
 import javax.inject.Inject
 
-class UnauthorisedController @Inject()(
+class UnauthorisedController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   appConfig: FrontendAppConfig,
   view: UnauthorisedView

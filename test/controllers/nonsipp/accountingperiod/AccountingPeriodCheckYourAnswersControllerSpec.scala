@@ -43,8 +43,8 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
   "AccountingPeriodCheckYourAnswersController" - {
     act.like(
-      renderView(onPageLoad, userAnswers)(
-        implicit app => implicit request => injected[CheckYourAnswersView].apply(viewModel)
+      renderView(onPageLoad, userAnswers)(implicit app =>
+        implicit request => injected[CheckYourAnswersView].apply(viewModel)
       )
     )
 
@@ -72,7 +72,9 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       "have the correct message key for heading" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          messageKey(viewModel(srn, refineMV[OneToThree](1), dateRange, NormalMode).heading) mustBe "checkYourAnswers.heading"
+          messageKey(
+            viewModel(srn, refineMV[OneToThree](1), dateRange, NormalMode).heading
+          ) mustBe "checkYourAnswers.heading"
         }
       }
 

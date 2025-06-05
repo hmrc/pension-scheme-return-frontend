@@ -42,7 +42,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class ReturnSubmittedController @Inject()(
+class ReturnSubmittedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
@@ -53,8 +53,8 @@ class ReturnSubmittedController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identify.andThen(allowAccess(srn)).async {
-    implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).async { implicit request =>
       val dashboardLink = if (request.pensionSchemeId.isPSP) {
         config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
       } else {
@@ -77,7 +77,7 @@ class ReturnSubmittedController @Inject()(
         .fold(
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         )(res => Future(res))
-  }
+    }
 }
 
 object ReturnSubmittedController {
@@ -101,20 +101,19 @@ object ReturnSubmittedController {
         submissionDate.show,
         submissionDate.format(DateRange.readableTimeFormat).toLowerCase()
       ),
-      whatHappensNextContent =
-        ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
-          ParagraphMessage(
-            "returnSubmitted.whatHappensNext.paragraph2",
-            LinkMessage(
-              Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
-              managePensionSchemeDashboardUrl
-            ),
-            "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
-          ) ++
-          ParagraphMessage(
-            "returnSubmitted.whatHappensNext.paragraph3",
-            LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
-          )
+      whatHappensNextContent = ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
+        ParagraphMessage(
+          "returnSubmitted.whatHappensNext.paragraph2",
+          LinkMessage(
+            Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
+            managePensionSchemeDashboardUrl
+          ),
+          "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
+        ) ++
+        ParagraphMessage(
+          "returnSubmitted.whatHappensNext.paragraph3",
+          LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
+        )
     )
 
   private def returnPeriodsToMessage(returnPeriods: NonEmptyList[DateRange]): DisplayMessage = {

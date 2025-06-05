@@ -49,7 +49,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class TransferReceivedMemberListController @Inject()(
+class TransferReceivedMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -75,8 +75,8 @@ class TransferReceivedMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -135,20 +135,18 @@ class TransferReceivedMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(
-    implicit request: DataRequest[_]
-  ): List[MemberWithReceiveTransfer] = indexes.map {
-    case (index, nameDOB) =>
-      MemberWithReceiveTransfer(
-        memberIndex = index,
-        transferFullName = nameDOB.fullName,
-        receive = request.userAnswers
-          .receiveTransferProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              ReceiveTransfer(secondaryIndex, status)
-          }
-      )
+  private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
+    request: DataRequest[_]
+  ): List[MemberWithReceiveTransfer] = indexes.map { case (index, nameDOB) =>
+    MemberWithReceiveTransfer(
+      memberIndex = index,
+      transferFullName = nameDOB.fullName,
+      receive = request.userAnswers
+        .receiveTransferProgress(srn, index)
+        .map { case (secondaryIndex, status) =>
+          ReceiveTransfer(secondaryIndex, status)
+        }
+    )
   }
 
 }

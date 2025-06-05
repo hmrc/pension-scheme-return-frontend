@@ -78,7 +78,7 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
   private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
 
   private val completedUserAnswers = defaultUserAnswers
-  // Other Assets #1
+    // Other Assets #1
     .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexOne), nameOfAsset)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexOne, disposalIndexOne), howOtherAssetsDisposedOne)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexOne, disposalIndexTwo), howOtherAssetsDisposedTwo)
@@ -115,9 +115,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     ((otherAssetIndexOne, disposalIndexes), SectionCompleted),
     ((otherAssetIndexTwo, disposalIndexes), SectionCompleted)
   )
-  private val numberOfDisposals = otherAssetsDisposalsWithIndexes.map {
-    case ((_, disposalIndexes), _) =>
-      disposalIndexes.size
+  private val numberOfDisposals = otherAssetsDisposalsWithIndexes.map { case ((_, disposalIndexes), _) =>
+    disposalIndexes.size
   }.sum
 
   private val numberOfOtherAssetsItems = otherAssetsDisposalsWithIndexes.size
@@ -281,9 +280,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only taskList")
     )
 
     act.like(

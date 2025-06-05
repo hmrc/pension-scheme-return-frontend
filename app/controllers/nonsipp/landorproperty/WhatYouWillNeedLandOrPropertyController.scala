@@ -32,7 +32,7 @@ import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 
-class WhatYouWillNeedLandOrPropertyController @Inject()(
+class WhatYouWillNeedLandOrPropertyController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,

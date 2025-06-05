@@ -48,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OutstandingArrearsOnLoanController @Inject()(
+class OutstandingArrearsOnLoanController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

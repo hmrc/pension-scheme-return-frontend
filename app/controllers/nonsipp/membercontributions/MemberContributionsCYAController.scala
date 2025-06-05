@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class MemberContributionsCYAController @Inject()(
+class MemberContributionsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -120,8 +120,8 @@ class MemberContributionsCYAController @Inject()(
             fallbackCall = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
               .onPageLoad(srn, index, mode)
           )
-      } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
       )
     }
 

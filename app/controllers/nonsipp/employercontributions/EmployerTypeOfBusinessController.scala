@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class EmployerTypeOfBusinessController @Inject()(
+class EmployerTypeOfBusinessController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -84,7 +84,7 @@ class EmployerTypeOfBusinessController @Inject()(
                   )
                 )
             },
-          answer => {
+          answer =>
             for {
               updatedAnswers <- request.userAnswers
                 .set(EmployerTypeOfBusinessPage(srn, memberIndex, index), answer)
@@ -93,7 +93,6 @@ class EmployerTypeOfBusinessController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

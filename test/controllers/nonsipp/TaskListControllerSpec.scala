@@ -200,14 +200,13 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         populatedUserAnswers,
         populatedUserAnswers
       ).before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
-            .thenReturn(
-              Future.successful(versionsResponseInProgress)
-            )
-        )
-        .withName(
-          "task list redirects to overview page when a historical submission with submitted status is in user answers"
-        )
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(versionsResponseInProgress)
+          )
+      ).withName(
+        "task list redirects to overview page when a historical submission with submitted status is in user answers"
+      )
     )
 
     act.like(
@@ -703,7 +702,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "with inProgressUrl with one member recorded and one in inProgress" in {
           val userAnswers = defaultUserAnswers
-          // member Index One
+            // member Index One
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
             .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
@@ -735,7 +734,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "with listPageUrl with two members recorded and none inProgress" in {
           val userAnswers = defaultUserAnswers
-          // member Index One
+            // member Index One
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
             .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)

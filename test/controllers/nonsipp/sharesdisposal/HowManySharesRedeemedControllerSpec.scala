@@ -58,20 +58,24 @@ class HowManySharesRedeemedControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      renderPrePopView(onPageLoad, HowManySharesRedeemedPage(srn, shareIndex, disposalIndex), totalShares, userAnswers) {
-        implicit app => implicit request =>
-          injected[IntView]
-            .apply(
-              form(injected[IntFormProvider]).fill(totalShares),
-              viewModel(
-                srn,
-                shareIndex,
-                disposalIndex,
-                companyName,
-                NormalMode,
-                form(injected[IntFormProvider])
-              )
+      renderPrePopView(
+        onPageLoad,
+        HowManySharesRedeemedPage(srn, shareIndex, disposalIndex),
+        totalShares,
+        userAnswers
+      ) { implicit app => implicit request =>
+        injected[IntView]
+          .apply(
+            form(injected[IntFormProvider]).fill(totalShares),
+            viewModel(
+              srn,
+              shareIndex,
+              disposalIndex,
+              companyName,
+              NormalMode,
+              form(injected[IntFormProvider])
             )
+          )
       }
     )
 

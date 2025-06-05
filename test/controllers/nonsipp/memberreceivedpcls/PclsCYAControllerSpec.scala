@@ -133,9 +133,8 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to Pcls Member List page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to Pcls Member List page")
     )
   }
 

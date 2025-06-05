@@ -136,9 +136,9 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
             when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(())))
           )
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -213,9 +213,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to land or property disposal list page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to land or property disposal list page")
     )
   }
 }

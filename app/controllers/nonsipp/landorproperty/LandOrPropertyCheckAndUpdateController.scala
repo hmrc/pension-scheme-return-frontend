@@ -37,7 +37,7 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
 import viewmodels.models._
 
-class LandOrPropertyCheckAndUpdateController @Inject()(
+class LandOrPropertyCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,

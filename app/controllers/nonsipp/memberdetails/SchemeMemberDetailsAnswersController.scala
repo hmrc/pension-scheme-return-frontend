@@ -48,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class SchemeMemberDetailsAnswersController @Inject()(
+class SchemeMemberDetailsAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -81,8 +81,8 @@ class SchemeMemberDetailsAnswersController @Inject()(
       onPageLoadCommon(srn, index, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.get(MemberDetailsManualProgress(srn, index)) match {
       case Some(value) if value.inProgress =>
@@ -131,9 +131,9 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
       for {
         updatedUserAnswers <- request.userAnswers
-        // Only set member state to CHANGED if something has actually changed
-        // if memberPsrVersion is not present for member, do not set to CHANGED
-        // CHANGED status is checked in the transformer later on to make sure this is the status we want to send to ETMP
+          // Only set member state to CHANGED if something has actually changed
+          // if memberPsrVersion is not present for member, do not set to CHANGED
+          // CHANGED status is checked in the transformer later on to make sure this is the status we want to send to ETMP
           .setWhen(
             mode.isCheckMode && memberDetailsChanged && !addedThisVersion
           )(
@@ -223,15 +223,14 @@ object SchemeMemberDetailsAnswersController {
     srn: Srn,
     index: Max300
   ): List[CheckYourAnswersRowViewModel] =
-    maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(
-      nino =>
-        List(
-          CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
-            .withAction(
-              SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent(("memberDetailsCYA.nino.hidden", memberName))
-            )
-        )
+    maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(nino =>
+      List(
+        CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
+          .withAction(
+            SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
+              .withVisuallyHiddenContent(("memberDetailsCYA.nino.hidden", memberName))
+          )
+      )
     )
 
   private def noNinoReasonRow(
@@ -240,15 +239,14 @@ object SchemeMemberDetailsAnswersController {
     srn: Srn,
     index: Max300
   ): List[CheckYourAnswersRowViewModel] =
-    maybeNoNinoReason.fold(List.empty[CheckYourAnswersRowViewModel])(
-      noNinoReason =>
-        List(
-          CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
-            .withAction(
-              SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent(("memberDetailsCYA.noNINO.hidden", memberName))
-            )
-        )
+    maybeNoNinoReason.fold(List.empty[CheckYourAnswersRowViewModel])(noNinoReason =>
+      List(
+        CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
+          .withAction(
+            SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
+              .withVisuallyHiddenContent(("memberDetailsCYA.noNINO.hidden", memberName))
+          )
+      )
     )
 
   def viewModel(

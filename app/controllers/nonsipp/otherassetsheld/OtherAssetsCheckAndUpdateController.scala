@@ -34,7 +34,7 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
 import viewmodels.models.{ContentTablePageViewModel, FormPageViewModel}
 
-class OtherAssetsCheckAndUpdateController @Inject()(
+class OtherAssetsCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,

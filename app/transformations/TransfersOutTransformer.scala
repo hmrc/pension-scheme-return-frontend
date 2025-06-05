@@ -56,20 +56,18 @@ class TransfersOutTransformer @Inject() extends Transformer {
     index: Max300,
     transfersOut: List[TransfersOut]
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
-    transfersOut.zipWithIndex.flatMap {
-      case (transferOut, zippedIndex) =>
-        refineIndex[Max5.Refined](zippedIndex).fold(List.empty[Try[UserAnswers] => Try[UserAnswers]]) {
-          secondaryIndex =>
-            List[Try[UserAnswers] => Try[UserAnswers]](
-              _.set(
-                TransfersOutSectionCompleted(srn, index, secondaryIndex),
-                SectionCompleted
-              ),
-              _.set(ReceivingSchemeNamePage(srn, index, secondaryIndex), transferOut.schemeName),
-              _.set(WhenWasTransferMadePage(srn, index, secondaryIndex), transferOut.dateOfTransfer),
-              _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferOut.transferSchemeType),
-              _.set(MemberTransferOutProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
-            )
-        }
+    transfersOut.zipWithIndex.flatMap { case (transferOut, zippedIndex) =>
+      refineIndex[Max5.Refined](zippedIndex).fold(List.empty[Try[UserAnswers] => Try[UserAnswers]]) { secondaryIndex =>
+        List[Try[UserAnswers] => Try[UserAnswers]](
+          _.set(
+            TransfersOutSectionCompleted(srn, index, secondaryIndex),
+            SectionCompleted
+          ),
+          _.set(ReceivingSchemeNamePage(srn, index, secondaryIndex), transferOut.schemeName),
+          _.set(WhenWasTransferMadePage(srn, index, secondaryIndex), transferOut.dateOfTransfer),
+          _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferOut.transferSchemeType),
+          _.set(MemberTransferOutProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
+        )
+      }
     }
 }

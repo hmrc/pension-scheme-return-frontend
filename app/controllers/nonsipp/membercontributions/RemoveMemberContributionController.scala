@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveMemberContributionController @Inject()(
+class RemoveMemberContributionController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -61,19 +61,17 @@ class RemoveMemberContributionController @Inject()(
         for {
           nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
           totalContrib <- request.userAnswers.get(TotalMemberContributionPage(srn, index)).getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemoveMemberContributionController.viewModel(
-                srn,
-                index: Max300,
-                totalContrib,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemoveMemberContributionController.viewModel(
+              srn,
+              index: Max300,
+              totalContrib,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
@@ -82,7 +80,7 @@ class RemoveMemberContributionController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -95,9 +93,8 @@ class RemoveMemberContributionController @Inject()(
                   RemoveMemberContributionController.viewModel(srn, index, total, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- request.userAnswers
@@ -111,12 +108,11 @@ class RemoveMemberContributionController @Inject()(
                   fallbackCall = controllers.nonsipp.membercontributions.routes.MemberContributionListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -127,7 +123,6 @@ class RemoveMemberContributionController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

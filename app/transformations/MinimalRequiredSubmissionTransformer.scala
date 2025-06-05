@@ -36,7 +36,7 @@ import scala.util.Try
 import javax.inject.Inject
 
 @Singleton()
-class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDateService) {
+class MinimalRequiredSubmissionTransformer @Inject() (schemeDateService: SchemeDateService) {
   def getVersionAndStatus(srn: Srn, currentUA: UserAnswers, isSubmitted: Boolean): (Option[String], PSRStatus) = {
     val fbVersion = currentUA.get(FbVersionPage(srn)).getOrElse(defaultFbVersion)
     val fbStatus = currentUA.get(FbStatus(srn)).getOrElse(Compiled)
@@ -46,8 +46,8 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
     )
   }
 
-  def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(
-    implicit request: DataRequest[_]
+  def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(implicit
+    request: DataRequest[_]
   ): Option[MinimalRequiredSubmission] = {
 
     val currentUA = request.userAnswers
@@ -119,15 +119,16 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
         CheckReturnDatesPage(srn),
         accPeriodSameAsTaxYear
       )
-      ua2 <- if (accPeriodSameAsTaxYear) {
-        Try(ua1)
-      } else {
-        ua1.set(
-          AccountingPeriods(srn),
-          minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.toList
-            .map(x => DateRange(x._1, x._2))
-        )
-      }
+      ua2 <-
+        if (accPeriodSameAsTaxYear) {
+          Try(ua1)
+        } else {
+          ua1.set(
+            AccountingPeriods(srn),
+            minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.toList
+              .map(x => DateRange(x._1, x._2))
+          )
+        }
       openBankAccount = minimalRequiredSubmission.schemeDesignatory.openBankAccount
       ua3 <- ua2.set(
         ActiveBankAccountPage(srn),
@@ -202,9 +203,7 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
       ua13 <- minimalRequiredSubmission.reportDetails.compilationOrSubmissionDate
         .map(rv => ua12.set(CompilationOrSubmissionDatePage(srn), rv))
         .getOrElse(Try(ua12))
-    } yield {
-      ua13
-    }
+    } yield ua13
 
   private def areAllFinancialValuesEmpty(schemeDesignatory: SchemeDesignatory): Boolean =
     schemeDesignatory.totalAssetValueStart.isEmpty &&

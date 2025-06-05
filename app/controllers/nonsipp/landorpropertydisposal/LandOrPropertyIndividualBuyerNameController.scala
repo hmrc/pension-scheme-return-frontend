@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyIndividualBuyerNameController @Inject()(
+class LandOrPropertyIndividualBuyerNameController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,7 +76,7 @@ class LandOrPropertyIndividualBuyerNameController @Inject()(
                 )
               )
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
@@ -90,7 +90,6 @@ class LandOrPropertyIndividualBuyerNameController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

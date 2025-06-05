@@ -46,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhyDoesSchemeHoldAssetsController @Inject()(
+class WhyDoesSchemeHoldAssetsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -84,7 +84,7 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                   )
                 )
               ),
-          answer => {
+          answer =>
             // If in NormalMode, save answers as usual
             if (mode == NormalMode) {
               for {
@@ -130,7 +130,6 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                   } yield Redirect(nextPage)
               }
             }
-          }
         )
     }
 }

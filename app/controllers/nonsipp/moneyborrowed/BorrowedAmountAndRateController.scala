@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class BorrowedAmountAndRateController @Inject()(
+class BorrowedAmountAndRateController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -57,18 +57,16 @@ class BorrowedAmountAndRateController @Inject()(
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      {
-        val form = BorrowedAmountAndRateController.form()
-        val viewModel = BorrowedAmountAndRateController.viewModel(
-          srn,
-          index,
-          mode,
-          request.schemeDetails.schemeName,
-          form
-        )
+      val form = BorrowedAmountAndRateController.form()
+      val viewModel = BorrowedAmountAndRateController.viewModel(
+        srn,
+        index,
+        mode,
+        request.schemeDetails.schemeName,
+        form
+      )
 
-        Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form), viewModel))
-      }
+      Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form), viewModel))
   }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -93,9 +91,7 @@ class BorrowedAmountAndRateController @Inject()(
               nextPage = navigator.nextPage(BorrowedAmountAndRatePage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield {
-              Redirect(nextPage)
-            }
+            } yield Redirect(nextPage)
         )
   }
 }

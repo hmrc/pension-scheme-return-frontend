@@ -35,15 +35,13 @@ object InterestOnLoan {
       .and((JsPath \ "intReceivedCY").readNullable[Money])
 
   implicit val interestOnLoanReads: Reads[InterestOnLoan] =
-    interestOnLoanReadsBuilder.apply(
-      (loanInterestAmount, loanInterestRate, optIntReceivedCY) => {
-        InterestOnLoan(
-          loanInterestAmount,
-          loanInterestRate,
-          optIntReceivedCY
-        )
-      }
-    )
+    interestOnLoanReadsBuilder.apply { (loanInterestAmount, loanInterestRate, optIntReceivedCY) =>
+      InterestOnLoan(
+        loanInterestAmount,
+        loanInterestRate,
+        optIntReceivedCY
+      )
+    }
 
   implicit val interestOnLoanWrites: Writes[InterestOnLoan] = Json.writes[InterestOnLoan]
 

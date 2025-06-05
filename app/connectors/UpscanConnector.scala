@@ -18,9 +18,10 @@ package connectors
 
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import config.FrontendAppConfig
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
+import play.api.libs.ws.JsonBodyWritables.given
+import play.api.libs.json.Json
 import models._
 import play.mvc.Http.HeaderNames
 
@@ -29,8 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class UpscanConnector @Inject()(httpClientV2: HttpClientV2, appConfig: FrontendAppConfig)(
-  implicit ec: ExecutionContext
+class UpscanConnector @Inject() (httpClientV2: HttpClientV2, appConfig: FrontendAppConfig)(implicit
+  ec: ExecutionContext
 ) {
 
   private val maxFileSizeMB = appConfig.upscanMaxFileSize

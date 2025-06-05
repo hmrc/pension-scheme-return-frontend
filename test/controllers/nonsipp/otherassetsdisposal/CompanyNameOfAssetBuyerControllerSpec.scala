@@ -45,13 +45,16 @@ class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), companyNameOfAssetBuyer) {
-        implicit app => implicit request =>
-          injected[TextInputView]
-            .apply(
-              form(injected[TextFormProvider]).fill(companyNameOfAssetBuyer),
-              viewModel(srn, assetIndex, disposalIndex, NormalMode)
-            )
+      renderPrePopView(
+        onPageLoad,
+        CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+        companyNameOfAssetBuyer
+      ) { implicit app => implicit request =>
+        injected[TextInputView]
+          .apply(
+            form(injected[TextFormProvider]).fill(companyNameOfAssetBuyer),
+            viewModel(srn, assetIndex, disposalIndex, NormalMode)
+          )
       }
     )
 

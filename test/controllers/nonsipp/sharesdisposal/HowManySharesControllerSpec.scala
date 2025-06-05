@@ -59,21 +59,25 @@ class HowManySharesControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      renderPrePopView(onPageLoad, HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), totalShares, userAnswers) {
-        implicit app => implicit request =>
-          injected[IntView]
-            .apply(
-              form(injected[IntFormProvider]).fill(totalShares),
-              viewModel(
-                srn,
-                shareIndex,
-                disposalIndex,
-                companyName,
-                schemeName,
-                NormalMode,
-                form(injected[IntFormProvider])
-              )
+      renderPrePopView(
+        onPageLoad,
+        HowManyDisposalSharesPage(srn, shareIndex, disposalIndex),
+        totalShares,
+        userAnswers
+      ) { implicit app => implicit request =>
+        injected[IntView]
+          .apply(
+            form(injected[IntFormProvider]).fill(totalShares),
+            viewModel(
+              srn,
+              shareIndex,
+              disposalIndex,
+              companyName,
+              schemeName,
+              NormalMode,
+              form(injected[IntFormProvider])
             )
+          )
       }
     )
 

@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 import javax.inject.{Inject, Named}
 
-class WhatYouWillNeedController @Inject()(
+class WhatYouWillNeedController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("root") navigator: Navigator,
   identify: IdentifierAction,

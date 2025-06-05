@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhyDoesSchemeHoldBondsController @Inject()(
+class WhyDoesSchemeHoldBondsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -79,7 +79,7 @@ class WhyDoesSchemeHoldBondsController @Inject()(
                   )
                 )
               ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(WhyDoesSchemeHoldBondsPage(srn, index), answer)
@@ -94,7 +94,6 @@ class WhyDoesSchemeHoldBondsController @Inject()(
             } yield Redirect(
               nextPage
             )
-          }
         )
     }
 }

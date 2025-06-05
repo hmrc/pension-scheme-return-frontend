@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class SessionDataCacheConnector @Inject()(config: FrontendAppConfig, http: HttpClientV2) extends Logging {
+class SessionDataCacheConnector @Inject() (config: FrontendAppConfig, http: HttpClientV2) extends Logging {
 
   private def url: String = s"${config.pensionsAdministrator}/pension-administrator/journey-cache/session-data-self"
 

@@ -46,8 +46,8 @@ class ListRadiosViewSpec extends ViewSpec {
         forAll(viewModelGen()) { viewModel =>
           val renderedRows = radioListRows(view(form, viewModel))
           renderedRows.length mustEqual viewModel.page.rows.size
-          renderedRows.map(_.selectFirst(".govuk-radios__item").text()) mustEqual viewModel.page.rows.map(
-            row => messageKey(row.text)
+          renderedRows.map(_.selectFirst(".govuk-radios__item").text()) mustEqual viewModel.page.rows.map(row =>
+            messageKey(row.text)
           )
         }
       }

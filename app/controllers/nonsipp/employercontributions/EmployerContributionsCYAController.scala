@@ -47,7 +47,7 @@ import scala.util.Try
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class EmployerContributionsCYAController @Inject()(
+class EmployerContributionsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,8 +76,8 @@ class EmployerContributionsCYAController @Inject()(
       onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     (
       for {
@@ -116,9 +116,8 @@ class EmployerContributionsCYAController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       // Set EmployerContributionsCompleted for each journey that's no longer In Progress:
       val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(srn, index).map(
-        _.foldLeft(Try(request.userAnswers))(
-          (userAnswers, secondaryIndex) =>
-            userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+        _.foldLeft(Try(request.userAnswers))((userAnswers, secondaryIndex) =>
+          userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
         )
       )
 
@@ -141,8 +140,8 @@ class EmployerContributionsCYAController @Inject()(
                 .onPageLoad(srn, index, page, mode)
             )
             .liftF
-        } yield submissionResult.getOrRecoverJourney(
-          _ => Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
+        } yield submissionResult.getOrRecoverJourney(_ =>
+          Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
         )
       ).merge
     }
@@ -157,8 +156,8 @@ class EmployerContributionsCYAController @Inject()(
       )
     }
 
-  private def buildCompletedSecondaryIndexes(srn: Srn, index: Max300)(
-    implicit request: DataRequest[_]
+  private def buildCompletedSecondaryIndexes(srn: Srn, index: Max300)(implicit
+    request: DataRequest[_]
   ): Either[Result, List[Max50]] =
     request.userAnswers
       .map(EmployerContributionsProgress.all(srn, index))
@@ -169,8 +168,8 @@ class EmployerContributionsCYAController @Inject()(
       .sequence
       .getOrRecoverJourney
 
-  private def buildCYA(srn: Srn, index: Max300, secondaryIndex: Max50)(
-    implicit request: DataRequest[_]
+  private def buildCYA(srn: Srn, index: Max300, secondaryIndex: Max50)(implicit
+    request: DataRequest[_]
   ): Either[Result, EmployerCYA] =
     for {
       employerName <- request.userAnswers
@@ -300,152 +299,196 @@ object EmployerContributionsCYAController {
     membersName: String,
     employerCYAs: List[EmployerCYA]
   ): List[CheckYourAnswersSection] =
-    employerCYAs.zipWithIndex.map {
-      case (employerCYA, journeyIndex) =>
-        import employerCYA._
+    employerCYAs.zipWithIndex.map { case (employerCYA, journeyIndex) =>
+      import employerCYA._
 
-        val (
-          employerIdOrReasonRowKey,
-          employerIdOrReasonRowHiddenKey,
-          employerIdOrReasonRowValue,
-          employerIdRedirectUrl
-        ) = employerIdOrReason.fold(
-          reason =>
-            (identityType: @unchecked) match {
-              case IdentityType.UKCompany =>
-                (
-                  Message("employerContributionsCYA.row.employerId.company.reason", employerName),
-                  Message("employerContributionsCYA.row.employerId.company.reason.hidden", employerName),
-                  reason,
-                  controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+      val (
+        employerIdOrReasonRowKey,
+        employerIdOrReasonRowHiddenKey,
+        employerIdOrReasonRowValue,
+        employerIdRedirectUrl
+      ) = employerIdOrReason.fold(
+        reason =>
+          (identityType: @unchecked) match {
+            case IdentityType.UKCompany =>
+              (
+                Message("employerContributionsCYA.row.employerId.company.reason", employerName),
+                Message("employerContributionsCYA.row.employerId.company.reason.hidden", employerName),
+                reason,
+                controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+                  .onPageLoad(
+                    srn,
+                    memberIndex,
+                    secondaryIndex,
+                    mode match {
                       case ViewOnlyMode => NormalMode
                       case _ => mode
-                    })
-                    .url
-                )
-              case IdentityType.UKPartnership =>
-                (
-                  Message("employerContributionsCYA.row.employerId.partnership.reason", employerName),
-                  Message("employerContributionsCYA.row.employerId.partnership.reason.hidden", employerName),
-                  reason,
-                  controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    }
+                  )
+                  .url
+              )
+            case IdentityType.UKPartnership =>
+              (
+                Message("employerContributionsCYA.row.employerId.partnership.reason", employerName),
+                Message("employerContributionsCYA.row.employerId.partnership.reason.hidden", employerName),
+                reason,
+                controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
+                  .onPageLoad(
+                    srn,
+                    memberIndex,
+                    secondaryIndex,
+                    mode match {
                       case ViewOnlyMode => NormalMode
                       case _ => mode
-                    })
-                    .url
-                )
-            },
-          id =>
-            (identityType: @unchecked) match {
-              case IdentityType.UKCompany =>
-                (
-                  Message("employerContributionsCYA.row.employerId.company", employerName),
-                  Message("employerContributionsCYA.row.employerId.company.hidden", employerName),
-                  id,
-                  controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    }
+                  )
+                  .url
+              )
+          },
+        id =>
+          (identityType: @unchecked) match {
+            case IdentityType.UKCompany =>
+              (
+                Message("employerContributionsCYA.row.employerId.company", employerName),
+                Message("employerContributionsCYA.row.employerId.company.hidden", employerName),
+                id,
+                controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+                  .onPageLoad(
+                    srn,
+                    memberIndex,
+                    secondaryIndex,
+                    mode match {
                       case ViewOnlyMode => NormalMode
                       case _ => mode
-                    })
-                    .url
-                )
-              case IdentityType.UKPartnership =>
-                (
-                  Message("employerContributionsCYA.row.employerId.partnership", employerName),
-                  Message("employerContributionsCYA.row.employerId.partnership.hidden", employerName),
-                  id,
-                  controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    }
+                  )
+                  .url
+              )
+            case IdentityType.UKPartnership =>
+              (
+                Message("employerContributionsCYA.row.employerId.partnership", employerName),
+                Message("employerContributionsCYA.row.employerId.partnership.hidden", employerName),
+                id,
+                controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
+                  .onPageLoad(
+                    srn,
+                    memberIndex,
+                    secondaryIndex,
+                    mode match {
                       case ViewOnlyMode => NormalMode
                       case _ => mode
-                    })
-                    .url
-                )
-              case IdentityType.Other =>
-                (
-                  Message("employerContributionsCYA.row.employerId.other", employerName),
-                  Message("employerContributionsCYA.row.employerId.other.hidden", employerName),
-                  id,
-                  controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    }
+                  )
+                  .url
+              )
+            case IdentityType.Other =>
+              (
+                Message("employerContributionsCYA.row.employerId.other", employerName),
+                Message("employerContributionsCYA.row.employerId.other.hidden", employerName),
+                id,
+                controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+                  .onPageLoad(
+                    srn,
+                    memberIndex,
+                    secondaryIndex,
+                    mode match {
                       case ViewOnlyMode => NormalMode
                       case _ => mode
-                    })
-                    .url
-                )
-            }
-        )
+                    }
+                  )
+                  .url
+              )
+          }
+      )
 
-        CheckYourAnswersSection(
-          if (employerCYAs.length == 1) None
-          else
-            Some(
-              Heading2.medium(Message("employerContributionsCYA.section.heading", employerCYA.secondaryIndex.value))
-            ),
-          List(
-            CheckYourAnswersRowViewModel("employerContributionsCYA.row.memberName", membersName),
-            CheckYourAnswersRowViewModel("employerContributionsCYA.row.employerName", employerName)
-              .withAction(
-                SummaryAction(
-                  "site.change",
-                  controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
-                      case ViewOnlyMode => NormalMode
-                      case _ => mode
-                    })
-                    .url
-                ).withVisuallyHiddenContent("employerContributionsCYA.row.employerName.hidden")
-              ),
-            CheckYourAnswersRowViewModel(
-              Message("employerContributionsCYA.row.businessType", employerName),
-              businessTypeMessageKey(identityType)
-            ).withChangeAction(
-              controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
-                .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
-                  case ViewOnlyMode => NormalMode
-                  case _ => CheckMode
-                })
-                .url,
-              hidden = Message("employerContributionsCYA.row.businessType.hidden", employerName)
-            ),
-            CheckYourAnswersRowViewModel(employerIdOrReasonRowKey, employerIdOrReasonRowValue).withAction(
-              SummaryAction("site.change", employerIdRedirectUrl)
-                .withVisuallyHiddenContent(employerIdOrReasonRowHiddenKey)
-            ),
-            CheckYourAnswersRowViewModel(
-              Message("employerContributionsCYA.row.contribution", employerName, membersName),
-              s"£${totalEmployerContribution.displayAs}"
-            ).withChangeAction(
-              controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
-                .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
-                  case ViewOnlyMode => NormalMode
-                  case _ => CheckMode
-                })
-                .url,
-              hidden = Message("employerContributionsCYA.row.contribution.hidden", employerName, membersName)
-            )
-            // append "any contributions by other employers" row to final section
-          ) :?+ Option.when(journeyIndex + 1 == employerCYAs.length)(
-            CheckYourAnswersRowViewModel(
-              Message("employerContributionsCYA.row.contributionOtherEmployer", membersName),
-              "site.no"
-            ).withAction(
+      CheckYourAnswersSection(
+        if (employerCYAs.length == 1) None
+        else
+          Some(
+            Heading2.medium(Message("employerContributionsCYA.section.heading", employerCYA.secondaryIndex.value))
+          ),
+        List(
+          CheckYourAnswersRowViewModel("employerContributionsCYA.row.memberName", membersName),
+          CheckYourAnswersRowViewModel("employerContributionsCYA.row.employerName", employerName)
+            .withAction(
               SummaryAction(
                 "site.change",
-                controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                controllers.nonsipp.employercontributions.routes.EmployerNameController
+                  .onPageLoad(
+                    srn,
+                    memberIndex,
+                    secondaryIndex,
+                    mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    }
+                  )
+                  .url
+              ).withVisuallyHiddenContent("employerContributionsCYA.row.employerName.hidden")
+            ),
+          CheckYourAnswersRowViewModel(
+            Message("employerContributionsCYA.row.businessType", employerName),
+            businessTypeMessageKey(identityType)
+          ).withChangeAction(
+            controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
+              .onPageLoad(
+                srn,
+                memberIndex,
+                secondaryIndex,
+                mode match {
+                  case ViewOnlyMode => NormalMode
+                  case _ => CheckMode
+                }
+              )
+              .url,
+            hidden = Message("employerContributionsCYA.row.businessType.hidden", employerName)
+          ),
+          CheckYourAnswersRowViewModel(employerIdOrReasonRowKey, employerIdOrReasonRowValue).withAction(
+            SummaryAction("site.change", employerIdRedirectUrl)
+              .withVisuallyHiddenContent(employerIdOrReasonRowHiddenKey)
+          ),
+          CheckYourAnswersRowViewModel(
+            Message("employerContributionsCYA.row.contribution", employerName, membersName),
+            s"£${totalEmployerContribution.displayAs}"
+          ).withChangeAction(
+            controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+              .onPageLoad(
+                srn,
+                memberIndex,
+                secondaryIndex,
+                mode match {
+                  case ViewOnlyMode => NormalMode
+                  case _ => CheckMode
+                }
+              )
+              .url,
+            hidden = Message("employerContributionsCYA.row.contribution.hidden", employerName, membersName)
+          )
+          // append "any contributions by other employers" row to final section
+        ) :?+ Option.when(journeyIndex + 1 == employerCYAs.length)(
+          CheckYourAnswersRowViewModel(
+            Message("employerContributionsCYA.row.contributionOtherEmployer", membersName),
+            "site.no"
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
+                .onPageLoad(
+                  srn,
+                  memberIndex,
+                  secondaryIndex,
+                  mode match {
                     case ViewOnlyMode => NormalMode
                     case _ => mode
-                  })
-                  .url
-              ).withVisuallyHiddenContent(
-                Message("employerContributionsCYA.row.contributionOtherEmployer", membersName)
-              )
+                  }
+                )
+                .url
+            ).withVisuallyHiddenContent(
+              Message("employerContributionsCYA.row.contributionOtherEmployer", membersName)
             )
           )
         )
+      )
     }
 
   private def businessTypeMessageKey(identityType: IdentityType): String = identityType match {

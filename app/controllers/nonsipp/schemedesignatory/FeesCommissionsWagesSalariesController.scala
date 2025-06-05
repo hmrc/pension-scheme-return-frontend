@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class FeesCommissionsWagesSalariesController @Inject()(
+class FeesCommissionsWagesSalariesController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -77,13 +77,11 @@ class FeesCommissionsWagesSalariesController @Inject()(
             updatedAnswers <- Future
               .fromTry(request.userAnswers.set(FeesCommissionsWagesSalariesPage(srn, mode), value))
             _ <- saveService.save(updatedAnswers)
-          } yield {
-            mode match {
-              case CheckMode =>
-                Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-              case NormalMode =>
-                Redirect(navigator.nextPage(FeesCommissionsWagesSalariesPage(srn, mode), mode, updatedAnswers))
-            }
+          } yield mode match {
+            case CheckMode =>
+              Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+            case NormalMode =>
+              Redirect(navigator.nextPage(FeesCommissionsWagesSalariesPage(srn, mode), mode, updatedAnswers))
           }
       )
   }

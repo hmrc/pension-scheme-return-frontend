@@ -46,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class HowWereSharesDisposedController @Inject()(
+class HowWereSharesDisposedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -62,9 +62,11 @@ class HowWereSharesDisposedController @Inject()(
   def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       // If this page is reached in CheckMode and there is no PointOfEntry set
-      if (mode == CheckMode && request.userAnswers
+      if (
+        mode == CheckMode && request.userAnswers
           .get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex))
-          .contains(NoPointOfEntry)) {
+          .contains(NoPointOfEntry)
+      ) {
         // Set this page as the PointOfEntry
         saveService.save(
           request.userAnswers

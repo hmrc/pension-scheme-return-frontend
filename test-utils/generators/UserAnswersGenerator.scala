@@ -45,9 +45,8 @@ trait UserAnswersGenerator extends TryValues {
         }
       } yield UserAnswers(
         id = id,
-        data = data.foldLeft(SensitiveJsObject(Json.obj())) {
-          case (obj, (path, value)) =>
-            obj.copy(decryptedValue = obj.decryptedValue.setObject(path.path, value).get)
+        data = data.foldLeft(SensitiveJsObject(Json.obj())) { case (obj, (path, value)) =>
+          obj.copy(decryptedValue = obj.decryptedValue.setObject(path.path, value).get)
         }
       )
     }

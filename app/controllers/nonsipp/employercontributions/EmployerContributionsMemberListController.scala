@@ -49,7 +49,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class EmployerContributionsMemberListController @Inject()(
+class EmployerContributionsMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,8 +76,8 @@ class EmployerContributionsMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean = true)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean = true)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -140,20 +140,18 @@ class EmployerContributionsMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(
-    implicit request: DataRequest[_]
-  ): List[MemberWithEmployerContributions] = indexes.map {
-    case (index, nameDOB) =>
-      MemberWithEmployerContributions(
-        memberIndex = index,
-        employerFullName = nameDOB.fullName,
-        contributions = request.userAnswers
-          .employerContributionsProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              EmployerContributions(secondaryIndex, status)
-          }
-      )
+  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
+    request: DataRequest[_]
+  ): List[MemberWithEmployerContributions] = indexes.map { case (index, nameDOB) =>
+    MemberWithEmployerContributions(
+      memberIndex = index,
+      employerFullName = nameDOB.fullName,
+      contributions = request.userAnswers
+        .employerContributionsProgress(srn, index)
+        .map { case (secondaryIndex, status) =>
+          EmployerContributions(secondaryIndex, status)
+        }
+    )
   }
 }
 

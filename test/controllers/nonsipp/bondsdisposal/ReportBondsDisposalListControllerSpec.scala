@@ -76,14 +76,14 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     List(((bondIndexOne, disposalIndexes), SectionCompleted))
 
   private val completedUserAnswers = defaultUserAnswers
-  // Bonds data 1
+    // Bonds data 1
     .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
     .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
     .unsafeSet(BondsDisposalPage(srn), true)
-    //Bond 1 - disposal data 1
+    // Bond 1 - disposal data 1
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
     .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
-    //Bond 1 - disposal data 2
+    // Bond 1 - disposal data 2
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
     .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
 
@@ -214,9 +214,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only taskList")
     )
 
     act.like(

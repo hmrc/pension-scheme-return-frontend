@@ -20,9 +20,8 @@ import models.ConditionalYesNo._
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max5000
-import utils.IntUtils.toInt
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models._
 import pages.nonsipp.common._
@@ -40,7 +39,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedLoansPage(srn) =>
       // if final loans page was completed, route user to loans list page
-      userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) match {
+      userAnswers.get(OutstandingArrearsOnLoanPage(srn, 1)) match {
         case Some(_) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
         case None =>

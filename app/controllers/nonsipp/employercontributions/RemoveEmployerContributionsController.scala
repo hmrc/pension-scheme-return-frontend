@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveEmployerContributionsController @Inject()(
+class RemoveEmployerContributionsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -77,7 +77,7 @@ class RemoveEmployerContributionsController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -88,9 +88,8 @@ class RemoveEmployerContributionsController @Inject()(
               } yield BadRequest(
                 view(formWithErrors, viewModel(srn, memberIndex, index, total, nameDOB.fullName, employerName))
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future.fromTry(
@@ -107,12 +106,11 @@ class RemoveEmployerContributionsController @Inject()(
                     controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                       .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -123,7 +121,6 @@ class RemoveEmployerContributionsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

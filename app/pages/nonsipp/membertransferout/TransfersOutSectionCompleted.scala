@@ -64,8 +64,8 @@ object TransfersOutSectionCompleted {
     def transfersOutSectionCompleted(srn: Srn, index: Max300): List[Max5] =
       ua.map(TransfersOutCompletedPages(srn, index))
         .toList
-        .collect {
-          case (index, _) => index
+        .collect { case (index, _) =>
+          index
         }
         .refine[Max5.Refined]
   }

@@ -52,11 +52,9 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
     _ =>
-      _ => {
-
-        case UnallocatedEmployerAmountPage(srn) =>
-          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, NormalMode)
+      _ => { case UnallocatedEmployerAmountPage(srn) =>
+        controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+          .onPageLoad(srn, NormalMode)
 
       }
 }

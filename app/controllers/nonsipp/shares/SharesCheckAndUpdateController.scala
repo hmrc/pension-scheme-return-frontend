@@ -34,7 +34,7 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
 import viewmodels.models._
 
-class SharesCheckAndUpdateController @Inject()(
+class SharesCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,

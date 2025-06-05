@@ -37,7 +37,7 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
       case (None, _) =>
-        //deletion
+        // deletion
         removePages(userAnswers, pages(srn))
       case _ => Try(userAnswers)
     }

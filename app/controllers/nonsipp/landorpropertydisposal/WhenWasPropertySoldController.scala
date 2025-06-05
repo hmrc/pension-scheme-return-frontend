@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class WhenWasPropertySoldController @Inject()(
+class WhenWasPropertySoldController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -67,13 +67,12 @@ class WhenWasPropertySoldController @Inject()(
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
           address =>
-            val preparedForm = {
+            val preparedForm =
               request.userAnswers
                 .fillForm(
                   WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
                   form(date.to, date.from, request)
                 )
-            }
             Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)))
         }
       }

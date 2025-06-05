@@ -32,7 +32,7 @@ import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
 import controllers.nonsipp.bonds.BondsCheckAndUpdateController._
 import viewmodels.models._
 
-class BondsCheckAndUpdateController @Inject()(
+class BondsCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,

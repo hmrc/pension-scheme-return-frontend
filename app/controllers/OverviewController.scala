@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.Inject
 
-class OverviewController @Inject()(
+class OverviewController @Inject() (
   override val messagesApi: MessagesApi,
   config: FrontendAppConfig,
   identify: IdentifierAction,
@@ -73,79 +73,77 @@ class OverviewController @Inject()(
     overview: Option[Seq[OverviewResponse]],
     versionsForYears: Seq[PsrVersionsForYearsResponse]
   )(implicit messages: Messages): Seq[OverviewSummary] =
-    overview.fold(Seq[OverviewSummary]())(
-      values =>
-        values
-          .filter(
-            overviewResponse =>
-              (
-                // if a NTF is issued
-                overviewResponse.numberOfVersions.getOrElse(-1) == 0
-                  && overviewResponse.compiledVersionAvailable.getOrElse(YesNo.Yes) == YesNo.No
-                  && overviewResponse.submittedVersionAvailable.getOrElse(YesNo.Yes) == YesNo.No
-              ) || (
-                // the only available version for a tax year is a compiled one
-                overviewResponse.numberOfVersions.getOrElse(-1) == 1
-                  && overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
-                  && overviewResponse.submittedVersionAvailable.getOrElse(YesNo.Yes) == YesNo.No
-              )
+    overview.fold(Seq[OverviewSummary]())(values =>
+      values
+        .filter(overviewResponse =>
+          (
+            // if a NTF is issued
+            overviewResponse.numberOfVersions.getOrElse(-1) == 0
+              && overviewResponse.compiledVersionAvailable.getOrElse(YesNo.Yes) == YesNo.No
+              && overviewResponse.submittedVersionAvailable.getOrElse(YesNo.Yes) == YesNo.No
+          ) || (
+            // the only available version for a tax year is a compiled one
+            overviewResponse.numberOfVersions.getOrElse(-1) == 1
+              && overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
+              && overviewResponse.submittedVersionAvailable.getOrElse(YesNo.Yes) == YesNo.No
           )
-          .map { overviewResponse =>
-            val yearFrom = overviewResponse.periodStartDate
-            val yearTo = overviewResponse.periodEndDate
-            val compiled = overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
+        )
+        .map { overviewResponse =>
+          val yearFrom = overviewResponse.periodStartDate
+          val yearTo = overviewResponse.periodEndDate
+          val compiled = overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
 
-            val (status, url, label) = if (compiled) {
-              val fbNumber = versionsForYears
-                .find(x => LocalDate.parse(x.startDate) == yearFrom)
-                .flatMap(_.data.sortBy(_.reportVersion).lastOption)
-                .map(_.reportFormBundleNumber)
-              (
-                ReportStatus.ReportStatusCompiled,
-                controllers.routes.OverviewController
-                  .onSelectContinue(
-                    srn,
-                    formatDateForApi(yearFrom),
-                    "001",
-                    fbNumber,
-                    overviewResponse.psrReportType.get.name,
-                    prePopulationService.findLastSubmittedPsrFbInPreviousYears(versionsForYears, yearFrom)
-                  )
-                  .url,
-                messages("site.continue")
-              )
-            } else {
-              (
-                ReportStatus.NotStarted,
-                controllers.routes.OverviewController
-                  .onSelectStart(
-                    srn,
-                    formatDateForApi(yearFrom),
-                    "001",
-                    overviewResponse.psrReportType.get.name,
-                    prePopulationService.findLastSubmittedPsrFbInPreviousYears(versionsForYears, yearFrom)
-                  )
-                  .url,
-                messages("site.start")
-              )
-            }
-            OverviewSummary(
-              key = Message("site.to", Message(yearFrom.show), Message(yearTo.show)),
-              firstValue = Message(s"overview.status.$status"),
-              secondValue = overviewResponse.psrDueDate.fold("")(dt => DateTimeUtils.formatHtml(dt)),
-              actions = Some(
-                Actions(
-                  items = Seq(
-                    ActionItem(
-                      content = label,
-                      href = url
-                    )
-                  )
+          val (status, url, label) = if (compiled) {
+            val fbNumber = versionsForYears
+              .find(x => LocalDate.parse(x.startDate) == yearFrom)
+              .flatMap(_.data.sortBy(_.reportVersion).lastOption)
+              .map(_.reportFormBundleNumber)
+            (
+              ReportStatus.ReportStatusCompiled,
+              controllers.routes.OverviewController
+                .onSelectContinue(
+                  srn,
+                  formatDateForApi(yearFrom),
+                  "001",
+                  fbNumber,
+                  overviewResponse.psrReportType.get.name,
+                  prePopulationService.findLastSubmittedPsrFbInPreviousYears(versionsForYears, yearFrom)
                 )
-              ),
-              yearFrom = yearFrom
+                .url,
+              messages("site.continue")
+            )
+          } else {
+            (
+              ReportStatus.NotStarted,
+              controllers.routes.OverviewController
+                .onSelectStart(
+                  srn,
+                  formatDateForApi(yearFrom),
+                  "001",
+                  overviewResponse.psrReportType.get.name,
+                  prePopulationService.findLastSubmittedPsrFbInPreviousYears(versionsForYears, yearFrom)
+                )
+                .url,
+              messages("site.start")
             )
           }
+          OverviewSummary(
+            key = Message("site.to", Message(yearFrom.show), Message(yearTo.show)),
+            firstValue = Message(s"overview.status.$status"),
+            secondValue = overviewResponse.psrDueDate.fold("")(dt => DateTimeUtils.formatHtml(dt)),
+            actions = Some(
+              Actions(
+                items = Seq(
+                  ActionItem(
+                    content = label,
+                    href = url
+                  )
+                )
+              )
+            ),
+            yearFrom = yearFrom
+          )
+        }
     )
 
   private def previousData(
@@ -168,8 +166,8 @@ class OverviewController @Inject()(
         case Some(last) =>
           val matchingOverviewResponse =
             overview.getOrElse(Seq()).find(overviewResponse => overviewResponse.periodStartDate == yearFrom)
-          val reportType = matchingOverviewResponse.fold(PsrReportType.Standard.name)(
-            or => or.psrReportType.getOrElse(PsrReportType.Standard).name
+          val reportType = matchingOverviewResponse.fold(PsrReportType.Standard.name)(or =>
+            or.psrReportType.getOrElse(PsrReportType.Standard).name
           )
           val key = Message("site.to", Message(yearFrom.show), Message(yearFrom.plusYears(1).minusDays(1).show))
           if (last.reportStatus == ReportStatus.ReportStatusCompiled) {
@@ -278,7 +276,7 @@ class OverviewController @Inject()(
               userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), dateRange))
               _ <- saveService.save(userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswers.id))
               _ <- saveService.save(userAnswers)
-            } yield {
+            } yield
               if (lastSubmittedPsrFbInPreviousYears.isDefined) {
                 Redirect(controllers.routes.CheckUpdateInformationController.onPageLoad(srn))
                   .addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(true))
@@ -287,7 +285,6 @@ class OverviewController @Inject()(
                   controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version)
                 ).addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false))
               }
-            }
         }
       }
 
@@ -308,7 +305,7 @@ class OverviewController @Inject()(
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(versionInt) =>
               val path = if (versionInt == 1) {
-                config.urls.sippContinueJourney //Standard journey - undeclared changes made
+                config.urls.sippContinueJourney // Standard journey - undeclared changes made
               } else {
                 config.urls.sippViewAndChange
               }

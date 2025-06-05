@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
-class KeepAliveController @Inject()(
+class KeepAliveController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   sessionRepository: SessionRepository

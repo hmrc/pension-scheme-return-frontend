@@ -48,8 +48,9 @@ class AssetsTransformerSpec
     with BeforeAndAfterEach {
 
   private val index: Max5000 = refineMV(1)
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockBondsTransformer = mock[BondsTransformer]

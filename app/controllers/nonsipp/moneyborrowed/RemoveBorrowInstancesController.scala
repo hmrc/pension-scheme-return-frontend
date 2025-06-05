@@ -41,7 +41,7 @@ import scala.util.Try
 
 import javax.inject.Named
 
-class RemoveBorrowInstancesController @Inject()(
+class RemoveBorrowInstancesController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -78,23 +78,20 @@ class RemoveBorrowInstancesController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          errors => {
+          errors =>
             Future.successful {
               (
                 for {
                   borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
                   lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
-                } yield {
-                  BadRequest(
-                    view(
-                      errors,
-                      RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
-                    )
+                } yield BadRequest(
+                  view(
+                    errors,
+                    RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
                   )
-                }
+                )
               ).merge
-            }
-          },
+            },
           value =>
             if (value) {
               for {

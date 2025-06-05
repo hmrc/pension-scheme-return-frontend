@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveAccountingPeriodController @Inject()(
+class RemoveAccountingPeriodController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -74,7 +74,7 @@ class RemoveAccountingPeriodController @Inject()(
                 BadRequest(view(formWithErrors, viewModel(srn, index, period, mode)))
               }
             ),
-          answer => {
+          answer =>
             if (answer) {
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index, mode)))
@@ -86,7 +86,6 @@ class RemoveAccountingPeriodController @Inject()(
                   Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn, mode), mode, request.userAnswers))
                 )
             }
-          }
         )
   }
 
@@ -96,9 +95,7 @@ class RemoveAccountingPeriodController @Inject()(
     (
       for {
         bankAccount <- request.userAnswers.get(AccountingPeriodPage(srn, index, mode)).getOrRedirectToTaskList(srn)
-      } yield {
-        f(bankAccount)
-      }
+      } yield f(bankAccount)
     ).merge
 
 }

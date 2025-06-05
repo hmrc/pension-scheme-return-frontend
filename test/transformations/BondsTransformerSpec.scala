@@ -62,7 +62,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         costOfBonds = money.value,
         optConnectedPartyStatus = Some(true),
         bondsUnregulated = false,
-        optTotalIncomeOrReceipts = None, //not coming back from ETMP
+        optTotalIncomeOrReceipts = None, // not coming back from ETMP
         optBondsDisposed = None
       )
     )
@@ -391,9 +391,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe None
       )
     }
 
@@ -413,9 +411,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
-        }
+        userAnswers => userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
       )
     }
 
@@ -436,9 +432,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
-        }
+        userAnswers => userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
       )
     }
 

@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class LoansCYAController @Inject()(
+class LoansCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -79,9 +79,11 @@ class LoansCYAController @Inject()(
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(LoansProgress(srn, index))
-        .exists(_.completed)) {
+        .exists(_.completed)
+    ) {
       Redirect(routes.LoansListController.onPageLoad(srn, 1, mode))
     } else {
       (
@@ -116,11 +118,12 @@ class LoansCYAController @Inject()(
               .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
-          connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
-            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
-          } else {
-            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
-          }
+          connectedParty =
+            if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
+              Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+            } else {
+              Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
+            }
           datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
           amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
@@ -491,20 +494,18 @@ object LoansCYAController {
               SummaryAction("site.change", recipientNameUrl)
                 .withVisuallyHiddenContent("loanCheckYourAnswers.section1.recipientName.hidden")
             )
-        ) :?+ recipientDetails.map(
-          details =>
-            CheckYourAnswersRowViewModel(recipientDetailsKey, details)
-              .withAction(
-                SummaryAction("site.change", recipientDetailsUrl)
-                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
-              )
-        ) :?+ recipientReasonNoDetails.map(
-          reason =>
-            CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
-              .withAction(
-                SummaryAction("site.change", recipientNoDetailsUrl)
-                  .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
-              )
+        ) :?+ recipientDetails.map(details =>
+          CheckYourAnswersRowViewModel(recipientDetailsKey, details)
+            .withAction(
+              SummaryAction("site.change", recipientDetailsUrl)
+                .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+            )
+        ) :?+ recipientReasonNoDetails.map(reason =>
+          CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
+            .withAction(
+              SummaryAction("site.change", recipientNoDetailsUrl)
+                .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+            )
         ) :+ CheckYourAnswersRowViewModel(connectedPartyKey, connectedPartyValue)
           .withAction(
             SummaryAction("site.change", connectedPartyUrl)

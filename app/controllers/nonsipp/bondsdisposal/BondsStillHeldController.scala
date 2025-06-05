@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class BondsStillHeldController @Inject()(
+class BondsStillHeldController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -95,7 +95,7 @@ class BondsStillHeldController @Inject()(
                 )
               )
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(BondsStillHeldPage(srn, bondIndex, disposalIndex), answer))
@@ -103,7 +103,6 @@ class BondsStillHeldController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

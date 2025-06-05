@@ -49,9 +49,7 @@ object DateRange {
 
   implicit val format: Format[DateRange] = Json.format[DateRange]
 
-  implicit val ordering: Ordering[DateRange] = (x: DateRange, y: DateRange) => {
-    Ordering[LocalDate].compare(y.to, x.to)
-  }
+  implicit val ordering: Ordering[DateRange] = (x: DateRange, y: DateRange) => Ordering[LocalDate].compare(y.to, x.to)
 
   val readableTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma")
 

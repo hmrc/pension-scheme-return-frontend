@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class SecurityGivenForLoanController @Inject()(
+class SecurityGivenForLoanController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -58,10 +58,8 @@ class SecurityGivenForLoanController @Inject()(
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      {
-        val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, mode)))
-      }
+      val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index), form)
+      Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -69,9 +67,7 @@ class SecurityGivenForLoanController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
-            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode))))
-          },
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value =>
             for {
               updatedAnswers <- request.userAnswers

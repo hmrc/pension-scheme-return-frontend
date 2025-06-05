@@ -88,10 +88,13 @@ trait DateFluency {
   implicit class FluentDate(date: DateInput) {
 
     def withId(id: String): DateInput =
-      date.copy(id = id, items = date.items.map { item =>
-        val newId = item.id.replace('_', '.')
-        item.copy(id = newId)
-      })
+      date.copy(
+        id = id,
+        items = date.items.map { item =>
+          val newId = item.id.replace('_', '.')
+          item.copy(id = newId)
+        }
+      )
 
     def withNamePrefix(prefix: String): DateInput =
       date.copy(namePrefix = Some(prefix))

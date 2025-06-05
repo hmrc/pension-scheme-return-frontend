@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveShareDisposalController @Inject()(
+class RemoveShareDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -64,9 +64,7 @@ class RemoveShareDisposalController @Inject()(
           nameOfSharesCompany <- request.userAnswers
             .get(CompanyNameRelatedSharesPage(srn, shareIndex))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
-        }
+        } yield Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
       ).merge
     }
 
@@ -108,8 +106,8 @@ class RemoveShareDisposalController @Inject()(
                   fallbackCall =
                     controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPageLoad(srn, 1)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ => Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))
               )
             } else {
               Future.successful(

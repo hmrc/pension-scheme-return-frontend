@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RecipientSponsoringEmployerConnectedPartyController @Inject()(
+class RecipientSponsoringEmployerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -97,9 +97,9 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
                 .nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield {
-              Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers))
-            }
+            } yield Redirect(
+              navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers)
+            )
         )
   }
 

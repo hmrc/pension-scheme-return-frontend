@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsLenderConnectedPartyController @Inject()(
+class IsLenderConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -87,9 +87,7 @@ class IsLenderConnectedPartyController @Inject()(
               nextPage = navigator.nextPage(IsLenderConnectedPartyPage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield {
-              Redirect(nextPage)
-            }
+            } yield Redirect(nextPage)
         )
     }
 }

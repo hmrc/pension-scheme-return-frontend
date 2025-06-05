@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class FinancialDetailsCheckYourAnswersController @Inject()(
+class FinancialDetailsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -73,8 +73,8 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
       onPageLoadCommon(srn, mode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     schemeDateService.schemeDate(srn) match {
       case Some(periods) =>
@@ -223,98 +223,88 @@ object FinancialDetailsCheckYourAnswersController {
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
       None,
-      List() :?+ howMuchCashPage.map(
-        howMuchCash =>
+      List() :?+ howMuchCashPage.map(howMuchCash =>
+        CheckYourAnswersRowViewModel(
+          Message(
+            "financialDetailsCheckYourAnswersController.totalCashInStartDate",
+            schemeDetails.schemeName,
+            schemeDates.from.show
+          ),
+          "£" + howMuchCash.moneyAtStart.displayAs
+        ).withChangeAction(
+          controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
+            .onPageLoad(srn, CheckMode)
+            .url + "#taxStartDate",
+          hidden = Message(
+            "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden",
+            schemeDates.from.show
+          )
+        ).withOneHalfWidth()
+      ) :?+
+        howMuchCashPage.map(howMuchCash =>
           CheckYourAnswersRowViewModel(
             Message(
-              "financialDetailsCheckYourAnswersController.totalCashInStartDate",
+              "financialDetailsCheckYourAnswersController.totalCashInEndDate",
               schemeDetails.schemeName,
+              schemeDates.to.show
+            ),
+            "£" + howMuchCash.moneyAtEnd.displayAs
+          ).withChangeAction(
+            controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
+              .onPageLoad(srn, CheckMode)
+              .url + "#taxEndDate",
+            hidden = Message(
+              "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden",
+              schemeDates.to.show
+            )
+          ).withOneHalfWidth()
+        ) :?+
+        valueOfAssetsPage.map(valueOfAssets =>
+          CheckYourAnswersRowViewModel(
+            Message(
+              "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate",
               schemeDates.from.show
             ),
-            "£" + howMuchCash.moneyAtStart.displayAs
+            "£" + valueOfAssets.moneyAtStart.displayAs
           ).withChangeAction(
-              controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
-                .onPageLoad(srn, CheckMode)
-                .url + "#taxStartDate",
-              hidden = Message(
-                "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden",
-                schemeDates.from.show
-              )
+            controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
+              .onPageLoad(srn, CheckMode)
+              .url + "#taxStartDate",
+            hidden = Message(
+              "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden",
+              schemeDates.from.show
             )
-            .withOneHalfWidth()
-      ) :?+
-        howMuchCashPage.map(
-          howMuchCash =>
-            CheckYourAnswersRowViewModel(
-              Message(
-                "financialDetailsCheckYourAnswersController.totalCashInEndDate",
-                schemeDetails.schemeName,
-                schemeDates.to.show
-              ),
-              "£" + howMuchCash.moneyAtEnd.displayAs
-            ).withChangeAction(
-                controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
-                  .onPageLoad(srn, CheckMode)
-                  .url + "#taxEndDate",
-                hidden = Message(
-                  "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden",
-                  schemeDates.to.show
-                )
-              )
-              .withOneHalfWidth()
+          ).withOneHalfWidth()
         ) :?+
-        valueOfAssetsPage.map(
-          valueOfAssets =>
-            CheckYourAnswersRowViewModel(
-              Message(
-                "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate",
-                schemeDates.from.show
-              ),
-              "£" + valueOfAssets.moneyAtStart.displayAs
-            ).withChangeAction(
-                controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
-                  .onPageLoad(srn, CheckMode)
-                  .url + "#taxStartDate",
-                hidden = Message(
-                  "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden",
-                  schemeDates.from.show
-                )
-              )
-              .withOneHalfWidth()
+        valueOfAssetsPage.map(valueOfAssets =>
+          CheckYourAnswersRowViewModel(
+            Message(
+              "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate",
+              schemeDates.to.show
+            ),
+            "£" + valueOfAssets.moneyAtEnd.displayAs
+          ).withChangeAction(
+            controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
+              .onPageLoad(srn, CheckMode)
+              .url + "#taxEndDate",
+            hidden = Message(
+              "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden",
+              schemeDates.to.show
+            )
+          ).withOneHalfWidth()
         ) :?+
-        valueOfAssetsPage.map(
-          valueOfAssets =>
-            CheckYourAnswersRowViewModel(
-              Message(
-                "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate",
-                schemeDates.to.show
-              ),
-              "£" + valueOfAssets.moneyAtEnd.displayAs
-            ).withChangeAction(
-                controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
-                  .onPageLoad(srn, CheckMode)
-                  .url + "#taxEndDate",
-                hidden = Message(
-                  "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden",
-                  schemeDates.to.show
-                )
-              )
-              .withOneHalfWidth()
-        ) :?+
-        feesCommissionsWagesSalariesPage.map(
-          feesCommissionsWagesSalaries =>
-            CheckYourAnswersRowViewModel(
-              Message(
-                "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary"
-              ),
-              "£" + feesCommissionsWagesSalaries.displayAs
-            ).withChangeAction(
-                controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
-                  .onPageLoad(srn, CheckMode)
-                  .url,
-                hidden = "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden"
-              )
-              .withOneHalfWidth()
+        feesCommissionsWagesSalariesPage.map(feesCommissionsWagesSalaries =>
+          CheckYourAnswersRowViewModel(
+            Message(
+              "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary"
+            ),
+            "£" + feesCommissionsWagesSalaries.displayAs
+          ).withChangeAction(
+            controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
+              .onPageLoad(srn, CheckMode)
+              .url,
+            hidden = "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden"
+          ).withOneHalfWidth()
         )
     )
   )

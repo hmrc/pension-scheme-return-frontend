@@ -147,9 +147,8 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.membercontributions.routes.MemberContributionListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to MemberContributionListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to MemberContributionListController page")
     )
   }
 }

@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class DidSchemeReceiveTransferController @Inject()(
+class DidSchemeReceiveTransferController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   psrSubmissionService: PsrSubmissionService,
@@ -74,18 +74,19 @@ class DidSchemeReceiveTransferController @Inject()(
                 .set(DidSchemeReceiveTransferPage(srn), value)
                 .mapK[Future]
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- if (value) {
-                Future.successful(Some(()))
-              } else {
-                psrSubmissionService.submitPsrDetailsWithUA(
-                  srn,
-                  updatedAnswers,
-                  fallbackCall =
-                    controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, mode)
-                )
-              }
-            } yield submissionResult.getOrRecoverJourney(
-              _ => Redirect(navigator.nextPage(DidSchemeReceiveTransferPage(srn), mode, updatedAnswers))
+              submissionResult <-
+                if (value) {
+                  Future.successful(Some(()))
+                } else {
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall = controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
+                      .onPageLoad(srn, mode)
+                  )
+                }
+            } yield submissionResult.getOrRecoverJourney(_ =>
+              Redirect(navigator.nextPage(DidSchemeReceiveTransferPage(srn), mode, updatedAnswers))
             )
         )
     }

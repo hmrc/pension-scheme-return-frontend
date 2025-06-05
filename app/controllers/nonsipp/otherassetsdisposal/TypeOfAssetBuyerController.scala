@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TypeOfAssetBuyerController @Inject()(
+class TypeOfAssetBuyerController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -78,7 +78,7 @@ class TypeOfAssetBuyerController @Inject()(
                   )
                 )
               ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), answer)
@@ -91,7 +91,6 @@ class TypeOfAssetBuyerController @Inject()(
                 updatedAnswers
               )
             )
-          }
         )
     }
 }

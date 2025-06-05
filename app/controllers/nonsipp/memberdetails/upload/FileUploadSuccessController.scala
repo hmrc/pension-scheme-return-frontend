@@ -43,7 +43,7 @@ import scala.util.Try
 
 import javax.inject.{Inject, Named}
 
-class FileUploadSuccessController @Inject()(
+class FileUploadSuccessController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   uploadService: UploadService,
@@ -90,8 +90,8 @@ class FileUploadSuccessController @Inject()(
                   controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, mode)
               )
               .liftF
-          } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-            _ => Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
+          } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+            Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
           )
         ).merge
 

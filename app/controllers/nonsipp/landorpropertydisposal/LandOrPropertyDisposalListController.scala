@@ -59,7 +59,7 @@ import scala.concurrent.Future
 
 import javax.inject.Named
 
-class LandOrPropertyDisposalListController @Inject()(
+class LandOrPropertyDisposalListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -143,8 +143,8 @@ class LandOrPropertyDisposalListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ): Result = {
     val (status, _) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
     logger.info(s"Land or property disposal status is $status")
@@ -202,48 +202,48 @@ class LandOrPropertyDisposalListController @Inject()(
 
       addressesWithIndexes <- getAddressesWithIndexes(srn, completedDisposals)
 
-      allPropertiesFullyDisposed = addressesWithIndexes.forall {
-        case ((addressIndex, disposalIndexes), _) =>
-          disposalIndexes.exists { disposalIndex =>
-            request.userAnswers.get(LandOrPropertyStillHeldPage(srn, addressIndex, disposalIndex)).contains(false)
-          }
+      allPropertiesFullyDisposed = addressesWithIndexes.forall { case ((addressIndex, disposalIndexes), _) =>
+        disposalIndexes.exists { disposalIndex =>
+          request.userAnswers.get(LandOrPropertyStillHeldPage(srn, addressIndex, disposalIndex)).contains(false)
+        }
       }
 
       maximumDisposalsReachedUpdated = numberOfDisposals >= maxLandOrProperties * maxLandOrPropertyDisposals ||
         numberOfDisposals >= maxPossibleNumberOfDisposals ||
         allPropertiesFullyDisposed
 
-      result <- if (maximumDisposalsReachedUpdated) {
-        Right(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
-      } else {
-        Right(
-          form
-            .bindFromRequest()
-            .fold(
-              errors =>
-                BadRequest(
-                  view(
-                    errors,
-                    viewModel(
-                      srn,
-                      mode,
-                      page,
-                      addressesWithIndexes,
-                      numberOfDisposals,
-                      maxPossibleNumberOfDisposals,
-                      request.userAnswers,
-                      request.schemeDetails.schemeName,
-                      showBackLink = true,
-                      maximumDisposalsReached = maximumDisposalsReachedUpdated,
-                      allPropertiesFullyDisposed = allPropertiesFullyDisposed
+      result <-
+        if (maximumDisposalsReachedUpdated) {
+          Right(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+        } else {
+          Right(
+            form
+              .bindFromRequest()
+              .fold(
+                errors =>
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        mode,
+                        page,
+                        addressesWithIndexes,
+                        numberOfDisposals,
+                        maxPossibleNumberOfDisposals,
+                        request.userAnswers,
+                        request.schemeDetails.schemeName,
+                        showBackLink = true,
+                        maximumDisposalsReached = maximumDisposalsReachedUpdated,
+                        allPropertiesFullyDisposed = allPropertiesFullyDisposed
+                      )
                     )
-                  )
-                ),
-              answer =>
-                Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
-            )
-        )
-      }
+                  ),
+                answer =>
+                  Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
+              )
+          )
+        }
     } yield result).merge
   }
 
@@ -275,16 +275,15 @@ class LandOrPropertyDisposalListController @Inject()(
         .toMap
     )
 
-  private def getAddressesWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
-    implicit request: DataRequest[_]
+  private def getAddressesWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
+    request: DataRequest[_]
   ): Either[Result, List[((Max5000, List[Max50]), Address)]] =
     disposals
-      .map {
-        case indexes @ (landOrPropertyIndex, _) =>
-          landOrPropertyIndex -> request.userAnswers
-            .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
-            .getOrRecoverJourney
-            .map(address => (indexes, address))
+      .map { case indexes @ (landOrPropertyIndex, _) =>
+        landOrPropertyIndex -> request.userAnswers
+          .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
+          .getOrRecoverJourney
+          .map(address => (indexes, address))
       }
       .toList
       .sortBy { case (index, _) => index.value }
@@ -315,45 +314,44 @@ object LandOrPropertyDisposalListController {
         )
       )
     } else {
-      addressesWithIndexes.flatMap {
-        case ((addressIndex, disposalIndexes), address) =>
-          disposalIndexes.sortBy(_.value).map { disposalIndex =>
-            val landOrPropertyDisposalData = LandOrPropertyDisposalData(
-              addressIndex,
-              disposalIndex,
-              address.addressLine1,
-              userAnswers.get(HowWasPropertyDisposedOfPage(srn, addressIndex, disposalIndex)).get
-            )
+      addressesWithIndexes.flatMap { case ((addressIndex, disposalIndexes), address) =>
+        disposalIndexes.sortBy(_.value).map { disposalIndex =>
+          val landOrPropertyDisposalData = LandOrPropertyDisposalData(
+            addressIndex,
+            disposalIndex,
+            address.addressLine1,
+            userAnswers.get(HowWasPropertyDisposedOfPage(srn, addressIndex, disposalIndex)).get
+          )
 
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
-                ListRow.view(
-                  buildMessage("landOrPropertyDisposalList.row", landOrPropertyDisposalData),
-                  routes.LandPropertyDisposalCYAController
-                    .onPageLoadViewOnly(srn, addressIndex, disposalIndex, year, currentVersion, previousVersion)
-                    .url,
-                  buildMessage("landOrPropertyDisposalList.row.view.hidden", landOrPropertyDisposalData)
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
+              ListRow.view(
+                buildMessage("landOrPropertyDisposalList.row", landOrPropertyDisposalData),
+                routes.LandPropertyDisposalCYAController
+                  .onPageLoadViewOnly(srn, addressIndex, disposalIndex, year, currentVersion, previousVersion)
+                  .url,
+                buildMessage("landOrPropertyDisposalList.row.view.hidden", landOrPropertyDisposalData)
+              )
+            case (_, _) =>
+              ListRow(
+                buildMessage("landOrPropertyDisposalList.row", landOrPropertyDisposalData),
+                changeUrl = routes.LandPropertyDisposalCYAController
+                  .onPageLoad(srn, addressIndex, disposalIndex, CheckMode)
+                  .url,
+                changeHiddenText = buildMessage(
+                  "landOrPropertyDisposalList.row.change.hidden",
+                  landOrPropertyDisposalData
+                ),
+                removeUrl = routes.RemoveLandPropertyDisposalController
+                  .onPageLoad(srn, addressIndex, disposalIndex, NormalMode)
+                  .url,
+                removeHiddenText = buildMessage(
+                  "landOrPropertyDisposalList.row.remove.hidden",
+                  landOrPropertyDisposalData
                 )
-              case (_, _) =>
-                ListRow(
-                  buildMessage("landOrPropertyDisposalList.row", landOrPropertyDisposalData),
-                  changeUrl = routes.LandPropertyDisposalCYAController
-                    .onPageLoad(srn, addressIndex, disposalIndex, CheckMode)
-                    .url,
-                  changeHiddenText = buildMessage(
-                    "landOrPropertyDisposalList.row.change.hidden",
-                    landOrPropertyDisposalData
-                  ),
-                  removeUrl = routes.RemoveLandPropertyDisposalController
-                    .onPageLoad(srn, addressIndex, disposalIndex, NormalMode)
-                    .url,
-                  removeHiddenText = buildMessage(
-                    "landOrPropertyDisposalList.row.remove.hidden",
-                    landOrPropertyDisposalData
-                  )
-                )
-            }
+              )
           }
+        }
       }
     }
 
@@ -411,20 +409,22 @@ object LandOrPropertyDisposalListController {
       }
     )
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (numberOfDisposals >= maxLandOrProperties * maxLandOrPropertyDisposals) {
         Message("landOrPropertyDisposalList.inset")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals || allPropertiesFullyDisposed) {
-        ParagraphMessage("landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph1") ++
+        ParagraphMessage(
+          "landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph1"
+        ) ++
           ParagraphMessage(
             "landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph2"
           )
       } else {
         Message("")
       }
-    }
 
-    val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals && !allPropertiesFullyDisposed
+    val showRadios =
+      !maximumDisposalsReached && !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals && !allPropertiesFullyDisposed
 
     val description = Option.when(
       numberOfDisposals < maxPossibleNumberOfDisposals && !maximumDisposalsReached && !allPropertiesFullyDisposed

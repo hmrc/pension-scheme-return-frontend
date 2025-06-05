@@ -60,7 +60,9 @@ class RadioListViewSpec extends ViewSpec {
 
       "no have a legend when not present" in {
         forAll(viewModelGen) { viewmodel =>
-          legend(view(radioListForm, viewmodel.copy(heading = Empty, page = viewmodel.page.copy(legend = None)))) mustBe Nil
+          legend(
+            view(radioListForm, viewmodel.copy(heading = Empty, page = viewmodel.page.copy(legend = None)))
+          ) mustBe Nil
         }
       }
 

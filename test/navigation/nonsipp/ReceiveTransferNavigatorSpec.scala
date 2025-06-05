@@ -137,32 +137,31 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
       (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
       (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ReportAnotherTransferInPage(srn, index, secondaryIndex), true)
-            .unsafeSet(TotalValueTransferPages(srn, index), existingIndexes.map(_ -> money).toMap)
-            .unsafeSet(
-              ReceiveTransferProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ReportAnotherTransferInPage(srn, index, secondaryIndex), true)
+          .unsafeSet(TotalValueTransferPages(srn, index), existingIndexes.map(_ -> money).toMap)
+          .unsafeSet(
+            ReceiveTransferProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          normalmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ReportAnotherTransferInPage,
-              (srn, index: Int, _: Int, _) =>
-                controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from report another transfer in  page to transferring scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ReportAnotherTransferInPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from report another transfer in  page to transferring scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 

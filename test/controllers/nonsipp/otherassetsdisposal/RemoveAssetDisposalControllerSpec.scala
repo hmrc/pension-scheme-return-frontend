@@ -91,10 +91,10 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
           when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(())))
         )
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

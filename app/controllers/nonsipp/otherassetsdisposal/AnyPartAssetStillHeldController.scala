@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class AnyPartAssetStillHeldController @Inject()(
+class AnyPartAssetStillHeldController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -102,39 +102,36 @@ class AnyPartAssetStillHeldController @Inject()(
                 .set(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
                 .mapK[Future]
               _ <- saveService.save(updatedAnswers)
-            } yield {
-              updatedAnswers.get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)) match {
-                case Some(HowDisposed.Transferred) =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
+            } yield updatedAnswers.get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)) match {
+              case Some(HowDisposed.Transferred) =>
+                Redirect(
+                  navigator
+                    .nextPage(
+                      AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                      mode,
+                      updatedAnswers
+                    )
+                )
 
-                case Some(HowDisposed.Sold) =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
+              case Some(HowDisposed.Sold) =>
+                Redirect(
+                  navigator
+                    .nextPage(
+                      AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                      mode,
+                      updatedAnswers
+                    )
+                )
 
-                case _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-              }
-
+              case _ =>
+                Redirect(
+                  navigator
+                    .nextPage(
+                      AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                      mode,
+                      updatedAnswers
+                    )
+                )
             }
         )
     }

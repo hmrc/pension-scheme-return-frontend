@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class DidTransferIncludeAssetController @Inject()(
+class DidTransferIncludeAssetController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -82,7 +82,7 @@ class DidTransferIncludeAssetController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future.successful(
               (for {
                 schemeName <- request.userAnswers
@@ -102,8 +102,7 @@ class DidTransferIncludeAssetController @Inject()(
                   )
                 )
               )).merge
-            )
-          },
+            ),
           value =>
             for {
               updatedAnswers <- request.userAnswers

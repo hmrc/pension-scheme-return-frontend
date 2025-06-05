@@ -112,7 +112,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           journeyByPassed = false
         )
       )
-    }.before { mockTaxYear(currentReturnTaxYear) }
+    }.before(mockTaxYear(currentReturnTaxYear))
       .after {
         verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
         verify(mockSchemeDateService, never).submissionDateAsString(any())
@@ -149,15 +149,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           )
         )
       }.before {
-          mockTaxYear(currentReturnTaxYear)
-        }
-        .after {
-          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-          verify(mockSchemeDateService, never).submissionDateAsString(any())
-          verify(mockSchemeDateService, never).returnPeriodsAsJsonString(any())(any())
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
-        }
-        .withName("when Initial UserAnswers & Current UserAnswers are same but bypassed journey requirements not meet")
+        mockTaxYear(currentReturnTaxYear)
+      }.after {
+        verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+        verify(mockSchemeDateService, never).submissionDateAsString(any())
+        verify(mockSchemeDateService, never).returnPeriodsAsJsonString(any())(any())
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+      }.withName("when Initial UserAnswers & Current UserAnswers are same but bypassed journey requirements not meet")
     )
 
     val currentTaxYearWithManyMembersAlreadySubmittedUserAnswer = currentTaxYearUserAnswersWithManyMembers
@@ -188,18 +186,16 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           )
         )
       }.before {
-          mockTaxYear(currentReturnTaxYear)
-          mockSubmissionDate
-          mockReturnPeriods
-          mockVersions(Seq.empty[PsrVersionsResponse])
-        }
-        .after {
-          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-          verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
-          verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
-          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-        }
-        .withName("when Initial UserAnswers & Current UserAnswers are same and bypassed journey requirements meet")
+        mockTaxYear(currentReturnTaxYear)
+        mockSubmissionDate
+        mockReturnPeriods
+        mockVersions(Seq.empty[PsrVersionsResponse])
+      }.after {
+        verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+        verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
+        verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
+        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+      }.withName("when Initial UserAnswers & Current UserAnswers are same and bypassed journey requirements meet")
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -217,13 +213,12 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithFewMembers,
             emptyUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
 
@@ -236,13 +231,12 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             fullUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
 
@@ -255,15 +249,14 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             emptyUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              mockVersions(versionsResponse)
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            mockVersions(versionsResponse)
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
 
@@ -276,15 +269,14 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             emptyUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              mockVersions(Seq.empty[PsrVersionsResponse])
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            mockVersions(Seq.empty[PsrVersionsResponse])
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
 
@@ -297,15 +289,14 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             skippedUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              mockVersions(versionsResponse)
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            mockVersions(versionsResponse)
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
 
@@ -318,13 +309,12 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             noTaxYearUserAnswers,
             emptyUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
 
@@ -338,15 +328,14 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
               .unsafeSet(LoansMadeOrOutstandingPage(srn), false),
             emptyUserAnswers
           ).before {
-              mockTaxYear(currentReturnTaxYear)
-              mockVersions(Seq.empty[PsrVersionsResponse])
-              MockPsrSubmissionService.submitPsrDetails()
-            }
-            .after {
-              verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-              verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            }
+            mockTaxYear(currentReturnTaxYear)
+            mockVersions(Seq.empty[PsrVersionsResponse])
+            MockPsrSubmissionService.submitPsrDetails()
+          }.after {
+            verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+            verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          }
         )
       }
     }
@@ -602,18 +591,16 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           )
         )
       }.before {
-          mockTaxYear(dateRange)
-          mockSubmissionDate
-          mockReturnPeriods
-          mockVersions(Seq.empty)
-        }
-        .after {
-          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-          verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
-          verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
-          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-        }
-        .withName("OnPageLoadViewOnly renders ok with byPassed journey button")
+        mockTaxYear(dateRange)
+        mockSubmissionDate
+        mockReturnPeriods
+        mockVersions(Seq.empty)
+      }.after {
+        verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+        verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
+        verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
+        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+      }.withName("OnPageLoadViewOnly renders ok with byPassed journey button")
     )
 
     act.like(
@@ -630,14 +617,12 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn),
         currentTaxYearUserAnswersWithManyMembers
       ).before(
-          mockVersions(Seq.empty[PsrVersionsResponse])
-        )
-        .after(
-          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
-        )
-        .withName(
-          "Should proceed to return submitted page when previously many members with no details, currently many members"
-        )
+        mockVersions(Seq.empty[PsrVersionsResponse])
+      ).after(
+        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+      ).withName(
+        "Should proceed to return submitted page when previously many members with no details, currently many members"
+      )
     )
 
     act.like(
@@ -647,11 +632,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne),
         currentTaxYearUserAnswersWithFewMembers
       ).after(
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
-        )
-        .withName(
-          "Should proceed to view only task list when previously many members with no details, currently few members"
-        )
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+      ).withName(
+        "Should proceed to view only task list when previously many members with no details, currently few members"
+      )
     )
 
     act.like(
@@ -662,11 +646,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         currentTaxYearUserAnswersWithManyMembers,
         previousTaxYearUserAnswersWithManyMembersWithMemberDetails
       ).after(
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
-        )
-        .withName(
-          "Should proceed to view only task list when previously many members with details, currently many members"
-        )
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+      ).withName(
+        "Should proceed to view only task list when previously many members with details, currently many members"
+      )
     )
 
     act.like(
@@ -677,11 +660,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         currentTaxYearUserAnswersWithFewMembers,
         previousTaxYearUserAnswersWithManyMembersWithMemberDetails
       ).after(
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
-        )
-        .withName(
-          "Should proceed to view only task list when previously many members with details, currently few members"
-        )
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+      ).withName(
+        "Should proceed to view only task list when previously many members with details, currently few members"
+      )
     )
 
     act.like(
@@ -692,11 +674,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         currentTaxYearUserAnswersWithManyMembers,
         previousTaxYearUserAnswersWithFewMembersWithMemberDetails
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName(
-          "Should proceed to view only task list when previously few members with details, currently many members"
-        )
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName(
+        "Should proceed to view only task list when previously few members with details, currently many members"
+      )
     )
 
     act.like(
@@ -707,11 +688,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         currentTaxYearUserAnswersWithFewMembers,
         previousTaxYearUserAnswersWithFewMembersWithMemberDetails
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName(
-          "Should proceed to view only task list when previously few members with details, currently few members"
-        )
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName(
+        "Should proceed to view only task list when previously few members with details, currently few members"
+      )
     )
   }
 

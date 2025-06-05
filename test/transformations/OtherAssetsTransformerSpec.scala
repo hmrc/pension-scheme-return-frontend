@@ -47,8 +47,9 @@ class OtherAssetsTransformerSpec
     with TestValues
     with DiffShouldMatcher {
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   private val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
       .withSession((PREPOPULATION_FLAG, "true"))
@@ -120,7 +121,7 @@ class OtherAssetsTransformerSpec
     "should return recordVersion when there is no change among UAs" - {
       "should return transformed List without disposed other assets" in {
         val userAnswers = emptyUserAnswers
-        //index-1
+          // index-1
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
@@ -139,7 +140,7 @@ class OtherAssetsTransformerSpec
             ConditionalYesNo.no[String, Nino]("reason")
           )
           .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-          //index-2
+          // index-2
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "assetDescription")
           .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(2)), Contribution)
@@ -149,7 +150,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, refineMV(2)), localDate)
           .unsafeSet(IndependentValuationPage(srn, refineMV(2)), true)
           .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
-          //index-3
+          // index-3
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
           .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3)), Transfer)
@@ -223,7 +224,7 @@ class OtherAssetsTransformerSpec
 
       "should return transformed List with disposed other assets" in {
         val userAnswers = emptyUserAnswers
-        //index-1
+          // index-1
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
@@ -257,7 +258,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
           .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
-          //index-2
+          // index-2
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "assetDescription")
           .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(2)), Contribution)
@@ -269,7 +270,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(2), refineMV(1)), Transferred)
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(2), refineMV(1)), false)
           .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
-          //index-3
+          // index-3
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
           .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3)), Transfer)
@@ -568,7 +569,7 @@ class OtherAssetsTransformerSpec
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          //index-1
+          // index-1
           userAnswers.get(OtherAssetsHeldPage(srn)) shouldMatchTo Some(true)
           userAnswers.get(OtherAssetsRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(1))) shouldMatchTo Some("assetDescription")
@@ -607,7 +608,7 @@ class OtherAssetsTransformerSpec
           )
           userAnswers.get(OtherAssetsProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
 
-          //index-2
+          // index-2
           userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(2))) shouldMatchTo Some("assetDescription")
           userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, refineMV(2))) shouldMatchTo Some(Contribution)
           userAnswers.get(CostOfOtherAssetPage(srn, refineMV(2))) shouldMatchTo Some(money)
@@ -624,7 +625,7 @@ class OtherAssetsTransformerSpec
           userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
-          //index-3
+          // index-3
           userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(3))) shouldMatchTo Some("assetDescription")
           userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3))) shouldMatchTo Some(Transfer)
           userAnswers.get(CostOfOtherAssetPage(srn, refineMV(3))) shouldMatchTo Some(money)
@@ -653,9 +654,7 @@ class OtherAssetsTransformerSpec
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe None
       )
     }
 
@@ -667,9 +666,7 @@ class OtherAssetsTransformerSpec
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
       )
     }
 
@@ -681,9 +678,7 @@ class OtherAssetsTransformerSpec
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
       )
     }
   }

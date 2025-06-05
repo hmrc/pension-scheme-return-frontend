@@ -26,10 +26,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class FakePsaIdentifierAction @Inject()(
+class FakePsaIdentifierAction @Inject() (
   val bodyParsers: PlayBodyParsers
-)(
-  implicit override val executionContext: ExecutionContext
+)(implicit
+  override val executionContext: ExecutionContext
 ) extends IdentifierAction
     with Generators
     with OptionValues {

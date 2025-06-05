@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
 
-class FileUploadErrorSummaryController @Inject()(
+class FileUploadErrorSummaryController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,

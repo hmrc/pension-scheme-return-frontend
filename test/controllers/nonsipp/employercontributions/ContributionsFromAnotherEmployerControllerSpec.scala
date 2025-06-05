@@ -76,18 +76,22 @@ class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec 
     })
 
     act.like(
-      renderPrePopView(onPageLoad, ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true, userAnswers) {
-        implicit app => implicit request =>
-          injected[YesNoPageView].apply(
-            form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(
-              srn,
-              index,
-              secondaryIndex,
-              NormalMode,
-              memberDetails.fullName
-            )
+      renderPrePopView(
+        onPageLoad,
+        ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex),
+        true,
+        userAnswers
+      ) { implicit app => implicit request =>
+        injected[YesNoPageView].apply(
+          form(injected[YesNoPageFormProvider]).fill(true),
+          viewModel(
+            srn,
+            index,
+            secondaryIndex,
+            NormalMode,
+            memberDetails.fullName
           )
+        )
       }
     )
 

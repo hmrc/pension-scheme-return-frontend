@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class AssetSaleIndependentValuationController @Inject()(
+class AssetSaleIndependentValuationController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -64,10 +64,9 @@ class AssetSaleIndependentValuationController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode))))
-          },
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode)))),
           value =>
             for {
               updatedAnswers <- Future

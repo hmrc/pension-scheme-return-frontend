@@ -124,19 +124,18 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-        }.after({
-            verify(mockSaveService, times(1)).save(any())(any(), any())
-            reset(mockPsrSubmissionService)
-          })
-          .withName(s"render correct $mode view for Sold journey")
+        }.after {
+          verify(mockSaveService, times(1)).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        }.withName(s"render correct $mode view for Sold journey")
       )
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -195,13 +194,12 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
             isMaximumReached = false
           )
         )
-      }.after({
-          verify(mockSaveService).save(captor.capture())(any(), any())
-          val userAnswers = captor.getValue
-          userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
-          reset(mockPsrSubmissionService)
-        })
-        .withName(s"onPageLoad should clear out point of entry when completed")
+      }.after {
+        verify(mockSaveService).save(captor.capture())(any(), any())
+        val userAnswers = captor.getValue
+        userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
+        reset(mockPsrSubmissionService)
+      }.withName(s"onPageLoad should clear out point of entry when completed")
     )
 
     act.like(
@@ -213,10 +211,9 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
           .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), HowWereBondsDisposedPointOfEntry),
         previousUserAnswers = emptyUserAnswers
       ).after {
-          verify(mockSaveService, never).save(any())(any(), any())
-          reset(mockPsrSubmissionService)
-        }
-        .withName(s"onPageLoad should not clear out point of entry when in progress")
+        verify(mockSaveService, never).save(any())(any(), any())
+        reset(mockPsrSubmissionService)
+      }.withName(s"onPageLoad should not clear out point of entry when in progress")
     )
   }
 
@@ -268,11 +265,10 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-      }.after({
-          verify(mockSaveService, never()).save(any())(any(), any())
-          reset(mockPsrSubmissionService)
-        })
-        .withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.after {
+        verify(mockSaveService, never()).save(any())(any(), any())
+        reset(mockPsrSubmissionService)
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
     act.like(
       redirectToPage(
@@ -280,9 +276,8 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only RemoveBondsDisposalController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only RemoveBondsDisposalController page")
     )
   }
 

@@ -46,7 +46,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class WhenDidSchemeAcquireController @Inject()(
+class WhenDidSchemeAcquireController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -67,9 +67,8 @@ class WhenDidSchemeAcquireController @Inject()(
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-          val preparedForm = {
+          val preparedForm =
             request.userAnswers.fillForm(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), form(date.to, request))
-          }
           Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName, address.addressLine1)))
         }
       }

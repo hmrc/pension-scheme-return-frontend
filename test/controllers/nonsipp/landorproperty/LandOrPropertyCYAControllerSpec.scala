@@ -131,10 +131,10 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -229,9 +229,8 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to land or property list")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to land or property list")
     )
   }
 }

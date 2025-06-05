@@ -41,7 +41,7 @@ import javax.inject.{Inject, Singleton}
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
 
 @Singleton
-class IdentifierActionImpl @Inject()(
+class IdentifierActionImpl @Inject() (
   appConfig: FrontendAppConfig,
   override val authConnector: AuthConnector,
   sessionDataCacheConnector: SessionDataCacheConnector,

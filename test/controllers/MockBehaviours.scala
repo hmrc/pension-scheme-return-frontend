@@ -42,8 +42,8 @@ trait MockBehaviours {
   object MockSchemeDateService {
     def taxYearOrAccountingPeriods(
       returns: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]
-    )(
-      implicit mock: SchemeDateService
+    )(implicit
+      mock: SchemeDateService
     ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
       when(mock.taxYearOrAccountingPeriods(any())(any())).thenReturn(returns)
 
@@ -77,8 +77,8 @@ trait MockBehaviours {
   }
 
   object MockEmailConnector {
-    def sendEmail(testEmailAddress: String, testTemplateId: String)(
-      implicit mockEmailConnector: EmailConnector
+    def sendEmail(testEmailAddress: String, testTemplateId: String)(implicit
+      mockEmailConnector: EmailConnector
     ): OngoingStubbing[Future[EmailStatus]] =
       when(
         mockEmailConnector.sendEmail(

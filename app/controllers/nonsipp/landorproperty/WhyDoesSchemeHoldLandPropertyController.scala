@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhyDoesSchemeHoldLandPropertyController @Inject()(
+class WhyDoesSchemeHoldLandPropertyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -80,7 +80,7 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
               nextPage = navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn, index), mode, userAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield { Redirect(nextPage) }
+            } yield Redirect(nextPage)
         )
   }
 }
