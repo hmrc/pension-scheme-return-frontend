@@ -606,7 +606,7 @@ shares.classOfShares.error.length = The class of the shares held in this company
 
 shares.costOfShares.title = What was the total cost of the shares in this company, in pounds and pence?
 shares.costOfShares.heading = What was the total cost of the shares in {0}, in pounds and pence?
-shares.costOfShares.hint = Include all costs related to the transaction. If the shares were not acquired or subscribed for, provide the total value.
+shares.costOfShares.hint = Include all costs related to the transaction. If the shares were contributed or transferred in, provide the total value. If the shares were obtained more than 6 years ago, provide the market value as at the year of the return.
 shares.costOfShares.error.required = Enter the total cost of the shares
 shares.costOfShares.error.invalid = Total cost of the shares must be an amount of money, like 123 or 123.45
 shares.costOfShares.error.tooSmall = Total cost of the shares must be 0.01 or more
@@ -1752,7 +1752,7 @@ whyDoesSchemeHoldLandProperty.error.required = Select why the scheme holds this 
 
 landOrPropertyTotalCost.title = What was the total cost or value of the land or property, in pounds and pence?
 landOrPropertyTotalCost.heading = What was the total cost or value of {0}, in pounds and pence?
-landOrPropertyTotalCost.hint = Include stamp duty, legal fees, VAT and other costs related to the transaction. If it was a contribution, transfer or an acquisition from more than 6 years ago, provide the market value as at the year of the return.
+landOrPropertyTotalCost.hint = Include stamp duty, legal fees, VAT and other costs related to the transaction. If the land or property was obtained more than 6 years ago, provide the market value as at the year of the return.
 landOrPropertyTotalCost.error.required = Enter the total cost or value of the land or property
 landOrPropertyTotalCost.error.invalid = Total cost or value of the land or property must be an amount of money, like 123 or 123.45
 landOrPropertyTotalCost.error.tooSmall = Total cost or value of the land or property must be 0.01 or more
@@ -3178,7 +3178,7 @@ whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired 
 
 bonds.costOfBonds.title = What was the total cost of these bonds, in pounds and pence?
 bonds.costOfBonds.heading = What was the total cost of these bonds, in pounds and pence?
-bonds.costOfBonds.hint = Include all costs related to the transaction. If the bonds were contributed or transferred in, provide the total value.
+bonds.costOfBonds.hint = Include all costs related to the transaction. If the bonds were contributed or transferred in, provide the total value. If the bonds were obtained more than 6 years ago, provide the market value as at the year of the return.
 bonds.costOfBonds.error.required = Enter the total cost of the bonds
 bonds.costOfBonds.error.invalid = Total cost of the bonds must be an amount of money, like 123 or 123.45
 bonds.costOfBonds.error.tooSmall = Total cost of the bonds must be 0.01 or more
@@ -3425,7 +3425,7 @@ otherAssets.sellerConnectedParty.error.required = Select yes if the seller is a 
 
 otherAssets.costOfOtherAsset.title = What was the total cost of the asset, in pounds and pence?
 otherAssets.costOfOtherAsset.heading = What was the total cost of the asset, in pounds and pence?
-otherAssets.costOfOtherAsset.hint = Include all costs related to the transaction. If the asset was contributed or transferred in, provide the total value.
+otherAssets.costOfOtherAsset.hint = Include all costs related to the transaction. If the asset was contributed or transferred in, provide the total value. If the asset was obtained more than 6 years ago, provide the market value as at the year of the return.
 otherAssets.costOfOtherAsset.error.required = Enter the total cost of the asset
 otherAssets.costOfOtherAsset.error.invalid = Total cost of the asset must be an amount of money, like 123 or 123.45
 otherAssets.costOfOtherAsset.error.tooSmall = Total cost of the asset must be 0.01 or more
