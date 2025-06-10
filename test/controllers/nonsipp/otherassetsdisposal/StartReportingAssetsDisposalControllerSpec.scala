@@ -25,8 +25,6 @@ import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalContr
 import forms.RadioListFormProvider
 import models.NormalMode
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
 class StartReportingAssetsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 

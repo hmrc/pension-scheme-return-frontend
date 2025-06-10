@@ -88,15 +88,13 @@ class ValueOfAssetsController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(ValueOfAssetsPage(srn, mode), value))
               _ <- saveService.save(updatedAnswers)
-            } yield {
-              mode match {
-                case CheckMode =>
-                  Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-                case NormalMode =>
-                  Redirect(navigator.nextPage(ValueOfAssetsPage(srn, mode), mode, updatedAnswers))
-                case ViewOnlyMode =>
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
+            } yield mode match {
+              case CheckMode =>
+                Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+              case NormalMode =>
+                Redirect(navigator.nextPage(ValueOfAssetsPage(srn, mode), mode, updatedAnswers))
+              case ViewOnlyMode =>
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
         )
     }

@@ -44,12 +44,12 @@ object LandOrPropertyCheckStatusUtils {
     landOrPropertyHeld match {
       case Some(false) => false
       case _ =>
-        journeysStartedList.exists(index => {
+        journeysStartedList.exists { index =>
           refineV[OneTo5000](index.toInt + 1).fold(
             _ => false,
             refinedIndex => checkLandOrPropertyRecord(userAnswers, srn, refinedIndex)
           )
-        })
+        }
     }
   }
 

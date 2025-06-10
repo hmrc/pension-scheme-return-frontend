@@ -252,8 +252,9 @@ class LoansTransformer @Inject() extends Transformer {
             case IdentityType.Individual => IndividualRecipientNamePage(srn, index) -> recipientName
             case IdentityType.UKCompany => CompanyRecipientNamePage(srn, index) -> recipientName
             case IdentityType.UKPartnership => PartnershipRecipientNamePage(srn, index) -> recipientName
-          case IdentityType.Other =>
-                throw new RuntimeException(s"Unsupported identity type 'Other' at index ${index.value}")}
+            case IdentityType.Other =>
+              throw new RuntimeException(s"Unsupported identity type 'Other' at index ${index.value}")
+          }
         }
       otherRecipientName = indexes
         .filter { index =>

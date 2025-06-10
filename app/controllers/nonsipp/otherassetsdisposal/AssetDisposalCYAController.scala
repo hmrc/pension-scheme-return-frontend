@@ -85,9 +85,11 @@ class AssetDisposalCYAController @Inject() (
   def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(OtherAssetsDisposalProgress(srn, index, disposalIndex))
-        .exists(_.completed)) {
+        .exists(_.completed)
+    ) {
       Future.successful(Redirect(routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)))
     } else {
       (
