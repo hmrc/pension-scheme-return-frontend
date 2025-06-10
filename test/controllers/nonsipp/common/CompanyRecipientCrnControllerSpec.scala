@@ -18,20 +18,18 @@ package controllers.nonsipp.common
 
 import play.api.mvc.Call
 import views.html.ConditionalYesNoPageView
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.common.CompanyRecipientCrnController._
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty.CompanySellerNamePage
 
-class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
+class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   val conditionalNo: ConditionalYesNo[String, Crn] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)

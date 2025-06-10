@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.employercontributions
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextAreaView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
 import pages.nonsipp.employercontributions.{EmployerNamePage, OtherEmployeeDescriptionPage}
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class OtherEmployeeDescriptionControllerSpec extends ControllerBaseSpec {
+class OtherEmployeeDescriptionControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private lazy val onPageLoad =
     routes.OtherEmployeeDescriptionController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.OtherEmployeeDescriptionController.onSubmit(srn, index, secondaryIndex, NormalMode)

@@ -17,19 +17,17 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
 import forms.MoneyFormProvider
 
-class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec {
+class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.TotalConsiderationSaleAssetController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)

@@ -24,7 +24,7 @@ import views.html.ContentPageView
 import navigation.{FakeNavigator, Navigator}
 import models.{CheckMode, SchemeMemberNumbers}
 
-class CheckUpdateInformationControllerSpec extends ControllerBaseSpec {
+class CheckUpdateInformationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   def onwardRoute: Call = Call("GET", "/foo")
 

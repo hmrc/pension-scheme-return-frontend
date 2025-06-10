@@ -20,7 +20,7 @@ import pages.nonsipp.otherassetsdisposal._
 import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import utils.UserAnswersUtils.UserAnswersOps
@@ -30,9 +30,9 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
 
   override val navigator: Navigator = new NonSippNavigator
 
-  private val assetIndexOne = refineMV[Max5000.Refined](1)
-  private val assetIndexTwo = refineMV[Max5000.Refined](2)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndexOne: Max5000 = 1
+  private val assetIndexTwo: Max5000 = 2
+  private val disposalIndex: Max50 = 1
 
   "OtherAssetsDisposalNavigator" - {
 

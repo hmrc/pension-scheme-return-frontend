@@ -57,7 +57,7 @@
 //)(implicit val ec: ExecutionContext)
 //    extends TestDataDoubleIndexController[Max5000.Refined, Max50.Refined] {
 //
-//  override val max: Max50 = refineMV(50)
+//  override val max: Max50 = 50
 //
 //  override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages =
 //    HList(

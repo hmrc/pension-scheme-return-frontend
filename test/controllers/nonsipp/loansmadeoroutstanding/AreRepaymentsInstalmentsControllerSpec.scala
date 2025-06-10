@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsPage
 import play.api.data.Form
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
+class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.AreRepaymentsInstalmentsController.onSubmit(srn, index, NormalMode)

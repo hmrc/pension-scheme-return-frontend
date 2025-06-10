@@ -19,8 +19,7 @@ package controllers.nonsipp.moneyborrowed
 import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.moneyborrowed._
@@ -29,10 +28,9 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
+class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -43,7 +41,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
   override protected def beforeAll(): Unit =
     reset(mockPsrSubmissionService)
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private def onPageLoad(mode: Mode) =
     routes.MoneyBorrowedCYAController.onPageLoad(srn, index, mode)

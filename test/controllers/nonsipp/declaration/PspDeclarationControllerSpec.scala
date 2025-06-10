@@ -19,7 +19,7 @@ package controllers.nonsipp.declaration
 import services._
 import controllers.nonsipp.declaration.PspDeclarationController._
 import connectors.EmailConnector
-import controllers.{ControllerBaseSpec, TestUserAnswers}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
 import play.api.inject.bind
 import views.html.PsaIdInputView
 import forms.TextFormProvider
@@ -43,6 +43,7 @@ import java.time.LocalDateTime
 
 class PspDeclarationControllerSpec
     extends ControllerBaseSpec
+    with ControllerBehaviours
     with BeforeAndAfterEach
     with TestUserAnswers
     with CommonTestValues {

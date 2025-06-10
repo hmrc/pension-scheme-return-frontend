@@ -58,7 +58,7 @@
 //    extends FrontendBaseController
 //    with I18nSupport {
 //
-//  private val max: Max5000 = refineMV(5000)
+//  private val max: Max5000 = 5000
 //
 //  def addBorrowDetails(srn: Srn, num: Int): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
 //    for {

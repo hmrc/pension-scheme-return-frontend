@@ -19,27 +19,25 @@ package controllers.nonsipp.memberdetails
 import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import views.html.TextAreaView
 import utils.IntUtils.toRefined300
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.memberdetails.NoNINOController._
-import controllers.nonsipp.memberdetails.routes
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class NoNINOControllerSpec extends ControllerBaseSpec {
+class NoNINOControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.NoNINOController.onPageLoad(srn, 1, NormalMode)
   private lazy val onSubmit = routes.NoNINOController.onSubmit(srn, 1, NormalMode)
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
 
   "NoNINOController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithMembersDetails) { implicit app => implicit request =>
       injected[TextAreaView].apply(
         form(injected[TextFormProvider], memberDetails.fullName),
-        viewModel(srn, memberDetails.fullName, refineMV(1), NormalMode)
+        viewModel(srn, memberDetails.fullName, 1, NormalMode)
       )
     })
 
@@ -47,7 +45,7 @@ class NoNINOControllerSpec extends ControllerBaseSpec {
       implicit app => implicit request =>
         injected[TextAreaView].apply(
           form(injected[TextFormProvider], memberDetails.fullName).fill("test text"),
-          viewModel(srn, memberDetails.fullName, refineMV(1), NormalMode)
+          viewModel(srn, memberDetails.fullName, 1, NormalMode)
         )
     })
 

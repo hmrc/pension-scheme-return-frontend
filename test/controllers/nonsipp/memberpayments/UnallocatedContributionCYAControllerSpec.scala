@@ -29,11 +29,11 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.Max3
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 
-class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
+class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 

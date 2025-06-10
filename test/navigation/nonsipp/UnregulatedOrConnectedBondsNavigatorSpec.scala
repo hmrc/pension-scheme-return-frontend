@@ -16,10 +16,10 @@
 
 package navigation.nonsipp
 
-import config.RefinedTypes.OneTo5000
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import utils.BaseSpec
@@ -30,8 +30,8 @@ import org.scalacheck.Gen
 class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo5000](1)
-  private val index2 = refineMV[OneTo5000](2)
+  private val index: Max5000 = 1
+  private val index2: Max5000 = 2
 
   "UnregulatedOrConnectedBondsNavigator" - {
 

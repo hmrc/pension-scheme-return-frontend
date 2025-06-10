@@ -16,15 +16,14 @@
 
 package pages.nonsipp.employercontributions
 
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max300, Max50}
 import controllers.TestValues
+import utils.IntUtils.given
+import pages.behaviours.PageBehaviours
 
 class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val memberIndex = 1
+  private val secondaryIndex = 1
 
   "ContributionsFromAnotherEmployerPage" - {
 

@@ -25,9 +25,9 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import config.RefinedTypes.OneToThree
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
+class AccountingPeriodListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "AccountingPeriodListController" - {
 

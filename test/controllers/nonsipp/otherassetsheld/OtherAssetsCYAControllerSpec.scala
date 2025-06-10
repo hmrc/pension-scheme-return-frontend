@@ -19,24 +19,22 @@ package controllers.nonsipp.otherassetsheld
 import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsheld._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
-class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
+class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -53,7 +51,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
   }
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val taxYear = Some(Left(dateRange))
   private val page = 1
   private val subject = IdentitySubject.OtherAssetSeller

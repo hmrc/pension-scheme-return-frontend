@@ -18,7 +18,9 @@ package transformations
 
 import org.scalatest.matchers.must.Matchers
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
+import utils.IntUtils.given
 import models.requests.psr._
+import pages.nonsipp.memberpensionpayments._
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.membersurrenderedbenefits._
 import models._
@@ -29,13 +31,10 @@ import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls._
-import config.RefinedTypes.{Max300, Max5, Max50}
 import viewmodels.models.MemberState.Deleted
 import controllers.TestValues
 import cats.implicits.catsSyntaxEitherId
 import pages.nonsipp.receivetransfer._
-import pages.nonsipp.memberpensionpayments._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.{FbStatus, FbVersionPage}
 import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
@@ -68,12 +67,12 @@ class MemberPaymentsTransformerSpec
       pensionAmountReceivedTransformer
     )
 
-  private val index = refineMV[Max300.Refined](1)
-  private val index2 = refineMV[Max300.Refined](2)
-  private val index3 = refineMV[Max300.Refined](3)
-  private val employerContribsIndex = refineMV[Max50.Refined](1)
-  private val transfersInIndex = refineMV[Max5.Refined](1)
-  private val transfersOutIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val index2 = 2
+  private val index3 = 3
+  private val employerContribsIndex = 1
+  private val transfersInIndex = 1
+  private val transfersOutIndex = 1
 
   private val memberDetailsIndexTwo: NameDOB = NameDOB(
     "testFirstNameIndexTwo",
@@ -548,8 +547,8 @@ class MemberPaymentsTransformerSpec
         )
 
         val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, None, srn, newMember).get
-        result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-        result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+        result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+        result.get(SafeToHardDelete(srn, 1)) shouldMatchTo Some(Flag)
       }
 
       "PSR status is Compiled" - {
@@ -582,8 +581,8 @@ class MemberPaymentsTransformerSpec
                 .transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember)
                 .get
 
-            result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-            result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+            result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+            result.get(SafeToHardDelete(srn, 1)) shouldMatchTo Some(Flag)
           }
 
         "should set SafeToHardDelete when member version is the same as PSR version -" +
@@ -602,8 +601,8 @@ class MemberPaymentsTransformerSpec
             )
 
             val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-            result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-            result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+            result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+            result.get(SafeToHardDelete(srn, 1)) shouldMatchTo Some(Flag)
           }
 
         "should set SafeToHardDelete when member version is the same as fb version and MemberStatus is Changed-" +
@@ -622,8 +621,8 @@ class MemberPaymentsTransformerSpec
             )
 
             val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-            result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
-            result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+            result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.Changed)
+            result.get(SafeToHardDelete(srn, 1)) shouldMatchTo Some(Flag)
           }
 
         "with previous user answers" - {
@@ -657,8 +656,8 @@ class MemberPaymentsTransformerSpec
                   .transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember)
                   .get
 
-              result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-              result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+              result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+              result.get(SafeToHardDelete(srn, 1)) shouldMatchTo None
             }
 
           "should NOT set SafeToHardDelete when member version is the same as PSR version and MemberState is Changed -" +
@@ -689,8 +688,8 @@ class MemberPaymentsTransformerSpec
                   .transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember)
                   .get
 
-              result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
-              result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+              result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.Changed)
+              result.get(SafeToHardDelete(srn, 1)) shouldMatchTo None
             }
         }
       }
@@ -715,8 +714,8 @@ class MemberPaymentsTransformerSpec
             )
 
             val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-            result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-            result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+            result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+            result.get(SafeToHardDelete(srn, 1)) shouldMatchTo None
           }
 
         "should NOT set SafeToHardDelete when member and PSR version are 001 and MemberStatus is Changed -" +
@@ -737,8 +736,8 @@ class MemberPaymentsTransformerSpec
             )
 
             val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-            result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
-            result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+            result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.Changed)
+            result.get(SafeToHardDelete(srn, 1)) shouldMatchTo None
           }
 
         "should NOT set SafeToHardDelete when member and PSR version are the same and greater than 001 and MemberStatus is New -" +
@@ -759,8 +758,8 @@ class MemberPaymentsTransformerSpec
             )
 
             val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-            result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-            result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+            result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+            result.get(SafeToHardDelete(srn, 1)) shouldMatchTo None
           }
 
         "with previous user answers" - {
@@ -793,8 +792,8 @@ class MemberPaymentsTransformerSpec
               val result = memberPaymentsTransformer
                 .transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, memberPayments)
                 .get
-              result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-              result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+              result.get(MemberStatus(srn, 1)) shouldMatchTo Some(MemberState.New)
+              result.get(SafeToHardDelete(srn, 1)) shouldMatchTo None
             }
         }
       }

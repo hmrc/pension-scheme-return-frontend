@@ -19,9 +19,8 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer._
-import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
 import viewmodels.models.SectionJourneyStatus
@@ -32,8 +31,8 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index: Max300 = 1
+  private val secondaryIndex: Max5 = 1
 
   "ReceiveTransferNavigator" - {
 
@@ -131,12 +130,12 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     )
 
     List(
-      (List("0"), refineMV[Max5.Refined](2)),
-      (List("0", "1", "2"), refineMV[Max5.Refined](4)),
-      (List("1", "2"), refineMV[Max5.Refined](1)), // deleted first entry
-      (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
-      (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
-      (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
+      (List("0"), 2),
+      (List("0", "1", "2"), 4),
+      (List("1", "2"), 1), // deleted first entry
+      (List("0", "1", "3"), 3), // deleted one entry in the middle
+      (List("0", "1", "2", "5", "6"), 4), // deleted two entry in the middle
+      (List("0", "1", "3", "5", "6"), 3) // deleted entry in the middle of two sections
     ).foreach { case (existingIndexes, expectedRedirectIndex) =>
       def userAnswers(srn: Srn) =
         defaultUserAnswers
@@ -159,7 +158,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             userAnswers
           )
           .withName(
-            s"go from report another transfer in  page to transferring scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
+            s"go from report another transfer in  page to transferring scheme name page with index ${expectedRedirectIndex} when indexes $existingIndexes already exist"
           )
       )
     }

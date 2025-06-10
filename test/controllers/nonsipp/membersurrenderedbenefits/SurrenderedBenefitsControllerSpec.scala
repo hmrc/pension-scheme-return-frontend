@@ -17,7 +17,7 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import play.api.libs.json.JsPath
@@ -31,7 +31,7 @@ import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsControll
 
 import scala.concurrent.Future
 
-class SurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
+class SurrenderedBenefitsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsController.onSubmit(srn, NormalMode)

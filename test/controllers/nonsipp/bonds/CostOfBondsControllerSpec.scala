@@ -17,18 +17,16 @@
 package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.CostOfBondsPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.MoneyFormProvider
 import controllers.nonsipp.bonds.CostOfBondsController._
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class CostOfBondsControllerSpec extends ControllerBaseSpec {
+class CostOfBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   "CostOfBondsController" - {
 

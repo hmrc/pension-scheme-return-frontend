@@ -19,19 +19,17 @@ package controllers.nonsipp.loansmadeoroutstanding
 import play.api.test.FakeRequest
 import models.ConditionalYesNo._
 import org.jsoup.Jsoup
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, Security}
 import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
+class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.SecurityGivenForLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.SecurityGivenForLoanController.onSubmit(srn, index, NormalMode)

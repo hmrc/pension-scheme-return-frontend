@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import play.api.test.FakeRequest
 import services.{AuditService, SchemeDateService, UploadService}
 import play.api.mvc.Call
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.UploadView
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
 import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
@@ -33,7 +33,7 @@ import config.FrontendAppConfig
 
 import scala.concurrent.Future
 
-class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
+class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.UploadMemberDetailsController.onPageLoad(srn)
   private def onPageLoad(errorCode: String, errorMessage: String): Call =

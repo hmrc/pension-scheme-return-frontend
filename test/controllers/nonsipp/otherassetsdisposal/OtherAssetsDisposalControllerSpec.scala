@@ -18,7 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -30,7 +30,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
+class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.OtherAssetsDisposalController.onSubmit(srn, NormalMode)

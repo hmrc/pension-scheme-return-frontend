@@ -19,8 +19,8 @@ package controllers.nonsipp.otherassetsdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
 import views.html.ListView
+import utils.IntUtils.given
 import config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
-import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
 import forms.YesNoPageFormProvider
 import models.{NormalMode, ViewOnlyMode, ViewOnlyViewModel}
@@ -31,11 +31,11 @@ import org.mockito.Mockito._
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed.{Other, Sold, Transferred}
 import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
-class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
+class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, page)
   private lazy val onSubmit = routes.ReportedOtherAssetsDisposalListController.onSubmit(srn, page, NormalMode)
@@ -66,16 +66,16 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
   private val page = 1
-  private val otherAssetIndexOne = refineMV[Max5000.Refined](1)
-  private val otherAssetIndexTwo = refineMV[Max5000.Refined](2)
-  private val disposalIndexOne = refineMV[Max50.Refined](1)
-  private val disposalIndexTwo = refineMV[Max50.Refined](2)
+  private val otherAssetIndexOne = 1
+  private val otherAssetIndexTwo = 2
+  private val disposalIndexOne = 1
+  private val disposalIndexTwo = 2
 
   private val howOtherAssetsDisposedOne = Sold
   private val howOtherAssetsDisposedTwo = Transferred
   private val howOtherAssetsDisposedThree = Other(otherDetails)
 
-  private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
+  private val disposalIndexes: List[Max50] = List(disposalIndexTwo, disposalIndexOne)
 
   private val completedUserAnswers = defaultUserAnswers
     // Other Assets #1

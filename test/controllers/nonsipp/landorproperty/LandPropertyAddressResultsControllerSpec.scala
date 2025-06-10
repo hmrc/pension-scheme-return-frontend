@@ -16,19 +16,17 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty._
 
-class LandPropertyAddressResultsControllerSpec extends ControllerBaseSpec {
+class LandPropertyAddressResultsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private lazy val onPageLoad = routes.LandPropertyAddressResultsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandPropertyAddressResultsController.onSubmit(srn, index, NormalMode)
 

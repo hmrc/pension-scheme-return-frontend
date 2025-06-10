@@ -17,7 +17,7 @@
 package pages
 
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{PensionCommencementLumpSum, UserAnswers}
 import pages.behaviours.PageBehaviours
@@ -40,11 +40,11 @@ class PensionCommencementLumpSumPageSpec extends PageBehaviours {
         UserAnswers("id")
           .unsafeSet(PensionCommencementLumpSumPage(srn), true)
           .unsafeSet(
-            PensionCommencementLumpSumAmountPage(srn, refineMV(1)),
+            PensionCommencementLumpSumAmountPage(srn, 1),
             PensionCommencementLumpSum(moneyGen.sample.value, moneyGen.sample.value)
           )
           .unsafeSet(
-            PensionCommencementLumpSumAmountPage(srn, refineMV(2)),
+            PensionCommencementLumpSumAmountPage(srn, 2),
             PensionCommencementLumpSum(moneyGen.sample.value, moneyGen.sample.value)
           )
 
@@ -53,8 +53,8 @@ class PensionCommencementLumpSumPageSpec extends PageBehaviours {
 
           val result = PensionCommencementLumpSumPage(srn).cleanup(answer, userAnswers).toOption.value
 
-          result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(1))) must not be None
-          result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(2))) must not be None
+          result.get(PensionCommencementLumpSumAmountPage(srn, 1)) must not be None
+          result.get(PensionCommencementLumpSumAmountPage(srn, 2)) must not be None
         }
       }
 
@@ -62,8 +62,8 @@ class PensionCommencementLumpSumPageSpec extends PageBehaviours {
 
         val result = PensionCommencementLumpSumPage(srn).cleanup(Some(false), userAnswers).toOption.value
 
-        result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(1))) mustBe None
-        result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(2))) mustBe None
+        result.get(PensionCommencementLumpSumAmountPage(srn, 1)) mustBe None
+        result.get(PensionCommencementLumpSumAmountPage(srn, 2)) mustBe None
       }
     }
   }

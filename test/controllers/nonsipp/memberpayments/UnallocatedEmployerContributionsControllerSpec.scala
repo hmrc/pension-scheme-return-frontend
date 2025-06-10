@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpayments
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import play.api.libs.json.JsPath
@@ -29,7 +29,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec {
+class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.UnallocatedEmployerContributionsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.UnallocatedEmployerContributionsController.onSubmit(srn, NormalMode)

@@ -18,17 +18,15 @@ package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
 import views.html.TextInputView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class PartnershipNameOfOtherAssetSellerControllerSpec extends ControllerBaseSpec {
+class PartnershipNameOfOtherAssetSellerControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.PartnershipNameOfOtherAssetsSellerController.onSubmit(srn, index, NormalMode)

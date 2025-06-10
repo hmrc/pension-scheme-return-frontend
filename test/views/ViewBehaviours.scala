@@ -21,8 +21,7 @@ import play.twirl.api.Html
 import org.scalacheck.Gen
 import viewmodels.DisplayMessage
 
-trait ViewBehaviours {
-  _: ViewSpec =>
+trait ViewBehaviours extends ViewSpec {
 
   def renderTitle[A](gen: Gen[A])(view: A => Html, key: A => String): Unit =
     "render the title" in {

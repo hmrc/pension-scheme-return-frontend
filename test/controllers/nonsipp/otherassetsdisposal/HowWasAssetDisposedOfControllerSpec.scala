@@ -17,19 +17,17 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController._
 
-class HowWasAssetDisposedOfControllerSpec extends ControllerBaseSpec {
+class HowWasAssetDisposedOfControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.HowWasAssetDisposedOfController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)

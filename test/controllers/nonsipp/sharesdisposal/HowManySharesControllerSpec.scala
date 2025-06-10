@@ -17,20 +17,18 @@
 package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.HowManyDisposalSharesPage
 import forms.IntFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.IntView
 import controllers.nonsipp.sharesdisposal.HowManySharesController._
 
-class HowManySharesControllerSpec extends ControllerBaseSpec {
+class HowManySharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val shareIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.HowManySharesController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)

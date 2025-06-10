@@ -18,8 +18,8 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal._
-import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models.{IdentityType, NormalMode}
 import viewmodels.models.SectionCompleted
@@ -30,8 +30,8 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index: Max5000 = 1
+  private val disposalIndex: Max50 = 1
 
   "LandOrPropertyDisposalPage" - {
     act.like(
@@ -269,13 +269,13 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
+            srn => LandOrPropertyDisposalAddressListPage(srn, 1),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
                 .onPageLoad(srn, 1, 2, mode),
             srn =>
               defaultUserAnswers
-                .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
+                .unsafeSet(LandPropertyDisposalCompletedPage(srn, 1, 1), SectionCompleted)
           )
           .withName("Add Land or property disposal with a record at index 1")
       )
@@ -285,13 +285,13 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
+            srn => LandOrPropertyDisposalAddressListPage(srn, 1),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
                 .onPageLoad(srn, 1, 1, mode),
             srn =>
               defaultUserAnswers
-                .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(2)), SectionCompleted)
+                .unsafeSet(LandPropertyDisposalCompletedPage(srn, 1, 2), SectionCompleted)
           )
           .withName("Add Land or property disposal with a record at index 2")
       )
@@ -301,7 +301,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
+            srn => LandOrPropertyDisposalAddressListPage(srn, 1),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
                 .onPageLoad(srn, 1, 1, mode)

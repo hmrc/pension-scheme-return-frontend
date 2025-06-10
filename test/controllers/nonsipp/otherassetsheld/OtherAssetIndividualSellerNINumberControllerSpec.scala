@@ -17,19 +17,17 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetIndividualSellerNINumberPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import controllers.nonsipp.otherassetsheld.OtherAssetIndividualSellerNINumberController._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class OtherAssetIndividualSellerNINumberControllerSpec extends ControllerBaseSpec {
+class OtherAssetIndividualSellerNINumberControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController

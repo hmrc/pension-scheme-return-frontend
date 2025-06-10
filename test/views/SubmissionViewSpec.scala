@@ -19,7 +19,7 @@ package views
 import forms.mappings.Mappings
 import views.html.SubmissionView
 
-class SubmissionViewSpec extends ViewSpec with Mappings {
+class SubmissionViewSpec extends ViewSpec with ViewBehaviours with Mappings {
   runningApplication { implicit app =>
     val view = injected[SubmissionView]
 

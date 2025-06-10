@@ -17,19 +17,17 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import controllers.nonsipp.shares.SharesIndividualSellerNINumberController._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class SharesIndividualSellerNINumberControllerSpec extends ControllerBaseSpec {
+class SharesIndividualSellerNINumberControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController

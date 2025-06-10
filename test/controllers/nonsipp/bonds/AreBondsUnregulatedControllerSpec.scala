@@ -17,18 +17,16 @@
 package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.AreBondsUnregulatedPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.bonds.AreBondsUnregulatedController._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class AreBondsUnregulatedControllerSpec extends ControllerBaseSpec {
+class AreBondsUnregulatedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private lazy val onPageLoad = routes.AreBondsUnregulatedController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.AreBondsUnregulatedController.onSubmit(srn, index, NormalMode)
 

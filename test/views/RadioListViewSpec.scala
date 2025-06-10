@@ -22,7 +22,7 @@ import models.Enumerable
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-class RadioListViewSpec extends ViewSpec {
+class RadioListViewSpec extends ViewSpec with ViewBehaviours {
 
   implicit val enumerable: Enumerable[Int] = Enumerable(
     ("1", 1),

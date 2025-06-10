@@ -17,9 +17,9 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.SchemeDateService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DatePageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import play.api.inject
 import forms.DatePageFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
@@ -28,14 +28,12 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
+class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.WhenDidMemberSurrenderBenefitsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhenDidMemberSurrenderBenefitsController.onSubmit(srn, index, NormalMode)

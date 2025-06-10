@@ -17,7 +17,7 @@
 package controllers.nonsipp.landorproperty
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
@@ -28,7 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-class LandOrPropertyHeldControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyHeldController.onSubmit(srn, NormalMode)

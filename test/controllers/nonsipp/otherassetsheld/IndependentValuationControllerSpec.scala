@@ -17,18 +17,16 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.IndependentValuationPage
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.otherassetsheld.IndependentValuationController._
 import views.html.YesNoPageView
 
-class IndependentValuationControllerSpec extends ControllerBaseSpec {
+class IndependentValuationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private lazy val onPageLoad = routes.IndependentValuationController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IndependentValuationController.onSubmit(srn, index, NormalMode)
 

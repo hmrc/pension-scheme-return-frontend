@@ -18,10 +18,10 @@ package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NameDOB
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +31,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
+class RemoveMemberContributionControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.RemoveMemberContributionController.onPageLoad(srn, 1)
   private lazy val onSubmit = routes.RemoveMemberContributionController.onSubmit(srn, 1)
@@ -41,9 +41,9 @@ class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-    .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), money)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+    .unsafeSet(TotalMemberContributionPage(srn, 1), money)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -62,7 +62,7 @@ class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
 
       view(
         RemoveMemberContributionController.form(injected[YesNoPageFormProvider]),
-        RemoveMemberContributionController.viewModel(srn, refineMV(1), money, memberDetails.fullName)
+        RemoveMemberContributionController.viewModel(srn, 1, money, memberDetails.fullName)
       )
     })
 

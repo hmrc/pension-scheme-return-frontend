@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.RefinedTypes.Max5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class IndependentValuationPageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class IndependentValuationPageSpec extends PageBehaviours {
 
   "IndependentValuationPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val index = 1
 
     beRetrievable[Boolean](IndependentValuationPage(srn, index))
 

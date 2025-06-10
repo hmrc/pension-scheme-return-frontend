@@ -19,18 +19,20 @@ package controllers.nonsipp.employercontributions
 import play.api.test.FakeRequest
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import views.html.TwoColumnsTripleAction
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import models.{NormalMode, ViewOnlyMode}
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import config.RefinedTypes.Max300
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
+import org.scalatest.matchers.should.Matchers._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
-class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class EmployerContributionsMemberListControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -54,25 +56,25 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec w
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(
-      EmployerContributionsProgress(srn, refineMV(1), refineMV(1)),
+      EmployerContributionsProgress(srn, 1, 1),
       SectionJourneyStatus.Completed
     )
     .unsafeSet(EmployerContributionsPage(srn), true)
 
   val employerContributions: List[MemberWithEmployerContributions] = List(
     MemberWithEmployerContributions(
-      memberIndex = refineMV(1),
+      memberIndex = 1,
       employerFullName = memberDetails.fullName,
       contributions = List(
         EmployerContributions(
-          contributionIndex = refineMV(1),
+          contributionIndex = 1,
           status = SectionJourneyStatus.Completed
         )
       )
@@ -99,11 +101,11 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec w
     "viewModel should show 1 Employer Contribution when there is 1 contribution" in {
       val employerContributionsSingle: List[MemberWithEmployerContributions] = List(
         MemberWithEmployerContributions(
-          memberIndex = refineMV(1),
+          memberIndex = 1,
           employerFullName = "Test Member",
           contributions = List(
             EmployerContributions(
-              contributionIndex = refineMV(1),
+              contributionIndex = 1,
               status = SectionJourneyStatus.Completed
             )
           )
@@ -123,11 +125,11 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec w
     "viewModel should show 2 Employer Contributions when there are 2 contributions" in {
       val employerContributionsMultiple: List[MemberWithEmployerContributions] = List.fill(2)(
         MemberWithEmployerContributions(
-          memberIndex = refineMV(1),
+          memberIndex = 1,
           employerFullName = "Test Member",
           contributions = List(
             EmployerContributions(
-              contributionIndex = refineMV(1),
+              contributionIndex = 1,
               status = SectionJourneyStatus.Completed
             )
           )
@@ -217,7 +219,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec w
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(TotalEmployerContributionPage(srn, index, refineMV(1)), money)
+      .unsafeSet(TotalEmployerContributionPage(srn, index, 1), money)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -240,8 +242,8 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec w
     )
 
     val userAnswersNoEmployerContributions = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
       .unsafeSet(EmployerContributionsPage(srn), false)
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
@@ -263,7 +265,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec w
             mode = ViewOnlyMode,
             employerContributions = List(
               MemberWithEmployerContributions(
-                memberIndex = refineMV(1),
+                memberIndex = 1,
                 employerFullName = memberDetails.fullName,
                 contributions = Nil
               )

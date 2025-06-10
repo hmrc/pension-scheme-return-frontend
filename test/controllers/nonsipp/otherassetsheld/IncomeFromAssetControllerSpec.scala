@@ -17,18 +17,16 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.IncomeFromAssetPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.MoneyFormProvider
 import models.NormalMode
 import controllers.nonsipp.otherassetsheld.IncomeFromAssetController._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class IncomeFromAssetControllerSpec extends ControllerBaseSpec {
+class IncomeFromAssetControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   "IncomeFromAssetController" - {
 

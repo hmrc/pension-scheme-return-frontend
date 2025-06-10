@@ -109,7 +109,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     "shouldn't submit PsrDetails request when initial UA not exist yet" in {
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(None))
-      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any(), any())(any())
         verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockAssetsTransformer, never).transformToEtmp(any(), any(), any())(any())
@@ -126,7 +126,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     "shouldn't submit PsrDetails request when initial UA and current UA are same and isSubmitted false" in {
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(defaultUserAnswers)))
-      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any(), any())(any())
         verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockAssetsTransformer, never).transformToEtmp(any(), any(), any())(any())
@@ -145,7 +145,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Future.successful(Some(emptyUserAnswers)))
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
-      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
         verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockAssetsTransformer, never).transformToEtmp(any(), any(), any())(any())
@@ -178,7 +178,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
         whenReady(
           service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-        ) { result: Option[Unit] =>
+        ) { (result: Option[Unit]) =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
           verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
@@ -220,7 +220,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       whenReady(
         service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-      ) { result: Option[Unit] =>
+      ) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1))
           .transformToEtmp(any(), any(), ArgumentMatchers.eq(false))(any())
         verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
@@ -266,7 +266,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       whenReady(
         service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-      ) { result: Option[Unit] =>
+      ) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1))
           .transformToEtmp(any(), any(), ArgumentMatchers.eq(false))(any())
         verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
@@ -313,7 +313,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       whenReady(
         service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)
-      ) { result: Option[Unit] =>
+      ) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1))
           .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
         verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
@@ -360,7 +360,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       whenReady(
         service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)
-      ) { result: Option[Unit] =>
+      ) { (result: Option[Unit]) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1))
           .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
         verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
@@ -412,7 +412,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Future.successful(Some(userAnswers)))
 
       whenReady(service.submitPsrDetailsBypassed(srn = srn, fallbackCall)(implicitly, implicitly, request)) {
-        result: Option[Unit] =>
+        (result: Option[Unit]) =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1))
             .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
           verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())

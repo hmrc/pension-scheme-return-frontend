@@ -19,21 +19,19 @@ package controllers.nonsipp.otherassetsheld
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsheld.{OtherAssetsPrePopulated, WhatIsOtherAssetPage}
 import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
+class RemoveOtherAssetControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.RemoveOtherAssetController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveOtherAssetController.onSubmit(srn, index, NormalMode)
@@ -47,8 +45,8 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(OtherAssetsPrePopulated(srn, refineMV(1)), true)
-  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(OtherAssetsPrePopulated(srn, refineMV(1)), false)
+  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(OtherAssetsPrePopulated(srn, 1), true)
+  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(OtherAssetsPrePopulated(srn, 1), false)
 
   override protected def beforeEach(): Unit =
     reset(mockPsrSubmissionService)

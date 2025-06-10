@@ -21,7 +21,7 @@ import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import eu.timepit.refined.{refineMV, refineV}
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -32,8 +32,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val index: Max300 = 1
+  private val secondaryIndex: Max50 = 1
 
   "EmployerContributionsNavigator" - {
 
@@ -103,9 +103,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
     def userAnswersWithEmployerNames(num: Int)(srn: Srn): UserAnswers =
       (1 to num).foldLeft(defaultUserAnswers) { (ua, i) =>
-        val secondaryIndex =
-          refineV[Max50.Refined](i).getOrElse(throw new RuntimeException(s"$i was not in between 1 and 50"))
-        ua.unsafeSet(EmployerNamePage(srn, refineMV[Max300.Refined](1), secondaryIndex), "test employer name")
+        val secondaryIndex: Max50 = i
+        ua.unsafeSet(EmployerNamePage(srn, 1, secondaryIndex), "test employer name")
       }
 
     List(
@@ -117,9 +116,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
       (49, 10)
     ).foreach { case (navigatingFromIndex, expectedPage) =>
       val userAnswers = userAnswersWithEmployerNames(50) _
-      val secondaryIndex =
-        refineV[Max50.Refined](navigatingFromIndex)
-          .getOrElse(throw new RuntimeException(s"$index was not in between 1 and 50"))
+      val secondaryIndex: Max50 = navigatingFromIndex
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
@@ -257,12 +254,12 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     )
 
     List(
-      (List("0"), refineMV[Max50.Refined](2)),
-      (List("0", "1", "2"), refineMV[Max50.Refined](4)),
-      (List("1", "2"), refineMV[Max50.Refined](1)), // deleted first entry
-      (List("0", "1", "3"), refineMV[Max50.Refined](3)), // deleted one entry in the middle
-      (List("0", "1", "2", "5", "6"), refineMV[Max50.Refined](4)), // deleted two entry in the middle
-      (List("0", "1", "3", "5", "6"), refineMV[Max50.Refined](3)) // deleted entry in the middle of two sections
+      (List("0"), 2),
+      (List("0", "1", "2"), 4),
+      (List("1", "2"), 1), // deleted first entry
+      (List("0", "1", "3"), 3), // deleted one entry in the middle
+      (List("0", "1", "2", "5", "6"), 4), // deleted two entry in the middle
+      (List("0", "1", "3", "5", "6"), 3) // deleted entry in the middle of two sections
     ).foreach { case (existingIndexes, expectedRedirectIndex) =>
       def userAnswers(srn: Srn) =
         defaultUserAnswers
@@ -285,7 +282,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
             userAnswers
           )
           .withName(
-            s"go from contribution from another employer page to employer name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
+            s"go from contribution from another employer page to employer name page with index ${expectedRedirectIndex} when indexes $existingIndexes already exist"
           )
       )
     }
@@ -314,7 +311,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
             (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                 .onPageLoad(srn, 1, NormalMode),
-            srn => defaultUserAnswers.unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+            srn => defaultUserAnswers.unsafeSet(EmployerNamePage(srn, 1, 1), employerName)
           )
           .withName("go from remove employer page to contributions list page")
       )

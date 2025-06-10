@@ -21,8 +21,6 @@ import org.mockito.Mockito.{never, _}
 import models.ConditionalYesNo._
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
 import views.html.ListView
-import pages.nonsipp.landorproperty._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
@@ -30,14 +28,16 @@ import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
 import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty._
 
-class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
-  val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
-  val indexThree: Refined[Int, OneTo5000] = refineMV[OneTo5000](3)
-  val indexFour: Refined[Int, OneTo5000] = refineMV[OneTo5000](4)
+  val indexOne: Refined[Int, OneTo5000] = 1
+  val indexTwo: Refined[Int, OneTo5000] = 2
+  val indexThree: Refined[Int, OneTo5000] = 3
+  val indexFour: Refined[Int, OneTo5000] = 4
 
   private val address1 = addressGen.sample.value.copy(addressLine1 = "test 1")
   private val address2 = addressGen.sample.value.copy(addressLine1 = "test 2")

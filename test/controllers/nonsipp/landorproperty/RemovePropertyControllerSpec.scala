@@ -19,23 +19,21 @@ package controllers.nonsipp.landorproperty
 import services.PsrSubmissionService
 import models.ConditionalYesNo._
 import models.SchemeHoldLandProperty.Transfer
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
 import controllers.nonsipp.landorproperty.RemovePropertyController._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty._
 
-class RemovePropertyControllerSpec extends ControllerBaseSpec {
+class RemovePropertyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.RemovePropertyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemovePropertyController.onSubmit(srn, index, NormalMode)
@@ -53,9 +51,9 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec {
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   val prePopUserAnswersChecked: UserAnswers =
-    filledUserAnswers.unsafeSet(LandOrPropertyPrePopulated(srn, refineMV(1)), true)
+    filledUserAnswers.unsafeSet(LandOrPropertyPrePopulated(srn, 1), true)
   val prePopUserAnswersNotChecked: UserAnswers =
-    filledUserAnswers.unsafeSet(LandOrPropertyPrePopulated(srn, refineMV(1)), false)
+    filledUserAnswers.unsafeSet(LandOrPropertyPrePopulated(srn, 1), false)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)

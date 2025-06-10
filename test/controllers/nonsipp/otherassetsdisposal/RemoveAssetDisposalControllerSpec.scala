@@ -20,24 +20,22 @@ import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.HowDisposed
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
+class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
   private val methodOfDisposal = HowDisposed.Sold
 
   private lazy val onPageLoad =

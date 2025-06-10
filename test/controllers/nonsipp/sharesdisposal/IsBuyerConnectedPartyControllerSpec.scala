@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
 import controllers.nonsipp.sharesdisposal.IsBuyerConnectedPartyController._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val shareIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.IsBuyerConnectedPartyController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)

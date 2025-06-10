@@ -17,24 +17,22 @@
 package controllers.nonsipp.bonds
 
 import services.SchemeDateService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.DatePageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.DatePageFormProvider
 import models.NormalMode
 import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
 import org.mockito.Mockito.reset
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenDidSchemeAcquireBondsControllerSpec extends ControllerBaseSpec {
+class WhenDidSchemeAcquireBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] = List(

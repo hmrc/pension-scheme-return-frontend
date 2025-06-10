@@ -16,15 +16,14 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class HowManySharesPageSpec extends PageBehaviours {
 
   "HowManySharesPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Int](HowManySharesPage(srn, index))
 

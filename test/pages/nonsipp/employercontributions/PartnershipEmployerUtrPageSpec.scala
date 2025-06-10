@@ -16,18 +16,17 @@
 
 package pages.nonsipp.employercontributions
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import models.{ConditionalYesNo, Utr}
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max300, Max50}
-import controllers.TestValues
 
 class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
 
   "PartnershipEmployerUtrPage" - {
 
-    val memberIndex = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val memberIndex = 1
+    val secondaryIndex = 1
     val srn = srnGen.sample.value
 
     beRetrievable[ConditionalYesNo[String, Utr]](PartnershipEmployerUtrPage(srn, memberIndex, secondaryIndex))

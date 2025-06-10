@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class LandPropertyIndependentValuationPageSpec extends PageBehaviours {
@@ -25,7 +24,7 @@ class LandPropertyIndependentValuationPageSpec extends PageBehaviours {
   "LandPropertyIndependentValuationPage" - {
 
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](LandPropertyIndependentValuationPage(srn, index))
 

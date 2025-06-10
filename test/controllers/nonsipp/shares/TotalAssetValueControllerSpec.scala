@@ -17,18 +17,16 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.TotalAssetValuePage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.shares.TotalAssetValueController._
 import forms.MoneyFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class TotalAssetValueControllerSpec extends ControllerBaseSpec {
+class TotalAssetValueControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   "TotalAssetValueController" - {
 

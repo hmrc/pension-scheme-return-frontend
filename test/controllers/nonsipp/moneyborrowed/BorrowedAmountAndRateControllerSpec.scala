@@ -16,19 +16,16 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MultipleQuestionView
-import utils.IntUtils.toInt
-import controllers.nonsipp.moneyborrowed.{routes, BorrowedAmountAndRateController}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.BorrowedAmountAndRatePage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class BorrowedAmountAndRateControllerSpec extends ControllerBaseSpec {
+class BorrowedAmountAndRateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   val maxAllowedAmount = 999999999.99
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   "BorrowedAmountAndRateController" - {
 

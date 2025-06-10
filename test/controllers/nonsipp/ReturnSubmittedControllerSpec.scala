@@ -17,7 +17,7 @@
 package controllers.nonsipp
 
 import play.api.test.FakeRequest
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
 import play.api.libs.json.Json
 import models.DateRange
@@ -30,7 +30,7 @@ import views.html.SubmissionView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class ReturnSubmittedControllerSpec extends ControllerBaseSpec {
+class ReturnSubmittedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.ReturnSubmittedController.onPageLoad(srn).url
 

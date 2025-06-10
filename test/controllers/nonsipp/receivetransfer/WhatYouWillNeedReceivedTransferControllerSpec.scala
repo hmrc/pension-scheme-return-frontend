@@ -16,11 +16,10 @@
 
 package controllers.nonsipp.receivetransfer
 
-import controllers.nonsipp.receivetransfer.{routes, WhatYouWillNeedReceivedTransferController}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedReceivedTransferControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedReceivedTransferControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedReceivedTransferController" - {
 

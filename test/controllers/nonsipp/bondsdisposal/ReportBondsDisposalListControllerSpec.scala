@@ -18,7 +18,7 @@ package controllers.nonsipp.bondsdisposal
 
 import services.PsrSubmissionService
 import views.html.ListView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import pages.nonsipp.bondsdisposal._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
@@ -27,13 +27,13 @@ import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
 
-class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
+class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.ReportBondsDisposalListController.onPageLoad(srn, page)
   private lazy val onSubmit = routes.ReportBondsDisposalListController.onSubmit(srn, page, NormalMode)
@@ -64,9 +64,9 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
   private val page = 1
-  private val bondIndexOne = refineMV[Max5000.Refined](1)
-  private val disposalIndexOne = refineMV[Max50.Refined](1)
-  private val disposalIndexTwo = refineMV[Max50.Refined](2)
+  private val bondIndexOne: Max5000 = 1
+  private val disposalIndexOne: Max50 = 1
+  private val disposalIndexTwo: Max50 = 2
 
   private val numberOfDisposals = 2
   private val maxPossibleNumberOfDisposals = 100

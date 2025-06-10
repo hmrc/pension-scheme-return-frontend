@@ -17,7 +17,7 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
@@ -28,7 +28,7 @@ import org.mockito.Mockito._
 import models.NormalMode
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController._
 
-class LandOrPropertyDisposalControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyDisposalController.onSubmit(srn, NormalMode)

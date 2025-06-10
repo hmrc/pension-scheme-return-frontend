@@ -18,10 +18,10 @@ package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.HowWereSharesDisposedPage
 import forms.YesNoPageFormProvider
 import models.{HowSharesDisposed, NormalMode}
@@ -29,15 +29,13 @@ import controllers.nonsipp.sharesdisposal.RemoveShareDisposalController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
+class RemoveShareDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad = routes.RemoveShareDisposalController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.RemoveShareDisposalController.onSubmit(srn, index, disposalIndex, NormalMode)

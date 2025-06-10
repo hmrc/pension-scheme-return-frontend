@@ -18,23 +18,21 @@ package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
-import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import eu.timepit.refined.refineMV
 
-class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
+class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -70,8 +68,8 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), money)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
   "MemberPensionPaymentsCYAController" - {
 
@@ -115,14 +113,14 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
   "MemberPensionPaymentsCYAController in view only mode" - {
 
     val currentUserAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
       .unsafeSet(FbVersionPage(srn), "002")
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
       .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), money)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {

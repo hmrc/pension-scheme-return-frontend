@@ -17,10 +17,10 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.{PsrSubmissionService, SaveService}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.bondsdisposal._
@@ -32,12 +32,10 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
+class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
   private implicit val mockSaveService: SaveService = mock[SaveService]
@@ -75,8 +73,8 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
     submissionNumberOne
   )
 
-  private val bondIndex = refineMV[OneTo5000](1)
-  private val disposalIndex = refineMV[OneTo50](1)
+  private val bondIndex = 1
+  private val disposalIndex = 1
   private val page = 1
 
   private val dateBondsSold = Some(localDate)

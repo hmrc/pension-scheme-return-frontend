@@ -17,18 +17,16 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 
-class IsLesseeConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsLesseeConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IsLesseeConnectedPartyController.onSubmit(srn, index, NormalMode)

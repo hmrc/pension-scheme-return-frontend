@@ -54,7 +54,7 @@
 //)(implicit val ec: ExecutionContext)
 //    extends TestDataSingleIndexController[Max5000.Refined] {
 //
-//  override val max: Max5000 = refineMV(5000)
+//  override val max: Max5000 = 5000
 //
 //  override def pages(srn: Srn, index: Max5000): Pages = HList(
 //    (

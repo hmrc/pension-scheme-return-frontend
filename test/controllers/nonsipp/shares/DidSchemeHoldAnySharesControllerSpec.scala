@@ -18,7 +18,7 @@ package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -28,7 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-class DidSchemeHoldAnySharesControllerSpec extends ControllerBaseSpec {
+class DidSchemeHoldAnySharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.DidSchemeHoldAnySharesController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.DidSchemeHoldAnySharesController.onSubmit(srn, NormalMode)

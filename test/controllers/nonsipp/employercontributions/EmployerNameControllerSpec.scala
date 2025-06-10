@@ -18,18 +18,16 @@ package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.EmployerNamePage
 import controllers.nonsipp.employercontributions.EmployerNameController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class EmployerNameControllerSpec extends ControllerBaseSpec {
+class EmployerNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val index = refineMV[Max50.Refined](1)
+  private val memberIndex = 1
+  private val index = 1
   private lazy val onPageLoad = routes.EmployerNameController.onPageLoad(srn, memberIndex, index, NormalMode)
   private lazy val onSubmit = routes.EmployerNameController.onSubmit(srn, memberIndex, index, NormalMode)
 

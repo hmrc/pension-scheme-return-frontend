@@ -18,19 +18,17 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController._
 import play.api.mvc.Call
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models._
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class RecipientSponsoringEmployerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class RecipientSponsoringEmployerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val subject = IdentitySubject.LoanRecipient
 
   lazy val onPageLoad: Call =

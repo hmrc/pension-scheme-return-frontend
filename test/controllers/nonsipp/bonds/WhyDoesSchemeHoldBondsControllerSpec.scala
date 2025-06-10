@@ -18,18 +18,16 @@ package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import views.html.RadioListView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.NormalMode
 import controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 
-class WhyDoesSchemeHoldBondsControllerSpec extends ControllerBaseSpec {
+class WhyDoesSchemeHoldBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     routes.WhyDoesSchemeHoldBondsController.onPageLoad(srn, index, NormalMode)

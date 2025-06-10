@@ -18,26 +18,24 @@ package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
 import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.{Max300, Max5}
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class ReportAnotherTransferInControllerSpec extends ControllerBaseSpec {
+class ReportAnotherTransferInControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 

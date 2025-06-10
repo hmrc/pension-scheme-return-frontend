@@ -21,7 +21,7 @@ import services._
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import views.html.OverviewView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses.PsrReportType
 import models.CheckMode
@@ -34,7 +34,7 @@ import play.api.inject.guice.GuiceableModule
 
 import scala.concurrent.Future
 
-class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
+class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviours with CommonTestValues {
 
   lazy val onPageLoad: String = routes.OverviewController.onPageLoad(srn).url
   def onSelectStart(lastSubmittedPsrFbInPreviousYears: Option[String]): String =
@@ -243,7 +243,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onSelectViewAndChange redirects to the task list page when members over threshold and previous userAnswers has some memberDetails" in {
       val currentUA = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-      val preUA = currentUA.unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+      val preUA = currentUA.unsafeSet(DoesMemberHaveNinoPage(srn, 1), true)
 
       running(_ => applicationBuilder(userAnswers = Some(currentUA), previousUserAnswers = Some(preUA))) { app =>
         val request = FakeRequest(GET, onSelectViewAndChange)

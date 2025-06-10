@@ -17,8 +17,7 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted._
-import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.UserAnswers
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
@@ -27,7 +26,7 @@ class SurrenderedBenefitsCompletedPageSpec extends PageBehaviours {
 
   "SurrenderedBenefitsCompletedPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
     val srn = srnGen.sample.value
 
     beRetrievable[SectionCompleted](SurrenderedBenefitsCompletedPage(srn, index))
@@ -39,7 +38,7 @@ class SurrenderedBenefitsCompletedPageSpec extends PageBehaviours {
   }
 
   "SurrenderedBenefitsCompletedPage" - {
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
     val srn = srnGen.sample.value
 
     SurrenderedBenefitsCompletedPage(srn, index).toString mustBe "surrenderedBenefitsSectionCompleted"
@@ -49,7 +48,7 @@ class SurrenderedBenefitsCompletedPageSpec extends PageBehaviours {
 
     "must return a list of indexes for completed sections" in {
       val srn = srnGen.sample.value
-      val index = refineMV[Max300.Refined](1)
+      val index = 1
 
       val userAnswers = UserAnswers(id = "test-id")
         .set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)

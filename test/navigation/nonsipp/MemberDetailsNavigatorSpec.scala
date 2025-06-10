@@ -19,8 +19,6 @@ package navigation.nonsipp
 import models.ManualOrUpload.{Manual, Upload}
 import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
 import models.SchemeId.Srn
-import generators.IndexGen
-import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import models._
@@ -28,6 +26,8 @@ import utils.BaseSpec
 import pages.nonsipp.memberdetails._
 import config.RefinedTypes.OneTo300
 import controllers.nonsipp.memberdetails.routes
+import generators.IndexGen
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -62,7 +62,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            MemberDetailsPage(_, refineMV(1)),
+            MemberDetailsPage(_, 1),
             routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, 1, _)
           )
           .withName("go from details to have a nino page")
@@ -71,7 +71,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            MemberDetailsPage(_, refineMV(1)),
+            MemberDetailsPage(_, 1),
             routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, 1, _)
           )
           .withName("go from member details page to does member have nino page")
@@ -80,7 +80,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            DoesMemberHaveNinoPage(_, refineMV(1)),
+            DoesMemberHaveNinoPage(_, 1),
             Gen.const(true),
             routes.MemberDetailsNinoController.onPageLoad(_, 1, _)
           )
@@ -90,7 +90,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            DoesMemberHaveNinoPage(_, refineMV(1)),
+            DoesMemberHaveNinoPage(_, 1),
             Gen.const(false),
             routes.NoNINOController.onPageLoad(_, 1, _)
           )
@@ -100,7 +100,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            MemberDetailsNinoPage(_, refineMV(1)),
+            MemberDetailsNinoPage(_, 1),
             (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, NormalMode)
           )
           .withName("go from nino page to check answers page")
@@ -109,7 +109,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            NoNINOPage(_, refineMV(1)),
+            NoNINOPage(_, 1),
             (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, NormalMode)
           )
           .withName("go from no nino page to scheme member details answers page")
@@ -292,7 +292,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         checkmode
           .navigateTo(
-            MemberDetailsPage(_, refineMV(1)),
+            MemberDetailsPage(_, 1),
             (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode)
           )
           .withName("go from member details page to check answers page")
@@ -301,7 +301,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         checkmode
           .navigateTo(
-            MemberDetailsNinoPage(_, refineMV(1)),
+            MemberDetailsNinoPage(_, 1),
             (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode)
           )
           .withName("go from member details nino page to check your answers page")
@@ -310,7 +310,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         checkmode
           .navigateTo(
-            NoNINOPage(_, refineMV(1)),
+            NoNINOPage(_, 1),
             (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode)
           )
           .withName("go from no nino page to check your answers page")
@@ -319,14 +319,14 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       "does member have nino page should go to" - {
 
         val userAnswersWithNino =
-          (srn: Srn) => defaultUserAnswers.unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+          (srn: Srn) => defaultUserAnswers.unsafeSet(MemberDetailsNinoPage(srn, 1), nino)
         val userAnswersWithNoNinoReason =
-          (srn: Srn) => defaultUserAnswers.unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+          (srn: Srn) => defaultUserAnswers.unsafeSet(NoNINOPage(srn, 1), noninoReason)
 
         act.like(
           checkmode
             .navigateToWithData(
-              DoesMemberHaveNinoPage(_, refineMV(1)),
+              DoesMemberHaveNinoPage(_, 1),
               Gen.const(true),
               routes.MemberDetailsNinoController.onPageLoad(_, 1, _)
             )
@@ -336,7 +336,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           checkmode
             .navigateToWithData(
-              DoesMemberHaveNinoPage(_, refineMV(1)),
+              DoesMemberHaveNinoPage(_, 1),
               Gen.const(false),
               routes.NoNINOController.onPageLoad(_, 1, _)
             )
@@ -346,7 +346,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           checkmode
             .navigateToWithData(
-              DoesMemberHaveNinoPage(_, refineMV(1)),
+              DoesMemberHaveNinoPage(_, 1),
               Gen.const(true),
               (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode),
               userAnswersWithNino
@@ -357,7 +357,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           checkmode
             .navigateToWithData(
-              DoesMemberHaveNinoPage(_, refineMV(1)),
+              DoesMemberHaveNinoPage(_, 1),
               Gen.const(false),
               (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode),
               userAnswersWithNoNinoReason

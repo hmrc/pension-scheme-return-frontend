@@ -17,10 +17,10 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.RefinedTypes.{Max5000, OneTo5000}
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed._
@@ -30,7 +30,7 @@ import org.scalacheck.Gen
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo5000](1)
+  private val index: Max5000 = 1
 
   "MoneyBorrowedNavigator" - {
 
@@ -138,7 +138,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          srn => RemoveBorrowInstancesPage(srn, refineMV(1)),
+          srn => RemoveBorrowInstancesPage(srn, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
         )
         .withName("go from remove page to Money Borrowed page")
@@ -150,7 +150,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          srn => RemoveBorrowInstancesPage(srn, refineMV(1)),
+          srn => RemoveBorrowInstancesPage(srn, 1),
           (srn, _) =>
             controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
               .onPageLoad(srn = srn, page = 1, mode = NormalMode),
@@ -169,7 +169,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, mode) => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, 2, mode),
             srn =>
               defaultUserAnswers
-                .unsafeSet(LenderNamePage(srn, refineMV(1)), "LenderName")
+                .unsafeSet(LenderNamePage(srn, 1), "LenderName")
           )
           .withName("Add Borrow instance with a record at index 1")
       )
@@ -183,7 +183,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, mode) => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, 1, mode),
             srn =>
               defaultUserAnswers
-                .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(2)), (money, percentage))
+                .unsafeSet(BorrowedAmountAndRatePage(srn, 2), (money, percentage))
           )
           .withName("Add Borrow instance with a record at index 2")
       )
@@ -206,7 +206,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       checkmode
         .navigateTo(
-          LenderNamePage(_, refineMV(1)),
+          LenderNamePage(_, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from lender name page to money borrowed CYA page")
@@ -215,7 +215,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       checkmode
         .navigateTo(
-          IsLenderConnectedPartyPage(_, refineMV(1)),
+          IsLenderConnectedPartyPage(_, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from is lender connected party page to money borrowed CYA page")
@@ -224,7 +224,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       checkmode
         .navigateTo(
-          BorrowedAmountAndRatePage(_, refineMV(1)),
+          BorrowedAmountAndRatePage(_, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from borrowed amount and interest rate page to money borrowed CYA page")
@@ -233,7 +233,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       checkmode
         .navigateTo(
-          WhenBorrowedPage(_, refineMV(1)),
+          WhenBorrowedPage(_, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from when amount was borrowed rate page to money borrowed CYA page")
@@ -242,7 +242,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       checkmode
         .navigateTo(
-          ValueOfSchemeAssetsWhenMoneyBorrowedPage(_, refineMV(1)),
+          ValueOfSchemeAssetsWhenMoneyBorrowedPage(_, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from value of scheme assets when money borrowed page to money borrowed CYA page")
@@ -251,7 +251,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       checkmode
         .navigateTo(
-          WhySchemeBorrowedMoneyPage(_, refineMV(1)),
+          WhySchemeBorrowedMoneyPage(_, 1),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from why scheme borrowed amount page to money borrowed CYA page")

@@ -18,13 +18,12 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
-import config.RefinedTypes.{Max5000, OneTo5000}
-import eu.timepit.refined.refineMV
+import config.RefinedTypes.Max5000
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty._
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
@@ -33,7 +32,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[OneTo5000](1)
+  private val index: Max5000 = 1
   private val subject = IdentitySubject.LandOrPropertySeller
 
   "LandOrPropertyNavigator" - {
@@ -479,7 +478,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          srn => RemovePropertyPage(srn, refineMV(1)),
+          srn => RemovePropertyPage(srn, 1),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad
         )
         .withName("go from remove page to LandOrPropertyHeldPage page")
@@ -496,7 +495,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               srn,
               mode
             ) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 2, mode),
-            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, 1), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 1")
       )
@@ -511,7 +510,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               srn,
               mode
             ) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode),
-            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, 2), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 2")
       )

@@ -17,13 +17,13 @@
 package pages.nonsipp.common
 
 import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.{ConditionalYesNo, IdentitySubject, Utr}
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 
 class PartnershipRecipientUtrPageSpec extends PageBehaviours {
-  val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  val index: Refined[Int, OneTo5000] = 1
   private val srnSample = srnGen.sample.value
 
   "PartnershipRecipientUtrPage" - {

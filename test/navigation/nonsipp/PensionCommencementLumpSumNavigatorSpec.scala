@@ -18,9 +18,9 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import pages.nonsipp.memberreceivedpcls._
-import config.RefinedTypes.OneTo300
+import config.RefinedTypes.Max300
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
@@ -28,7 +28,7 @@ import models.NormalMode
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo300](1)
+  private val index: Max300 = 1
 
   "PensionCommencementLumpSumNavigator" - {
 

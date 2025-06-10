@@ -18,8 +18,8 @@ package controllers.nonsipp.shares
 
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import models.ConditionalYesNo._
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
 import models._
@@ -30,8 +30,6 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import pages.nonsipp.shares._
 import play.api.mvc.Call
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import models.SchemeHoldShare.Contribution
 import views.html.CheckYourAnswersView
@@ -39,7 +37,7 @@ import models.TypeOfShares.ConnectedParty
 
 import scala.concurrent.Future
 
-class SharesCYAControllerSpec extends ControllerBaseSpec {
+class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -56,7 +54,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
   }
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.SharesSeller
 

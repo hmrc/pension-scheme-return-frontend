@@ -24,6 +24,7 @@ import models.ManualOrUpload.{Manual, Upload}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import play.api.inject.bind
 import views.html.ListView
+import utils.IntUtils.given
 import eu.timepit.refined._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
@@ -34,9 +35,9 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
 import config.RefinedTypes.OneTo300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class SchemeMembersListControllerSpec extends ControllerBaseSpec {
+class SchemeMembersListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   lazy val onPageLoadManual: Call = routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
   lazy val onPageLoadUpload: Call = routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
@@ -64,9 +65,9 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   )
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberStatus(srn, 1), MemberState.New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
   private val userAnswersWith300MembersDetails =
     (1 to 300).foldLeft(defaultUserAnswers)((ua, i) =>
@@ -83,8 +84,8 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   )
 
   val userAnswers: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(MemberContributionsPage(srn), true)
 
   private val userAnswersToCheck = userAnswers
@@ -96,9 +97,9 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   "SchemeMembersListController" - {
     "incomplete members must be filtered" in {
       val userAnswers = defaultUserAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
 
       val completedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
       val unfilteredMemberDetails = userAnswers.membersDetails(srn)
@@ -121,7 +122,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                 1,
                 Manual,
                 NormalMode,
-                List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+                List((1, ((index - 1).toString, memberDetails.fullName))),
                 viewOnlyUpdated = false
               )
             )
@@ -181,7 +182,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                 1,
                 Upload,
                 NormalMode,
-                List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+                List((1, ((index - 1).toString, memberDetails.fullName))),
                 viewOnlyUpdated = false
               )
             )
@@ -235,14 +236,14 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       val currentUserAnswers = defaultUserAnswers
         .unsafeSet(FbVersionPage(srn), "002")
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
       val previousUserAnswers = currentUserAnswers
         .unsafeSet(FbVersionPage(srn), "001")
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
       act.like(
         renderView(
@@ -257,7 +258,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
               page = 1,
               manualOrUpload = Upload,
               mode = ViewOnlyMode,
-              filteredMembers = List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+              filteredMembers = List((1, ((index - 1).toString, memberDetails.fullName))),
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -269,7 +270,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       )
 
       val updatedUserAnswers = currentUserAnswers
-        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+        .unsafeSet(MemberDetailsNinoPage(srn, 1), nino)
 
       act.like(
         renderView(
@@ -284,7 +285,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
               page = 1,
               manualOrUpload = Upload,
               mode = ViewOnlyMode,
-              filteredMembers = List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+              filteredMembers = List((1, ((index - 1).toString, memberDetails.fullName))),
               viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -344,7 +345,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                 1,
                 Manual,
                 NormalMode,
-                List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+                List((1, ((index - 1).toString, memberDetails.fullName))),
                 viewOnlyUpdated = false,
                 prePopNotChecked = true
               )
@@ -362,7 +363,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                 1,
                 Manual,
                 NormalMode,
-                List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+                List((1, ((index - 1).toString, memberDetails.fullName))),
                 viewOnlyUpdated = false,
                 prePopNotChecked = false
               )

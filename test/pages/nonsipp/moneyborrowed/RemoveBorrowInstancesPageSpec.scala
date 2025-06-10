@@ -16,8 +16,7 @@
 
 package pages.nonsipp.moneyborrowed
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemoveBorrowInstancesPageSpec extends PageBehaviours {
@@ -25,7 +24,7 @@ class RemoveBorrowInstancesPageSpec extends PageBehaviours {
   private val srn = srnGen.sample.value
 
   "RemoveBorrowInstancesPage" - {
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](RemoveBorrowInstancesPage(srn, index))
 

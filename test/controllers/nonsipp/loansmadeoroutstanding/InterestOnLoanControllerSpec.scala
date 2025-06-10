@@ -17,7 +17,7 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import models.ConditionalYesNo._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MultipleQuestionView
 import utils.IntUtils.toInt
 import config.Constants.maxCurrencyValue
@@ -25,7 +25,7 @@ import models._
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.partialAnswersForm
 import pages.nonsipp.loansmadeoroutstanding._
 
-class InterestOnLoanControllerSpec extends ControllerBaseSpec {
+class InterestOnLoanControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val partialUserAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(InterestOnLoanPage(srn, index1of5000), partialInterestOnLoan)

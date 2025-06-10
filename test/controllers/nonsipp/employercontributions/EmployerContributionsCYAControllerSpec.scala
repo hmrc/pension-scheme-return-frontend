@@ -16,9 +16,9 @@
 
 package controllers.nonsipp.employercontributions
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -28,17 +28,15 @@ import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when, _}
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
+class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private val page = 1
 
   private val employerCYAs = List(

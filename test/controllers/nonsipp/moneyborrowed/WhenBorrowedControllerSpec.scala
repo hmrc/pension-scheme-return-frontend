@@ -18,23 +18,21 @@ package controllers.nonsipp.moneyborrowed
 
 import services.SchemeDateService
 import controllers.nonsipp.moneyborrowed.WhenBorrowedController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.DatePageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.DatePageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhenBorrowedPage}
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenBorrowedControllerSpec extends ControllerBaseSpec {
+class WhenBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 

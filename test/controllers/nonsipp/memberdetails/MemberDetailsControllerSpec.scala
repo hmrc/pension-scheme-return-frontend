@@ -17,10 +17,9 @@
 package controllers.nonsipp.memberdetails
 
 import play.api.test.FakeRequest
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.NameDOBView
 import utils.IntUtils.toRefined300
-import eu.timepit.refined.refineMV
 import forms.NameDOBFormProvider
 import models.{NameDOB, NormalMode}
 import play.api.i18n.Messages
@@ -31,7 +30,7 @@ import controllers.nonsipp.memberdetails.MemberDetailsController._
 
 import java.time.LocalDate
 
-class MemberDetailsControllerSpec extends ControllerBaseSpec {
+class MemberDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.MemberDetailsController.onPageLoad(srn, 1, NormalMode)
   private lazy val onSubmit = routes.MemberDetailsController.onSubmit(srn, 1, NormalMode)
@@ -70,12 +69,12 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[NameDOBView]
-        .apply(form(injected[NameDOBFormProvider], None), viewModel(srn, refineMV(1), NormalMode))
+        .apply(form(injected[NameDOBFormProvider], None), viewModel(srn, 1, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, MemberDetailsPage(srn, 1), nameDOB) { implicit app => implicit request =>
       val preparedForm = form(injected[NameDOBFormProvider], None).fill(nameDOB)
-      injected[NameDOBView].apply(preparedForm, viewModel(srn, refineMV(1), NormalMode))
+      injected[NameDOBView].apply(preparedForm, viewModel(srn, 1, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

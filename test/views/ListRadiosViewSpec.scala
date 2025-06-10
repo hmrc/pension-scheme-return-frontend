@@ -26,7 +26,7 @@ import config.RefinedTypes.Max5000._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, ListRadiosViewModel, PaginatedViewModel}
 
-class ListRadiosViewSpec extends ViewSpec {
+class ListRadiosViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     implicit val view: ListRadiosView = injected[ListRadiosView]

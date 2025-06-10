@@ -18,8 +18,8 @@ package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
+import utils.IntUtils.given
 import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
-import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, IndependentValuationPage, SharesDisposalProgress}
 import forms.YesNoPageFormProvider
 import models.{NormalMode, ViewOnlyMode, ViewOnlyViewModel}
@@ -29,14 +29,14 @@ import org.mockito.Mockito._
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import play.api.inject.guice.GuiceableModule
 import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListView
 import models.TypeOfShares._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 import models.HowSharesDisposed._
 
-class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
+class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.ReportedSharesDisposalListController.onPageLoad(srn, page)
   private lazy val onSubmit = routes.ReportedSharesDisposalListController.onSubmit(srn, page, NormalMode)
@@ -67,10 +67,10 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
   private val page = 1
-  private val shareIndexOne = refineMV[Max5000.Refined](1)
-  private val shareIndexTwo = refineMV[Max5000.Refined](2)
-  private val disposalIndexOne = refineMV[Max50.Refined](1)
-  private val disposalIndexTwo = refineMV[Max50.Refined](2)
+  private val shareIndexOne = 1
+  private val shareIndexTwo = 2
+  private val disposalIndexOne = 1
+  private val disposalIndexTwo = 2
 
   private val sharesTypeOne = SponsoringEmployer
   private val sharesTypeTwo = Unquoted
@@ -80,7 +80,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
   private val howSharesDisposedThree = Transferred
   private val howSharesDisposedFour = Other(otherDetails)
 
-  private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
+  private val disposalIndexes: List[Max50] = List(disposalIndexTwo, disposalIndexOne)
 
   private val completedUserAnswers = defaultUserAnswers
     // Shares #1

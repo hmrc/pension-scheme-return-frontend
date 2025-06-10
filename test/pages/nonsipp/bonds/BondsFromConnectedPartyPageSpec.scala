@@ -16,8 +16,7 @@
 
 package pages.nonsipp.bonds
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class BondsFromConnectedPartyPageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class BondsFromConnectedPartyPageSpec extends PageBehaviours {
 
   "BondsFromConnectedPartyPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](BondsFromConnectedPartyPage(srn, index))
 

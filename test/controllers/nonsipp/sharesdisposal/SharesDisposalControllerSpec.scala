@@ -26,11 +26,11 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import controllers.nonsipp.sharesdisposal.SharesDisposalController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
 import scala.concurrent.Future
 
-class SharesDisposalControllerSpec extends ControllerBaseSpec {
+class SharesDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SharesDisposalController.onSubmit(srn, NormalMode)

@@ -20,14 +20,14 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import forms.mappings.Mappings
-import generators.Generators
 import cats.implicits._
-import eu.timepit.refined.refineMV
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
 import uk.gov.hmrc.time.TaxYear
 import play.api.data.{Form, FormError}
 import forms.mappings.errors.DateFormErrors
+import generators.Generators
+import utils.IntUtils.given
 import utils.DateTimeUtils.localDateShow
 import models.DateRange
 
@@ -71,7 +71,7 @@ class DateRangeMappingsSpec
       overlappedEndDateError = "error.overlapped.end",
       duplicateRanges = duplicateRanges,
       previousDateRangeError = Some("error.previousStartDate"),
-      index = refineMV(1),
+      index = 1,
       taxYear = defaultTaxYear,
       errorStartBefore = "error.startBefore",
       errorStartAfter = "error.startAfter",

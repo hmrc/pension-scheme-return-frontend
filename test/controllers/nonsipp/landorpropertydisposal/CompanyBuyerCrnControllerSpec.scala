@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerCrnController._
 import views.html.ConditionalYesNoPageView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
+class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.CompanyBuyerCrnController

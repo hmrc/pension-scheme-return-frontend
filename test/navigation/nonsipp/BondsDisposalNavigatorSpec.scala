@@ -20,7 +20,7 @@ import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.bondsdisposal._
@@ -30,9 +30,9 @@ import org.scalacheck.Gen
 class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val bondIndexOne = refineMV[Max5000.Refined](1)
-  private val bondIndexTwo = refineMV[Max5000.Refined](2)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndexOne: Max5000 = 1
+  private val bondIndexTwo: Max5000 = 2
+  private val disposalIndex: Max50 = 1
 
   "BondsDisposalNavigator" - {
 

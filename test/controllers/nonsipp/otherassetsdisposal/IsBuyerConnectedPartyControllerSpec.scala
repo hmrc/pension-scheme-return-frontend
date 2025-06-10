@@ -17,19 +17,17 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.IsBuyerConnectedPartyController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)

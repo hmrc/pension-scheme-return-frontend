@@ -17,19 +17,17 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, TypeOfSharesHeldPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.shares.CompanyNameRelatedSharesController._
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.{NormalMode, TypeOfShares}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import models.TypeOfShares.ConnectedParty
 
-class CompanyNameRelatedSharesControllerSpec extends ControllerBaseSpec {
+class CompanyNameRelatedSharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val populatedUserAnswers =
     defaultUserAnswers.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
 

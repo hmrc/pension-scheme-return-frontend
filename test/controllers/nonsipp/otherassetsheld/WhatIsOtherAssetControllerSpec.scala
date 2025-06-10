@@ -17,15 +17,14 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextAreaView
 import utils.IntUtils.toRefined5000
 import controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController._
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 
-class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
+class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.WhatIsOtherAssetController.onPageLoad(srn, 1, NormalMode)
   private lazy val onSubmit = routes.WhatIsOtherAssetController.onSubmit(srn, 1, NormalMode)
@@ -35,7 +34,7 @@ class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[TextAreaView].apply(
         form(injected[TextFormProvider]),
-        viewModel(srn, refineMV(1), NormalMode)
+        viewModel(srn, 1, NormalMode)
       )
     })
 
@@ -43,7 +42,7 @@ class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
       implicit app => implicit request =>
         injected[TextAreaView].apply(
           form(injected[TextFormProvider]).fill("test text"),
-          viewModel(srn, refineMV(1), NormalMode)
+          viewModel(srn, 1, NormalMode)
         )
     })
 

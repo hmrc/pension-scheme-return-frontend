@@ -17,23 +17,22 @@
 package controllers.nonsipp.bondsdisposal
 
 import pages.nonsipp.bonds._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListRadiosView
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode, SchemeHoldBond}
 import pages.nonsipp.bondsdisposal.{BondsDisposalProgress, HowWereBondsDisposedOfPage}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class BondsDisposalListControllerSpec extends ControllerBaseSpec {
+class BondsDisposalListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val page = 1
-  private val indexOne = refineMV[Max5000.Refined](1)
-  private val indexTwo = refineMV[Max5000.Refined](2)
-  private val indexThree = refineMV[Max5000.Refined](3)
+  private val indexOne = 1
+  private val indexTwo = 2
+  private val indexThree = 3
 
   private lazy val onPageLoad = routes.BondsDisposalListController.onPageLoad(srn, page, NormalMode)
   private lazy val onSubmit = routes.BondsDisposalListController.onSubmit(srn, page, NormalMode)

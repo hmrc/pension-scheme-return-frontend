@@ -19,7 +19,7 @@ package views
 import views.html.ContentTablePageView
 import viewmodels.models.ContentTablePageViewModel
 
-class ContentTablePageViewSpec extends ViewSpec {
+class ContentTablePageViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     val view = injected[ContentTablePageView]

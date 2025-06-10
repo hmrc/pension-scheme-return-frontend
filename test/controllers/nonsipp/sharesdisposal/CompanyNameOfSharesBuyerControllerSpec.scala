@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.CompanyBuyerNamePage
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class CompanyNameOfSharesBuyerControllerSpec extends ControllerBaseSpec {
+class CompanyNameOfSharesBuyerControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private lazy val onPageLoad =
     routes.CompanyNameOfSharesBuyerController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.CompanyNameOfSharesBuyerController.onSubmit(srn, index, secondaryIndex, NormalMode)

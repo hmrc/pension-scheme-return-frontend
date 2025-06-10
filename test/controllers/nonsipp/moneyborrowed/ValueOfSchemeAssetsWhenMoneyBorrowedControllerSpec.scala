@@ -17,22 +17,20 @@
 package controllers.nonsipp.moneyborrowed
 
 import controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.MoneyFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.{ValueOfSchemeAssetsWhenMoneyBorrowedPage, WhenBorrowedPage}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 import java.util.Locale
 import java.time.format.DateTimeFormatter
 
-class ValueOfSchemeAssetsWhenMoneyBorrowedControllerSpec extends ControllerBaseSpec {
+class ValueOfSchemeAssetsWhenMoneyBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn, index, NormalMode)
 

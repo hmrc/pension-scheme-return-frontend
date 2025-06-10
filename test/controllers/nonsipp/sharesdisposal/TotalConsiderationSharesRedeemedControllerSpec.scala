@@ -17,20 +17,18 @@
 package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.{HowManySharesRedeemedPage, TotalConsiderationSharesRedeemedPage}
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController._
 import forms.MoneyFormProvider
 
-class TotalConsiderationSharesRedeemedControllerSpec extends ControllerBaseSpec {
+class TotalConsiderationSharesRedeemedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val shareIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.TotalConsiderationSharesRedeemedController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)

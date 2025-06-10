@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import org.mockito.Mockito._
 import pages.nonsipp.otherassetsheld._
 import models.IdentityType.Individual
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListView
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
@@ -32,7 +32,7 @@ import org.mockito.ArgumentMatchers.any
 import models._
 import models.SchemeHoldAsset._
 
-class OtherAssetsListControllerSpec extends ControllerBaseSpec {
+class OtherAssetsListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val completedUserAnswers = defaultUserAnswers
     .unsafeSet(OtherAssetsHeldPage(srn), true)

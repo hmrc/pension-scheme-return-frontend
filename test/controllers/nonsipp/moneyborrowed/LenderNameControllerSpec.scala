@@ -16,19 +16,17 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
+import controllers.nonsipp.moneyborrowed.LenderNameController._
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.LenderNamePage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.moneyborrowed.LenderNameController._
-import eu.timepit.refined.refineMV
 
-class LenderNameControllerSpec extends ControllerBaseSpec {
+class LenderNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   "LenderNameController" - {
 

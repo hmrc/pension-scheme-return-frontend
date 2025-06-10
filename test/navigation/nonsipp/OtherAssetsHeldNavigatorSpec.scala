@@ -17,10 +17,10 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.RefinedTypes.OneTo5000
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
@@ -32,8 +32,8 @@ import org.scalacheck.Gen
 class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo5000](1)
-  private val index2 = refineMV[OneTo5000](2)
+  private val index: Max5000 = 1
+  private val index2: Max5000 = 2
   private val subject = IdentitySubject.OtherAssetSeller
   private val recipientDetails = RecipientDetails(
     "testName",

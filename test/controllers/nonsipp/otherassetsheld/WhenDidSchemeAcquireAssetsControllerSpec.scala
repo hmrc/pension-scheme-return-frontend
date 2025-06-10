@@ -17,24 +17,22 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.DatePageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.DatePageFormProvider
 import models.NormalMode
 import services.SchemeDateService
 import controllers.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsController._
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenDidSchemeAcquireAssetsControllerSpec extends ControllerBaseSpec {
+class WhenDidSchemeAcquireAssetsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] = List(

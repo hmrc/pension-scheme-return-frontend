@@ -18,15 +18,14 @@ package pages
 
 import pages.nonsipp.memberdetails.MemberPsrVersionPage
 import pages.nonsipp.memberreceivedpcls.Paths
-import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.SchemeId
 import pages.behaviours.PageBehaviours
 
 class MemberPsrVersionPageSpec extends PageBehaviours {
 
   private val srn: SchemeId.Srn = srnGen.sample.value
-  private val memberIndex = refineMV[Max300.Refined](1)
+  private val memberIndex = 1
 
   "MemberPsrVersionPage" - {
 

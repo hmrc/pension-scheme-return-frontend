@@ -19,7 +19,7 @@ package navigation.nonsipp
 import utils.BaseSpec
 import pages.nonsipp.membercontributions._
 import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
@@ -28,7 +28,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index: Max300 = 1
 
   "MemberContributionsNavigator" - {
 

@@ -19,11 +19,10 @@ package controllers.nonsipp
 import services.PsrVersionsService
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TaskListView
-import utils.IntUtils.toInt
+import utils.IntUtils.{toInt, given}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-import eu.timepit.refined.refineMV
 import models.backend.responses.{PsrVersionsResponse, ReportStatus}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
@@ -49,7 +48,7 @@ import scala.concurrent.Future
 
 import java.time.LocalDateTime
 
-class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
+class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviours with CommonTestValues {
 
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
 
@@ -582,9 +581,9 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "DoesMemberHaveNinoPage is missing" in {
           val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+            .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
             .unsafeSet(
-              MemberDetailsManualProgress(srn, refineMV(1)),
+              MemberDetailsManualProgress(srn, 1),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
                   .onPageLoad(srn, 1, NormalMode)
@@ -607,10 +606,10 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "MemberDetailsNinoPage is missing" in {
           val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 1), true)
             .unsafeSet(
-              MemberDetailsManualProgress(srn, refineMV(1)),
+              MemberDetailsManualProgress(srn, 1),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
                   .onPageLoad(srn, 1, NormalMode)
@@ -633,10 +632,10 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "NoNINOPage is missing" in {
           val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
             .unsafeSet(
-              MemberDetailsManualProgress(srn, refineMV(1)),
+              MemberDetailsManualProgress(srn, 1),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.NoNINOController
                   .onPageLoad(srn, 1, NormalMode)
@@ -662,10 +661,10 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "with NINO" in {
           val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
-            .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 1), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, 1), nino)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
           testViewModel(
             userAnswers,
@@ -682,10 +681,10 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         "with reason for no NINO" in {
           val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
+            .unsafeSet(NoNINOPage(srn, 1), reason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
           testViewModel(
             userAnswers,
@@ -703,15 +702,15 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         "with inProgressUrl with one member recorded and one in inProgress" in {
           val userAnswers = defaultUserAnswers
             // member Index One
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
+            .unsafeSet(NoNINOPage(srn, 1), reason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
             // member Index Two
-            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), false)
+            .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 2), false)
             .unsafeSet(
-              MemberDetailsManualProgress(srn, refineMV(2)),
+              MemberDetailsManualProgress(srn, 2),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.NoNINOController
                   .onPageLoad(srn, 2, NormalMode)
@@ -735,15 +734,15 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         "with listPageUrl with two members recorded and none inProgress" in {
           val userAnswers = defaultUserAnswers
             // member Index One
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
+            .unsafeSet(NoNINOPage(srn, 1), reason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
             // member Index Two
-            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), true)
-            .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), nino)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
+            .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, 2), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, 2), nino)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 2), SectionCompleted)
 
           testViewModel(
             userAnswers,
@@ -781,8 +780,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         val userAnswersWithLoans =
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-            .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-            .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "First Last")
+            .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.Individual)
+            .unsafeSet(IndividualRecipientNamePage(srn, 1), "First Last")
             .unsafeSet(
               LoansProgress(srn, index1of5000),
               SectionJourneyStatus.InProgress(
@@ -809,11 +808,11 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         val userAnswersWithLoans =
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-            .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-            .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-            .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-            .unsafeSet(LoanCompleted(srn, refineMV(2)), SectionCompleted)
-            .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+            .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.Individual)
+            .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+            .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+            .unsafeSet(LoanCompleted(srn, 2), SectionCompleted)
+            .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithLoans,
@@ -920,7 +919,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "notStarted and only visible with a share existing" in {
         testViewModel(
-          defaultUserAnswers.unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted),
+          defaultUserAnswers.unsafeSet(SharesCompleted(srn, 1), SectionCompleted),
           4,
           1,
           expectedStatus = TaskListStatus.NotStarted,
@@ -934,7 +933,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "Recorded (with 'No' selection on first page) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(SharesCompleted(srn, 1), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), false)
           .unsafeSet(SharesDisposalCompleted(srn), SectionCompleted)
 
@@ -953,11 +952,11 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "inProgress (with only 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(SharesCompleted(srn, 1), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Incomplete journey:
-          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Sold)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowWereSharesDisposedPage(srn, 1, 1), HowSharesDisposed.Sold)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
 
         testViewModel(
           userAnswersWithData,
@@ -974,16 +973,16 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "Recorded (with 1 complete and 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(SharesCompleted(srn, 1), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
-          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 1)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWereSharesDisposedPage(srn, 1, 1), HowSharesDisposed.Transferred)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowManyDisposalSharesPage(srn, 1, 1), 1)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
           // Shares 1 - Disposal 2 - Incomplete journey:
-          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(2)), HowSharesDisposed.Sold)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowWereSharesDisposedPage(srn, 1, 2), HowSharesDisposed.Sold)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 2), SectionJourneyStatus.InProgress("x"))
 
         testViewModel(
           userAnswersWithData,
@@ -1000,13 +999,13 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "Recorded (with only 1 complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(SharesCompleted(srn, 1), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
-          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 1)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWereSharesDisposedPage(srn, 1, 1), HowSharesDisposed.Transferred)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowManyDisposalSharesPage(srn, 1, 1), 1)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithData,
@@ -1023,17 +1022,17 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "notStarted (with removal of only complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(SharesCompleted(srn, 1), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
-          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 1)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWereSharesDisposedPage(srn, 1, 1), HowSharesDisposed.Transferred)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowManyDisposalSharesPage(srn, 1, 1), 1)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
           // Shares 1 - Disposal 1 - Removal:
-          .unsafeRemove(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)))
+          .unsafeRemove(HowWereSharesDisposedPage(srn, 1, 1))
           .unsafeRemove(SharesDisposalCompleted(srn))
-          .unsafeRemove(SharesDisposalProgress(srn, refineMV(1), refineMV(1)))
+          .unsafeRemove(SharesDisposalProgress(srn, 1, 1))
 
         testViewModel(
           userAnswersWithData,
@@ -1211,7 +1210,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "notStarted and only visible with an asset existing" in {
         testViewModel(
-          defaultUserAnswers.unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted),
+          defaultUserAnswers.unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted),
           7,
           1,
           expectedStatus = TaskListStatus.NotStarted,
@@ -1225,7 +1224,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "recorded (with 'No' selection on first page) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), false)
           .unsafeSet(OtherAssetsDisposalCompleted(srn), SectionCompleted)
 
@@ -1244,11 +1243,11 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "inProgress (with only 1 incomplete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Assets 1 - Disposal 1 - Incomplete journey:
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), HowDisposed.Sold)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
 
         testViewModel(
           userAnswersWithData,
@@ -1265,16 +1264,16 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "recorded (with 1 complete and 1 incomplete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
           // Other Assets 1 - Disposal 2 - Incomplete journey:
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Sold)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 2), HowDisposed.Sold)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 2), SectionJourneyStatus.InProgress("x"))
 
         testViewModel(
           userAnswersWithData,
@@ -1291,13 +1290,13 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "recorded (with only 1 complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithData,
@@ -1314,17 +1313,17 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
       "notStarted (with removal of only complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
           // Other Asset 1 - Disposal 1 - Removal:
-          .unsafeRemove(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)))
+          .unsafeRemove(HowWasAssetDisposedOfPage(srn, 1, 1))
           .unsafeRemove(OtherAssetsDisposalCompleted(srn))
-          .unsafeRemove(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)))
+          .unsafeRemove(OtherAssetsDisposalProgress(srn, 1, 1))
 
         testViewModel(
           userAnswersWithData,

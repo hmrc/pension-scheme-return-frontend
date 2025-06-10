@@ -20,10 +20,10 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.shares._
 import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -31,14 +31,12 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
-class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
+class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
   private implicit val mockSaveService: SaveService = mock[SaveService]
@@ -76,8 +74,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     submissionNumberOne
   )
 
-  private val shareIndex = refineMV[OneTo5000](1)
-  private val disposalIndex = refineMV[OneTo50](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   // Shares parameters
   private val nameOfCompany = Some(companyName)

@@ -18,7 +18,7 @@ package controllers.nonsipp.declaration
 
 import services._
 import connectors.EmailConnector
-import controllers.{ControllerBaseSpec, TestUserAnswers}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
 import play.api.inject.bind
 import views.html.ContentPageView
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -40,6 +40,7 @@ import java.time.LocalDateTime
 
 class PsaDeclarationControllerSpec
     extends ControllerBaseSpec
+    with ControllerBehaviours
     with BeforeAndAfterEach
     with TestUserAnswers
     with CommonTestValues {

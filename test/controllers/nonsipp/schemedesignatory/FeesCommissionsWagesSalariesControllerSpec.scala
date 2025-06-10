@@ -22,11 +22,11 @@ import forms.MoneyFormProvider
 import models.{Money, NormalMode}
 import play.api.data.Form
 import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.Application
 import play.api.libs.json.JsPath
 
-class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
+class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.FeesCommissionsWagesSalariesController.onSubmit(srn, NormalMode)

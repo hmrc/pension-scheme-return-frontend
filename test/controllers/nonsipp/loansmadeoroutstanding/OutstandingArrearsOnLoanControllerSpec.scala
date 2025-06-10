@@ -19,9 +19,9 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.SchemeDateService
 import models.ConditionalYesNo._
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import play.api.inject
 import forms.YesNoPageFormProvider
 import models._
@@ -29,14 +29,12 @@ import pages.nonsipp.loansmadeoroutstanding.{ArrearsPrevYears, OutstandingArrear
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
+class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.OutstandingArrearsOnLoanController.onSubmit(srn, index, NormalMode)

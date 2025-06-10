@@ -19,8 +19,7 @@ package controllers.nonsipp.bonds
 import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -29,11 +28,10 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import models.SchemeHoldBond.Acquisition
 
-class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpec {
+class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -44,7 +42,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
   override protected def beforeAll(): Unit =
     reset(mockPsrSubmissionService)
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val page = 1
 
   private def onPageLoad(mode: Mode) =

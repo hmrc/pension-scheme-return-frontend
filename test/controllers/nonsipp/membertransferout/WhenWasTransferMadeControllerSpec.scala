@@ -17,9 +17,9 @@
 package controllers.nonsipp.membertransferout
 
 import services.SchemeDateService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DatePageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import play.api.inject
 import forms.DatePageFormProvider
 import models.{DateRange, NormalMode, UserAnswers}
@@ -28,15 +28,13 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.{Max300, Max5}
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenWasTransferMadeControllerSpec extends ControllerBaseSpec {
+class WhenWasTransferMadeControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private lazy val onPageLoad =
     routes.WhenWasTransferMadeController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasTransferMadeController.onSubmit(srn, index, secondaryIndex, NormalMode)

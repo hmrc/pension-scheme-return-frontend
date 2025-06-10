@@ -21,8 +21,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
 import controllers.TestValues
+import utils.IntUtils.given
 import models.requests.psr.{Borrowing, MoneyBorrowed}
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import pages.nonsipp.moneyborrowed._
@@ -88,13 +88,13 @@ class BorrowingTransformerSpec
         val userAnswers = emptyUserAnswers
           .unsafeSet(MoneyBorrowedPage(srn), true)
           .unsafeSet(BorrowingRecordVersionPage(srn), "001")
-          .unsafeSet(LenderNamePage(srn, refineMV(1)), "borrowingFromName")
-          .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(1)), true)
-          .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(1)), (money, percentage))
-          .unsafeSet(WhenBorrowedPage(srn, refineMV(1)), localDate)
-          .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1)), money)
-          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), "reasonForBorrow")
-          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(LenderNamePage(srn, 1), "borrowingFromName")
+          .unsafeSet(IsLenderConnectedPartyPage(srn, 1), true)
+          .unsafeSet(BorrowedAmountAndRatePage(srn, 1), (money, percentage))
+          .unsafeSet(WhenBorrowedPage(srn, 1), localDate)
+          .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, 1), money)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 1), "reasonForBorrow")
+          .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -122,21 +122,21 @@ class BorrowingTransformerSpec
         val userAnswers = emptyUserAnswers
           .unsafeSet(MoneyBorrowedPage(srn), true)
           .unsafeSet(BorrowingRecordVersionPage(srn), "001")
-          .unsafeSet(LenderNamePage(srn, refineMV(1)), "borrowingFromName")
-          .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(1)), true)
-          .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(1)), (money, percentage))
-          .unsafeSet(WhenBorrowedPage(srn, refineMV(1)), localDate)
-          .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1)), money)
-          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), "reasonForBorrow")
-          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(LenderNamePage(srn, 1), "borrowingFromName")
+          .unsafeSet(IsLenderConnectedPartyPage(srn, 1), true)
+          .unsafeSet(BorrowedAmountAndRatePage(srn, 1), (money, percentage))
+          .unsafeSet(WhenBorrowedPage(srn, 1), localDate)
+          .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, 1), money)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 1), "reasonForBorrow")
+          .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
           .unsafeSet(MoneyBorrowedPage(srn), true)
           .unsafeSet(BorrowingRecordVersionPage(srn), "001")
-          .unsafeSet(LenderNamePage(srn, refineMV(2)), "borrowingFromName")
-          .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(2)), true)
-          .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(2)), (money, percentage))
-          .unsafeSet(WhenBorrowedPage(srn, refineMV(2)), localDate)
+          .unsafeSet(LenderNamePage(srn, 2), "borrowingFromName")
+          .unsafeSet(IsLenderConnectedPartyPage(srn, 2), true)
+          .unsafeSet(BorrowedAmountAndRatePage(srn, 2), (money, percentage))
+          .unsafeSet(WhenBorrowedPage(srn, 2), localDate)
           .unsafeSet(
-            MoneyBorrowedProgress(srn, refineMV(2)),
+            MoneyBorrowedProgress(srn, 2),
             SectionJourneyStatus.InProgress(
               "someurl"
             )
@@ -214,12 +214,12 @@ class BorrowingTransformerSpec
         userAnswers => {
           userAnswers.get(MoneyBorrowedPage(srn)) mustBe Some(true)
           userAnswers.get(BorrowingRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(WhenBorrowedPage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(BorrowedAmountAndRatePage(srn, refineMV(1))) mustBe Some((money, percentage))
-          userAnswers.get(LenderNamePage(srn, refineMV(1))) mustBe Some("LenderName")
-          userAnswers.get(WhySchemeBorrowedMoneyPage(srn, refineMV(1))) mustBe Some("reasonForBorrow")
-          userAnswers.get(IsLenderConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1))) mustBe Some(money)
+          userAnswers.get(WhenBorrowedPage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(BorrowedAmountAndRatePage(srn, 1)) mustBe Some((money, percentage))
+          userAnswers.get(LenderNamePage(srn, 1)) mustBe Some("LenderName")
+          userAnswers.get(WhySchemeBorrowedMoneyPage(srn, 1)) mustBe Some("reasonForBorrow")
+          userAnswers.get(IsLenderConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, 1)) mustBe Some(money)
         }
       )
     }

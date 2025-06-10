@@ -20,15 +20,15 @@ import controllers.nonsipp.shares.SharesCheckAndUpdateController._
 import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
 import views.html.ContentTablePageView
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.NormalMode
 import eu.timepit.refined.api.Refined
 import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class SharesCheckAndUpdateControllerSpec extends ControllerBaseSpec {
+class SharesCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  private val index: Refined[Int, OneTo5000] = 1
 
   private def onPageLoad = routes.SharesCheckAndUpdateController.onPageLoad(srn, index)
   private def onSubmit = routes.SharesCheckAndUpdateController.onSubmit(srn, index)

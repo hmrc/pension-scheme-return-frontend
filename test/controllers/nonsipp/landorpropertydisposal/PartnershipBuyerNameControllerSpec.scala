@@ -16,19 +16,17 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerNameController._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
-class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec {
+class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad = routes.PartnershipBuyerNameController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.PartnershipBuyerNameController.onSubmit(srn, index, disposalIndex, NormalMode)

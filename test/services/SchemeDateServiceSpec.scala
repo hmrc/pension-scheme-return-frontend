@@ -21,7 +21,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
 import play.api.mvc.AnyContentAsEmpty
 import cats.data.NonEmptyList
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.WhichTaxYearPage
 import models.{DateRange, NormalMode, UserAnswers}
@@ -78,7 +78,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
         forAll(dateRangeGen, dateRangeGen) { (whichTaxYearPage, accountingPeriod) =>
           val userAnswers = defaultUserAnswers
             .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-            .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), accountingPeriod)
+            .unsafeSet(AccountingPeriodPage(srn, 1, NormalMode), accountingPeriod)
 
           val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -102,8 +102,8 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
               (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
                 val userAnswers = defaultUserAnswers
                   .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                  .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), newestAccountingPeriod)
-                  .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), oldestAccountingPeriod)
+                  .unsafeSet(AccountingPeriodPage(srn, 1, NormalMode), newestAccountingPeriod)
+                  .unsafeSet(AccountingPeriodPage(srn, 2, NormalMode), oldestAccountingPeriod)
 
                 val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -125,8 +125,8 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
               (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
                 val userAnswers = defaultUserAnswers
                   .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                  .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), newestAccountingPeriod)
-                  .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), oldestAccountingPeriod)
+                  .unsafeSet(AccountingPeriodPage(srn, 1, NormalMode), newestAccountingPeriod)
+                  .unsafeSet(AccountingPeriodPage(srn, 2, NormalMode), oldestAccountingPeriod)
 
                 val request = DataRequest(allowedAccessRequest, userAnswers)
 

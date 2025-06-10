@@ -9,7 +9,6 @@ import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.6"
-// logLevel := Level.Error
 
 lazy val appName: String = "pension-scheme-return-frontend"
 
@@ -51,7 +50,9 @@ lazy val root = Project(appName, file("."))
     PlayKeys.playDefaultPort := 10701,
     scalacOptions ++= Seq(
       "-feature",
-      "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"
+      "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
+      "-Xmax-inlines", "100",
+      "-language:implicitConversions"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,

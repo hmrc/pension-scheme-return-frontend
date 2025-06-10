@@ -17,26 +17,25 @@
 package pages.nonsipp.otherassetsdisposal
 
 import models.HowDisposed._
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{HowDisposed, IdentityType}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
 
-  private val assetIndexOne = refineMV[Max5000.Refined](1)
-  private val assetIndexTwo = refineMV[Max5000.Refined](2)
-  private val indexOne = refineMV[Max50.Refined](1)
-  private val indexTwo = refineMV[Max50.Refined](2)
+  private val assetIndexOne = 1
+  private val assetIndexTwo = 2
+  private val indexOne = 1
+  private val indexTwo = 2
 
   "HowWasAssetDisposedOfPage" - {
 
     val srn = srnGen.sample.value
-    val assetIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[HowDisposed](HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
 

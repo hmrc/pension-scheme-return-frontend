@@ -17,28 +17,27 @@
 package pages.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsdisposal._
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{HowDisposed, UserAnswers}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val index2 = refineMV[Max5000.Refined](2)
-  private val disposalIndex1 = refineMV[Max50.Refined](1)
-  private val disposalIndex2 = refineMV[Max50.Refined](2)
+  private val index = 1
+  private val index2 = 2
+  private val disposalIndex1 = 1
+  private val disposalIndex2 = 2
 
   "WhatIsOtherAssetPage" - {
 
-    beRetrievable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+    beRetrievable[String](WhatIsOtherAssetPage(srn, 1))
 
-    beSettable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+    beSettable[String](WhatIsOtherAssetPage(srn, 1))
 
-    beRemovable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+    beRemovable[String](WhatIsOtherAssetPage(srn, 1))
   }
 
   "cleanup list size of 1" - {

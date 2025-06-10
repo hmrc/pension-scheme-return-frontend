@@ -59,7 +59,7 @@
 //    extends FrontendBaseController
 //    with I18nSupport {
 //
-//  private val max: Max50 = refineMV(50)
+//  private val max: Max50 = 50
 //
 //  def addEmployerContributions(srn: Srn, index: Int, num: Int): Action[AnyContent] =
 //    identifyAndRequireData(srn).async { implicit request =>

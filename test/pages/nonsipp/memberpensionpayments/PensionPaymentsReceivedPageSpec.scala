@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberpensionpayments
 
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.UserAnswers
 import pages.behaviours.PageBehaviours
@@ -38,16 +38,16 @@ class PensionPaymentsReceivedPageSpec extends PageBehaviours {
       val userAnswers =
         UserAnswers("id")
           .unsafeSet(PensionPaymentsReceivedPage(srn), true)
-          .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), moneyGen.sample.value)
-          .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(2)), moneyGen.sample.value)
+          .unsafeSet(TotalAmountPensionPaymentsPage(srn, 1), moneyGen.sample.value)
+          .unsafeSet(TotalAmountPensionPaymentsPage(srn, 2), moneyGen.sample.value)
 
       List(Some(true), None).foreach { answer =>
         s"retain pension payment amount values when answer is $answer" in {
 
           val result = PensionPaymentsReceivedPage(srn).cleanup(answer, userAnswers).toOption.value
 
-          result.get(TotalAmountPensionPaymentsPage(srn, refineMV(1))) must not be None
-          result.get(TotalAmountPensionPaymentsPage(srn, refineMV(2))) must not be None
+          result.get(TotalAmountPensionPaymentsPage(srn, 1)) must not be None
+          result.get(TotalAmountPensionPaymentsPage(srn, 2)) must not be None
         }
       }
 
@@ -55,8 +55,8 @@ class PensionPaymentsReceivedPageSpec extends PageBehaviours {
 
         val result = PensionPaymentsReceivedPage(srn).cleanup(Some(false), userAnswers).toOption.value
 
-        result.get(TotalAmountPensionPaymentsPage(srn, refineMV(1))) mustBe None
-        result.get(TotalAmountPensionPaymentsPage(srn, refineMV(2))) mustBe None
+        result.get(TotalAmountPensionPaymentsPage(srn, 1)) mustBe None
+        result.get(TotalAmountPensionPaymentsPage(srn, 2)) mustBe None
       }
     }
   }

@@ -17,10 +17,10 @@
 package controllers.nonsipp.bonds
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.bonds.BondsListController._
 import views.html.ListView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
@@ -28,16 +28,14 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
-class BondsListControllerSpec extends ControllerBaseSpec {
+class BondsListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val indexTwo = refineMV[Max5000.Refined](2)
-  private val indexThree = refineMV[Max5000.Refined](3)
+  private val index = 1
+  private val indexTwo = 2
+  private val indexThree = 3
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 

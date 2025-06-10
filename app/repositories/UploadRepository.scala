@@ -18,26 +18,25 @@ package repositories
 
 import org.mongodb.scala.model.Updates.{combine, set}
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.Codecs._
-import play.api.libs.json._
-import models._
+import uk.gov.hmrc.mongo.play.json.Codecs.*
+import play.api.libs.json.*
+import models.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import org.mongodb.scala.model.Filters.equal
 import models.UploadKey.separator
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import repositories.UploadRepository.MongoUpload.{SensitiveUpload, SensitiveUploadStatus}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
-import org.mongodb.scala.model._
+import org.mongodb.scala.model.*
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import config.{Crypto, FrontendAppConfig}
 import cats.data.NonEmptyList
 import models.SchemeId.asSrn
 import models.UploadStatus.UploadStatus
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
+import repositories.UploadRepository.MongoUpload
 
 import scala.Function.unlift
 import scala.concurrent.{ExecutionContext, Future}
-
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
@@ -134,6 +133,15 @@ class UploadRepository @Inject() (
 }
 
 object UploadRepository {
+  case class SensitiveUploadStatus(override val decryptedValue: UploadStatus) extends Sensitive[UploadStatus]
+
+  case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
+
+  implicit def sensitiveUploadFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
+    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
+
+  implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUploadStatus] =
+    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUploadStatus.apply)
 
   case class MongoUpload(
     key: UploadKey,
@@ -144,16 +152,6 @@ object UploadRepository {
   )
 
   object MongoUpload {
-
-    case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
-
-    implicit def sensitiveUploadFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
-      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
-
-    case class SensitiveUploadStatus(override val decryptedValue: UploadStatus) extends Sensitive[UploadStatus]
-
-    implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUploadStatus] =
-      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUploadStatus.apply)
 
     def reads(implicit crypto: Encrypter with Decrypter): Reads[MongoUpload] =
       (__ \ "id")

@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RecipientDetailsView
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
-import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails, UserAnswers}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 
-class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
+class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController

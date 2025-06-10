@@ -16,11 +16,10 @@
 
 package controllers.nonsipp.memberdetails
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
-import controllers.nonsipp.memberdetails.HowToUploadController
-import controllers.ControllerBaseSpec
 
-class HowToUploadControllerSpec extends ControllerBaseSpec {
+class HowToUploadControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "HowToUploadController" - {
 

@@ -16,21 +16,19 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.DisposalIndependentValuationPage
-import eu.timepit.refined.refineMV
 import controllers.nonsipp.landorpropertydisposal.DisposalIndependentValuationController.{form, viewModel}
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import play.api.data.FormError
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
+class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController

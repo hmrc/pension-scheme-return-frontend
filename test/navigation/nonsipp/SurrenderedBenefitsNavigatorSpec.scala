@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.membersurrenderedbenefits._
@@ -28,7 +28,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val memberIndex = refineMV[Max300.Refined](1)
+  private val memberIndex: Max300 = 1
 
   "SurrenderedBenefitsNavigator" - {
 

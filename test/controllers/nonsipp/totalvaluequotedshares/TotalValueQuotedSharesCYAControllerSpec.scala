@@ -27,11 +27,11 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito._
 import config.RefinedTypes.Max3
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 
-class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
+class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.TotalValueQuotedSharesCYAController.onPageLoad(srn)
   private lazy val onSubmit = routes.TotalValueQuotedSharesCYAController.onSubmit(srn)

@@ -16,15 +16,14 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class CompanyRecipientNamePageSpec extends PageBehaviours {
 
   "companyRecipientNamePage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[String](CompanyRecipientNamePage(srn, index))
 

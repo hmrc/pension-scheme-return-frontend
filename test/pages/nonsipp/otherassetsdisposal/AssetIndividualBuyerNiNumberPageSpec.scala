@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
@@ -27,8 +26,8 @@ class AssetIndividualBuyerNiNumberPageSpec extends PageBehaviours {
 
   "AssetIndividualBuyerNiNumberPage" - {
 
-    val assetIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[ConditionalYesNo[String, Nino]](AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex))
 

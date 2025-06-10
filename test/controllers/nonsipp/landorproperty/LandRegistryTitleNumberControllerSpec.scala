@@ -16,19 +16,17 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
 import views.html._
-import eu.timepit.refined.refineMV
 import forms._
 import models.{ConditionalYesNo, NormalMode}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 
-class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec {
+class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.LandRegistryTitleNumberController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandRegistryTitleNumberController.onSubmit(srn, index, NormalMode)
 

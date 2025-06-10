@@ -18,17 +18,17 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.RefinedTypes.Max300
+import utils.IntUtils.given
+import pages.nonsipp.memberpensionpayments._
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
-import pages.nonsipp.memberpensionpayments._
-import eu.timepit.refined.refineMV
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index: Max300 = 1
 
   "PensionPaymentsReceivedNavigator" - {
 

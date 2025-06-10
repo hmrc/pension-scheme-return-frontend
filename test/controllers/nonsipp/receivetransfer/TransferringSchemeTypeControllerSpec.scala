@@ -16,20 +16,18 @@
 
 package controllers.nonsipp.receivetransfer
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
-import eu.timepit.refined.refineMV
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
 import forms.RadioListFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max300, Max5}
-import controllers.ControllerBaseSpec
 
-class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
+class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondarylIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondarylIndex = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController

@@ -59,7 +59,7 @@
 //    extends FrontendBaseController
 //    with I18nSupport {
 //
-//  private val max: Max300 = refineMV(300)
+//  private val max: Max300 = 300
 //
 //  def addMemberDetails(srn: Srn, num: Int): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
 //    for {

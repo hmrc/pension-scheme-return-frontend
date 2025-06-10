@@ -19,23 +19,21 @@ package controllers.nonsipp.otherassetsdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 
 import scala.concurrent.Future
 
-class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
+class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -70,8 +68,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
     submissionNumberOne
   )
 
-  private val assetIndex = refineMV[OneTo5000](1)
-  private val disposalIndex = refineMV[OneTo50](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
   private val page = 1
 
   private val dateAssetSold = Some(localDate)

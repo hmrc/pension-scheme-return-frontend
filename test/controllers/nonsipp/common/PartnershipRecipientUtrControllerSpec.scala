@@ -16,19 +16,17 @@
 
 package controllers.nonsipp.common
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.PartnershipRecipientUtrPage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import controllers.nonsipp.common.PartnershipRecipientUtrController._
 
-class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
+class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)

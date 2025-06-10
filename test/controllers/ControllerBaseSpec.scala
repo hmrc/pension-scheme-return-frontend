@@ -21,7 +21,7 @@ import services.SaveService
 import queries.{Removable, Settable}
 import config.RefinedTypes._
 import play.api.inject.bind
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import controllers.actions._
 import models.PensionSchemeId.PsaId
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators._
@@ -38,8 +38,8 @@ import models.UserAnswers.SensitiveJsObject
 import play.api.http._
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
-import controllers.actions._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import org.scalatest.OptionValues
 import play.api.Application
 import uk.gov.hmrc.domain.Nino
@@ -50,7 +50,6 @@ import java.time.format.DateTimeFormatter
 
 trait ControllerBaseSpec
     extends BaseSpec
-    with ControllerBehaviours
     with MockBehaviours
     with DefaultAwaitTimeout
     with HttpVerbs
@@ -120,11 +119,10 @@ trait ControllerBaseSpec
   }
 }
 
-trait TestValues {
-  _: OptionValues =>
+trait TestValues extends OptionValues {
   val accountNumber = "12345678"
   val sortCode = "123456"
-  val srn: SchemeId.Srn = srnGen.sample.value
+  val srn: SchemeId.Srn = srnGen.sample.get
   val schemeName = "testSchemeName"
   val email = "testEmail"
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
@@ -186,7 +184,7 @@ trait TestValues {
   val otherDetails = "other details"
   val bondsStillHeld = 5
   val nameOfBonds = "name of bonds"
-  val schemeHoldBonds: SchemeHoldBond = schemeHoldBondsGen.sample.value
+  val schemeHoldBonds: SchemeHoldBond = schemeHoldBondsGen.sample.get
   val nameOfAsset = "name of asset"
   val otherAssetDescription = "other asset description"
   val fallbackUrl = "fallbackUrl"
@@ -201,14 +199,14 @@ trait TestValues {
     LocalDateTime.of(2019, 11, 11, 9, 29, 14)
   val name: String = "name"
   val reason: String = "reason"
-  val index1of3: Max3 = refineMV(1)
-  val index1of5: Max5 = refineMV(1)
-  val index1of50: Max50 = refineMV(1)
-  val index1of300: Max300 = refineMV(1)
-  val index1of5000: Max5000 = refineMV(1)
-  val index2of5000: Max5000 = refineMV(2)
-  val index3of5000: Max5000 = refineMV(3)
-  val index4of5000: Max5000 = refineMV(4)
+  val index1of3: Max3 = 1
+  val index1of5: Max5 = 1
+  val index1of50: Max50 = 1
+  val index1of300: Max300 = 1
+  val index1of5000: Max5000 = 1
+  val index2of5000: Max5000 = 2
+  val index3of5000: Max5000 = 3
+  val index4of5000: Max5000 = 4
   val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
   val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
   val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)

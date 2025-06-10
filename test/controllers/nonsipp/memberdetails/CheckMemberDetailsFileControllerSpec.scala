@@ -29,7 +29,7 @@ import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import org.mockito.Mockito._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import config.RefinedTypes.Max3
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import cats.data.NonEmptyList
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -41,7 +41,11 @@ import scala.concurrent.Future
 
 import java.time.LocalDate
 
-class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with GuiceOneAppPerSuite with MockitoSugar {
+class CheckMemberDetailsFileControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with GuiceOneAppPerSuite
+    with MockitoSugar {
 
   private lazy val onPageLoad = routes.CheckMemberDetailsFileController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.CheckMemberDetailsFileController.onSubmit(srn, NormalMode)

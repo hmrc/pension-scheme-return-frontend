@@ -16,21 +16,19 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{IndividualBuyerNinoNumberPage, SharesIndividualBuyerNamePage}
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import controllers.nonsipp.sharesdisposal.IndividualBuyerNinoNumberController._
 
-class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
+class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController

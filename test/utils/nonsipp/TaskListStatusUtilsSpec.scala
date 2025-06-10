@@ -47,10 +47,10 @@ import controllers.TestValues
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import models.SchemeHoldShare.Acquisition
 import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import controllers.nonsipp.bonds.routes
-import eu.timepit.refined.refineMV
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
@@ -243,10 +243,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(TotalValueQuotedSharesPage(srn), Money(1))
 
   private val defaultUserAnswersWithMember: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-    .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
+    .unsafeSet(NoNINOPage(srn, 1), noninoReason)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
   "Loans status" - {
     val firstQuestionPageUrl =
@@ -319,12 +319,12 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           // First loan:
-          .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
           .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
           // Second loan:
-          .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.Individual)
           .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -337,11 +337,11 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           // First loan:
-          .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
           .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
           // Second loan:
-          .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -491,12 +491,12 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when moneyBorrowedPage true and equal number of first pages and last pages are present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(MoneyBorrowedPage(srn), true)
-          .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
-          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), reasonBorrowed)
-          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-          .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
-          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(2)), reasonBorrowed)
-          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+          .unsafeSet(LenderNamePage(srn, 1), lenderName)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 1), reasonBorrowed)
+          .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(LenderNamePage(srn, 2), lenderName)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 2), reasonBorrowed)
+          .unsafeSet(MoneyBorrowedProgress(srn, 2), SectionJourneyStatus.Completed)
 
         val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(2, "borrowings"), listPageUrl)
@@ -506,10 +506,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     "when moneyBorrowedPage true and more first pages than last pages is present - index 2 is missing" in {
       val customUserAnswers = defaultUserAnswers
         .unsafeSet(MoneyBorrowedPage(srn), true)
-        .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
-        .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), reasonBorrowed)
-        .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-        .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
+        .unsafeSet(LenderNamePage(srn, 1), lenderName)
+        .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 1), reasonBorrowed)
+        .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
+        .unsafeSet(LenderNamePage(srn, 2), lenderName)
 
       val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
       result mustBe (Recorded(1, "borrowings"), listPageUrl)
@@ -518,11 +518,11 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     "when moneyBorrowedPage true and more first pages than last pages is present - index 1 is missing" in {
       val customUserAnswers = defaultUserAnswers
         .unsafeSet(MoneyBorrowedPage(srn), true)
-        .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
+        .unsafeSet(LenderNamePage(srn, 1), lenderName)
         // missing here
-        .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
-        .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(2)), reasonBorrowed)
-        .unsafeSet(MoneyBorrowedProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+        .unsafeSet(LenderNamePage(srn, 2), lenderName)
+        .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 2), reasonBorrowed)
+        .unsafeSet(MoneyBorrowedProgress(srn, 2), SectionJourneyStatus.Completed)
 
       val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
       result mustBe (Recorded(1, "borrowings"), listPageUrl)
@@ -574,10 +574,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           // first share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 1), TypeOfShares.Unquoted)
           // second share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
-          .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 2), TypeOfShares.Unquoted)
+          .unsafeSet(SharesCompleted(srn, 2), SectionCompleted)
           .unsafeSet(SharesProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -588,10 +588,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           // first share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 1), TypeOfShares.Unquoted)
+          .unsafeSet(SharesCompleted(srn, 1), SectionCompleted)
           // second share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 2), TypeOfShares.Unquoted)
           .unsafeSet(SharesProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -610,7 +610,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when DidSchemeHoldAnyShares is true and only first page is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 1), TypeOfShares.Unquoted)
           .unsafeSet(
             SharesProgress(srn, index1of5000),
             SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
@@ -624,10 +624,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           // nothing for first share
           // second share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 2), TypeOfShares.Unquoted)
           .unsafeSet(
-            SharesProgress(srn, refineMV(2)),
-            SectionJourneyStatus.InProgress(secondQuestionPageUrl(refineMV(2)))
+            SharesProgress(srn, 2),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(2))
           )
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -698,17 +698,17 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           // first bond:
-          .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "NameOfFirstBond")
+          .unsafeSet(NameOfBondsPage(srn, 1), "NameOfFirstBond")
           .unsafeSet(
-            BondsProgress(srn, refineMV(1)),
+            BondsProgress(srn, 1),
             SectionJourneyStatus.InProgress(
               routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
             )
           )
           // second bond:
-          .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
-          .unsafeSet(BondsCompleted(srn, refineMV(2)), SectionCompleted)
-          .unsafeSet(BondsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+          .unsafeSet(NameOfBondsPage(srn, 2), "NameOfSecondBond")
+          .unsafeSet(BondsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, 2), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "bonds"), listPageUrl)
       }
@@ -717,13 +717,13 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           // first bond:
-          .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "NameOfFirstBond")
-          .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(NameOfBondsPage(srn, 1), "NameOfFirstBond")
+          .unsafeSet(BondsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, 1), SectionJourneyStatus.Completed)
           // second bond:
-          .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
+          .unsafeSet(NameOfBondsPage(srn, 2), "NameOfSecondBond")
           .unsafeSet(
-            BondsProgress(srn, refineMV(2)),
+            BondsProgress(srn, 2),
             SectionJourneyStatus.InProgress(
               routes.NameOfBondsController.onPageLoad(srn, 2, NormalMode)
             )
@@ -760,9 +760,9 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           // nothing for the first bond:
           // second bond:
-          .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
+          .unsafeSet(NameOfBondsPage(srn, 2), "NameOfSecondBond")
           .unsafeSet(
-            BondsProgress(srn, refineMV(2)),
+            BondsProgress(srn, 2),
             SectionJourneyStatus.InProgress(
               routes.NameOfBondsController.onPageLoad(srn, 2, NormalMode)
             )
@@ -809,11 +809,11 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           // first asset:
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "asset one")
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "asset one")
           // second asset:
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "asset two")
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "otherAssets"), listPageUrl)
       }
@@ -822,11 +822,11 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           // first asset:
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "asset one")
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "asset one")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
           // second asset:
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "asset two")
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "otherAssets"), listPageUrl)
       }

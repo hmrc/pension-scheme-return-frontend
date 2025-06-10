@@ -17,10 +17,10 @@
 package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.membertransferout.RemoveTransferOutController._
 import forms.YesNoPageFormProvider
 import models.NameDOB
@@ -29,15 +29,13 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.{Max300, Max5}
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class RemoveTransferOutControllerSpec extends ControllerBaseSpec {
+class RemoveTransferOutControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private lazy val onPageLoad = routes.RemoveTransferOutController.onPageLoad(srn, index, secondaryIndex)
   private lazy val onSubmit = routes.RemoveTransferOutController.onSubmit(srn, index, secondaryIndex)
 
@@ -46,8 +44,8 @@ class RemoveTransferOutControllerSpec extends ControllerBaseSpec {
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
     .unsafeSet(ReceivingSchemeNamePage(srn, index, secondaryIndex), receivingSchemeName)
 
   override protected val additionalBindings: List[GuiceableModule] = List(

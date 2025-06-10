@@ -17,19 +17,17 @@
 package controllers.nonsipp.bondsdisposal
 
 import controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.{BuyerNamePage, IsBuyerConnectedPartyPage}
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
   private lazy val onPageLoad = routes.IsBuyerConnectedPartyController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.IsBuyerConnectedPartyController.onSubmit(srn, index, disposalIndex, NormalMode)
 

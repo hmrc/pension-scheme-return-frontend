@@ -18,12 +18,12 @@ package controllers.nonsipp.bonds
 
 import controllers.nonsipp.bonds.NameOfBondsController._
 import pages.nonsipp.bonds.NameOfBondsPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextAreaView
 import forms.TextFormProvider
 import models.NormalMode
 
-class NameOfBondsControllerSpec extends ControllerBaseSpec {
+class NameOfBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
   private lazy val onSubmit = routes.NameOfBondsController.onSubmit(srn, 1, NormalMode)

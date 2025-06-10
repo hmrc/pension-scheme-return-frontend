@@ -16,24 +16,22 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.MultipleQuestionView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, DatePeriodLoanPage}
 import services.SchemeDateService
 import controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController._
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
+class DatePeriodLoanControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 

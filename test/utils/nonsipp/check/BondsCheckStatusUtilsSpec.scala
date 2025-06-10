@@ -22,9 +22,9 @@ import utils.nonsipp.check.BondsCheckStatusUtils.checkBondsRecord
 import org.scalatest.OptionValues
 import models.{SchemeHoldBond, UserAnswers}
 import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class BondsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
+class BondsCheckStatusUtilsSpec extends ControllerBaseSpec with ControllerBehaviours with Matchers with OptionValues {
 
   private def addBondsBaseAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers

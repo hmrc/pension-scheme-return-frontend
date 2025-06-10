@@ -18,19 +18,17 @@ package controllers.nonsipp.membertransferout
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.membertransferout.ReportAnotherTransferOutPage
-import config.RefinedTypes.{Max300, Max5}
-import controllers.ControllerBaseSpec
 
-class ReportAnotherTransferOutControllerSpec extends ControllerBaseSpec {
+class ReportAnotherTransferOutControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
 
   private lazy val onPageLoad =
     routes.ReportAnotherTransferOutController.onPageLoad(srn, index, secondaryIndex, NormalMode)

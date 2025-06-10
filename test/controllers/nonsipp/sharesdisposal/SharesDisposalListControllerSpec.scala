@@ -18,22 +18,21 @@ package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController.{SharesDisposalData, _}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListRadiosView
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, SharesDisposalProgress}
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldShare, TypeOfShares}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class SharesDisposalListControllerSpec extends ControllerBaseSpec {
+class SharesDisposalListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val page = 1
-  private val shareIndexOne = refineMV[Max5000.Refined](1)
-  private val shareIndexTwo = refineMV[Max5000.Refined](2)
-  private val shareIndexThree = refineMV[Max5000.Refined](3)
+  private val shareIndexOne = 1
+  private val shareIndexTwo = 2
+  private val shareIndexThree = 3
 
   private lazy val onPageLoad = routes.SharesDisposalListController.onPageLoad(srn, page)
   private lazy val onSubmit = routes.SharesDisposalListController.onSubmit(srn, page)

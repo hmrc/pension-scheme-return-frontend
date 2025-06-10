@@ -20,8 +20,8 @@ import play.api.test.FakeRequest
 import services._
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
 import play.api.inject.bind
+import utils.IntUtils.given
 import cats.implicits.toShow
-import eu.timepit.refined.refineMV
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import pages.nonsipp._
 import models.backend.responses.PsrVersionsResponse
@@ -35,7 +35,7 @@ import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import config.RefinedTypes.Max3
-import controllers.{ControllerBaseSpec, TestUserAnswers}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -44,7 +44,11 @@ import viewmodels.models._
 
 import scala.concurrent.Future
 
-class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with CommonTestValues with TestUserAnswers {
+class BasicDetailsCheckYourAnswersControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with CommonTestValues
+    with TestUserAnswers {
 
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onPageLoadWithCheckMode = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
@@ -94,32 +98,34 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
 
   "BasicDetailsCheckYourAnswersController" - {
 
-    act.like(renderView(onPageLoad, currentTaxYearUserAnswersWithFewMembers) { implicit app => implicit request =>
-      injected[CheckYourAnswersView].apply(
-        viewModel(
-          srn,
-          NormalMode,
-          memberNumbersUnderThreshold,
-          activeBankAccount = true,
-          whyNoBankAccount = None,
-          whichTaxYearPage = Some(currentReturnTaxYear),
-          Left(currentReturnTaxYear),
-          individualDetails.fullName,
-          defaultSchemeDetails,
-          psaId,
-          psaId.isPSP,
-          viewOnlyUpdated = false,
-          journeyByPassed = false
+    act.like(
+      renderView(onPageLoad, currentTaxYearUserAnswersWithFewMembers) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            srn,
+            NormalMode,
+            memberNumbersUnderThreshold,
+            activeBankAccount = true,
+            whyNoBankAccount = None,
+            whichTaxYearPage = Some(currentReturnTaxYear),
+            Left(currentReturnTaxYear),
+            individualDetails.fullName,
+            defaultSchemeDetails,
+            psaId,
+            psaId.isPSP,
+            viewOnlyUpdated = false,
+            journeyByPassed = false
+          )
         )
-      )
-    }.before(mockTaxYear(currentReturnTaxYear))
-      .after {
-        verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
-        verify(mockSchemeDateService, never).submissionDateAsString(any())
-        verify(mockSchemeDateService, never).returnPeriodsAsJsonString(any())(any())
-        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
-      }
-      .withName("when Initial UserAnswers empty"))
+      }.before(mockTaxYear(currentReturnTaxYear))
+        .after {
+          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+          verify(mockSchemeDateService, never).submissionDateAsString(any())
+          verify(mockSchemeDateService, never).returnPeriodsAsJsonString(any())(any())
+          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+        }
+        .withName("when Initial UserAnswers empty")
+    )
 
     val currentTaxYearWithFewMembersAlreadySubmittedUserAnswer = currentTaxYearUserAnswersWithFewMembers
       .unsafeSet(FbStatus(srn), Submitted)
@@ -367,9 +373,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         val vm = buildViewModel(
           taxYearOrAccountingPeriods = Right(
             NonEmptyList.of(
-              dateRange1 -> refineMV(1),
-              dateRange2 -> refineMV(2),
-              dateRange3 -> refineMV(3)
+              dateRange1 -> 1,
+              dateRange2 -> 2,
+              dateRange3 -> 3
             )
           )
         )

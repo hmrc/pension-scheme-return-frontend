@@ -17,23 +17,21 @@
 package controllers.nonsipp.bonds
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import controllers.nonsipp.bonds.RemoveBondsController._
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{BondPrePopulated, NameOfBondsPage}
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class RemoveBondsControllerSpec extends ControllerBaseSpec {
+class RemoveBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.RemoveBondsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveBondsController.onSubmit(srn, index, NormalMode)
@@ -47,8 +45,8 @@ class RemoveBondsControllerSpec extends ControllerBaseSpec {
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(BondPrePopulated(srn, refineMV(1)), true)
-  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(BondPrePopulated(srn, refineMV(1)), false)
+  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(BondPrePopulated(srn, 1), true)
+  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(BondPrePopulated(srn, 1), false)
 
   override protected def beforeEach(): Unit =
     reset(mockPsrSubmissionService)

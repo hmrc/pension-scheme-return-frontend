@@ -17,19 +17,17 @@
 package controllers.nonsipp.receivetransfer
 
 import views.html.TextInputView
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
 
-class TransferringSchemeNameControllerSpec extends ControllerBaseSpec {
+class TransferringSchemeNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val index = refineMV[Max5.Refined](1)
+  private val memberIndex = 1
+  private val index = 1
   private lazy val onPageLoad = routes.TransferringSchemeNameController.onPageLoad(srn, memberIndex, index, NormalMode)
   private lazy val onSubmit = routes.TransferringSchemeNameController.onSubmit(srn, memberIndex, index, NormalMode)
 

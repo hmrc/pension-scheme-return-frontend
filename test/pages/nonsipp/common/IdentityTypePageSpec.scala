@@ -16,21 +16,20 @@
 
 package pages.nonsipp.common
 
-import config.RefinedTypes.OneTo5000
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
 import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansMadeOrOutstandingPage, LoansProgress}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 
 import java.time.LocalDate
 
 class IdentityTypePageSpec extends PageBehaviours {
-  private val indexOne = refineMV[OneTo5000](1)
-  private val indexTwo = refineMV[OneTo5000](2)
-  private val indexThree = refineMV[OneTo5000](3)
+  private val indexOne = 1
+  private val indexTwo = 2
+  private val indexThree = 3
 
   private val srn = srnGen.sample.value
 

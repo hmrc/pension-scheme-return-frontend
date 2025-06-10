@@ -16,19 +16,17 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextAreaView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController._
 import forms.TextFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhySchemeBorrowedMoneyPage}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec {
+class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhySchemeBorrowedMoneyController.onSubmit(srn, index, NormalMode)

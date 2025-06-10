@@ -17,19 +17,18 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyController._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import models.{NormalMode, UserAnswers}
 import models.SchemeHoldAsset.Transfer
 
-class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
+class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IsAssetTangibleMoveablePropertyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm125100#IDAUURQB"

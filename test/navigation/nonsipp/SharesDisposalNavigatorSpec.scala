@@ -19,7 +19,7 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import models._
 import utils.UserAnswersUtils.UserAnswersOps
@@ -31,9 +31,9 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val shareIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
-  private val shareIndexTwo = refineMV[Max5000.Refined](2)
+  private val shareIndex: Max5000 = 1
+  private val disposalIndex: Max50 = 1
+  private val shareIndexTwo: Max5000 = 2
 
   "SharesDisposalNavigator" - {
 

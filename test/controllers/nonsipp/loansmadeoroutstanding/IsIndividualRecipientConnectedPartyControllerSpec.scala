@@ -18,18 +18,16 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import play.api.mvc.Call
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   lazy val onPageLoad: Call = routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit: Call = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)

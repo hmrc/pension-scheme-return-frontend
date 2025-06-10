@@ -17,7 +17,7 @@
 package controllers.nonsipp.bonds
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -28,7 +28,7 @@ import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import org.mockito.ArgumentMatchers.any
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController._
 
-class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec {
+class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.UnregulatedOrConnectedBondsHeldController.onSubmit(srn, NormalMode)

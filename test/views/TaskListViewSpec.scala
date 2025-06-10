@@ -21,7 +21,7 @@ import views.html.TaskListView
 import viewmodels.models.TaskListStatus.UnableToStart
 import viewmodels.models.{TaskListItemViewModel, TaskListViewModel}
 
-class TaskListViewSpec extends ViewSpec with TestValues {
+class TaskListViewSpec extends ViewSpec with ViewBehaviours with TestValues {
 
   runningApplication { implicit app =>
     val view = injected[TaskListView]

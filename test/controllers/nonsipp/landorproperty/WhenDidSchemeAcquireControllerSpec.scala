@@ -17,24 +17,22 @@
 package controllers.nonsipp.landorproperty
 
 import services.SchemeDateService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.DatePageView
-import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
-import utils.IntUtils.toInt
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import models.{NormalMode, UserAnswers}
 import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
 
 import java.time.LocalDate
 
-class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
+class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 

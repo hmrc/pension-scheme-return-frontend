@@ -20,17 +20,17 @@ import play.api.mvc.Call
 import pages.nonsipp.otherassetsheld._
 import views.html.ContentTablePageView
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import models.NormalMode
 import models.SchemeHoldAsset.Transfer
 import controllers.nonsipp.otherassetsheld.OtherAssetsCheckAndUpdateController.viewModel
 import eu.timepit.refined.api.Refined
 
-class OtherAssetsCheckAndUpdateControllerSpec extends ControllerBaseSpec {
+class OtherAssetsCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  private val index: Refined[Int, OneTo5000] = 1
 
   private def onPageLoad: Call = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index)
   private def onSubmit: Call = routes.OtherAssetsCheckAndUpdateController.onSubmit(srn, index)

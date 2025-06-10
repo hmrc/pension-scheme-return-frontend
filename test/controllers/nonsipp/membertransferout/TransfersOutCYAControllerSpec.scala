@@ -19,8 +19,7 @@ package controllers.nonsipp.membertransferout
 import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models.{NormalMode, PensionSchemeType, ViewOnlyMode}
 import pages.nonsipp.membertransferout._
@@ -29,16 +28,15 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 
 import scala.concurrent.Future
 
-class TransfersOutCYAControllerSpec extends ControllerBaseSpec {
+class TransfersOutCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private val page = 1
   private lazy val onPageLoad = routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.TransfersOutCYAController.onSubmit(srn, index, NormalMode)

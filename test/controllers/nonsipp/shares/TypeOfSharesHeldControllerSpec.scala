@@ -17,18 +17,16 @@
 package controllers.nonsipp.shares
 
 import controllers.nonsipp.shares.TypeOfSharesHeldController._
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.NormalMode
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 
-class TypeOfSharesHeldControllerSpec extends ControllerBaseSpec {
+class TypeOfSharesHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode)

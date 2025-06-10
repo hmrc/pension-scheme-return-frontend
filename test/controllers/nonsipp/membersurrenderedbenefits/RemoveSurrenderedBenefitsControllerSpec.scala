@@ -17,10 +17,10 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models.NameDOB
@@ -31,7 +31,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
+class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.RemoveSurrenderedBenefitsController.onPageLoad(srn, 1)
   private lazy val onSubmit = routes.RemoveSurrenderedBenefitsController.onSubmit(srn, 1)
@@ -41,9 +41,9 @@ class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-    .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+    .unsafeSet(SurrenderedBenefitsAmountPage(srn, 1), money)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -62,7 +62,7 @@ class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
 
       view(
         RemoveSurrenderedBenefitsController.form(injected[YesNoPageFormProvider]),
-        RemoveSurrenderedBenefitsController.viewModel(srn, refineMV(1), money, memberDetails.fullName)
+        RemoveSurrenderedBenefitsController.viewModel(srn, 1, money, memberDetails.fullName)
       )
     })
 

@@ -21,19 +21,19 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import views.html.MultipleQuestionView
 import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.Transform.TransformOps
 import play.api.libs.json.JsPath
 import forms.MoneyFormProvider
 import models.{Money, NormalMode}
 import models.PensionCommencementLumpSum._
 import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec {
+class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   val maxAllowedAmount = 999999999.99
-  val index: Max300 = refineMV(1)
+  val index: Max300 = 1
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

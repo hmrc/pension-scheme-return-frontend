@@ -18,18 +18,18 @@ package controllers.nonsipp.membertransferout
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.ListRadiosView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.NameDOB
 import pages.nonsipp.membertransferout.{MemberTransferOutProgress, ReceivingSchemeNamePage, WhenWasTransferMadePage}
 import config.RefinedTypes.Max5
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
 import viewmodels.models.SectionJourneyStatus
 
 import java.time.LocalDate
 
-class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
+class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.WhichTransferOutRemoveController.onPageLoad(srn, 1)
   private lazy val onSubmit = routes.WhichTransferOutRemoveController.onSubmit(srn, 1)
@@ -37,24 +37,24 @@ class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
   private val memberDetailsMap: List[(Max5, String, LocalDate)] =
-    List((refineMV(1), receivingSchemeName, localDate), (refineMV(2), receivingSchemeName + "2", localDate))
+    List((1, receivingSchemeName, localDate), (2, receivingSchemeName + "2", localDate))
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
-    .unsafeSet(WhenWasTransferMadePage(srn, refineMV(1), refineMV(1)), localDate)
-    .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1)), receivingSchemeName)
-    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(WhenWasTransferMadePage(srn, refineMV(1), refineMV(2)), localDate)
-    .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(2)), receivingSchemeName + "2")
-    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetail1)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetail2)
+    .unsafeSet(WhenWasTransferMadePage(srn, 1, 1), localDate)
+    .unsafeSet(ReceivingSchemeNamePage(srn, 1, 1), receivingSchemeName)
+    .unsafeSet(MemberTransferOutProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(WhenWasTransferMadePage(srn, 1, 2), localDate)
+    .unsafeSet(ReceivingSchemeNamePage(srn, 1, 2), receivingSchemeName + "2")
+    .unsafeSet(MemberTransferOutProgress(srn, 1, 2), SectionJourneyStatus.Completed)
 
   private val userAnswersWithOneContributionOnly = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
-    .unsafeSet(WhenWasTransferMadePage(srn, refineMV(1), refineMV(1)), localDate)
-    .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1)), receivingSchemeName)
-    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetail1)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetail2)
+    .unsafeSet(WhenWasTransferMadePage(srn, 1, 1), localDate)
+    .unsafeSet(ReceivingSchemeNamePage(srn, 1, 1), receivingSchemeName)
+    .unsafeSet(MemberTransferOutProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
   "WhichTransferOutRemoveController" - {
 
@@ -62,7 +62,7 @@ class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
       injected[ListRadiosView]
         .apply(
           form(injected[RadioListFormProvider]),
-          viewModel(srn, refineMV(1), memberDetail1.fullName, memberDetailsMap)
+          viewModel(srn, 1, memberDetail1.fullName, memberDetailsMap)
         )
     })
 

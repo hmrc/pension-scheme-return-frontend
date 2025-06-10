@@ -18,7 +18,7 @@ package controllers.nonsipp.bondsdisposal
 
 import services.PsrSubmissionService
 import controllers.nonsipp.bondsdisposal.BondsDisposalController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -28,7 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-class BondsDisposalControllerSpec extends ControllerBaseSpec {
+class BondsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.BondsDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BondsDisposalController.onSubmit(srn, NormalMode)

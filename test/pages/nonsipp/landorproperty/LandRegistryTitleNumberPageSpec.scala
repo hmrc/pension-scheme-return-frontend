@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import pages.behaviours.PageBehaviours
 
@@ -27,7 +26,7 @@ class LandRegistryTitleNumberPageSpec extends PageBehaviours {
 
   "LandRegistryTitleNumberPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srn, index))
 

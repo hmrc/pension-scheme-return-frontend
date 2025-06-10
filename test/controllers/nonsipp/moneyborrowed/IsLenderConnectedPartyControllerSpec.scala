@@ -18,18 +18,16 @@ package controllers.nonsipp.moneyborrowed
 
 import play.api.mvc.Call
 import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class IsLenderConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsLenderConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   lazy val onPageLoad: Call = routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)

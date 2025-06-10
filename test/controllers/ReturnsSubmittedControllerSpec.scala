@@ -19,7 +19,7 @@ package controllers
 import services.{PsrRetrievalService, PsrVersionsService}
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.WhichTaxYearPage
 import controllers.ReturnsSubmittedController._
 import org.mockito.ArgumentMatchers.any
@@ -34,7 +34,7 @@ import viewmodels.models.TableElem
 
 import scala.concurrent.Future
 
-class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestValues {
+class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerBehaviours with CommonTestValues {
 
   private val populatedUserAnswers =
     defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
@@ -200,7 +200,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
             submissionNumberOne
           ),
         userAnswers = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold),
-        previousUserAnswers = emptyUserAnswers.unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+        previousUserAnswers = emptyUserAnswers.unsafeSet(DoesMemberHaveNinoPage(srn, 1), true)
       ).after {
         verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
         verify(mockPsrRetrievalService, never)

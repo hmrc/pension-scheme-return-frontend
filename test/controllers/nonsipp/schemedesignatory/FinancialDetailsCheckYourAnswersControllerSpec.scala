@@ -19,7 +19,7 @@ package controllers.nonsipp.schemedesignatory
 import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, ValueOfAssetsPage}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage, WhichTaxYearPage}
@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
+class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
