@@ -22,13 +22,15 @@ import org.mockito.Mockito.when
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
-import repositories.UploadRepository.MongoUpload.SensitiveUploadStatus
+import repositories.UploadRepository.SensitiveUploadStatus
+import org.scalatest.matchers.must.Matchers
+import org.mongodb.scala.ObservableImplicits
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
+class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] with Matchers with ObservableImplicits {
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.uploadTtl).thenReturn(1)
@@ -39,7 +41,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
     MongoUpload(uploadKey, reference, SensitiveUploadStatus(UploadStatus.InProgress), oldInstant, None)
   private val encryptedRegex = "^[A-Za-z0-9+/=]+$"
 
-  override protected val repository = new UploadRepository(
+  override protected val repository: UploadRepository = new UploadRepository(
     mongoComponent,
     stubClock,
     mockAppConfig,

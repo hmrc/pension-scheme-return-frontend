@@ -32,7 +32,7 @@ package object memberdetails {
 
     val isCyaPage: Boolean = {
       val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(check|change)-member-details(?!.*\\/\\d+\\/\\d+$$).*"
+        s"^\\/pension-scheme-return\\/[^\\/]+\\/(check|change)-member-details\\/(?!.*\\/\\d+\\/\\d+$$).*"
 
       call.url.matches(pattern)
     }

@@ -32,7 +32,7 @@ package object receivetransfer {
 
     val isCyaPage: Boolean = {
       val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-check-answers|check-answers)-transfers-in(?!.*\\/\\d+\\/\\d+$$).*"
+        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-check-answers|check-answers)-transfers-in\\/(?!.*\\/\\d+\\/\\d+$$).*"
 
       call.url.matches(pattern)
     }
