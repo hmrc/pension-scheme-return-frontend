@@ -24,7 +24,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 case class ALFCountry(code: String, name: String)
 
 case class ALFAddress(lines: Seq[String], town: String, postcode: String, country: ALFCountry) {
-  val firstLine: String = lines.head
+  val firstLine: Option[String] = lines.headOption
   val secondLine: Option[String] = lines.drop(1).headOption
   val thirdLine: Option[String] = lines.drop(2).headOption
 }
