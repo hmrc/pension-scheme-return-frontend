@@ -811,9 +811,9 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
             .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
             .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-            .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-            .unsafeSet(LoanCompleted(srn, refineMV(2)), SectionCompleted)
             .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+            .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+            .unsafeSet(LoansProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithLoans,

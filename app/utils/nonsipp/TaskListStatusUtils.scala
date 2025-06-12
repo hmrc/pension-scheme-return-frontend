@@ -16,18 +16,18 @@
 
 package utils.nonsipp
 
-import pages.nonsipp.employercontributions.{EmployerContributionsCompleted, EmployerContributionsPage}
+import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsProgress}
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, ReceiveTransferProgress}
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandOrPropertyDisposalProgress}
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import pages.nonsipp.sharesdisposal._
 import play.api.libs.json.{JsObject, JsPath}
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompleted, SurrenderedBenefitsPage}
+import pages.nonsipp.membersurrenderedbenefits.{MemberSurrenderedBenefitsProgress, SurrenderedBenefitsPage}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.bonds._
@@ -39,11 +39,11 @@ import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, P
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import utils.nonsipp.check._
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
+import pages.nonsipp.membertransferout.{MemberTransferOutProgress, SchemeTransferOutPage}
 import pages.nonsipp.moneyborrowed.{MoneyBorrowedPage, MoneyBorrowedProgress}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{SectionCompleted, SectionJourneyStatus, TaskListStatus}
+import viewmodels.models.{SectionJourneyStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -112,7 +112,10 @@ object TaskListStatusUtils {
   def getEmployerContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereEmployerContributions = userAnswers.get(EmployerContributionsPage(srn))
     val numRecorded =
-      userAnswers.map(EmployerContributionsCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+      userAnswers
+        .map(EmployerContributionsProgress.all(srn))
+        .flatten(_._2)
+        .count(_._2 == SectionJourneyStatus.Completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.employercontributions.routes.EmployerContributionsController
@@ -182,7 +185,13 @@ object TaskListStatusUtils {
   def getTransferInStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereTransfersIn = userAnswers.get(DidSchemeReceiveTransferPage(srn))
     val numRecorded =
-      userAnswers.map(TransfersInSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+      userAnswers
+        .map(
+          ReceiveTransferProgress
+            .all(srn)
+        )
+        .flatten(_._2)
+        .count(_._2 == SectionJourneyStatus.Completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
@@ -205,7 +214,7 @@ object TaskListStatusUtils {
   def getTransferOutStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereTransfersOut = userAnswers.get(SchemeTransferOutPage(srn))
     val numRecorded =
-      userAnswers.map(TransfersOutSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+      userAnswers.map(MemberTransferOutProgress.all(srn)).flatten(_._2).count(_._2 == SectionJourneyStatus.Completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
@@ -277,7 +286,8 @@ object TaskListStatusUtils {
 
   def getSurrenderedBenefitsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
-    val numRecorded = userAnswers.get(SurrenderedBenefitsCompleted.all(srn)).getOrElse(Map.empty).size
+    val numRecorded =
+      userAnswers.map(MemberSurrenderedBenefitsProgress.all(srn)).count(_._2 == SectionJourneyStatus.Completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
@@ -311,7 +321,7 @@ object TaskListStatusUtils {
       )
     } else {
       val wereLoans = userAnswers.get(LoansMadeOrOutstandingPage(srn))
-      val numRecorded = userAnswers.get(LoanCompleted.all(srn)).getOrElse(Map.empty).size
+      val numRecorded = userAnswers.get(LoansProgress.all(srn)).getOrElse(Map.empty).count(_._2.completed)
 
       val firstQuestionPageUrl =
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController

@@ -40,16 +40,13 @@ object MemberSurrenderedBenefitsProgress {
       override def toString: String = "memberSurrenderedBenefitsProgress"
     }
 
-  private def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
-    new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
+  def all(srn: Srn): IndexedQuestionPage[SectionJourneyStatus] =
+    new IndexedQuestionPage[SectionJourneyStatus] {
 
       override def path: JsPath = JsPath \ toString
 
       override def toString: String = "memberSurrenderedBenefitsProgress"
     }
-
-  def exist(srn: Srn, userAnswers: UserAnswers): Boolean =
-    userAnswers.map(MemberSurrenderedBenefitsProgress.all(srn)).values.exists(_.values.nonEmpty)
 
   implicit class SurrenderedBenefitsUserAnswersOps(userAnswers: UserAnswers) {
 
