@@ -31,7 +31,10 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
 ) {
 
   def postcodeLookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[Address]] =
-    connector.lookup(postcode, filter).map(_.map(addressFromALFAddress)).map(sortAddresses)
+    connector
+      .lookup(postcode, filter)
+      .map(_.filter(_.address.lines.nonEmpty).map(addressFromALFAddress))
+      .map(sortAddresses)
 
   private def sortAddresses(unsorted: List[Address]): List[Address] =
     unsorted.sortBy(
@@ -95,10 +98,11 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
     Try(s.toInt).getOrElse(Int.MaxValue)
 
   private def addressFromALFAddress(lookupResponse: ALFAddressResponse): Address = {
-    val sortingDetails = getAddressSortingDetails(lookupResponse.address.firstLine, lookupResponse.address.secondLine)
+    val sortingDetails =
+      getAddressSortingDetails(lookupResponse.address.firstLine.getOrElse(""), lookupResponse.address.secondLine)
     Address(
       lookupResponse.id,
-      lookupResponse.address.firstLine,
+      lookupResponse.address.firstLine.getOrElse(""),
       lookupResponse.address.secondLine,
       lookupResponse.address.thirdLine,
       lookupResponse.address.town,
