@@ -19,7 +19,6 @@ package controllers.nonsipp.otherassetsheld
 import play.api.mvc.Call
 import pages.nonsipp.otherassetsheld._
 import views.html.ContentTablePageView
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import config.RefinedTypes.OneTo5000
 import controllers.{ControllerBaseSpec, ControllerBehaviours}

@@ -8,7 +8,7 @@ import complete.DefaultParsers.*
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.3.6"
+ThisBuild / scalaVersion := "3.7.1"
 
 lazy val appName: String = "pension-scheme-return-frontend"
 
@@ -52,7 +52,8 @@ lazy val root = Project(appName, file("."))
       "-feature",
       "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
       "-Xmax-inlines", "100",
-      "-language:implicitConversions"
+      "-language:implicitConversions",
+      "-Wunused:all"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,

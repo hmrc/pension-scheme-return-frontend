@@ -21,7 +21,6 @@ import models.ConditionalYesNo._
 import models.IdentityType.UKCompany
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._

@@ -19,7 +19,6 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import models._
 import pages.nonsipp.common._

@@ -20,7 +20,6 @@ import pages.nonsipp.employercontributions._
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._

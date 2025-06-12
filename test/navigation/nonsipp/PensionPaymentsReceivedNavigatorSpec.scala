@@ -85,7 +85,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
     act.like(
       normalmode
         .navigateTo(
-          MemberPensionPaymentsCYAPage,
+          MemberPensionPaymentsCYAPage.apply,
           (srn, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
               .onPageLoad(srn, page = 1, NormalMode)

@@ -19,7 +19,6 @@ package navigation.nonsipp
 import utils.BaseSpec
 import pages.nonsipp.memberreceivedpcls._
 import config.RefinedTypes.Max300
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}

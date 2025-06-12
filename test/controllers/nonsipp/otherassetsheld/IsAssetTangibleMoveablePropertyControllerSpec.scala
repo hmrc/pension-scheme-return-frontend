@@ -19,7 +19,6 @@ package controllers.nonsipp.otherassetsheld
 import pages.nonsipp.otherassetsheld._
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyController._

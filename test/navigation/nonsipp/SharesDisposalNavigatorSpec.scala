@@ -18,7 +18,6 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import models._

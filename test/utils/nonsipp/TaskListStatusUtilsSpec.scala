@@ -46,7 +46,6 @@ import config.RefinedTypes._
 import controllers.TestValues
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import models.SchemeHoldShare.Acquisition
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}

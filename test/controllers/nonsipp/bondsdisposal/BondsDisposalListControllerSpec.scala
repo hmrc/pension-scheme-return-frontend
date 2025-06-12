@@ -19,7 +19,6 @@ package controllers.nonsipp.bondsdisposal
 import pages.nonsipp.bonds._
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListRadiosView
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import forms.RadioListFormProvider

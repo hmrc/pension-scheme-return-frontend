@@ -20,7 +20,6 @@ import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController.{SharesDisposalData, _}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListRadiosView
-import utils.IntUtils.toInt
 import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, SharesDisposalProgress}
 import forms.RadioListFormProvider

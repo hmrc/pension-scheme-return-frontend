@@ -19,7 +19,6 @@ package controllers.actions
 import play.api.mvc.{Action, AnyContent}
 import controllers.routes
 import config.{Constants, FrontendAppConfig}
-import play.api.http.Status.OK
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import play.api.mvc.Results.Ok
 import org.mockito.ArgumentMatchers._
