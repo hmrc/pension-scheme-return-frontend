@@ -42,7 +42,7 @@ import scala.util.Try
 
 import javax.inject.Named
 
-class RemoveTotalValueQuotedSharesController @Inject()(
+class RemoveTotalValueQuotedSharesController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -76,22 +76,19 @@ class RemoveTotalValueQuotedSharesController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        errors => {
+        errors =>
           Future.successful {
             (
               for {
                 totalValueQuotedShares <- request.userAnswers.get(TotalValueQuotedSharesPage(srn)).getOrRecoverJourney
-              } yield {
-                BadRequest(
-                  view(
-                    errors,
-                    RemoveTotalValueQuotedSharesController.viewModel(srn, mode, totalValueQuotedShares.displayAs)
-                  )
+              } yield BadRequest(
+                view(
+                  errors,
+                  RemoveTotalValueQuotedSharesController.viewModel(srn, mode, totalValueQuotedShares.displayAs)
                 )
-              }
+              )
             ).merge
-          }
-        },
+          },
         value =>
           if (value) {
             for {
@@ -104,12 +101,11 @@ class RemoveTotalValueQuotedSharesController @Inject()(
                 fallbackCall = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
                   .onPageLoad(srn, mode)
               )
-            } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-              _ =>
-                Redirect(
-                  navigator
-                    .nextPage(RemoveTotalValueQuotedSharesPage(srn), NormalMode, updatedAnswers)
-                )
+            } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+              Redirect(
+                navigator
+                  .nextPage(RemoveTotalValueQuotedSharesPage(srn), NormalMode, updatedAnswers)
+              )
             )
           } else {
             Future

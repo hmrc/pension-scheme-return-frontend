@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class ReturnsSubmittedController @Inject()(
+class ReturnsSubmittedController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -64,7 +64,9 @@ class ReturnsSubmittedController @Inject()(
                 val maxReportVersion = reportVersions.max
                 val currentVersion = psrVersionsResponse.reportVersion
                 val submitter =
-                  if (currentVersion == maxReportVersion && psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled) {
+                  if (
+                    currentVersion == maxReportVersion && psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled
+                  ) {
                     "returnsSubmitted.inProgress"
                   } else {
                     getSubmitter(psrVersionsResponse)
@@ -201,7 +203,7 @@ object ReturnsSubmittedController {
       refresh = None,
       buttonText = Message("returnsSubmitted.link", schemeName),
       details = None,
-      onSubmit = controllers.nonsipp.routes.TaskListController.onPageLoad(srn) //not used
+      onSubmit = controllers.nonsipp.routes.TaskListController.onPageLoad(srn) // not used
     )
   }
 }

@@ -22,6 +22,7 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.membersurrenderedbenefits._
@@ -47,7 +48,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class SurrenderedBenefitsMemberListController @Inject()(
+class SurrenderedBenefitsMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -73,8 +74,8 @@ class SurrenderedBenefitsMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -86,9 +87,8 @@ class SurrenderedBenefitsMemberListController @Inject()(
       case Right(completedMemberDetails) =>
         val noPageEnabled = !request.userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false)
         val memberDetailsWithAmount: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] =
-          completedMemberDetails.map {
-            case (index, memberDetails) =>
-              (index, memberDetails, request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)))
+          completedMemberDetails.map { case (index, memberDetails) =>
+            (index, memberDetails, request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)))
           }
 
         val memberDetails = buildSurrenderedBenefits(srn, memberDetailsWithAmount)
@@ -150,15 +150,14 @@ class SurrenderedBenefitsMemberListController @Inject()(
     srn: Srn,
     indexes: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])]
   )(implicit request: DataRequest[_]): List[MemberSurrenderedBenefits] =
-    indexes.map {
-      case (index, nameDOB, surrenderedAccountOpt) =>
-        val status = request.userAnswers.memberSurrenderedBenefitsProgress(srn, index)
-        MemberSurrenderedBenefits(
-          memberIndex = index,
-          surrenderedFullName = nameDOB.fullName,
-          status = status,
-          surrenderedBenefitsAccount = surrenderedAccountOpt
-        )
+    indexes.map { case (index, nameDOB, surrenderedAccountOpt) =>
+      val status = request.userAnswers.memberSurrenderedBenefitsProgress(srn, index)
+      MemberSurrenderedBenefits(
+        memberIndex = index,
+        surrenderedFullName = nameDOB.fullName,
+        status = status,
+        surrenderedBenefitsAccount = surrenderedAccountOpt
+      )
     }
 
 }

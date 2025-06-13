@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class AssetSaleIndependentValuationPageSpec extends PageBehaviours {
@@ -26,8 +25,8 @@ class AssetSaleIndependentValuationPageSpec extends PageBehaviours {
 
   "AssetSaleIndependentValuationPage" - {
 
-    val assetIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Boolean](AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex))
 

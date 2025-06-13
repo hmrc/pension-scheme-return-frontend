@@ -21,7 +21,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import play.api.mvc.AnyContentAsEmpty
 import models.IdentityType.Individual
 import controllers.TestValues
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import models._
@@ -93,18 +93,18 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
-          .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "IndividualRecipientName")
-          .unsafeSet(IndividualRecipientNinoPage(srn, refineMV(1)), ConditionalYesNo.yes[String, Nino](nino))
-          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), false)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(IndividualRecipientNamePage(srn, 1), "IndividualRecipientName")
+          .unsafeSet(IndividualRecipientNinoPage(srn, 1), ConditionalYesNo.yes[String, Nino](nino))
+          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, 1), true)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), false)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -146,18 +146,18 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
-          .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "IndividualRecipientName")
-          .unsafeSet(IndividualRecipientNinoPage(srn, refineMV(1)), ConditionalYesNo.no[String, Nino]("noNinoReason"))
-          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), false)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(IndividualRecipientNamePage(srn, 1), "IndividualRecipientName")
+          .unsafeSet(IndividualRecipientNinoPage(srn, 1), ConditionalYesNo.no[String, Nino]("noNinoReason"))
+          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, 1), false)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), true)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -169,7 +169,8 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             loanTransactions = List(
               LoanTransactions(
                 prePopulated = None,
-                recipientIdentityType = RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
+                recipientIdentityType =
+                  RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
                 loanRecipientName = "IndividualRecipientName",
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = None,
@@ -199,21 +200,21 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKCompany))
-          .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "CompanyRecipientName")
+          .unsafeSet(CompanyRecipientNamePage(srn, 1), "CompanyRecipientName")
           .unsafeSet(
-            CompanyRecipientCrnPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            CompanyRecipientCrnPage(srn, 1, IdentitySubject.LoanRecipient),
             ConditionalYesNo.yes[String, Crn](crn)
           )
-          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Sponsoring)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), false)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, 1), Sponsoring)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), false)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -255,20 +256,20 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKCompany))
-          .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "CompanyRecipientName")
+          .unsafeSet(CompanyRecipientNamePage(srn, 1), "CompanyRecipientName")
           .unsafeSet(
-            CompanyRecipientCrnPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            CompanyRecipientCrnPage(srn, 1, IdentitySubject.LoanRecipient),
             ConditionalYesNo.no[String, Crn]("noCrnReason")
           )
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), true)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -310,21 +311,21 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKPartnership))
-          .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(1)), "PartnershipRecipientName")
+          .unsafeSet(PartnershipRecipientNamePage(srn, 1), "PartnershipRecipientName")
           .unsafeSet(
-            PartnershipRecipientUtrPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            PartnershipRecipientUtrPage(srn, 1, IdentitySubject.LoanRecipient),
             ConditionalYesNo.yes[String, Utr](utr)
           )
-          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), ConnectedParty)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), false)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, 1), ConnectedParty)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), false)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -366,21 +367,21 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKPartnership))
-          .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(1)), "PartnershipRecipientName")
+          .unsafeSet(PartnershipRecipientNamePage(srn, 1), "PartnershipRecipientName")
           .unsafeSet(
-            PartnershipRecipientUtrPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            PartnershipRecipientUtrPage(srn, 1, IdentitySubject.LoanRecipient),
             ConditionalYesNo.no[String, Utr]("noUtrReason")
           )
-          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Neither)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, 1), Neither)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), true)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -424,19 +425,19 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Other))
           .unsafeSet(
-            OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            OtherRecipientDetailsPage(srn, 1, IdentitySubject.LoanRecipient),
             RecipientDetails("OtherRecipientDetailsName", "otherDescription")
           )
-          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Neither)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), false)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.no[Unit, Money](()))
-          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, 1), Neither)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), true)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(ArrearsPrevYears(srn, 1), false)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, 1), ConditionalYesNo.no[Unit, Money](()))
+          .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -478,16 +479,16 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Other))
           .unsafeSet(
-            OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            OtherRecipientDetailsPage(srn, 1, IdentitySubject.LoanRecipient),
             RecipientDetails("OtherRecipientDetailsName", "otherDescription")
           )
-          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Neither)
-          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
-          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), partialAmountOfTheLoan)
-          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
-          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), partialInterestOnLoan)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, 1), Neither)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), true)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), partialAmountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, 1), partialInterestOnLoan)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
@@ -543,18 +544,18 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe None
-          userAnswers.get(IndividualRecipientNamePage(srn, refineMV(1))) mustBe None
-          userAnswers.get(IndividualRecipientNinoPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(LoanCompleted(srn, refineMV(1))) mustBe None
-          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe None
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe None
+          userAnswers.get(IndividualRecipientNamePage(srn, 1)) mustBe None
+          userAnswers.get(IndividualRecipientNinoPage(srn, 1)) mustBe None
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
+          userAnswers.get(DatePeriodLoanPage(srn, 1)) mustBe None
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)) mustBe None
+          userAnswers.get(AreRepaymentsInstalmentsPage(srn, 1)) mustBe None
+          userAnswers.get(InterestOnLoanPage(srn, 1)) mustBe None
+          userAnswers.get(SecurityGivenForLoanPage(srn, 1)) mustBe None
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, 1)) mustBe None
+          userAnswers.get(LoanCompleted(srn, 1)) mustBe None
+          userAnswers.get(LoansProgress(srn, 1)) mustBe None
         }
       )
     }
@@ -573,22 +574,22 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(IndividualRecipientNamePage(srn, refineMV(1))) mustBe Some(individualRecipientName)
-          userAnswers.get(IndividualRecipientNinoPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(nino))
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(IndividualRecipientNamePage(srn, 1)) mustBe Some(individualRecipientName)
+          userAnswers.get(IndividualRecipientNinoPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(nino))
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(DatePeriodLoanPage(srn, 1)) mustBe Some(
             (localDate, Money(Double.MinPositiveValue), Int.MaxValue)
           )
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(amountOfTheLoan)
-          userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(interestOnLoan)
-          userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
-          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(money))
-          userAnswers.get(LoanCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
-          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)) mustBe Some(amountOfTheLoan)
+          userAnswers.get(AreRepaymentsInstalmentsPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(InterestOnLoanPage(srn, 1)) mustBe Some(interestOnLoan)
+          userAnswers.get(SecurityGivenForLoanPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(security))
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(money))
+          userAnswers.get(LoanCompleted(srn, 1)) mustBe Some(SectionCompleted)
+          userAnswers.get(LoansProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }
@@ -607,12 +608,12 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(IndividualRecipientNamePage(srn, refineMV(1))) mustBe Some(individualRecipientName)
-          userAnswers.get(IndividualRecipientNinoPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.no(noninoReason))
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(IndividualRecipientNamePage(srn, 1)) mustBe Some(individualRecipientName)
+          userAnswers.get(IndividualRecipientNinoPage(srn, 1)) mustBe Some(ConditionalYesNo.no(noninoReason))
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe Some(true)
         }
       )
     }
@@ -635,15 +636,15 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKCompany
           )
-          userAnswers.get(CompanyRecipientNamePage(srn, refineMV(1))) mustBe Some(companyRecipientName)
-          userAnswers.get(CompanyRecipientCrnPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(CompanyRecipientNamePage(srn, 1)) mustBe Some(companyRecipientName)
+          userAnswers.get(CompanyRecipientCrnPage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             ConditionalYesNo.yes(crn)
           )
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
+          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, 1)) mustBe Some(
             SponsoringOrConnectedParty.Sponsoring
           )
         }
@@ -664,15 +665,15 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKCompany
           )
-          userAnswers.get(CompanyRecipientNamePage(srn, refineMV(1))) mustBe Some(companyRecipientName)
-          userAnswers.get(CompanyRecipientCrnPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(CompanyRecipientNamePage(srn, 1)) mustBe Some(companyRecipientName)
+          userAnswers.get(CompanyRecipientCrnPage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             ConditionalYesNo.no(noCrnReason)
           )
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
+          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, 1)) mustBe Some(
             SponsoringOrConnectedParty.ConnectedParty
           )
         }
@@ -693,14 +694,14 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKPartnership
           )
-          userAnswers.get(PartnershipRecipientNamePage(srn, refineMV(1))) mustBe Some(partnershipRecipientName)
-          userAnswers.get(PartnershipRecipientUtrPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(PartnershipRecipientNamePage(srn, 1)) mustBe Some(partnershipRecipientName)
+          userAnswers.get(PartnershipRecipientUtrPage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             ConditionalYesNo.yes(utr)
           )
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
         }
       )
     }
@@ -722,14 +723,14 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKPartnership
           )
-          userAnswers.get(PartnershipRecipientNamePage(srn, refineMV(1))) mustBe Some(partnershipRecipientName)
-          userAnswers.get(PartnershipRecipientUtrPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(PartnershipRecipientNamePage(srn, 1)) mustBe Some(partnershipRecipientName)
+          userAnswers.get(PartnershipRecipientUtrPage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             ConditionalYesNo.no(noUtrReason)
           )
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
         }
       )
     }
@@ -751,13 +752,13 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Other
           )
-          userAnswers.get(OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(OtherRecipientDetailsPage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             RecipientDetails(otherRecipientName, otherRecipientDescription)
           )
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
         }
       )
     }
@@ -785,23 +786,23 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe None
 
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(IndividualRecipientNamePage(srn, refineMV(1))) mustBe Some(individualRecipientName)
-          userAnswers.get(IndividualRecipientNinoPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(nino))
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(IndividualRecipientNamePage(srn, 1)) mustBe Some(individualRecipientName)
+          userAnswers.get(IndividualRecipientNinoPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(nino))
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(DatePeriodLoanPage(srn, 1)) mustBe Some(
             (localDate, Money(Double.MinPositiveValue), Int.MaxValue)
           )
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)) mustBe Some(
             AmountOfTheLoan(money, Some(Money(0.0)), Some(Money(0.0)))
           )
-          userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(AreRepaymentsInstalmentsPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(InterestOnLoanPage(srn, 1)) mustBe Some(
             InterestOnLoan(money, percentage, Some(Money(0.0)))
           )
-          userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
+          userAnswers.get(SecurityGivenForLoanPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(security))
         }
       )
     }
@@ -818,9 +819,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
-        }
+        userAnswers => userAnswers.get(LoansProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
       )
     }
 
@@ -833,10 +832,10 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optAmountOutstanding) mustBe None
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optCapRepaymentCY) mustBe None
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))).flatMap(_.optIntReceivedCY) mustBe None
-          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))).flatMap(_.value.toOption) mustBe None
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)).flatMap(_.optAmountOutstanding) mustBe None
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)).flatMap(_.optCapRepaymentCY) mustBe None
+          userAnswers.get(InterestOnLoanPage(srn, 1)).flatMap(_.optIntReceivedCY) mustBe None
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, 1)).flatMap(_.value.toOption) mustBe None
         }
       )
     }
@@ -850,10 +849,10 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optAmountOutstanding) mustBe Some(Money(0))
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optCapRepaymentCY) mustBe Some(Money(0))
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))).flatMap(_.optIntReceivedCY) mustBe Some(Money(0))
-          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))).flatMap(_.value.toOption) mustBe Some(
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)).flatMap(_.optAmountOutstanding) mustBe Some(Money(0))
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)).flatMap(_.optCapRepaymentCY) mustBe Some(Money(0))
+          userAnswers.get(InterestOnLoanPage(srn, 1)).flatMap(_.optIntReceivedCY) mustBe Some(Money(0))
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, 1)).flatMap(_.value.toOption) mustBe Some(
             Money(0)
           )
         }
@@ -869,10 +868,10 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optAmountOutstanding) mustBe Some(Money(0))
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optCapRepaymentCY) mustBe Some(Money(0))
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))).flatMap(_.optIntReceivedCY) mustBe Some(Money(0))
-          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))).flatMap(_.value.toOption) mustBe Some(
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)).flatMap(_.optAmountOutstanding) mustBe Some(Money(0))
+          userAnswers.get(AmountOfTheLoanPage(srn, 1)).flatMap(_.optCapRepaymentCY) mustBe Some(Money(0))
+          userAnswers.get(InterestOnLoanPage(srn, 1)).flatMap(_.optIntReceivedCY) mustBe Some(Money(0))
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, 1)).flatMap(_.value.toOption) mustBe Some(
             Money(0)
           )
         }

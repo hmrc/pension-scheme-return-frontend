@@ -46,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
-class TaskListController @Inject()(
+class TaskListController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -68,18 +68,19 @@ class TaskListController @Inject()(
         lastVersion = if (response.nonEmpty) response.maxBy(_.reportVersion).reportVersion else defaultFbVersion.toInt
         fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt
         hasHistory = response.exists(isSubmitted)
-        noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
-          true
-        } else {
-          userAnswersUnchangedAllSections(
-            request.userAnswers,
-            if (isSubmitted(response.maxBy(_.reportVersion))) {
-              request.pureUserAnswers.get
-            } else {
-              request.previousUserAnswers.get
-            }
-          )
-        }
+        noChangesSincePreviousVersion =
+          if (!hasHistory || request.previousUserAnswers.isEmpty) {
+            true
+          } else {
+            userAnswersUnchangedAllSections(
+              request.userAnswers,
+              if (isSubmitted(response.maxBy(_.reportVersion))) {
+                request.pureUserAnswers.get
+              } else {
+                request.previousUserAnswers.get
+              }
+            )
+          }
         viewModel = TaskListController.viewModel(
           srn,
           request.schemeDetails.schemeName,
@@ -93,7 +94,7 @@ class TaskListController @Inject()(
           request.pureUserAnswers,
           isPrePopulation
         )
-      } yield {
+      } yield
         if (fbVersion < lastVersion && hasHistory && noChangesSincePreviousVersion) {
           logger.warn(
             s"[TaskListController] fbVersion ($fbVersion) < lastVersion($lastVersion) and return hasn't just changed, redirecting to overview page"
@@ -102,7 +103,6 @@ class TaskListController @Inject()(
         } else {
           Ok(view(viewModel, request.schemeDetails.schemeName))
         }
-      }
     }
   }
 

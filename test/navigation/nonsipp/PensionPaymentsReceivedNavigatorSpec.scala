@@ -18,17 +18,17 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.RefinedTypes.Max300
+import utils.IntUtils.given
+import pages.nonsipp.memberpensionpayments._
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
-import pages.nonsipp.memberpensionpayments._
-import eu.timepit.refined.refineMV
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index: Max300 = 1
 
   "PensionPaymentsReceivedNavigator" - {
 
@@ -73,7 +73,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .navigateToWithIndex(
           index,
           TotalAmountPensionPaymentsPage.apply,
-          (srn, index: Max300, _) =>
+          (srn, index: Int, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
               .onPageLoad(srn, index, NormalMode)
         )
@@ -85,7 +85,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
     act.like(
       normalmode
         .navigateTo(
-          MemberPensionPaymentsCYAPage,
+          MemberPensionPaymentsCYAPage.apply,
           (srn, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
               .onPageLoad(srn, page = 1, NormalMode)
@@ -100,7 +100,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .navigateToWithIndex(
           index,
           RemovePensionPaymentsPage,
-          (srn, _: Max300, _) =>
+          (srn, _: Int, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
               .onPageLoad(srn, 1, NormalMode)
         )

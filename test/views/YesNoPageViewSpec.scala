@@ -21,7 +21,7 @@ import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import viewmodels.models.YesNoPageViewModel
 
-class YesNoPageViewSpec extends ViewSpec {
+class YesNoPageViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     val view = injected[YesNoPageView]

@@ -18,17 +18,16 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.AnyPartAssetStillHeldPage
 import controllers.nonsipp.otherassetsdisposal.AnyPartAssetStillHeldController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class AnyPartAssetStillHeldControllerSpec extends ControllerBaseSpec {
+class AnyPartAssetStillHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.AnyPartAssetStillHeldController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)

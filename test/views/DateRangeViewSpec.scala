@@ -24,7 +24,7 @@ import viewmodels.models.DateRangeViewModel
 
 import java.time.LocalDate
 
-class DateRangeViewSpec extends ViewSpec {
+class DateRangeViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     val view = injected[DateRangeView]
@@ -38,7 +38,7 @@ class DateRangeViewSpec extends ViewSpec {
           "dates" -> mapping(
             "startDate" -> localDateMapping("startDate.required"),
             "endDate" -> localDateMapping("endDate.required")
-          )(DateRange.apply)(DateRange.unapply)
+          )(DateRange.apply)(x => Some(x._1, x._2))
         )(identity)(Some(_))
       )
     val invalidForm = dateRangeForm.bind(Map("dates.startDate" -> "", "dates.endDate" -> ""))

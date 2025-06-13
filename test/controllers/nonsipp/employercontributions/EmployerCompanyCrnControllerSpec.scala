@@ -17,17 +17,16 @@
 package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models._
-import config.RefinedTypes.{Max300, Max50}
-import controllers.ControllerBaseSpec
 
-class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec {
+class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val memberIndex = refineMV[Max300.Refined](1) //memberIndex: Max300
-  private val index = refineMV[Max50.Refined](1)
+  private val memberIndex = 1 // memberIndex: Max300
+  private val index = 1
 
   private lazy val onPageLoad =
     routes.EmployerCompanyCrnController

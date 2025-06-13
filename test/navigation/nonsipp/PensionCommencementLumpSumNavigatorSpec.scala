@@ -18,8 +18,8 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import pages.nonsipp.memberreceivedpcls._
-import config.RefinedTypes.{Max300, OneTo300}
-import eu.timepit.refined.refineMV
+import config.RefinedTypes.Max300
+import utils.IntUtils.given
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
@@ -27,7 +27,7 @@ import models.NormalMode
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo300](1)
+  private val index: Max300 = 1
 
   "PensionCommencementLumpSumNavigator" - {
 
@@ -79,7 +79,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
       normalmode
         .navigateToWithIndex(
           index,
-          (srn, index: Max300) => PensionCommencementLumpSumAmountPage(srn, index),
+          (srn, index) => PensionCommencementLumpSumAmountPage(srn, index),
           (srn, index, _) =>
             controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
         )
@@ -90,8 +90,8 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
       normalmode
         .navigateToWithIndex(
           index,
-          (srn, index: Max300) => PclsCYAPage(srn, index),
-          (srn, _: Max300, _) =>
+          (srn, index) => PclsCYAPage(srn, index),
+          (srn, _: Int, _) =>
             controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
               .onPageLoad(srn, 1, NormalMode)
         )

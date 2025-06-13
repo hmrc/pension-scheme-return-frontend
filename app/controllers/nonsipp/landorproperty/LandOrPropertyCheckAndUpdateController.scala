@@ -19,16 +19,17 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyChosenAddressPage,
-  LandOrPropertyTotalCostPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
 import controllers.actions._
 import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.ContentTablePageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyChosenAddressPage,
+  LandOrPropertyTotalCostPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import models._
 import controllers.nonsipp.landorproperty.LandOrPropertyCheckAndUpdateController._
 import play.api.i18n.MessagesApi
@@ -36,14 +37,14 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
 import viewmodels.models._
 
-class LandOrPropertyCheckAndUpdateController @Inject()(
+class LandOrPropertyCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
         address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney
@@ -63,7 +64,7 @@ class LandOrPropertyCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode))
   }
 }

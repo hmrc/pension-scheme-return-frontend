@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -28,7 +27,7 @@ class LandOrPropertyWhenDidSchemeAcquirePageSpec extends PageBehaviours {
 
   "LandOrPropertyWhenDidSchemeAcquirePage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srn, index))
 

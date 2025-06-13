@@ -19,23 +19,22 @@ package controllers.nonsipp.otherassetsheld
 import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsheld._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
-class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
+class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -52,7 +51,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
   }
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val taxYear = Some(Left(dateRange))
   private val page = 1
   private val subject = IdentitySubject.OtherAssetSeller
@@ -95,7 +94,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
       OtherAssetsProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )
@@ -128,25 +127,25 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .after({
+          .after {
             verify(mockSaveService, times(1)).save(any())(any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"render correct ${mode.toString} view")
       )
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before({
+          .before {
             when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
             MockPsrSubmissionService.submitPsrDetailsWithUA()
-          })
-          .after({
+          }
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             verify(mockSaveService, times(2)).save(any())(any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -156,12 +155,11 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
           page = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, page, mode),
           userAnswers = incompleteUserAnswers,
           previousUserAnswers = emptyUserAnswers
-        ).after({
-            verify(mockSaveService, never()).save(any())(any(), any())
-            reset(mockPsrSubmissionService)
-            reset(mockSaveService)
-          })
-          .withName(s"redirect to list page when in $mode mode and incomplete data")
+        ).after {
+          verify(mockSaveService, never()).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+          reset(mockSaveService)
+        }.withName(s"redirect to list page when in $mode mode and incomplete data")
       )
 
       act.like(
@@ -228,11 +226,10 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
               compilationOrSubmissionDate = Some(submissionDateTwo)
             )
           )
-      }.after({
-          verify(mockSaveService, never()).save(any())(any(), any())
-          reset(mockPsrSubmissionService)
-        })
-        .withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.after {
+        verify(mockSaveService, never()).save(any())(any(), any())
+        reset(mockPsrSubmissionService)
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
     act.like(
       redirectToPage(
@@ -240,9 +237,8 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to other assets list page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to other assets list page")
     )
   }
 

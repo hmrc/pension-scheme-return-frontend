@@ -22,7 +22,9 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils._
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
+import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import config.RefinedTypes.Max5000
@@ -33,8 +35,6 @@ import views.html.ListView
 import models.SchemeId.Srn
 import _root_.config.Constants
 import config.Constants.maxBondsTransactions
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator
@@ -53,7 +53,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class BondsListController @Inject()(
+class BondsListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -107,38 +107,37 @@ class BondsListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     val (status, incompleteBondsUrl) =
       getBondsTaskListStatusAndLink(request.userAnswers, srn, isPrePopulation)
 
     if (status == TaskListStatus.NotStarted) {
       logger.info("Bonds journey not started, redirecting to NameOfBonds page")
-      Redirect(routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode))
+      Redirect(routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode))
     } else if (status == TaskListStatus.InProgress) {
       Redirect(incompleteBondsUrl)
     } else {
-      bondsData(srn).map {
-        case (bondsToCheck, bonds) =>
-          val filledForm =
-            request.userAnswers.get(BondsListPage(srn)).fold(form)(form.fill)
-          Ok(
-            view(
-              filledForm,
-              viewModel(
-                srn,
-                page,
-                mode,
-                bonds,
-                bondsToCheck,
-                request.schemeDetails.schemeName,
-                viewOnlyViewModel,
-                showBackLink = showBackLink,
-                isPrePop = isPrePopulation
-              )
+      bondsData(srn).map { case (bondsToCheck, bonds) =>
+        val filledForm =
+          request.userAnswers.get(BondsListPage(srn)).fold(form)(form.fill)
+        Ok(
+          view(
+            filledForm,
+            viewModel(
+              srn,
+              page,
+              mode,
+              bonds,
+              bondsToCheck,
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel,
+              showBackLink = showBackLink,
+              isPrePop = isPrePopulation
             )
           )
+        )
       }.merge
     }
   }
@@ -160,29 +159,27 @@ class BondsListController @Inject()(
         form
           .bindFromRequest()
           .fold(
-            errors => {
+            errors =>
               bondsData(srn)
-                .map {
-                  case (bondsToCheck, bonds) =>
-                    BadRequest(
-                      view(
-                        errors,
-                        viewModel(
-                          srn,
-                          page,
-                          mode,
-                          bonds,
-                          bondsToCheck,
-                          request.schemeDetails.schemeName,
-                          showBackLink = true,
-                          isPrePop = isPrePopulation
-                        )
+                .map { case (bondsToCheck, bonds) =>
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        bonds,
+                        bondsToCheck,
+                        request.schemeDetails.schemeName,
+                        showBackLink = true,
+                        isPrePop = isPrePopulation
                       )
                     )
+                  )
                 }
                 .merge
-                .pure[Future]
-            },
+                .pure[Future],
             addAnother =>
               for {
                 updatedUserAnswers <- Future.fromTry(request.userAnswers.set(BondsListPage(srn), addAnother))
@@ -230,8 +227,8 @@ class BondsListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def bondsData(srn: Srn)(
-    implicit request: DataRequest[_],
+  private def bondsData(srn: Srn)(implicit
+    request: DataRequest[_],
     logger: Logger
   ): Either[Result, (List[BondsData], List[BondsData])] = {
     // if return has been pre-populated, partition bonds by those that need to be checked
@@ -258,9 +255,7 @@ class BondsListController @Inject()(
       for {
         completedIndexes <- completedIndexesOrError
         bonds <- completedIndexes.traverse(buildBonds)
-      } yield bonds.partition(
-        bonds => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, bonds.index)
-      )
+      } yield bonds.partition(bonds => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, bonds.index))
     } else {
       val noBondsToCheck = List.empty[BondsData]
       for {
@@ -296,54 +291,53 @@ object BondsListController {
       case (Nil, mode) if !mode.isViewOnlyMode =>
         List()
       case (list, _) =>
-        list.map {
-          case BondsData(index, nameOfBonds, acquisition, costOfBonds, canRemove) =>
-            val acquisitionType = acquisition match {
-              case SchemeHoldBond.Acquisition => "bondsList.acquisition.acquired"
-              case SchemeHoldBond.Contribution => "bondsList.acquisition.contributed"
-              case SchemeHoldBond.Transfer => "bondsList.acquisition.transferred"
-            }
-            val bondsMessage =
-              Message("bondsList.row.withCost", nameOfBonds.show, acquisitionType, costOfBonds.displayAs)
+        list.map { case BondsData(index, nameOfBonds, acquisition, costOfBonds, canRemove) =>
+          val acquisitionType = acquisition match {
+            case SchemeHoldBond.Acquisition => "bondsList.acquisition.acquired"
+            case SchemeHoldBond.Contribution => "bondsList.acquisition.contributed"
+            case SchemeHoldBond.Transfer => "bondsList.acquisition.transferred"
+          }
+          val bondsMessage =
+            Message("bondsList.row.withCost", nameOfBonds.show, acquisitionType, costOfBonds.displayAs)
 
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
-                ListRow.view(
-                  bondsMessage,
-                  controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-                    .onPageLoadViewOnly(srn, index, year, current, previous)
-                    .url,
-                  Message("bondsList.row.view.hiddenText", bondsMessage)
-                )
-              case _ if check =>
-                ListRow.check(
-                  bondsMessage,
-                  routes.BondsCheckAndUpdateController.onPageLoad(srn, index).url,
-                  Message("bondsList.row.check.hiddenText", bondsMessage)
-                )
-              case _ if canRemove =>
-                ListRow(
-                  bondsMessage,
-                  changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-                    .onPageLoad(srn, index, CheckMode)
-                    .url,
-                  changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage),
-                  removeUrl = controllers.nonsipp.bonds.routes.RemoveBondsController
-                    .onPageLoad(srn, index, NormalMode)
-                    .url,
-                  removeHiddenText = Message("bondsList.row.remove.hiddenText", bondsMessage)
-                )
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+              ListRow.view(
+                bondsMessage,
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoadViewOnly(srn, index, year, current, previous)
+                  .url,
+                Message("bondsList.row.view.hiddenText", bondsMessage)
+              )
+            case _ if check =>
+              ListRow.check(
+                bondsMessage,
+                routes.BondsCheckAndUpdateController.onPageLoad(srn, index).url,
+                Message("bondsList.row.check.hiddenText", bondsMessage)
+              )
+            case _ if canRemove =>
+              ListRow(
+                bondsMessage,
+                changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+                  .url,
+                changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage),
+                removeUrl = controllers.nonsipp.bonds.routes.RemoveBondsController
+                  .onPageLoad(srn, index, NormalMode)
+                  .url,
+                removeHiddenText = Message("bondsList.row.remove.hiddenText", bondsMessage)
+              )
 
-              case _ =>
-                ListRow(
-                  bondsMessage,
-                  changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-                    .onPageLoad(srn, index, CheckMode)
-                    .url,
-                  changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage)
-                )
+            case _ =>
+              ListRow(
+                bondsMessage,
+                changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+                  .url,
+                changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage)
+              )
 
-            }
+          }
         }
     }
 
@@ -400,13 +394,12 @@ object BondsListController {
       }
     )
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (bondsSize >= Constants.maxBondsTransactions) {
         ParagraphMessage("bondsList.inset")
       } else {
         Message("")
       }
-    }
 
     val sections: List[ListSection] = if (isPrePop) {
       Option
@@ -503,7 +496,7 @@ object BondsListController {
   }
 
   case class BondsData(
-    index: Max5000,
+    index: Int,
     nameOfBonds: String,
     acquisitionType: SchemeHoldBond,
     costOfBonds: Money,

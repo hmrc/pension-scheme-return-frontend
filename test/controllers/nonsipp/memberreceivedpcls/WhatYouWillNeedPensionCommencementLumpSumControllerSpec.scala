@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedPensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedPensionCommencementLumpSumControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedPensionCommencementLumpSumController" - {
 

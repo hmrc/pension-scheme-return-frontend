@@ -16,25 +16,24 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.DatePageView
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
-import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.NormalMode
 import services.SchemeDateService
 import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
+class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 

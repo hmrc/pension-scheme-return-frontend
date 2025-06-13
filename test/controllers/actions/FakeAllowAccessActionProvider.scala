@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class FakeAllowAccessActionProvider @Inject()(schemeDetails: SchemeDetails, minimalDetails: MinimalDetails)
+class FakeAllowAccessActionProvider @Inject() (schemeDetails: SchemeDetails, minimalDetails: MinimalDetails)
     extends AllowAccessActionProvider
     with Generators
     with OptionValues {

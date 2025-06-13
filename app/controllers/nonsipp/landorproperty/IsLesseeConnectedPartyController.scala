@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -29,6 +28,8 @@ import config.RefinedTypes.Max5000
 import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsLesseeConnectedPartyController @Inject()(
+class IsLesseeConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -52,7 +53,7 @@ class IsLesseeConnectedPartyController @Inject()(
 
   private val form = IsLesseeConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(LandOrPropertyLeaseDetailsPage(srn, index)).sync { leaseName =>
         val preparedForm = request.userAnswers.fillForm(IsLesseeConnectedPartyPage(srn, index), form)
@@ -60,7 +61,7 @@ class IsLesseeConnectedPartyController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

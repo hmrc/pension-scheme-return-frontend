@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import cats.implicits._
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
@@ -53,7 +54,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class ReportBondsDisposalListController @Inject()(
+class ReportBondsDisposalListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -106,8 +107,8 @@ class ReportBondsDisposalListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -164,11 +165,10 @@ class ReportBondsDisposalListController @Inject()(
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
 
-          val allBondsFullyDisposed: Boolean = completedDisposals.forall {
-            case (bondIndex, disposalIndexes) =>
-              disposalIndexes.exists { disposalIndex =>
-                request.userAnswers.get(BondsStillHeldPage(srn, bondIndex, disposalIndex)).contains(0)
-              }
+          val allBondsFullyDisposed: Boolean = completedDisposals.forall { case (bondIndex, disposalIndexes) =>
+            disposalIndexes.exists { disposalIndex =>
+              request.userAnswers.get(BondsStillHeldPage(srn, bondIndex, disposalIndex)).contains(0)
+            }
           }
 
           val maximumDisposalsReached = numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond ||
@@ -284,20 +284,18 @@ class ReportBondsDisposalListController @Inject()(
         .toMap
     )
 
-  private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
-    implicit request: DataRequest[_]
+  private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
+    request: DataRequest[_]
   ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
     disposals
-      .map {
-        case indexes @ (index, _) =>
-          index -> request.userAnswers
-            .get(BondsCompleted(srn, index))
-            .getOrRecoverJourney
-            .leftMap { result =>
-              logger.warn(s"couldn't find completed bonds page for index ${index} from bonds disposals completed")
-              result
-            }
-            .map(bondsDisposal => (indexes, bondsDisposal))
+      .map { case indexes @ (index, _) =>
+        index -> request.userAnswers
+          .get(BondsCompleted(srn, index))
+          .toRight {
+            logger.warn(s"couldn't find completed bonds page for index ${index} from bonds disposals completed")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+          .map(bondsDisposal => (indexes, bondsDisposal))
       }
       .toList
       .sortBy { case (index, _) => index.value }
@@ -327,45 +325,44 @@ object ReportBondsDisposalListController {
         )
       )
     } else {
-      bondsDisposalsWithIndexes.flatMap {
-        case ((bondIndex, disposalIndexes), bondsDisposal) =>
-          disposalIndexes.sortBy(_.value).map { disposalIndex =>
-            val bondsDisposalData = BondsDisposalData(
-              bondIndex,
-              disposalIndex,
-              userAnswers.get(NameOfBondsPage(srn, bondIndex)).get,
-              userAnswers.get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)).get
-            )
+      bondsDisposalsWithIndexes.flatMap { case ((bondIndex, disposalIndexes), bondsDisposal) =>
+        disposalIndexes.sortBy(_.value).map { disposalIndex =>
+          val bondsDisposalData = BondsDisposalData(
+            bondIndex,
+            disposalIndex,
+            userAnswers.get(NameOfBondsPage(srn, bondIndex)).get,
+            userAnswers.get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)).get
+          )
 
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
-                ListRow.view(
-                  buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
-                  routes.BondsDisposalCYAController
-                    .onPageLoadViewOnly(srn, bondIndex, disposalIndex, year, currentVersion, previousVersion)
-                    .url,
-                  buildMessage("bondsDisposal.reportBondsDisposalList.row.view.hidden", bondsDisposalData)
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
+              ListRow.view(
+                buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
+                routes.BondsDisposalCYAController
+                  .onPageLoadViewOnly(srn, bondIndex, disposalIndex, year, currentVersion, previousVersion)
+                  .url,
+                buildMessage("bondsDisposal.reportBondsDisposalList.row.view.hidden", bondsDisposalData)
+              )
+            case (_, _) =>
+              ListRow(
+                buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
+                changeUrl = routes.BondsDisposalCYAController
+                  .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+                  .url,
+                changeHiddenText = buildMessage(
+                  "bondsDisposal.reportBondsDisposalList.row.change.hidden",
+                  bondsDisposalData
+                ),
+                removeUrl = routes.RemoveBondsDisposalController
+                  .onPageLoad(srn, bondIndex, disposalIndex)
+                  .url,
+                removeHiddenText = buildMessage(
+                  "bondsDisposal.reportBondsDisposalList.row.remove.hidden",
+                  bondsDisposalData
                 )
-              case (_, _) =>
-                ListRow(
-                  buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
-                  changeUrl = routes.BondsDisposalCYAController
-                    .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
-                    .url,
-                  changeHiddenText = buildMessage(
-                    "bondsDisposal.reportBondsDisposalList.row.change.hidden",
-                    bondsDisposalData
-                  ),
-                  removeUrl = routes.RemoveBondsDisposalController
-                    .onPageLoad(srn, bondIndex, disposalIndex)
-                    .url,
-                  removeHiddenText = buildMessage(
-                    "bondsDisposal.reportBondsDisposalList.row.remove.hidden",
-                    bondsDisposalData
-                  )
-                )
-            }
+              )
           }
+        }
       }
     }
 
@@ -437,7 +434,7 @@ object ReportBondsDisposalListController {
       }
     )
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) {
         Message("bondsDisposal.reportBondsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals || allBondsFullyDisposed) {
@@ -446,7 +443,6 @@ object ReportBondsDisposalListController {
       } else {
         Message("")
       }
-    }
 
     val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode &&
       numberOfDisposals < maxPossibleNumberOfDisposals && !allBondsFullyDisposed

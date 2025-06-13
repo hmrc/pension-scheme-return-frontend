@@ -18,7 +18,7 @@ package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
 import controllers.nonsipp.membertransferout.SchemeTransferOutController.{form, viewModel}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import play.api.libs.json.JsPath
@@ -31,7 +31,7 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
+class SchemeTransferOutControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SchemeTransferOutController.onSubmit(srn, NormalMode)

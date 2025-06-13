@@ -19,8 +19,8 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer._
-import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
 import viewmodels.models.SectionJourneyStatus
@@ -31,8 +31,8 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index: Max300 = 1
+  private val secondaryIndex: Max5 = 1
 
   "ReceiveTransferNavigator" - {
 
@@ -91,7 +91,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TransferringSchemeNamePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -123,45 +123,44 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           secondaryIndex,
           ReportAnotherTransferInPage,
           Gen.const(false),
-          (srn, index: Max300, _: Max5, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from report another transfer in page to CYA page")
     )
 
     List(
-      (List("0"), refineMV[Max5.Refined](2)),
-      (List("0", "1", "2"), refineMV[Max5.Refined](4)),
-      (List("1", "2"), refineMV[Max5.Refined](1)), // deleted first entry
-      (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
-      (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
-      (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ReportAnotherTransferInPage(srn, index, secondaryIndex), true)
-            .unsafeSet(TotalValueTransferPages(srn, index), existingIndexes.map(_ -> money).toMap)
-            .unsafeSet(
-              ReceiveTransferProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+      (List("0"), 2),
+      (List("0", "1", "2"), 4),
+      (List("1", "2"), 1), // deleted first entry
+      (List("0", "1", "3"), 3), // deleted one entry in the middle
+      (List("0", "1", "2", "5", "6"), 4), // deleted two entry in the middle
+      (List("0", "1", "3", "5", "6"), 3) // deleted entry in the middle of two sections
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ReportAnotherTransferInPage(srn, index, secondaryIndex), true)
+          .unsafeSet(TotalValueTransferPages(srn, index), existingIndexes.map(_ -> money).toMap)
+          .unsafeSet(
+            ReceiveTransferProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          normalmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ReportAnotherTransferInPage,
-              (srn, index: Max300, _: Max5, _) =>
-                controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from report another transfer in  page to transferring scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ReportAnotherTransferInPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from report another transfer in  page to transferring scheme name page with index ${expectedRedirectIndex} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 
@@ -172,7 +171,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           DidTransferIncludeAssetPage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
           srn => defaultUserAnswers.unsafeSet(TotalValueTransferPage(srn, index, secondaryIndex), money)
@@ -187,7 +186,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           RemoveTransferInPage,
-          (srn, _: Max300, _) =>
+          (srn, _: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
               .onPageLoad(srn, 1, NormalMode)
         )
@@ -202,7 +201,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TransfersInSectionCompleted.apply,
-          (srn, index: Max300, secondaryIndex: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Int, secondaryIndex: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from TransfersInCYACompletedPage to ??? page")
     )

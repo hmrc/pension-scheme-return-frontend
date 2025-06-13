@@ -18,7 +18,7 @@ package controllers.nonsipp.schemedesignatory
 
 import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.MultipleQuestionView
 import utils.Transform.TransformOps
@@ -29,7 +29,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
 
-class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
+class ValueOfAssetsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]

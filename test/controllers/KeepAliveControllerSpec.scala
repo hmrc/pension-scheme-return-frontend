@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
-class KeepAliveControllerSpec extends ControllerBaseSpec {
+class KeepAliveControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "keepAlive" - {
 

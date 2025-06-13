@@ -19,7 +19,7 @@ package views
 import views.html.ContentPageView
 import viewmodels.models.ContentPageViewModel
 
-class ContentPageViewSpec extends ViewSpec {
+class ContentPageViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     val view = injected[ContentPageView]

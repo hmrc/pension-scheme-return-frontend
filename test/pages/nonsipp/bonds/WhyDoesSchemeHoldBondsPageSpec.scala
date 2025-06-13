@@ -16,8 +16,7 @@
 
 package pages.nonsipp.bonds
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{SchemeHoldBond, UserAnswers}
 import pages.behaviours.PageBehaviours
@@ -28,7 +27,7 @@ class WhyDoesSchemeHoldBondsPageSpec extends PageBehaviours {
 
   "WhyDoesSchemeHoldBondsPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srn = srnGen.sample.value
 
     beRetrievable[SchemeHoldBond](WhyDoesSchemeHoldBondsPage(srn, index))

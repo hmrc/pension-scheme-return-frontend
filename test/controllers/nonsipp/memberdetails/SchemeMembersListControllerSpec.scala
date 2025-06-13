@@ -24,6 +24,7 @@ import models.ManualOrUpload.{Manual, Upload}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import play.api.inject.bind
 import views.html.ListView
+import utils.IntUtils.given
 import eu.timepit.refined._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
@@ -34,9 +35,9 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
 import config.RefinedTypes.OneTo300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class SchemeMembersListControllerSpec extends ControllerBaseSpec {
+class SchemeMembersListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   lazy val onPageLoadManual: Call = routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
   lazy val onPageLoadUpload: Call = routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
@@ -64,15 +65,14 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   )
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberStatus(srn, 1), MemberState.New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
   private val userAnswersWith300MembersDetails =
-    (1 to 300).foldLeft(defaultUserAnswers)(
-      (ua, i) =>
-        ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo300](i).value), memberDetails)
-          .unsafeSet(MemberStatus(srn, refineV[OneTo300](i).value), MemberState.New)
+    (1 to 300).foldLeft(defaultUserAnswers)((ua, i) =>
+      ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo300](i).value), memberDetails)
+        .unsafeSet(MemberStatus(srn, refineV[OneTo300](i).value), MemberState.New)
     )
 
   private val index = 1
@@ -84,8 +84,8 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   )
 
   val userAnswers: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(MemberContributionsPage(srn), true)
 
   private val userAnswersToCheck = userAnswers
@@ -97,9 +97,9 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   "SchemeMembersListController" - {
     "incomplete members must be filtered" in {
       val userAnswers = defaultUserAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
 
       val completedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
       val unfilteredMemberDetails = userAnswers.membersDetails(srn)
@@ -113,20 +113,19 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
     "on Manual" - {
       act.like(
-        renderView(onPageLoadManual, userAnswersWithMembersDetails)(
-          implicit app =>
-            implicit request =>
-              injected[ListView].apply(
-                form(injected[YesNoPageFormProvider], Manual),
-                viewModel(
-                  srn,
-                  1,
-                  Manual,
-                  NormalMode,
-                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                  viewOnlyUpdated = false
-                )
+        renderView(onPageLoadManual, userAnswersWithMembersDetails)(implicit app =>
+          implicit request =>
+            injected[ListView].apply(
+              form(injected[YesNoPageFormProvider], Manual),
+              viewModel(
+                srn,
+                1,
+                Manual,
+                NormalMode,
+                List((1, ((index - 1).toString, memberDetails.fullName))),
+                viewOnlyUpdated = false
               )
+            )
         )
       )
 
@@ -174,20 +173,19 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
     "on Upload" - {
       act.like(
-        renderView(onPageLoadUpload, userAnswersWithMembersDetails)(
-          implicit app =>
-            implicit request =>
-              injected[ListView].apply(
-                form(injected[YesNoPageFormProvider], Upload),
-                viewModel(
-                  srn,
-                  1,
-                  Upload,
-                  NormalMode,
-                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                  viewOnlyUpdated = false
-                )
+        renderView(onPageLoadUpload, userAnswersWithMembersDetails)(implicit app =>
+          implicit request =>
+            injected[ListView].apply(
+              form(injected[YesNoPageFormProvider], Upload),
+              viewModel(
+                srn,
+                1,
+                Upload,
+                NormalMode,
+                List((1, ((index - 1).toString, memberDetails.fullName))),
+                viewOnlyUpdated = false
               )
+            )
         )
       )
 
@@ -238,57 +236,63 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       val currentUserAnswers = defaultUserAnswers
         .unsafeSet(FbVersionPage(srn), "002")
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
       val previousUserAnswers = currentUserAnswers
         .unsafeSet(FbVersionPage(srn), "001")
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[ListView].apply(
-              form(injected[YesNoPageFormProvider], Upload),
-              viewModel(
-                srn = srn,
-                page = 1,
-                manualOrUpload = Upload,
-                mode = ViewOnlyMode,
-                filteredMembers = List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo)
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider], Upload),
+            viewModel(
+              srn = srn,
+              page = 1,
+              manualOrUpload = Upload,
+              mode = ViewOnlyMode,
+              filteredMembers = List((1, ((index - 1).toString, memberDetails.fullName))),
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
       )
 
       val updatedUserAnswers = currentUserAnswers
-        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+        .unsafeSet(MemberDetailsNinoPage(srn, 1), nino)
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[ListView].apply(
-              form(injected[YesNoPageFormProvider], Upload),
-              viewModel(
-                srn = srn,
-                page = 1,
-                manualOrUpload = Upload,
-                mode = ViewOnlyMode,
-                filteredMembers = List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                viewOnlyUpdated = true,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo)
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = updatedUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider], Upload),
+            viewModel(
+              srn = srn,
+              page = 1,
+              manualOrUpload = Upload,
+              mode = ViewOnlyMode,
+              filteredMembers = List((1, ((index - 1).toString, memberDetails.fullName))),
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
       )
 
@@ -332,40 +336,38 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
     "Check scenario" - {
       act.like(
-        renderViewWithPrePopSession(onPageLoadManual, userAnswersToCheck)(
-          implicit app =>
-            implicit request =>
-              injected[ListView].apply(
-                form(injected[YesNoPageFormProvider], Manual),
-                viewModel(
-                  srn,
-                  1,
-                  Manual,
-                  NormalMode,
-                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                  viewOnlyUpdated = false,
-                  prePopNotChecked = true
-                )
+        renderViewWithPrePopSession(onPageLoadManual, userAnswersToCheck)(implicit app =>
+          implicit request =>
+            injected[ListView].apply(
+              form(injected[YesNoPageFormProvider], Manual),
+              viewModel(
+                srn,
+                1,
+                Manual,
+                NormalMode,
+                List((1, ((index - 1).toString, memberDetails.fullName))),
+                viewOnlyUpdated = false,
+                prePopNotChecked = true
               )
+            )
         ).withName("OnPageLoad with checked = Some(false) renders ok with check messsage")
       )
 
       act.like(
-        renderViewWithPrePopSession(onPageLoadManual, userAnswersChecked)(
-          implicit app =>
-            implicit request =>
-              injected[ListView].apply(
-                form(injected[YesNoPageFormProvider], Manual),
-                viewModel(
-                  srn,
-                  1,
-                  Manual,
-                  NormalMode,
-                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                  viewOnlyUpdated = false,
-                  prePopNotChecked = false
-                )
+        renderViewWithPrePopSession(onPageLoadManual, userAnswersChecked)(implicit app =>
+          implicit request =>
+            injected[ListView].apply(
+              form(injected[YesNoPageFormProvider], Manual),
+              viewModel(
+                srn,
+                1,
+                Manual,
+                NormalMode,
+                List((1, ((index - 1).toString, memberDetails.fullName))),
+                viewOnlyUpdated = false,
+                prePopNotChecked = false
               )
+            )
         ).withName("OnPageLoad with checked = Some(false) renders ok with normal radios")
       )
 

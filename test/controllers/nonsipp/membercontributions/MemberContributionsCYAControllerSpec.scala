@@ -18,8 +18,9 @@ package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.CheckYourAnswersView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionCompleted
@@ -27,12 +28,10 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
-import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 
-class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
+class MemberContributionsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private def onPageLoad(mode: Mode) = routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
   private def onSubmit(mode: Mode) = routes.MemberContributionsCYAController.onSubmit(srn, index, mode)
@@ -53,7 +52,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
     submissionNumberOne
   )
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -67,8 +66,8 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalMemberContributionPage(srn, index), money)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
   "CYAMemberContributionsController" - {
 
@@ -112,14 +111,14 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
   "MemberContributionsCYAController in view only mode" - {
 
     val currentUserAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
       .unsafeSet(FbVersionPage(srn), "002")
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
       .unsafeSet(TotalMemberContributionPage(srn, index), money)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -146,9 +145,8 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.membercontributions.routes.MemberContributionListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to MemberContributionListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to MemberContributionListController page")
     )
   }
 }

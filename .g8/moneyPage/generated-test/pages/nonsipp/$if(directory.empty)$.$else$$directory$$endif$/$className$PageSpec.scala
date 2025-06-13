@@ -29,7 +29,7 @@ $endif$
 
 $if(!index.empty)$
 import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 $endif$
 
 import pages.behaviours.PageBehaviours
@@ -45,9 +45,9 @@ class $className$PageSpec extends PageBehaviours {
   "$className$Page" - {
 
     $if(!index.empty)$
-    val index = refineMV[$index$.Refined](1)
+    val index = 1
     $if(!secondaryIndex.empty)$
-    val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
+    val secondaryIndex = 1
 
     beRetrievable[Money]($className;format="cap"$Page(srn, index, secondaryIndex))
 

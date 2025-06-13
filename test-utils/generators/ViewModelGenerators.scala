@@ -37,9 +37,7 @@ trait ViewModelGenerators extends BasicGenerators {
       buttonText <- nonEmptyMessage
       details <- Gen.option(furtherDetailsViewModel)
       onSubmit <- call
-    } yield {
-      FormPageViewModel(title, heading, description, page, refresh, buttonText, details, onSubmit)
-    }
+    } yield FormPageViewModel(title, heading, description, page, refresh, buttonText, details, onSubmit)
 
   def pageViewModelGen[A](implicit gen: Gen[A]): Gen[PageViewModel[A]] =
     for {
@@ -47,17 +45,13 @@ trait ViewModelGenerators extends BasicGenerators {
       heading <- nonEmptyInlineMessage
       description <- Gen.option(nonEmptyBlockMessage)
       page <- gen
-    } yield {
-      PageViewModel(title, heading, description, page)
-    }
+    } yield PageViewModel(title, heading, description, page)
 
   implicit val contentPageViewModelGen: Gen[ContentPageViewModel] =
     for {
       isStartButton <- boolean
       isLargeHeading <- boolean
-    } yield {
-      ContentPageViewModel(isStartButton, isLargeHeading)
-    }
+    } yield ContentPageViewModel(isStartButton, isLargeHeading)
 
   implicit val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
     for {
@@ -65,27 +59,21 @@ trait ViewModelGenerators extends BasicGenerators {
       before <- nonEmptyParagraphMessage
       after <- nonEmptyParagraphMessage
       rows <- Gen.listOf(tupleOf(nonEmptyMessage, nonEmptyMessage))
-    } yield {
-      ContentTablePageViewModel(Some(inset), Some(before), Some(after), rows)
-    }
+    } yield ContentTablePageViewModel(Some(inset), Some(before), Some(after), rows)
 
   val actionItemGen: Gen[SummaryAction] =
     for {
       content <- nonEmptyString.map(Message(_))
       href <- relativeUrl
       hidden <- nonEmptyString.map(Message(_))
-    } yield {
-      SummaryAction(content, href, hidden)
-    }
+    } yield SummaryAction(content, href, hidden)
 
   val summaryListRowGen: Gen[CheckYourAnswersRowViewModel] =
     for {
       key <- nonEmptyString
       value <- nonEmptyString
       items <- Gen.listOf(actionItemGen)
-    } yield {
-      CheckYourAnswersRowViewModel(Message(key), Message(value), items)
-    }
+    } yield CheckYourAnswersRowViewModel(Message(key), Message(value), items)
 
   val summaryListSectionGen: Gen[CheckYourAnswersSection] =
     for {
@@ -96,9 +84,7 @@ trait ViewModelGenerators extends BasicGenerators {
   implicit val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
     for {
       sections <- Gen.listOfN(2, summaryListSectionGen)
-    } yield {
-      CheckYourAnswersViewModel(sections)
-    }
+    } yield CheckYourAnswersViewModel(sections)
 
   implicit val submissionViewModelGen: Gen[SubmissionViewModel] =
     for {
@@ -194,34 +180,26 @@ trait ViewModelGenerators extends BasicGenerators {
       yes <- Gen.option(nonEmptyMessage)
       no <- Gen.option(nonEmptyMessage)
       details <- Gen.option(furtherDetailsViewModel)
-    } yield {
-      YesNoPageViewModel(legend, hint, yes, no, details)
-    }
+    } yield YesNoPageViewModel(legend, hint, yes, no, details)
 
   def furtherDetailsViewModel: Gen[FurtherDetailsViewModel] =
     for {
       title <- nonEmptyMessage(30)
       contents <- nonEmptyDisplayMessage
-    } yield {
-      FurtherDetailsViewModel(title, contents)
-    }
+    } yield FurtherDetailsViewModel(title, contents)
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
     for {
       content <- nonEmptyMessage(30)
       value <- uniqueStringGen
-    } yield {
-      RadioListRowViewModel(content, value)
-    }
+    } yield RadioListRowViewModel(content, value)
 
   implicit val radioListViewModelGen: Gen[RadioListViewModel] =
     for {
       legend <- Gen.option(nonEmptyMessage(30))
       items <- Gen.listOfN(5, radioListRowViewModelGen)
       divider <- Gen.oneOf(Nil, List(RadioListRowDivider("divider")))
-    } yield {
-      RadioListViewModel(legend, items ++ divider)
-    }
+    } yield RadioListViewModel(legend, items ++ divider)
 
   implicit val dateRangeViewModelGen: Gen[DateRangeViewModel] =
     for {
@@ -229,23 +207,19 @@ trait ViewModelGenerators extends BasicGenerators {
       startDateHint <- nonEmptyMessage
       endDateLabel <- nonEmptyMessage
       endDateHint <- nonEmptyMessage
-    } yield {
-      DateRangeViewModel(
-        startDateLabel,
-        startDateHint,
-        endDateLabel,
-        endDateHint
-      )
-    }
+    } yield DateRangeViewModel(
+      startDateLabel,
+      startDateHint,
+      endDateLabel,
+      endDateHint
+    )
 
   def fieldGen: Gen[QuestionField] =
     for {
       label <- nonEmptyInlineMessage
       hint <- Gen.option(nonEmptyInlineMessage)
       fieldType <- Gen.oneOf(FieldType.Input, FieldType.Date, FieldType.Currency)
-    } yield {
-      QuestionField(label, hint, Some(InputWidth.Full), Nil, fieldType)
-    }
+    } yield QuestionField(label, hint, Some(InputWidth.Full), Nil, fieldType)
 
   def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =
     fieldGen.map(SingleQuestion(form, _))
@@ -254,35 +228,29 @@ trait ViewModelGenerators extends BasicGenerators {
     for {
       field1 <- fieldGen
       field2 <- fieldGen
-    } yield {
-      DoubleQuestion(
-        form,
-        field1,
-        field2
-      )
-    }
+    } yield DoubleQuestion(
+      form,
+      field1,
+      field2
+    )
 
   def tripleQuestionGen[A](form: Form[(A, A, A)]): Gen[TripleQuestion[A, A, A]] =
     for {
       field1 <- fieldGen
       field2 <- fieldGen
       field3 <- fieldGen
-    } yield {
-      TripleQuestion(
-        form,
-        field1,
-        field2,
-        field3
-      )
-    }
+    } yield TripleQuestion(
+      form,
+      field1,
+      field2,
+      field3
+    )
 
   implicit val textInputViewModelGen: Gen[TextInputViewModel] =
     for {
       label <- Gen.option(nonEmptyMessage)
       isFixedLength <- boolean
-    } yield {
-      TextInputViewModel(label, isFixedLength)
-    }
+    } yield TextInputViewModel(label, isFixedLength)
 
   implicit val uploadViewModelGen: Gen[UploadViewModel] =
     for {
@@ -290,22 +258,18 @@ trait ViewModelGenerators extends BasicGenerators {
       fileSize <- Gen.chooseNum(1, 100)
       formFields <- mapOf(Gen.alphaStr, Gen.alphaStr, 10)
       error <- Gen.option(Gen.alphaStr)
-    } yield {
-      UploadViewModel(
-        displayContent,
-        ".csv",
-        fileSize.toString,
-        formFields,
-        error.map(FormError("file-upload", _))
-      )
-    }
+    } yield UploadViewModel(
+      displayContent,
+      ".csv",
+      fileSize.toString,
+      formFields,
+      error.map(FormError("file-upload", _))
+    )
 
   implicit val textAreaViewModelGen: Gen[TextAreaViewModel] =
     for {
       rows <- Gen.chooseNum(1, 100)
-    } yield {
-      TextAreaViewModel(rows)
-    }
+    } yield TextAreaViewModel(rows)
 
   val taskListStatusGen: Gen[TaskListStatus] =
     Gen.oneOf(
@@ -319,9 +283,7 @@ trait ViewModelGenerators extends BasicGenerators {
     for {
       link <- nonEmptyLinkMessage
       status <- taskListStatusGen
-    } yield {
-      TaskListItemViewModel(link, status)
-    }
+    } yield TaskListItemViewModel(link, status)
 
   val taskListSectionViewModelGen: Gen[TaskListSectionViewModel] = {
     val itemsGen = Gen.nonEmptyListOf(taskListItemViewModelGen).map(NonEmptyList.fromList(_).get)
@@ -330,9 +292,7 @@ trait ViewModelGenerators extends BasicGenerators {
       sectionTitle <- nonEmptyMessage
       items <- Gen.either(nonEmptyInlineMessage, itemsGen)
       postActionLink <- Gen.option(nonEmptyLinkMessage)
-    } yield {
-      TaskListSectionViewModel(sectionTitle, items, postActionLink)
-    }
+    } yield TaskListSectionViewModel(sectionTitle, items, postActionLink)
   }
 
   implicit val taskListViewModel: Gen[TaskListViewModel] =

@@ -17,21 +17,23 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import views.html.TwoColumnsTripleAction
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, SurrenderedBenefitsPage}
 import models._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController._
 import play.api.test.FakeRequest
-import config.RefinedTypes.Max300
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
 import java.time.LocalDate
 
-class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class SurrenderedBenefitsMemberListControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -55,19 +57,19 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   private val userAnswers: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
       .unsafeSet(SurrenderedBenefitsPage(srn), true)
-      .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
+      .unsafeSet(SurrenderedBenefitsAmountPage(srn, 1), money)
 
   private val testMemberList: List[MemberSurrenderedBenefits] = List(
     MemberSurrenderedBenefits(
-      refineMV[Max300.Refined](1),
+      1,
       "testFirstName testLastName",
       Some(SectionJourneyStatus.Completed),
       Some(money)
@@ -112,13 +114,13 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
 
       val memberList: List[MemberSurrenderedBenefits] = List(
         MemberSurrenderedBenefits(
-          refineMV[Max300.Refined](1),
+          1,
           "Ferdinand Bull",
           Some(SectionJourneyStatus.Completed),
           Some(money)
         ),
         MemberSurrenderedBenefits(
-          refineMV[Max300.Refined](1),
+          1,
           "Johnny Quicke",
           Some(SectionJourneyStatus.Completed),
           Some(money)
@@ -217,7 +219,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
 
       val memberList: List[MemberSurrenderedBenefits] = List(
         MemberSurrenderedBenefits(
-          refineMV[Max300.Refined](1),
+          1,
           "testFirstName testLastName",
           Some(SectionJourneyStatus.Completed),
           Some(otherMoney)
@@ -246,7 +248,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
     act.like {
       val noUserAnswers = currentUserAnswers
         .unsafeSet(SurrenderedBenefitsPage(srn), false)
-        .unsafeRemove(SurrenderedBenefitsAmountPage(srn, refineMV(1)))
+        .unsafeRemove(SurrenderedBenefitsAmountPage(srn, 1))
 
       renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>

@@ -16,8 +16,7 @@
 
 package pages.nonsipp.membertransferout
 
-import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemoveTransferOutPageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class RemoveTransferOutPageSpec extends PageBehaviours {
 
   "RemoveTransferOutPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
 
     RemoveTransferOutPage(srn, index).toString mustBe "removeTransferOut"
 

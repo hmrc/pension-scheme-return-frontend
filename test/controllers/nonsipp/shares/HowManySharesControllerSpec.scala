@@ -17,20 +17,18 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.IntView
+import utils.IntUtils.given
 import controllers.nonsipp.shares.HowManySharesController._
-import eu.timepit.refined.refineMV
 import forms.IntFormProvider
 import models.NormalMode
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class HowManySharesControllerSpec extends ControllerBaseSpec {
+class HowManySharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
-  private val populatedUserAnswers = {
+  private val index = 1
+  private val populatedUserAnswers =
     defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-  }
 
   "HowManySharesController" - {
 

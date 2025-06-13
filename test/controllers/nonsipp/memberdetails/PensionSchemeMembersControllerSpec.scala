@@ -17,13 +17,12 @@
 package controllers.nonsipp.memberdetails
 
 import models.ManualOrUpload.{Manual, Upload}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
 import forms.RadioListFormProvider
 import controllers.nonsipp.memberdetails.PensionSchemeMembersController._
-import controllers.nonsipp.memberdetails.routes
-import controllers.ControllerBaseSpec
 
-class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
+class PensionSchemeMembersControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.PensionSchemeMembersController.onPageLoad(srn)
   private lazy val onSubmit = routes.PensionSchemeMembersController.onSubmit(srn)

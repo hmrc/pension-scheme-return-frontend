@@ -16,18 +16,17 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.{IsLandOrPropertyResidentialPage, LandOrPropertyChosenAddressPage}
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{IsLandOrPropertyResidentialPage, LandOrPropertyChosenAddressPage}
 
-class IsLandOrPropertyResidentialControllerSpec extends ControllerBaseSpec {
+class IsLandOrPropertyResidentialControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IsLandOrPropertyResidentialController.onSubmit(srn, index, NormalMode)
 

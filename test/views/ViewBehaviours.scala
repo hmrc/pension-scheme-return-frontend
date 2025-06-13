@@ -21,8 +21,7 @@ import play.twirl.api.Html
 import org.scalacheck.Gen
 import viewmodels.DisplayMessage
 
-trait ViewBehaviours {
-  _: ViewSpec =>
+trait ViewBehaviours extends ViewSpec {
 
   def renderTitle[A](gen: Gen[A])(view: A => Html, key: A => String): Unit =
     "render the title" in {
@@ -52,12 +51,11 @@ trait ViewBehaviours {
   def renderDescription[A](gen: Gen[A])(view: A => Html, key: A => Option[DisplayMessage]): Behaviours.BehaviourTest =
     Behaviours.BehaviourTest(
       "render the description",
-      () => {
+      () =>
         forAll(gen) { viewmodel =>
           elementText(view(viewmodel)).flatMap(_.split(" ")) must contain allElementsOf
             key(viewmodel).toList.flatMap(allMessages).map(_.key)
         }
-      }
     )
 
   def renderInputWithH1Label[A](

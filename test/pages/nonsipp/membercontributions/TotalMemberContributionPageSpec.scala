@@ -16,8 +16,7 @@
 
 package pages.nonsipp.membercontributions
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -25,7 +24,7 @@ class TotalMemberContributionPageSpec extends PageBehaviours {
 
   "TotalMemberContributionPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[Money](TotalMemberContributionPage(srnSample, index))

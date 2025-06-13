@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
 import navigation.Navigator
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsBuyerConnectedPartyController @Inject()(
+class IsBuyerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -52,7 +53,7 @@ class IsBuyerConnectedPartyController @Inject()(
 
   private val form = IsBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), form)
@@ -61,8 +62,8 @@ class IsBuyerConnectedPartyController @Inject()(
         .merge
     }
 
-  private def getBuyerName(srn: Srn, assetIndex: Max5000, disposalIndex: Max50)(
-    implicit request: DataRequest[_]
+  private def getBuyerName(srn: Srn, assetIndex: Max5000, disposalIndex: Max50)(implicit
+    request: DataRequest[_]
   ): Either[Result, String] =
     for {
       buyerType <- request.userAnswers
@@ -89,7 +90,7 @@ class IsBuyerConnectedPartyController @Inject()(
       }
     } yield buyerName
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -97,9 +98,8 @@ class IsBuyerConnectedPartyController @Inject()(
           formWithErrors =>
             Future.successful(
               getBuyerName(srn, assetIndex, disposalIndex)
-                .map(
-                  buyerName =>
-                    BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, buyerName, mode)))
+                .map(buyerName =>
+                  BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, buyerName, mode)))
                 )
                 .merge
             ),

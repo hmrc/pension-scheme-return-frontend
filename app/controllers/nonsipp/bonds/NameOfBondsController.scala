@@ -19,7 +19,7 @@ package controllers.nonsipp.bonds
 import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.RefinedTypes.Max5000
+import utils.IntUtils.toRefined5000
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class NameOfBondsController @Inject()(
+class NameOfBondsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -51,13 +51,13 @@ class NameOfBondsController @Inject()(
 
   private val form = NameOfBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val preparedForm = request.userAnswers.fillForm(NameOfBondsPage(srn, index), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -81,7 +81,7 @@ object NameOfBondsController {
     "error.textarea.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] = FormPageViewModel(
+  def viewModel(srn: Srn, index: Int, mode: Mode): FormPageViewModel[TextAreaViewModel] = FormPageViewModel(
     "bonds.nameOfBonds.title",
     "bonds.nameOfBonds.heading",
     TextAreaViewModel(),

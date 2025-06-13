@@ -35,15 +35,13 @@ object AmountOfTheLoan {
       .and((JsPath \ "amountOutstanding").readNullable[Money])
 
   implicit val amountOfTheLoanReads: Reads[AmountOfTheLoan] =
-    amountOfTheLoanReadsBuilder.apply(
-      (loanAmount, optCapRepaymentCY, optAmountOutstanding) => {
-        AmountOfTheLoan(
-          loanAmount,
-          optCapRepaymentCY,
-          optAmountOutstanding
-        )
-      }
-    )
+    amountOfTheLoanReadsBuilder.apply { (loanAmount, optCapRepaymentCY, optAmountOutstanding) =>
+      AmountOfTheLoan(
+        loanAmount,
+        optCapRepaymentCY,
+        optAmountOutstanding
+      )
+    }
 
   implicit val amountOfTheLoanWrites: Writes[AmountOfTheLoan] = Json.writes[AmountOfTheLoan]
 

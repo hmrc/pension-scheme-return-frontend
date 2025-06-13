@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes.{Max50, OneTo5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.{ConditionalYesNo, Crn}
 import pages.behaviours.PageBehaviours
 
@@ -26,8 +25,8 @@ class AssetCompanyBuyerCrnPageSpec extends PageBehaviours {
 
   "Asset disposal - AssetCompanyBuyerCrnPage" - {
 
-    val assetIndex = refineMV[OneTo5000](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[ConditionalYesNo[String, Crn]](AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex))
 

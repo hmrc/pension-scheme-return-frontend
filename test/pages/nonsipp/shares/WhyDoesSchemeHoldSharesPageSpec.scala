@@ -16,8 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.common
 import models._
@@ -30,7 +29,7 @@ class WhyDoesSchemeHoldSharesPageSpec extends PageBehaviours {
 
   "WhyDoesSchemeHoldSharesPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srn = srnGen.sample.value
     val money = moneyGen.sample.value
 

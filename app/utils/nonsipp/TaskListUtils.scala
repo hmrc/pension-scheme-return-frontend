@@ -80,7 +80,7 @@ object TaskListUtils {
               )
               .url
           )
-        case (true, false) => {
+        case (true, false) =>
           val psaOrPspDeclarationUrl =
             if (isPsp) {
               controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
@@ -91,7 +91,6 @@ object TaskListUtils {
             s"$prefix.complete",
             psaOrPspDeclarationUrl
           )
-        }
         case (false, _) =>
           Message(s"$prefix.incomplete")
       },

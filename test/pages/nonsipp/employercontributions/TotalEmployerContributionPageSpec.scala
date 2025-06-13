@@ -16,18 +16,17 @@
 
 package pages.nonsipp.employercontributions
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes._
-import controllers.TestValues
 
 class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
 
   "TotalEmployerContributionPage" - {
 
-    val memberIndex = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val memberIndex = 1
+    val secondaryIndex = 1
     val srn = srnGen.sample.value
 
     beRetrievable[Money](TotalEmployerContributionPage(srn, memberIndex, secondaryIndex))

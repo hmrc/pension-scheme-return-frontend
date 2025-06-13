@@ -24,14 +24,14 @@ import models.HowDisposed.Sold
 import models.IdentityType.Individual
 import models.SchemeHoldLandProperty.Acquisition
 import controllers.TestValues
-import pages.nonsipp.landorproperty._
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import models._
 import pages.nonsipp.common._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.{AllowedAccessRequest, DataRequest}
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty._
 import models.requests.psr._
 import config.Constants.PREPOPULATION_FLAG
 import pages.nonsipp.landorpropertydisposal.{Paths, _}
@@ -62,7 +62,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), Money(100000.0))
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), Money(100000.0))
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, 1), SectionJourneyStatus.Completed)
 
   private val transformer = new LandOrPropertyTransformer()
 
@@ -259,23 +259,23 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       val incompleteUserAnswers = userAnswers
         .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
         .unsafeSet(LandOrPropertyDisposalPage(srn), true)
-        .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1)), Sold)
-        .unsafeSet(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-        .unsafeSet(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1)), localDate)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, 1, 1), Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, 1, 1), true)
+        .unsafeSet(WhenWasPropertySoldPage(srn, 1, 1), localDate)
         .unsafeSet(
-          LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)),
+          LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1),
           true
         )
-        .unsafeSet(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1)), money)
-        .unsafeSet(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1)), true)
-        .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1)), IdentityType.Individual)
-        .unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, refineMV(1), refineMV(1)), individualRecipientName)
+        .unsafeSet(TotalProceedsSaleLandPropertyPage(srn, 1, 1), money)
+        .unsafeSet(DisposalIndependentValuationPage(srn, 1, 1), true)
+        .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, 1, 1), IdentityType.Individual)
+        .unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, 1, 1), individualRecipientName)
         .unsafeSet(
-          IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1)),
+          IndividualBuyerNinoNumberPage(srn, 1, 1),
           ConditionalYesNo.no[String, Nino](noninoReason)
         )
-        .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
-        .unsafeSet(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, 1, 1), SectionCompleted)
+        .unsafeSet(LandOrPropertyDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
@@ -302,54 +302,54 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(LandPropertyIndividualSellersNamePage(srn, refineMV(1))) mustBe Some(individualRecipientName)
-          userAnswers.get(IndividualSellerNiPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(nino))
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyIndividualSellersNamePage(srn, 1)) mustBe Some(individualRecipientName)
+          userAnswers.get(IndividualSellerNiPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(nino))
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
-          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, 1, 1)) mustBe Some(
             individualRecipientName
           )
-          userAnswers.get(IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IndividualBuyerNinoNumberPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.yes(nino)
           )
-          userAnswers.get(LandOrPropertyProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
+          userAnswers.get(LandOrPropertyProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }
@@ -369,52 +369,52 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(LandPropertyIndividualSellersNamePage(srn, refineMV(1))) mustBe Some(individualRecipientName)
-          userAnswers.get(IndividualSellerNiPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.no(noninoReason))
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyIndividualSellersNamePage(srn, 1)) mustBe Some(individualRecipientName)
+          userAnswers.get(IndividualSellerNiPage(srn, 1)) mustBe Some(ConditionalYesNo.no(noninoReason))
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
 
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
-          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, 1, 1)) mustBe Some(
             individualRecipientName
           )
-          userAnswers.get(IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IndividualBuyerNinoNumberPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.no(noninoReason)
           )
         }
@@ -436,53 +436,53 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.UKCompany
           )
-          userAnswers.get(CompanySellerNamePage(srn, refineMV(1))) mustBe Some(companyRecipientName)
-          userAnswers.get(CompanyRecipientCrnPage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(CompanySellerNamePage(srn, 1)) mustBe Some(companyRecipientName)
+          userAnswers.get(CompanyRecipientCrnPage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             ConditionalYesNo.yes(crn)
           )
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
-          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.UKCompany
           )
-          userAnswers.get(CompanyBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(CompanyBuyerNamePage(srn, 1, 1)) mustBe Some(
             companyRecipientName
           )
-          userAnswers.get(CompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(CompanyBuyerCrnPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.yes(crn)
           )
         }
@@ -504,53 +504,53 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.UKCompany
           )
-          userAnswers.get(CompanySellerNamePage(srn, refineMV(1))) mustBe Some(companyRecipientName)
-          userAnswers.get(CompanyRecipientCrnPage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(CompanySellerNamePage(srn, 1)) mustBe Some(companyRecipientName)
+          userAnswers.get(CompanyRecipientCrnPage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             ConditionalYesNo.no(noCrnReason)
           )
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
-          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.UKCompany
           )
-          userAnswers.get(CompanyBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(CompanyBuyerNamePage(srn, 1, 1)) mustBe Some(
             companyRecipientName
           )
-          userAnswers.get(CompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(CompanyBuyerCrnPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.no(noCrnReason)
           )
         }
@@ -572,54 +572,54 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.UKPartnership
           )
-          userAnswers.get(PartnershipSellerNamePage(srn, refineMV(1))) mustBe Some(partnershipRecipientName)
+          userAnswers.get(PartnershipSellerNamePage(srn, 1)) mustBe Some(partnershipRecipientName)
           userAnswers
-            .get(PartnershipRecipientUtrPage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+            .get(PartnershipRecipientUtrPage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             ConditionalYesNo.yes(utr)
           )
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
-          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.UKPartnership
           )
-          userAnswers.get(PartnershipBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(PartnershipBuyerNamePage(srn, 1, 1)) mustBe Some(
             partnershipRecipientName
           )
-          userAnswers.get(PartnershipBuyerUtrPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(PartnershipBuyerUtrPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.yes(utr)
           )
         }
@@ -641,51 +641,51 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.UKPartnership
           )
-          userAnswers.get(PartnershipSellerNamePage(srn, refineMV(1))) mustBe Some(partnershipRecipientName)
+          userAnswers.get(PartnershipSellerNamePage(srn, 1)) mustBe Some(partnershipRecipientName)
           userAnswers
-            .get(PartnershipRecipientUtrPage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+            .get(PartnershipRecipientUtrPage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             ConditionalYesNo.no(noUtrReason)
           )
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.UKPartnership
           )
-          userAnswers.get(PartnershipBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(PartnershipBuyerNamePage(srn, 1, 1)) mustBe Some(
             partnershipRecipientName
           )
-          userAnswers.get(PartnershipBuyerUtrPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(PartnershipBuyerUtrPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.no(noUtrReason)
           )
         }
@@ -707,51 +707,51 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
-          userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandPropertyInUKPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, 1)) mustBe Some(address)
+          userAnswers.get(LandRegistryTitleNumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
-          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, 1)) mustBe Some(
             SchemeHoldLandProperty.Acquisition
           )
-          userAnswers.get(LandOrPropertyTotalCostPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(IsLandPropertyLeasedPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandPropertyIndependentValuationPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+          userAnswers.get(LandOrPropertyTotalCostPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(IsLandPropertyLeasedPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(LandPropertyIndependentValuationPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             IdentityType.Other
           )
           userAnswers
-            .get(OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LandOrPropertySeller)) mustBe Some(
+            .get(OtherRecipientDetailsPage(srn, 1, IdentitySubject.LandOrPropertySeller)) mustBe Some(
             RecipientDetails(otherRecipientName, otherRecipientDescription)
           )
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)) mustBe Some(
             ("lesseeName", money, localDate)
           )
-          userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(IsLesseeConnectedPartyPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, 1, 1)) mustBe Some(
             SectionCompleted
           )
-          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(
             true
           )
-          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, 1, 1)) mustBe Some(
             IdentityType.Other
           )
           userAnswers
-            .get(OtherBuyerDetailsPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            .get(OtherBuyerDetailsPage(srn, 1, 1)) mustBe Some(
             RecipientDetails(otherRecipientName, otherRecipientDescription)
           )
         }
@@ -766,9 +766,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe None
       )
     }
 
@@ -781,8 +779,8 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))).map(_._2) mustBe Some(Money(0))
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(Money(0))
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)).map(_._2) mustBe Some(Money(0))
         }
       )
     }
@@ -796,8 +794,8 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
-          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))).map(_._2) mustBe Some(Money(0))
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, 1)) mustBe Some(Money(0))
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, 1)).map(_._2) mustBe Some(Money(0))
         }
       )
     }

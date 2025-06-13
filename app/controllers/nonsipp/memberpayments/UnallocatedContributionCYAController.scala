@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class UnallocatedContributionCYAController @Inject()(
+class UnallocatedContributionCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -68,8 +68,8 @@ class UnallocatedContributionCYAController @Inject()(
       onPageLoadCommon(srn, mode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     Ok(
       view(

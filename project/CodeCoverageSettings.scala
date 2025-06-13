@@ -10,7 +10,8 @@ object CodeCoverageSettings {
     ".*components.*",
     ".*Routes.*",
     ".*controllers.testonly.*",
-    ".*viewmodels.govuk.*;"
+    ".*viewmodels.govuk.*;",
+    "models.*"
   )
 
   val settings: Seq[Setting[?]] = Seq(

@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class MemberContributionsController @Inject()(
+class MemberContributionsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -70,10 +70,10 @@ class MemberContributionsController @Inject()(
                 .set(MemberContributionsPage(srn), value)
             )
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(Redirect(navigator.nextPage(MemberContributionsPage(srn), mode, updatedAnswers)))
-            } else {
-              {
+            redirectTo <-
+              if (value) {
+                Future.successful(Redirect(navigator.nextPage(MemberContributionsPage(srn), mode, updatedAnswers)))
+              } else {
                 psrSubmissionService
                   .submitPsrDetailsWithUA(
                     srn,
@@ -86,7 +86,6 @@ class MemberContributionsController @Inject()(
                     case Some(_) => Redirect(navigator.nextPage(MemberContributionsPage(srn), mode, updatedAnswers))
                   }
               }
-            }
           } yield redirectTo
       )
   }

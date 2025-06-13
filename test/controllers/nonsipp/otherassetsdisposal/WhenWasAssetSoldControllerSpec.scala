@@ -18,23 +18,22 @@ package controllers.nonsipp.otherassetsdisposal
 
 import services.SchemeDateService
 import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DatePageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import play.api.inject
 import forms.DatePageFormProvider
 import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec {
+class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.WhenWasAssetSoldController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)

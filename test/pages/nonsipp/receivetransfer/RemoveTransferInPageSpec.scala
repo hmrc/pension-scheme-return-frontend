@@ -16,8 +16,7 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemoveTransferInPageSpec extends PageBehaviours {
@@ -25,7 +24,7 @@ class RemoveTransferInPageSpec extends PageBehaviours {
 
   "RemoveTransferInPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
 
     RemoveTransferInPage(srn, index).toString mustBe "RemoveTransferInPage"
 

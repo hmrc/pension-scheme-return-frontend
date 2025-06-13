@@ -18,19 +18,18 @@ package controllers.nonsipp.landorproperty
 
 import services.SchemeDateService
 import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.MultipleQuestionView
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
-import eu.timepit.refined.refineMV
 import models.{DateRange, NormalMode}
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 
-class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyLeaseDetailsController.onSubmit(srn, index, NormalMode)
 

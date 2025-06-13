@@ -20,14 +20,14 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import forms.mappings.Mappings.text
 import org.scalatest.matchers.must.Matchers
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import models._
 import play.api.i18n.Messages
 import play.api.data.Form
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.PaginatedViewModel
 
-class ViewUtilsSpec extends ControllerBaseSpec with Matchers {
+class ViewUtilsSpec extends ControllerBaseSpec with ControllerBehaviours with Matchers {
 
   private val onwardRoute = controllers.routes.UnauthorisedController.onPageLoad()
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())

@@ -19,7 +19,7 @@ package controllers
 import play.api.test.FakeRequest
 import views.html.UnauthorisedView
 
-class UnauthorisedControllerSpec extends ControllerBaseSpec {
+class UnauthorisedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "UnauthorisedController" - {
 

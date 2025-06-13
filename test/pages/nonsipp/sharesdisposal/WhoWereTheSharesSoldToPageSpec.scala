@@ -16,17 +16,16 @@
 
 package pages.nonsipp.sharesdisposal
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndexOne = refineMV[Max50.Refined](1)
-  private val disposalIndexTwo = refineMV[Max50.Refined](2)
+  private val index = 1
+  private val disposalIndexOne = 1
+  private val disposalIndexTwo = 2
   private val conditionalCrnYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
 
   "WhoWereTheSharesSoldToPage" - {

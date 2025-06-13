@@ -26,11 +26,11 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import controllers.nonsipp.sharesdisposal.SharesDisposalController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
 import scala.concurrent.Future
 
-class SharesDisposalControllerSpec extends ControllerBaseSpec {
+class SharesDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SharesDisposalController.onSubmit(srn, NormalMode)
@@ -58,18 +58,18 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

@@ -22,7 +22,7 @@ import views.html.IntView
 import org.scalacheck.Gen
 import play.api.data
 
-class IntViewSpec extends ViewSpec with Mappings {
+class IntViewSpec extends ViewSpec with ViewBehaviours with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[IntView]

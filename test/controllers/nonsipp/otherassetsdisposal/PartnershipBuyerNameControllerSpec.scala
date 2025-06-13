@@ -17,18 +17,17 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import models.NormalMode
 import controllers.nonsipp.otherassetsdisposal.PartnershipBuyerNameController._
 
-class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec {
+class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   "PartnershipBuyerNameController" - {
 

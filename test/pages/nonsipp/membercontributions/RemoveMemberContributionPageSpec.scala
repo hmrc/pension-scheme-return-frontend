@@ -16,7 +16,7 @@
 
 package pages.nonsipp.membercontributions;
 
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours;
 
 class RemoveMemberContributionPageSpec extends PageBehaviours {
@@ -24,7 +24,7 @@ class RemoveMemberContributionPageSpec extends PageBehaviours {
   "RemoveMemberContributionPage" - {
     val srn = srnGen.sample.value
 
-    RemoveMemberContributionPage(srn, refineMV(1)).toString mustBe "RemoveMemberContributionPage"
+    RemoveMemberContributionPage(srn, 1).toString mustBe "RemoveMemberContributionPage"
 
   }
 

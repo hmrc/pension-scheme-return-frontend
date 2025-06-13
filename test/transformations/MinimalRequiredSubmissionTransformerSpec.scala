@@ -23,8 +23,8 @@ import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
 import controllers.TestValues
 import cats.data.NonEmptyList
+import utils.IntUtils.given
 import models.requests.psr._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage, AccountingPeriods}
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
@@ -52,8 +52,9 @@ class MinimalRequiredSubmissionTransformerSpec
   override def beforeEach(): Unit =
     Mockito.reset(mockSchemeDateService)
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockSchemeDateService = mock[SchemeDateService]
@@ -91,7 +92,7 @@ class MinimalRequiredSubmissionTransformerSpec
         .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
         .unsafeSet(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId), SchemeMemberNumbers(2, 3, 4))
         .unsafeSet(
-          AccountingPeriodPage(srn, refineMV(1), NormalMode),
+          AccountingPeriodPage(srn, 1, NormalMode),
           DateRange(from = LocalDate.of(2020, 4, 6), to = LocalDate.of(2021, 4, 5))
         )
         .unsafeSet(AccountingPeriodRecordVersionPage(srn), "001")
@@ -142,7 +143,7 @@ class MinimalRequiredSubmissionTransformerSpec
         .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
         .unsafeSet(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId), SchemeMemberNumbers(2, 3, 4))
         .unsafeSet(
-          AccountingPeriodPage(srn, refineMV(1), NormalMode),
+          AccountingPeriodPage(srn, 1, NormalMode),
           DateRange(from = LocalDate.of(2020, 4, 6), to = LocalDate.of(2021, 4, 5))
         )
         .unsafeSet(AccountingPeriodRecordVersionPage(srn), "001")

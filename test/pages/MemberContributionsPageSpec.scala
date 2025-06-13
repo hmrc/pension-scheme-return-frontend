@@ -17,7 +17,7 @@
 package pages
 
 import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.UserAnswers
 import pages.behaviours.PageBehaviours
@@ -39,16 +39,16 @@ class MemberContributionsPageSpec extends PageBehaviours {
       val userAnswers =
         UserAnswers("id")
           .unsafeSet(MemberContributionsPage(srn), true)
-          .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), moneyGen.sample.value)
-          .unsafeSet(TotalMemberContributionPage(srn, refineMV(2)), moneyGen.sample.value)
+          .unsafeSet(TotalMemberContributionPage(srn, 1), moneyGen.sample.value)
+          .unsafeSet(TotalMemberContributionPage(srn, 2), moneyGen.sample.value)
 
       List(Some(true), None).foreach { answer =>
         s"retain total member contributions when answer is $answer" in {
 
           val result = MemberContributionsPage(srn).cleanup(answer, userAnswers).toOption.value
 
-          result.get(TotalMemberContributionPage(srn, refineMV(1))) must not be None
-          result.get(TotalMemberContributionPage(srn, refineMV(2))) must not be None
+          result.get(TotalMemberContributionPage(srn, 1)) must not be None
+          result.get(TotalMemberContributionPage(srn, 2)) must not be None
         }
       }
 
@@ -56,8 +56,8 @@ class MemberContributionsPageSpec extends PageBehaviours {
 
         val result = MemberContributionsPage(srn).cleanup(Some(false), userAnswers).toOption.value
 
-        result.get(TotalMemberContributionPage(srn, refineMV(1))) mustBe None
-        result.get(TotalMemberContributionPage(srn, refineMV(2))) mustBe None
+        result.get(TotalMemberContributionPage(srn, 1)) mustBe None
+        result.get(TotalMemberContributionPage(srn, 2)) mustBe None
       }
     }
 

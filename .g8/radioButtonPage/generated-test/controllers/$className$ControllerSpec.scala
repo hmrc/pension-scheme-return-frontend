@@ -19,7 +19,7 @@ import views.html.RadioListView
 
 import scala.concurrent.Future
 
-class $className$ControllerSpec extends ControllerBaseSpec {
+class $className$ControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   lazy val onPageLoad = routes.$className$Controller.onPageLoad(srn, NormalMode)
   lazy val onSubmit = routes.$className$Controller.onSubmit(srn, NormalMode)

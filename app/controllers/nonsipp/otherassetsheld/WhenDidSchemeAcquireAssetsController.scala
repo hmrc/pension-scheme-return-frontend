@@ -20,6 +20,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsPage
 import config.Constants
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -45,7 +46,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class WhenDidSchemeAcquireAssetsController @Inject()(
+class WhenDidSchemeAcquireAssetsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -62,18 +63,17 @@ class WhenDidSchemeAcquireAssetsController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenDidSchemeAcquireAssetsController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        val preparedForm = {
+        val preparedForm =
           request.userAnswers.fillForm(WhenDidSchemeAcquireAssetsPage(srn, index), form(date.to, request))
-        }
         Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName)))
 
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to, request)

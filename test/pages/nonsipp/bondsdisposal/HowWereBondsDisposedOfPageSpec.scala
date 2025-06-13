@@ -16,24 +16,23 @@
 
 package pages.nonsipp.bondsdisposal
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionJourneyStatus.Completed
 import pages.behaviours.PageBehaviours
 import models.PointOfEntry._
 import models.HowDisposed._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
 
   "HowWereBondsDisposedOfPage" - {
 
     val srn = srnGen.sample.value
-    val bondIndexOne = refineMV[Max5000.Refined](1)
-    val bondIndexTwo = refineMV[Max5000.Refined](2)
-    val disposalIndexOne = refineMV[Max50.Refined](1)
-    val disposalIndexTwo = refineMV[Max50.Refined](2)
+    val bondIndexOne = 1
+    val bondIndexTwo = 2
+    val disposalIndexOne = 1
+    val disposalIndexTwo = 2
 
     beRetrievable[HowDisposed](HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne))
 

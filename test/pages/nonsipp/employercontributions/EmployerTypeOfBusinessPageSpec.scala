@@ -16,23 +16,22 @@
 
 package pages.nonsipp.employercontributions
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.IdentityType
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max300, Max50}
-import controllers.TestValues
 
 class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val indexOne = refineMV[Max50.Refined](1)
+  private val memberIndex = 1
+  private val indexOne = 1
   private val typeOfBusiness = IdentityType.UKCompany
   private val otherTypeOfBusiness = IdentityType.UKPartnership
 
   "EmployerTypeOfBusinessPage" - {
 
-    val index = refineMV[Max50.Refined](1)
+    val index = 1
     val srn = srnGen.sample.value
 
     beRetrievable[IdentityType](EmployerTypeOfBusinessPage(srn, memberIndex, index))

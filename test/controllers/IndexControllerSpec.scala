@@ -19,7 +19,7 @@ package controllers
 import play.api.test.FakeRequest
 import views.html.IndexView
 
-class IndexControllerSpec extends ControllerBaseSpec {
+class IndexControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "Index Controller" - {
 

@@ -17,18 +17,17 @@
 package controllers.nonsipp.bondsdisposal
 
 import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}
 import pages.nonsipp.bondsdisposal.HowWereBondsDisposedOfPage
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class HowWereBondsDisposedOfControllerSpec extends ControllerBaseSpec {
+class HowWereBondsDisposedOfControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val bondIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.HowWereBondsDisposedOfController.onPageLoad(srn, bondIndex, disposalIndex, NormalMode)

@@ -18,7 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -30,7 +30,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
+class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.OtherAssetsDisposalController.onSubmit(srn, NormalMode)
@@ -57,18 +57,18 @@ class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

@@ -24,7 +24,7 @@ import play.api.data
 import models.Money
 import forms.mappings.errors.MoneyFormErrors
 
-class MoneyViewWithDescriptionSpec extends ViewSpec with Mappings {
+class MoneyViewWithDescriptionSpec extends ViewSpec with ViewBehaviours with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[MoneyViewWithDescription]

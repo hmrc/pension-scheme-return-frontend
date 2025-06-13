@@ -146,10 +146,9 @@ private object MonthFormatter extends Formatters {
               case Some(number) if number >= MinMonth && number <= MaxMonth => Right(number)
               case _ =>
                 Month.values.toList
-                  .find(
-                    m =>
-                      m.toString.toUpperCase == normalizedString ||
-                        m.toString.take(MonthAbbreviationLength).toUpperCase == normalizedString
+                  .find(m =>
+                    m.toString.toUpperCase == normalizedString ||
+                      m.toString.take(MonthAbbreviationLength).toUpperCase == normalizedString
                   )
                   .map(_.getValue)
                   .toRight(List(FormError(key, invalidKey, args)))

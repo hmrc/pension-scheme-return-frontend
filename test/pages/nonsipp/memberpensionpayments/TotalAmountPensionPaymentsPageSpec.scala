@@ -16,8 +16,7 @@
 
 package pages.nonsipp.memberpensionpayments
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -25,7 +24,7 @@ class TotalAmountPensionPaymentsPageSpec extends PageBehaviours {
 
   "TotalAmountPensionPaymentsPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[Money](TotalAmountPensionPaymentsPage(srnSample, index))

@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -25,7 +24,7 @@ class IncomeFromAssetPageSpec extends PageBehaviours {
 
   "IncomeFromAssetPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Money](IncomeFromAssetPage(srn, index))
 

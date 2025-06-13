@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class PensionCommencementLumpSumController @Inject()(
+class PensionCommencementLumpSumController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -67,10 +67,11 @@ class PensionCommencementLumpSumController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionCommencementLumpSumPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers)))
-            } else {
-              {
+            redirectTo <-
+              if (value) {
+                Future
+                  .successful(Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers)))
+              } else {
                 psrSubmissionService
                   .submitPsrDetailsWithUA(
                     srn,
@@ -84,7 +85,6 @@ class PensionCommencementLumpSumController @Inject()(
                       Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers))
                   }
               }
-            }
           } yield redirectTo
       )
   }

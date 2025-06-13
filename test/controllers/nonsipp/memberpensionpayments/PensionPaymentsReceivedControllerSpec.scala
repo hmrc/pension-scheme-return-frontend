@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
 import play.api.libs.json.JsPath
@@ -31,7 +31,7 @@ import views.html.YesNoPageView
 
 import scala.concurrent.Future
 
-class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec {
+class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.PensionPaymentsReceivedController.onSubmit(srn, NormalMode)

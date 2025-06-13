@@ -27,7 +27,7 @@ case class CheckYourAnswersViewModel(
   paginatedViewModel: Option[PaginatedViewModel] = None
 ) {
   def withMarginBottom(margin: Margin): CheckYourAnswersViewModel = copy(marginBottom = Some(margin))
-  def withInset(inset: Option[DisplayMessage]): CheckYourAnswersViewModel = copy(inset = (inset))
+  def withInset(inset: Option[DisplayMessage]): CheckYourAnswersViewModel = copy(inset = inset)
 }
 
 case class CheckYourAnswersSection(

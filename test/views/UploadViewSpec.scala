@@ -20,7 +20,7 @@ import forms.mappings.Mappings
 import views.html.UploadView
 import viewmodels.models.UploadViewModel
 
-class UploadViewSpec extends ViewSpec with Mappings {
+class UploadViewSpec extends ViewSpec with ViewBehaviours with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[UploadView]

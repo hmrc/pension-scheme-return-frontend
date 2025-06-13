@@ -18,7 +18,7 @@ package utils
 
 import org.scalatest.freespec.AnyFreeSpecLike
 
-trait ActsLikeSpec { _: AnyFreeSpecLike =>
+trait ActsLikeSpec extends AnyFreeSpecLike {
 
   import Behaviours._
 

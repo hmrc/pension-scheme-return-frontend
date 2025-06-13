@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -46,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class WhenDidMemberSurrenderBenefitsController @Inject()(
+class WhenDidMemberSurrenderBenefitsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -62,7 +63,7 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenDidMemberSurrenderBenefitsController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
@@ -82,7 +83,7 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>

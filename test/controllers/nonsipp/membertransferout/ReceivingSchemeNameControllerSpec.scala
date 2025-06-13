@@ -16,18 +16,17 @@
 
 package controllers.nonsipp.membertransferout
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputViewWidth40
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
-import config.RefinedTypes.{OneTo300, OneTo5}
-import controllers.ControllerBaseSpec
 
-class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec {
+class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo300](1)
-  private val transferIndex = refineMV[OneTo5](1)
+  private val index = 1
+  private val transferIndex = 1
   private lazy val onPageLoad =
     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
       .onPageLoad(srn, index, transferIndex, NormalMode)

@@ -21,17 +21,20 @@ import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPag
 import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import views.html.TwoColumnsTripleAction
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import config.RefinedTypes.Max300
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
-class MemberContributionListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class MemberContributionListControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.MemberContributionListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.MemberContributionListController.onSubmit(srn, page = 1, NormalMode)
@@ -55,12 +58,12 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec with Membe
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   val userAnswers: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(MemberContributionsPage(srn), true)
 
   "MemberContributionListController" - {
@@ -127,8 +130,8 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec with Membe
     "ViewModel should display 'Member Contributions' when there are 0 member contributions" in {
       val userAnswersWithNoContributions = userAnswers
         .unsafeSet(MemberContributionsPage(srn), true)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(0))
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(TotalMemberContributionPage(srn, 1), Money(0))
 
       val memberList = userAnswersWithNoContributions.completedMembersDetails(srn).value
 
@@ -152,8 +155,8 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec with Membe
 
     "ViewModel should display 'Member contribution' for 1 member contribution" in {
       val userAnswersWithOneContribution = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(1))
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(TotalMemberContributionPage(srn, 1), Money(1))
 
       val memberList = userAnswersWithOneContribution.completedMembersDetails(srn).value
 
@@ -179,13 +182,13 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec with Membe
       val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
 
       val userAnswersWithTwoContributions = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(10))
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
-        .unsafeSet(TotalMemberContributionPage(srn, refineMV(2)), Money(20))
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails1)
+        .unsafeSet(TotalMemberContributionPage(srn, 1), Money(10))
+        .unsafeSet(MemberDetailsPage(srn, 2), memberDetails2)
+        .unsafeSet(TotalMemberContributionPage(srn, 2), Money(20))
 
-      val memberList =
-        List((refineMV[Max300.Refined](1), memberDetails1), (refineMV[Max300.Refined](2), memberDetails2))
+      val memberList: List[(Max300, NameDOB)] =
+        List((1, memberDetails1), (2, memberDetails2))
 
       val result = MemberContributionListController.viewModel(
         srn,

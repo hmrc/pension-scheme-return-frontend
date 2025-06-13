@@ -18,7 +18,7 @@ package pages
 
 import play.api.libs.json.Writes._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, NoNINOPage}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import models.UserAnswers
 import pages.behaviours.PageBehaviours
@@ -29,47 +29,47 @@ class DoesMemberHaveNinoPageSpec extends PageBehaviours {
 
   "DoesMemberHaveNinoPage" - {
 
-    beRetrievable[Boolean](DoesMemberHaveNinoPage(srn, refineMV(1)))
+    beRetrievable[Boolean](DoesMemberHaveNinoPage(srn, 1))
 
-    beSettable[Boolean](DoesMemberHaveNinoPage(srn, refineMV(1)))
+    beSettable[Boolean](DoesMemberHaveNinoPage(srn, 1))
 
-    beRemovable[Boolean](DoesMemberHaveNinoPage(srn, refineMV(1)))
+    beRemovable[Boolean](DoesMemberHaveNinoPage(srn, 1))
 
     "cleanup no NINO page if page value is true" in {
 
-      val userAnswers = UserAnswers("test").set(NoNINOPage(srn, refineMV(1)), "test reason").success.value
-      userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test reason"))
+      val userAnswers = UserAnswers("test").set(NoNINOPage(srn, 1), "test reason").success.value
+      userAnswers.get(NoNINOPage(srn, 1)) must be(Some("test reason"))
 
-      val result = userAnswers.set(DoesMemberHaveNinoPage(srn, refineMV(1)), true).success.value
-      result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
+      val result = userAnswers.set(DoesMemberHaveNinoPage(srn, 1), true).success.value
+      result.get(NoNINOPage(srn, 1)) must be(empty)
     }
 
     "cleanup enter NINO page if page value is false" in {
 
       val nino = Nino("AB123456A")
-      val userAnswers = UserAnswers("test").set(MemberDetailsNinoPage(srn, refineMV(1)), nino).success.value
-      userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
+      val userAnswers = UserAnswers("test").set(MemberDetailsNinoPage(srn, 1), nino).success.value
+      userAnswers.get(MemberDetailsNinoPage(srn, 1)) must be(Some(nino))
 
-      val result = userAnswers.set(DoesMemberHaveNinoPage(srn, refineMV(1)), false).success.value
-      result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
+      val result = userAnswers.set(DoesMemberHaveNinoPage(srn, 1), false).success.value
+      result.get(MemberDetailsNinoPage(srn, 1)) must be(empty)
     }
 
     "cleanup both enter NINO page and no NINO page if page value is missing" in {
 
       val nino = Nino("AB123456A")
       val userAnswers = UserAnswers("test")
-        .set(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+        .set(MemberDetailsNinoPage(srn, 1), nino)
         .success
         .value
-        .set(NoNINOPage(srn, refineMV(1)), "test reason")
+        .set(NoNINOPage(srn, 1), "test reason")
         .success
         .value
-      userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
-      userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test reason"))
+      userAnswers.get(MemberDetailsNinoPage(srn, 1)) must be(Some(nino))
+      userAnswers.get(NoNINOPage(srn, 1)) must be(Some("test reason"))
 
-      val result = userAnswers.remove(DoesMemberHaveNinoPage(srn, refineMV(1))).success.value
-      result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
-      result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
+      val result = userAnswers.remove(DoesMemberHaveNinoPage(srn, 1)).success.value
+      result.get(MemberDetailsNinoPage(srn, 1)) must be(empty)
+      result.get(NoNINOPage(srn, 1)) must be(empty)
     }
   }
 }

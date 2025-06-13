@@ -18,7 +18,7 @@ package pages
 
 import pages.nonsipp.memberdetails.MemberDetailsNinoPage
 import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import pages.behaviours.PageBehaviours
 
@@ -28,12 +28,12 @@ class MemberDetailsNinoPageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
+    beRetrievable[Nino](MemberDetailsNinoPage(srn, 1))
 
-    beSettable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
+    beSettable[Nino](MemberDetailsNinoPage(srn, 1))
 
     beSettableWithIndex[Nino, Max300](i => MemberDetailsNinoPage(srn, i))
 
-    beRemovable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
+    beRemovable[Nino](MemberDetailsNinoPage(srn, 1))
   }
 }

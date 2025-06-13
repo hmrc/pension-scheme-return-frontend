@@ -20,6 +20,7 @@ import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import controllers.actions._
 import forms.YesNoPageFormProvider
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IndividualBuyerNinoNumberController @Inject()(
+class IndividualBuyerNinoNumberController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class IndividualBuyerNinoNumberController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualBuyerNinoNumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync {
         individualName =>
@@ -66,7 +67,7 @@ class IndividualBuyerNinoNumberController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

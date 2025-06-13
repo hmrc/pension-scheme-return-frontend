@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class PensionPaymentsReceivedController @Inject()(
+class PensionPaymentsReceivedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -69,19 +69,20 @@ class PensionPaymentsReceivedController @Inject()(
               .set(PensionPaymentsReceivedPage(srn), value)
               .mapK[Future]
             _ <- saveService.save(updatedAnswers)
-            submissionResult <- if (!value) {
-              psrSubmissionService.submitPsrDetailsWithUA(
-                srn,
-                updatedAnswers,
-                fallbackCall = controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
-                  .onPageLoad(srn, mode)
-              )
-            } else {
-              Future.successful(Some(()))
-            }
+            submissionResult <-
+              if (!value) {
+                psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  fallbackCall = controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+                    .onPageLoad(srn, mode)
+                )
+              } else {
+                Future.successful(Some(()))
+              }
           } yield submissionResult
-            .getOrRecoverJourney(
-              _ => Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
+            .getOrRecoverJourney(_ =>
+              Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
             )
       )
   }

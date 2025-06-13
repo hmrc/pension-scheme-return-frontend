@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.membertransferout
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedTransferOutControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedTransferOutControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedTransferOutController" - {
 

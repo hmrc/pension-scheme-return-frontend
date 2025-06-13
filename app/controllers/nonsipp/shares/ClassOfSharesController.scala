@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.SaveService
 import controllers.nonsipp.shares.ClassOfSharesController._
 import utils.FormUtils._
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class ClassOfSharesController @Inject()(
+class ClassOfSharesController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -51,7 +52,7 @@ class ClassOfSharesController @Inject()(
 
   private def form = ClassOfSharesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
         Ok(
@@ -63,7 +64,7 @@ class ClassOfSharesController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
         form
@@ -78,7 +79,7 @@ class ClassOfSharesController @Inject()(
                   )
                 )
               ),
-            answer => {
+            answer =>
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(ClassOfSharesPage(srn, index), answer))
@@ -86,7 +87,6 @@ class ClassOfSharesController @Inject()(
                 updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
-            }
           )
       }
   }

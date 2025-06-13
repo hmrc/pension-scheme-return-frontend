@@ -25,6 +25,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits._
 import controllers.actions._
 import config.RefinedTypes.Max50._
@@ -42,7 +43,7 @@ import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
-class WhichEmployerContributionRemoveController @Inject()(
+class WhichEmployerContributionRemoveController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -52,11 +53,11 @@ class WhichEmployerContributionRemoveController @Inject()(
 
   val form: Form[Max50] = WhichEmployerContributionRemoveController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max50] = request.userAnswers
       .map(EmployerContributionsProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -83,7 +84,7 @@ class WhichEmployerContributionRemoveController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     form
       .bindFromRequest()
       .fold(
@@ -102,13 +103,13 @@ class WhichEmployerContributionRemoveController @Inject()(
       )
   }
 
-  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
-    implicit request: DataRequest[_]
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(implicit
+    request: DataRequest[_]
   ): Either[Result, List[(Max50, Money, String)]] =
     request.userAnswers
       .map(EmployerContributionsProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -132,14 +133,13 @@ object WhichEmployerContributionRemoveController {
     )
 
   private def buildRows(values: List[(Max50, Money, String)]): List[ListRadiosRow] =
-    values.flatMap {
-      case (index, total, employerName) =>
-        List(
-          ListRadiosRow(
-            index.value,
-            Message("whichEmployerContributionRemove.radio.label", total.displayAs, employerName)
-          )
+    values.flatMap { case (index, total, employerName) =>
+      List(
+        ListRadiosRow(
+          index.value,
+          Message("whichEmployerContributionRemove.radio.label", total.displayAs, employerName)
         )
+      )
     }
 
   def viewModel(

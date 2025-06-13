@@ -18,17 +18,17 @@ package controllers.nonsipp.landorpropertydisposal
 
 import views.html.ListView
 import pages.nonsipp.landorpropertydisposal._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted, LandOrPropertyProgress}
 
-class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.LandOrPropertyDisposalListController.onPageLoad(srn, page = 1)
   private lazy val onSubmit = routes.LandOrPropertyDisposalListController.onSubmit(srn, page = 1)
@@ -58,24 +58,27 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
 
   private val address1 = addressGen.sample.value
 
-  private val addressesWithIndexes: List[((Max5000, List[Max50]), Address)] = List(
-    refineMV[Max5000.Refined](1) -> List(refineMV[Max50.Refined](1), refineMV[Max50.Refined](2)) -> address1
+  private val one: Max5000 = 1
+
+  private val addressesWithIndexes: List[((Max5000, List[Max50]), Address)] = List[((Max5000, List[Max50]), Address)](
+    one -> List[Max50](1, 2) -> address1
   )
 
-  private val addressesWithIndexesIncomplete: List[((Max5000, List[Max50]), Address)] = List(
-    refineMV[Max5000.Refined](1) -> List(refineMV[Max50.Refined](1)) -> address1
-  )
+  private val addressesWithIndexesIncomplete: List[((Max5000, List[Max50]), Address)] =
+    List[((Max5000, List[Max50]), Address)](
+      one -> List[Max50](1) -> address1
+    )
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(2)), SectionCompleted)
-    .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
-    .unsafeSet(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
-    .unsafeSet(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
-    .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Transferred)
-    .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+    .unsafeSet(LandOrPropertyCompleted(srn, 1), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(LandPropertyDisposalCompletedPage(srn, 1, 2), SectionCompleted)
+    .unsafeSet(LandPropertyDisposalCompletedPage(srn, 1, 1), SectionCompleted)
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, 1, 2), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 1), address1)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, 1, 2), HowDisposed.Transferred)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, 1, 1), HowDisposed.Transferred)
     .unsafeSet(LandOrPropertyDisposalPage(srn), true)
 
   "LandOrPropertyDisposalListController" - {
@@ -102,7 +105,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderView(onPageLoad, userAnswers.unsafeRemove(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(2)))) {
+      renderView(onPageLoad, userAnswers.unsafeRemove(LandOrPropertyDisposalProgress(srn, 1, 2))) {
         implicit app => implicit request =>
           injected[ListView]
             .apply(
@@ -151,25 +154,28 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[ListView].apply(
-              form(injected[YesNoPageFormProvider]),
-              viewModel(
-                srn,
-                ViewOnlyMode,
-                page = 1,
-                addressesWithIndexes,
-                numberOfDisposals = 2,
-                maxPossibleNumberOfDisposals = 50,
-                userAnswers,
-                schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel),
-                showBackLink = true,
-                maximumDisposalsReached = false,
-                allPropertiesFullyDisposed = false
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              ViewOnlyMode,
+              page = 1,
+              addressesWithIndexes,
+              numberOfDisposals = 2,
+              maxPossibleNumberOfDisposals = 50,
+              userAnswers,
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true,
+              maximumDisposalsReached = false,
+              allPropertiesFullyDisposed = false
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
       )
 
@@ -180,7 +186,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
           onPageLoadViewOnly,
           userAnswers = updatedUserAnswers,
           optPreviousAnswers = Some(
-            previousUserAnswers.unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
+            previousUserAnswers.unsafeSet(HowWasPropertyDisposedOfPage(srn, 1, 1), HowDisposed.Sold)
           )
         ) { implicit app => implicit request =>
           injected[ListView].apply(

@@ -20,7 +20,7 @@ import pages.nonsipp.employercontributions._
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
-import eu.timepit.refined.{refineMV, refineV}
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -31,8 +31,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val index: Max300 = 1
+  private val secondaryIndex: Max50 = 1
 
   "EmployerContributionsNavigator" - {
 
@@ -93,7 +93,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           EmployerNamePage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -102,9 +102,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
     def userAnswersWithEmployerNames(num: Int)(srn: Srn): UserAnswers =
       (1 to num).foldLeft(defaultUserAnswers) { (ua, i) =>
-        val secondaryIndex =
-          refineV[Max50.Refined](i).getOrElse(throw new RuntimeException(s"$i was not in between 1 and 50"))
-        ua.unsafeSet(EmployerNamePage(srn, refineMV[Max300.Refined](1), secondaryIndex), "test employer name")
+        val secondaryIndex: Max50 = i
+        ua.unsafeSet(EmployerNamePage(srn, 1, secondaryIndex), "test employer name")
       }
 
     List(
@@ -114,27 +113,24 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
       (10, 2),
       (12, 3),
       (49, 10)
-    ).foreach {
-      case (navigatingFromIndex, expectedPage) =>
-        val userAnswers = userAnswersWithEmployerNames(50) _
-        val secondaryIndex =
-          refineV[Max50.Refined](navigatingFromIndex)
-            .getOrElse(throw new RuntimeException(s"$index was not in between 1 and 50"))
-        act.like(
-          checkmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              EmployerNamePage,
-              (srn, index: Max300, _: Max50, _) =>
-                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onPageLoad(srn, index, expectedPage, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from employer name page to employer contributions CYA page $expectedPage when navigating from page with index $navigatingFromIndex"
-            )
-        )
+    ).foreach { case (navigatingFromIndex, expectedPage) =>
+      val userAnswers = userAnswersWithEmployerNames(50) _
+      val secondaryIndex: Max50 = navigatingFromIndex
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            EmployerNamePage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, expectedPage, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from employer name page to employer contributions CYA page $expectedPage when navigating from page with index $navigatingFromIndex"
+          )
+      )
     }
   }
 
@@ -146,7 +142,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKCompany),
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
               .onPageLoad(srn, memberIndex, index, NormalMode)
         )
@@ -160,7 +156,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKPartnership),
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
               .onPageLoad(srn, memberIndex, index, NormalMode)
         )
@@ -174,7 +170,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.Other),
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
               .onPageLoad(srn, memberIndex, index, NormalMode)
         )
@@ -203,7 +199,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           PartnershipEmployerUtrPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -218,7 +214,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           TotalEmployerContributionPage,
-          (srn, index: Max300, _: Max50, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -233,7 +229,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           EmployerCompanyCrnPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -249,7 +245,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           ContributionsFromAnotherEmployerPage,
-          (srn, index: Max300, _: Max50, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
               .onPageLoad(srn, index, page = 1, NormalMode)
         )
@@ -257,38 +253,37 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     )
 
     List(
-      (List("0"), refineMV[Max50.Refined](2)),
-      (List("0", "1", "2"), refineMV[Max50.Refined](4)),
-      (List("1", "2"), refineMV[Max50.Refined](1)), // deleted first entry
-      (List("0", "1", "3"), refineMV[Max50.Refined](3)), // deleted one entry in the middle
-      (List("0", "1", "2", "5", "6"), refineMV[Max50.Refined](4)), // deleted two entry in the middle
-      (List("0", "1", "3", "5", "6"), refineMV[Max50.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true)
-            .unsafeSet(TotalEmployerContributionPages(srn, index), existingIndexes.map(_ -> money).toMap)
-            .unsafeSet(
-              EmployerContributionsProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+      (List("0"), 2),
+      (List("0", "1", "2"), 4),
+      (List("1", "2"), 1), // deleted first entry
+      (List("0", "1", "3"), 3), // deleted one entry in the middle
+      (List("0", "1", "2", "5", "6"), 4), // deleted two entry in the middle
+      (List("0", "1", "3", "5", "6"), 3) // deleted entry in the middle of two sections
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true)
+          .unsafeSet(TotalEmployerContributionPages(srn, index), existingIndexes.map(_ -> money).toMap)
+          .unsafeSet(
+            EmployerContributionsProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          normalmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ContributionsFromAnotherEmployerPage,
-              (srn, index: Max300, _: Max50, _) =>
-                controllers.nonsipp.employercontributions.routes.EmployerNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from contribution from another employer page to employer name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ContributionsFromAnotherEmployerPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from contribution from another employer page to employer name page with index ${expectedRedirectIndex} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 
@@ -299,7 +294,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .navigateToWithIndex(
             index,
             RemoveEmployerContributionsPage,
-            (srn, _: Max300, _) =>
+            (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsController
                 .onPageLoad(srn, NormalMode)
           )
@@ -312,10 +307,10 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .navigateToWithIndex(
             index,
             RemoveEmployerContributionsPage,
-            (srn, _: Max300, _) =>
+            (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                 .onPageLoad(srn, 1, NormalMode),
-            srn => defaultUserAnswers.unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+            srn => defaultUserAnswers.unsafeSet(EmployerNamePage(srn, 1, 1), employerName)
           )
           .withName("go from remove employer page to contributions list page")
       )

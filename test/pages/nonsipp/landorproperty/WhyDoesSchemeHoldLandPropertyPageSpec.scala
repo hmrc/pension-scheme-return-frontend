@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
 import pages.nonsipp.common.IdentityTypePage
@@ -30,7 +29,7 @@ class WhyDoesSchemeHoldLandPropertyPageSpec extends PageBehaviours {
 
   "WhyDoesSchemeHoldLandPropertyPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srn = srnGen.sample.value
     val subject = IdentitySubject.LandOrPropertySeller
 

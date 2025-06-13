@@ -38,7 +38,7 @@ import scala.util.Try
 
 import javax.inject.Named
 
-class RemoveUnallocatedAmountController @Inject()(
+class RemoveUnallocatedAmountController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -72,22 +72,19 @@ class RemoveUnallocatedAmountController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        errors => {
+        errors =>
           Future.successful {
             (
               for {
                 unallocatedAmount <- request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).getOrRecoverJourney
-              } yield {
-                BadRequest(
-                  view(
-                    errors,
-                    RemoveUnallocatedAmountController.viewModel(srn, mode, unallocatedAmount.displayAs)
-                  )
+              } yield BadRequest(
+                view(
+                  errors,
+                  RemoveUnallocatedAmountController.viewModel(srn, mode, unallocatedAmount.displayAs)
                 )
-              }
+              )
             ).merge
-          }
-        },
+          },
         value =>
           if (value) {
             for {
@@ -100,12 +97,11 @@ class RemoveUnallocatedAmountController @Inject()(
                 fallbackCall = controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
                   .onPageLoad(srn, mode)
               )
-            } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-              _ =>
-                Redirect(
-                  navigator
-                    .nextPage(RemoveUnallocatedAmountPage(srn), NormalMode, updatedAnswers)
-                )
+            } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+              Redirect(
+                navigator
+                  .nextPage(RemoveUnallocatedAmountPage(srn), NormalMode, updatedAnswers)
+              )
             )
           } else {
             Future

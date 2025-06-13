@@ -17,19 +17,18 @@
 package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.IndependentValuationPage
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.sharesdisposal.IndependentValuationController._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class IndependentValuationControllerSpec extends ControllerBaseSpec {
+class IndependentValuationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
   private lazy val onPageLoad = routes.IndependentValuationController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.IndependentValuationController.onSubmit(srn, index, disposalIndex, NormalMode)
 

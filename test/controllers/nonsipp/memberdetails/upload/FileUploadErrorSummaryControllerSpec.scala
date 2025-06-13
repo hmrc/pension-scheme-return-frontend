@@ -18,7 +18,7 @@ package controllers.nonsipp.memberdetails.upload
 
 import services.UploadService
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 import play.api.inject
 import models.{NormalMode, Upload, UploadFormatError}
@@ -28,7 +28,7 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class FileUploadErrorSummaryControllerSpec extends ControllerBaseSpec {
+class FileUploadErrorSummaryControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val mockUploadService = mock[UploadService]
 

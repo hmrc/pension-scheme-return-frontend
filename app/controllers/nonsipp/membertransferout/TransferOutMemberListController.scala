@@ -23,7 +23,9 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import cats.implicits.toShow
+import controllers.actions._
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import config.RefinedTypes.{Max300, Max5}
@@ -32,8 +34,6 @@ import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -49,7 +49,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class TransferOutMemberListController @Inject()(
+class TransferOutMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,8 +76,8 @@ class TransferOutMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -141,20 +141,18 @@ class TransferOutMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(
-    implicit request: DataRequest[_]
-  ): List[MemberWithTransferOut] = memberTransferOutList.map {
-    case (index, nameDOB) =>
-      MemberWithTransferOut(
-        memberIndex = index,
-        transferFullName = nameDOB.fullName,
-        transfer = request.userAnswers
-          .memberTransferOutProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              TransferOut(secondaryIndex, status)
-          }
-      )
+  private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(implicit
+    request: DataRequest[_]
+  ): List[MemberWithTransferOut] = memberTransferOutList.map { case (index, nameDOB) =>
+    MemberWithTransferOut(
+      memberIndex = index,
+      transferFullName = nameDOB.fullName,
+      transfer = request.userAnswers
+        .memberTransferOutProgress(srn, index)
+        .map { case (secondaryIndex, status) =>
+          TransferOut(secondaryIndex, status)
+        }
+    )
   }
 
 }
@@ -190,7 +188,7 @@ object TransferOutMemberListController {
                   case Some(TransferOut(_, InProgress(url))) => url
                   case _ =>
                     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                      .onSubmit(srn, membersWithTransfers.memberIndex, refineMV(1), mode)
+                      .onSubmit(srn, membersWithTransfers.memberIndex, 1, mode)
                       .url
                 },
                 Message(

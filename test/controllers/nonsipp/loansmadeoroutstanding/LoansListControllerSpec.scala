@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import org.mockito.Mockito._
 import models.ConditionalYesNo._
 import play.api.mvc.{AnyContent, Session}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListView
 import config.Constants.PREPOPULATION_FLAG
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
@@ -34,7 +34,7 @@ import org.mockito.ArgumentMatchers.any
 import models.SponsoringOrConnectedParty._
 import models.requests.DataRequest
 
-class LoansListControllerSpec extends ControllerBaseSpec {
+class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val loanRecipient = IdentitySubject.LoanRecipient
 
@@ -339,9 +339,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
         onSubmitViewOnly,
         onPageLoadViewOnlyTaskListController
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only tasklist")
     )
 
     act.like(

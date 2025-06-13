@@ -16,8 +16,7 @@
 
 package pages.nonsipp.moneyborrowed
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -28,7 +27,7 @@ class WhenBorrowedPageSpec extends PageBehaviours {
 
   "WhenBorrowedPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[LocalDate](WhenBorrowedPage(srn, index))
 

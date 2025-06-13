@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedSharesDisposalControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedSharesDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedSharesDisposalController" - {
 

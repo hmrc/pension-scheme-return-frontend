@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
 import org.slf4j.LoggerFactory
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions.IdentifyAndRequireData
 import models._
 import play.api.i18n.MessagesApi
@@ -42,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class MemberContributionsCYAController @Inject()(
+class MemberContributionsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -57,7 +58,7 @@ class MemberContributionsCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -66,7 +67,7 @@ class MemberContributionsCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -102,7 +103,7 @@ class MemberContributionsCYAController @Inject()(
         }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val memberContributionsChanged =
         request.userAnswers.changed(_.buildMemberContributions(srn, index))
@@ -119,8 +120,8 @@ class MemberContributionsCYAController @Inject()(
             fallbackCall = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
               .onPageLoad(srn, index, mode)
           )
-      } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
       )
     }
 

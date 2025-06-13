@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -40,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalConsiderationSaleAssetController @Inject()(
+class TotalConsiderationSaleAssetController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -53,7 +54,7 @@ class TotalConsiderationSaleAssetController @Inject()(
 
   private val form = TotalConsiderationSaleAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), form)
@@ -61,12 +62,12 @@ class TotalConsiderationSaleAssetController @Inject()(
       Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, form, mode)))
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future.successful(
               BadRequest(
                 view(
@@ -74,8 +75,7 @@ class TotalConsiderationSaleAssetController @Inject()(
                   viewModel(srn, assetIndex, disposalIndex, form, mode)
                 )
               )
-            )
-          },
+            ),
           value =>
             for {
               updatedAnswers <- Future

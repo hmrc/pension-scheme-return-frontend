@@ -28,15 +28,13 @@ object MapUtils {
   }
 
   implicit class UserAnswersMapOps[A](m: Map[String, A]) {
-    def refine[I: Validate[Int, *]]: Either[String, Map[Refined[Int, I], A]] =
-      m.map {
-          case (k, v) =>
-            for {
-              index <- k.toIntOption.toRight(s"index $k is not a number")
-              refined <- refineV[I](index + 1)
-            } yield (refined, v)
-        }
-        .toList
+    def refine[I](using Validate[Int, I]): Either[String, Map[Refined[Int, I], A]] =
+      m.map { case (k, v) =>
+        for {
+          index <- k.toIntOption.toRight(s"index $k is not a number")
+          refined <- refineV[I](index + 1)
+        } yield (refined, v)
+      }.toList
         .sequence
         .map(_.toMap)
   }

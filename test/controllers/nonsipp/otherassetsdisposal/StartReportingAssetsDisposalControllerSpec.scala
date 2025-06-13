@@ -18,21 +18,20 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, OtherAssetsDisposalProgress}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListRadiosView
+import utils.IntUtils.given
 import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.{AssetData, _}
-import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class StartReportingAssetsDisposalControllerSpec extends ControllerBaseSpec {
+class StartReportingAssetsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val page = 1
-  private val assetIndexOne = refineMV[Max5000.Refined](1)
-  private val assetIndexTwo = refineMV[Max5000.Refined](2)
-  private val assetIndexThree = refineMV[Max5000.Refined](3)
+  private val assetIndexOne = 1
+  private val assetIndexTwo = 2
+  private val assetIndexThree = 3
 
   private lazy val onPageLoad = routes.StartReportingAssetsDisposalController.onPageLoad(srn, page)
   private lazy val onSubmit = routes.StartReportingAssetsDisposalController.onSubmit(srn, page)

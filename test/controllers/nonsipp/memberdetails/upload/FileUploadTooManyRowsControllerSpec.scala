@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 import controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController._
 import models.NormalMode
 
-class FileUploadTooManyRowsControllerSpec extends ControllerBaseSpec {
+class FileUploadTooManyRowsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.FileUploadTooManyRowsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.FileUploadTooManyRowsController.onSubmit(srn, NormalMode)

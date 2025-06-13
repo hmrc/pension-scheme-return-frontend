@@ -18,17 +18,16 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.IndividualNameOfAssetBuyerPage
 import views.html.TextInputView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.otherassetsdisposal.IndividualNameOfAssetBuyerController._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class IndividualNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
+class IndividualNameOfAssetBuyerControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   "IndividualNameOfAssetBuyerController" - {
 

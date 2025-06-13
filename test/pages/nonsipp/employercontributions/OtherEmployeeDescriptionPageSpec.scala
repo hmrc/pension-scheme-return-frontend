@@ -16,17 +16,16 @@
 
 package pages.nonsipp.employercontributions
 
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import config.RefinedTypes._
 import controllers.TestValues
+import utils.IntUtils.given
+import pages.behaviours.PageBehaviours
 
 class OtherEmployeeDescriptionPageSpec extends PageBehaviours with TestValues {
 
   "OtherEmployeeDescriptionPage" - {
 
-    val memberIndex = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val memberIndex = 1
+    val secondaryIndex = 1
     val srn = srnGen.sample.value
 
     beRetrievable[String](OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex))

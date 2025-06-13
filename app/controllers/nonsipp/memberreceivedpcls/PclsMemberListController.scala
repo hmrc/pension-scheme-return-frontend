@@ -20,6 +20,7 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
@@ -46,7 +47,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class PclsMemberListController @Inject()(
+class PclsMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -72,8 +73,8 @@ class PclsMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -84,9 +85,8 @@ class PclsMemberListController @Inject()(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Right(completedMemberDetails) =>
         val noPageEnabled = !request.userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
-        val memberDetails = completedMemberDetails.map {
-          case (index, memberDetails) =>
-            (index, memberDetails, request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index)))
+        val memberDetails = completedMemberDetails.map { case (index, memberDetails) =>
+          (index, memberDetails, request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index)))
         }
         Ok(
           view(
@@ -241,8 +241,8 @@ object PclsMemberListController {
             .onPageLoad(srn, _, NormalMode)
       }
     )
-    val sumPcls = memberList.count {
-      case (_, _, items) => items.isDefined
+    val sumPcls = memberList.count { case (_, _, items) =>
+      items.isDefined
     }
 
     val optDescription =

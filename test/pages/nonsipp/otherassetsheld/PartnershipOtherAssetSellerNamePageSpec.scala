@@ -16,15 +16,14 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class PartnershipOtherAssetSellerNamePageSpec extends PageBehaviours {
 
   "PartnershipOtherAssetSellerNamePage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[String](PartnershipOtherAssetSellerNamePage(srnSample, index))

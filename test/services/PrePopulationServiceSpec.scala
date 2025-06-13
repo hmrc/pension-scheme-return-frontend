@@ -134,7 +134,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
 
           val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
           result.isSuccess mustBe true
-          result.get.data.decryptedValue mustBe Json.parse("""
+          result.get.data.decryptedValue mustBe Json
+            .parse("""
               |{
               |  "current": "dummy-current-data",
               |  "lop": "dummy-lop-data",
@@ -146,7 +147,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "otherAssets": "dummy-other-assets-data",
               |  "sharesProgress": "dummy-shares-progress-data"
               |}
-              |""".stripMargin).as[JsObject]
+              |""".stripMargin)
+            .as[JsObject]
 
           verify(mockLandOrPropertyPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockMemberPrePopulationProcessor, times(1)).clean(any(), any())(any())
@@ -164,11 +166,13 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
 
           val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
           result.isSuccess mustBe true
-          result.get.data.decryptedValue mustBe Json.parse("""
+          result.get.data.decryptedValue mustBe Json
+            .parse("""
               |{
               |  "current": "dummy-current-data"
               |}
-              |""".stripMargin).as[JsObject]
+              |""".stripMargin)
+            .as[JsObject]
 
           verify(mockLandOrPropertyPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockMemberPrePopulationProcessor, never()).clean(any(), any())(any())
@@ -282,7 +286,7 @@ object PrePopulationServiceSpec {
     )
   ) ++ currentAndFutureYears
 
-  val versionsForYears: Seq[PsrVersionsForYearsResponse] = {
+  val versionsForYears: Seq[PsrVersionsForYearsResponse] =
     containsPreviousYearsButNotSubmitted ++
       Seq(
         PsrVersionsForYearsResponse(
@@ -332,5 +336,4 @@ object PrePopulationServiceSpec {
           )
         )
       )
-  }
 }

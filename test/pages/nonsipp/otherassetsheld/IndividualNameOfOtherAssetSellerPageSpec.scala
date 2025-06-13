@@ -16,16 +16,15 @@
 
 package pages.nonsipp.otherassetsheld
 
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import config.RefinedTypes.OneTo5000
 import controllers.TestValues
+import utils.IntUtils.given
+import pages.behaviours.PageBehaviours
 
 class IndividualNameOfOtherAssetSellerPageSpec extends PageBehaviours with TestValues {
 
   "IndividualNameOfOtherAssetSellerPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[String](IndividualNameOfOtherAssetSellerPage(srnSample, index))

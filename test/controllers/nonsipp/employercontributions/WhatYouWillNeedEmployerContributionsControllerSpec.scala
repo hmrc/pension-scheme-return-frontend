@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.employercontributions
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedEmployerContributionsControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedEmployerContributionsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedLandPropertyDisposalController" - {
 

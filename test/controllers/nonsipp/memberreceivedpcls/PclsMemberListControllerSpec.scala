@@ -20,16 +20,16 @@ import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import views.html.TwoColumnsTripleAction
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import config.RefinedTypes.Max300
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
-class PclsMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class PclsMemberListControllerSpec extends ControllerBaseSpec with ControllerBehaviours with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.PclsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.PclsMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -53,19 +53,19 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec with MemberListBas
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
   val lumpSumData: PensionCommencementLumpSum = pensionCommencementLumpSumGen.sample.value
 
   private val userAnswers: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
       .unsafeSet(PensionCommencementLumpSumPage(srn), true)
-      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), lumpSumData)
+      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, 1), lumpSumData)
 
   private val testMemberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])] = List(
-    (refineMV[Max300.Refined](1), memberDetails, Some(lumpSumData))
+    (1, memberDetails, Some(lumpSumData))
   )
 
   "PclsMemberListController" - {
@@ -103,8 +103,8 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec with MemberListBas
     "viewModel should show 2 Pension commencement lump sums when there are 2 PCLS" in {
 
       val memberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])] = List(
-        (refineMV[Max300.Refined](1), nameDobGen.sample.value, Some(pensionCommencementLumpSumGen.sample.value)),
-        (refineMV[Max300.Refined](1), nameDobGen.sample.value, Some(pensionCommencementLumpSumGen.sample.value))
+        (1, nameDobGen.sample.value, Some(pensionCommencementLumpSumGen.sample.value)),
+        (1, nameDobGen.sample.value, Some(pensionCommencementLumpSumGen.sample.value))
       )
 
       val result = PclsMemberListController.viewModel(
@@ -201,7 +201,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec with MemberListBas
         .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), newLumpSumData)
 
       val memberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])] = List(
-        (refineMV[Max300.Refined](1), memberDetails, Some(newLumpSumData))
+        (1, memberDetails, Some(newLumpSumData))
       )
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>

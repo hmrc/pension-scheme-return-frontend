@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
 
-class CheckingMemberDetailsFileController @Inject()(
+class CheckingMemberDetailsFileController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,

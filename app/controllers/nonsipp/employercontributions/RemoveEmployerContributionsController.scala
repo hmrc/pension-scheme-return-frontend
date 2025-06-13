@@ -20,6 +20,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
+import utils.IntUtils.{toInt, toRefined300, toRefined50}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveEmployerContributionsController @Inject()(
+class RemoveEmployerContributionsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,7 +55,7 @@ class RemoveEmployerContributionsController @Inject()(
 
   private val form = RemoveEmployerContributionsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -71,12 +72,12 @@ class RemoveEmployerContributionsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -87,9 +88,8 @@ class RemoveEmployerContributionsController @Inject()(
               } yield BadRequest(
                 view(formWithErrors, viewModel(srn, memberIndex, index, total, nameDOB.fullName, employerName))
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future.fromTry(
@@ -106,12 +106,11 @@ class RemoveEmployerContributionsController @Inject()(
                     controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                       .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -122,7 +121,6 @@ class RemoveEmployerContributionsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

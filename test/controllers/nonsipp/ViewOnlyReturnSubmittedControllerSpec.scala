@@ -18,7 +18,7 @@ package controllers.nonsipp
 
 import services.{PsrRetrievalService, PsrVersionsService}
 import play.api.mvc.Call
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.SubmissionView
 import models.backend.responses.PsrVersionsResponse
 import controllers.nonsipp.ViewOnlyReturnSubmittedController.viewModel
@@ -32,7 +32,7 @@ import play.api.inject
 
 import scala.concurrent.Future
 
-class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with CommonTestValues {
+class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with ControllerBehaviours with CommonTestValues {
 
   private val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]

@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.toInt
 import cats.implicits.{toShow, toTraverseOps, _}
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
@@ -50,7 +51,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class OtherAssetsListController @Inject()(
+class OtherAssetsListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -103,8 +104,8 @@ class OtherAssetsListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     val completedIndexes: List[String] =
       request.userAnswers.map(OtherAssetsProgress.all(srn)).filter(_._2.completed).keys.toList
@@ -112,24 +113,23 @@ class OtherAssetsListController @Inject()(
     val filledForm = request.userAnswers.get(OtherAssetsListPage(srn)).fold(form)(form.fill)
 
     if (completedIndexes.nonEmpty || mode.isViewOnlyMode) {
-      otherAssetsToTraverse(srn, completedIndexes).map {
-        case (otherAssetsToCheck, otherAssets) =>
-          Ok(
-            view(
-              filledForm,
-              viewModel(
-                srn,
-                page,
-                mode,
-                otherAssets,
-                otherAssetsToCheck,
-                request.schemeDetails.schemeName,
-                viewOnlyViewModel,
-                showBackLink,
-                isPrePopulation
-              )
+      otherAssetsToTraverse(srn, completedIndexes).map { case (otherAssetsToCheck, otherAssets) =>
+        Ok(
+          view(
+            filledForm,
+            viewModel(
+              srn,
+              page,
+              mode,
+              otherAssets,
+              otherAssetsToCheck,
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel,
+              showBackLink,
+              isPrePopulation
             )
           )
+        )
       }.merge
     } else {
       Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
@@ -141,48 +141,46 @@ class OtherAssetsListController @Inject()(
       val progressPages = request.userAnswers.map(OtherAssetsProgress.all(srn))
       val completedIndexes: List[String] = progressPages.filter(_._2.completed).keys.toList
       val inProgressUrl = progressPages.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
-      otherAssetsToTraverse(srn, completedIndexes).traverse {
-        case (otherAssetsToCheck, otherAssets) =>
-          if (otherAssetsToCheck.size + otherAssets.size >= Constants.maxOtherAssetsTransactions) {
-            Future.successful(
-              Redirect(
-                navigator.nextPage(OtherAssetsListPage(srn), mode, request.userAnswers)
-              )
+      otherAssetsToTraverse(srn, completedIndexes).traverse { case (otherAssetsToCheck, otherAssets) =>
+        if (otherAssetsToCheck.size + otherAssets.size >= Constants.maxOtherAssetsTransactions) {
+          Future.successful(
+            Redirect(
+              navigator.nextPage(OtherAssetsListPage(srn), mode, request.userAnswers)
             )
-          } else {
-            form
-              .bindFromRequest()
-              .fold(
-                errors => {
-                  Future.successful(
-                    BadRequest(
-                      view(
-                        errors,
-                        viewModel(
-                          srn = srn,
-                          page = page,
-                          mode = mode,
-                          otherAssets = otherAssets,
-                          otherAssetsToCheck = otherAssetsToCheck,
-                          schemeName = request.schemeDetails.schemeName,
-                          viewOnlyViewModel = None,
-                          showBackLink = true,
-                          isPrePop = isPrePopulation
-                        )
+          )
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              errors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(
+                        srn = srn,
+                        page = page,
+                        mode = mode,
+                        otherAssets = otherAssets,
+                        otherAssetsToCheck = otherAssetsToCheck,
+                        schemeName = request.schemeDetails.schemeName,
+                        viewOnlyViewModel = None,
+                        showBackLink = true,
+                        isPrePop = isPrePopulation
                       )
                     )
                   )
-                },
-                addAnother =>
-                  for {
-                    updatedUserAnswers <- Future.fromTry(request.userAnswers.set(OtherAssetsListPage(srn), addAnother))
-                    _ <- saveService.save(updatedUserAnswers)
-                  } yield (addAnother, inProgressUrl) match {
-                    case (true, Some(url)) => Redirect(url)
-                    case _ => Redirect(navigator.nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers))
-                  }
-              )
-          }
+                ),
+              addAnother =>
+                for {
+                  updatedUserAnswers <- Future.fromTry(request.userAnswers.set(OtherAssetsListPage(srn), addAnother))
+                  _ <- saveService.save(updatedUserAnswers)
+                } yield (addAnother, inProgressUrl) match {
+                  case (true, Some(url)) => Redirect(url)
+                  case _ => Redirect(navigator.nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers))
+                }
+            )
+        }
       }.merge
   }
 
@@ -220,8 +218,8 @@ class OtherAssetsListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def otherAssetsToTraverse(srn: Srn, completedIndexes: List[String])(
-    implicit request: DataRequest[_],
+  private def otherAssetsToTraverse(srn: Srn, completedIndexes: List[String])(implicit
+    request: DataRequest[_],
     logger: Logger
   ): Either[Result, (List[OtherAssetsData], List[OtherAssetsData])] = {
     // if return has been pre-populated, partition shares by those that need to be checked
@@ -240,8 +238,8 @@ class OtherAssetsListController @Inject()(
           .map(_.keys.toList)
           .getOrRecoverJourney
         otherAssets <- indexes.traverse(buildOtherAssets)
-      } yield otherAssets.partition(
-        otherAssets => OtherAssetsCheckStatusUtils.checkOtherAssetsRecord(request.userAnswers, srn, otherAssets.index)
+      } yield otherAssets.partition(otherAssets =>
+        OtherAssetsCheckStatusUtils.checkOtherAssetsRecord(request.userAnswers, srn, otherAssets.index)
       )
     } else {
       val noOtherAssetsToCheck = List.empty[OtherAssetsData]
@@ -283,37 +281,36 @@ object OtherAssetsListController {
       case (Nil, mode) if !mode.isViewOnlyMode =>
         List()
       case (list, _) =>
-        list.map {
-          case OtherAssetsData(index, nameOfOtherAssets, canRemove) =>
-            val otherAssetsMessage = Message("otherAssets.list.row", nameOfOtherAssets)
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
-                ListRow.view(
-                  text = otherAssetsMessage,
-                  url = routes.OtherAssetsCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
-                  hiddenText = Message("otherAssets.list.row.view.hiddenText", otherAssetsMessage)
-                )
-              case _ if check =>
-                ListRow.check(
-                  text = otherAssetsMessage,
-                  url = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index).url,
-                  hiddenText = Message("site.check.param", nameOfOtherAssets)
-                )
-              case _ if canRemove =>
-                ListRow(
-                  text = otherAssetsMessage,
-                  changeUrl = routes.OtherAssetsCYAController.onPageLoad(srn, index, CheckMode).url,
-                  changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage),
-                  removeUrl = routes.RemoveOtherAssetController.onPageLoad(srn, index, NormalMode).url,
-                  removeHiddenText = Message("otherAssets.list.row.remove.hiddenText", otherAssetsMessage)
-                )
-              case _ =>
-                ListRow(
-                  text = otherAssetsMessage,
-                  changeUrl = routes.OtherAssetsCYAController.onPageLoad(srn, index, CheckMode).url,
-                  changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage)
-                )
-            }
+        list.map { case OtherAssetsData(index, nameOfOtherAssets, canRemove) =>
+          val otherAssetsMessage = Message("otherAssets.list.row", nameOfOtherAssets)
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+              ListRow.view(
+                text = otherAssetsMessage,
+                url = routes.OtherAssetsCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
+                hiddenText = Message("otherAssets.list.row.view.hiddenText", otherAssetsMessage)
+              )
+            case _ if check =>
+              ListRow.check(
+                text = otherAssetsMessage,
+                url = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index).url,
+                hiddenText = Message("site.check.param", nameOfOtherAssets)
+              )
+            case _ if canRemove =>
+              ListRow(
+                text = otherAssetsMessage,
+                changeUrl = routes.OtherAssetsCYAController.onPageLoad(srn, index, CheckMode).url,
+                changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage),
+                removeUrl = routes.RemoveOtherAssetController.onPageLoad(srn, index, NormalMode).url,
+                removeHiddenText = Message("otherAssets.list.row.remove.hiddenText", otherAssetsMessage)
+              )
+            case _ =>
+              ListRow(
+                text = otherAssetsMessage,
+                changeUrl = routes.OtherAssetsCYAController.onPageLoad(srn, index, CheckMode).url,
+                changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage)
+              )
+          }
         }
     }
 
@@ -381,15 +378,14 @@ object OtherAssetsListController {
       }
     }
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (otherAssetsSize >= Constants.maxOtherAssetsTransactions) {
         ParagraphMessage("otherAssets.list.inset")
       } else {
         Message("")
       }
-    }
 
-    val sections = {
+    val sections =
       if (isPrePop) {
         Option
           .when(otherAssetsToCheck.nonEmpty)(
@@ -412,7 +408,6 @@ object OtherAssetsListController {
           ListSection(rows = rows(srn, mode, otherAssets, viewOnlyViewModel, schemeName))
         )
       }
-    }
 
     FormPageViewModel(
       mode = mode,

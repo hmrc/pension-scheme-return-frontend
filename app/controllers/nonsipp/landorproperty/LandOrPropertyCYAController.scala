@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
-import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandOrPropertyCYAController._
@@ -32,6 +31,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -45,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyCYAController @Inject()(
+class LandOrPropertyCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -58,7 +59,7 @@ class LandOrPropertyCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -67,7 +68,7 @@ class LandOrPropertyCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -77,8 +78,8 @@ class LandOrPropertyCYAController @Inject()(
       onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
     }
 
-  def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     request.userAnswers.get(LandOrPropertyProgress(srn, index)) match {
       case Some(value) if value.inProgress =>
@@ -202,7 +203,7 @@ class LandOrPropertyCYAController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index))
       for {
@@ -218,12 +219,11 @@ class LandOrPropertyCYAController @Inject()(
             fallbackCall =
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
           )
-      } yield result.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator
-              .nextPage(LandOrPropertyCYAPage(srn), NormalMode, updatedAnswers)
-          )
+      } yield result.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator
+            .nextPage(LandOrPropertyCYAPage(srn), NormalMode, updatedAnswers)
+        )
       )
     }
 
@@ -436,18 +436,17 @@ object LandOrPropertyCYAController {
           mode
         ) ++
           leaseDetails
-            .map(
-              leaseDetails =>
-                leaseDetailsSection(
-                  srn,
-                  index,
-                  leaseDetails._1,
-                  leaseDetails._2,
-                  leaseDetails._3,
-                  leaseDetails._4,
-                  addressLookUpPage.addressLine1,
-                  mode
-                )
+            .map(leaseDetails =>
+              leaseDetailsSection(
+                srn,
+                index,
+                leaseDetails._1,
+                leaseDetails._2,
+                leaseDetails._3,
+                leaseDetails._4,
+                addressLookUpPage.addressLine1,
+                mode
+              )
             )
             .getOrElse(List.empty)
     }
@@ -701,33 +700,31 @@ object LandOrPropertyCYAController {
         )
           ++
             List(
-              optLandOrPropertyAcquire.map(
-                landOrPropertyAcquire =>
-                  CheckYourAnswersRowViewModel(
-                    Message("landOrPropertyCYA.section2.acquire", address),
-                    s"${landOrPropertyAcquire.show}"
-                  ).withAction(
-                    SummaryAction(
-                      "site.change",
-                      routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode).url + "#landOrPropertyAcquire"
-                    ).withVisuallyHiddenContent(("landOrPropertyCYA.section2.landOrPropertyAcquire.hidden", address))
-                  )
+              optLandOrPropertyAcquire.map(landOrPropertyAcquire =>
+                CheckYourAnswersRowViewModel(
+                  Message("landOrPropertyCYA.section2.acquire", address),
+                  s"${landOrPropertyAcquire.show}"
+                ).withAction(
+                  SummaryAction(
+                    "site.change",
+                    routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode).url + "#landOrPropertyAcquire"
+                  ).withVisuallyHiddenContent(("landOrPropertyCYA.section2.landOrPropertyAcquire.hidden", address))
+                )
               )
             ).flatten ++
-          List(
-            CheckYourAnswersRowViewModel(
-              Message("landOrPropertyCYA.section2.totalCost", address),
-              s"£${landOrPropertyTotalCost.displayAs}"
-            ).withAction(
-              SummaryAction(
-                "site.change",
-                routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent(("landOrPropertyCYA.section2.landOrPropertyTotalCost.hidden", address))
-            )
-          ) ++
-          List(
-            optLandPropertyIndependentValuation.map(
-              landPropertyIndependentValuation =>
+            List(
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section2.totalCost", address),
+                s"£${landOrPropertyTotalCost.displayAs}"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent(("landOrPropertyCYA.section2.landOrPropertyTotalCost.hidden", address))
+              )
+            ) ++
+            List(
+              optLandPropertyIndependentValuation.map(landPropertyIndependentValuation =>
                 CheckYourAnswersRowViewModel(
                   Message("landOrPropertyCYA.section2.independentValuation", address),
                   if (landPropertyIndependentValuation) "site.yes" else "site.no"
@@ -739,8 +736,8 @@ object LandOrPropertyCYAController {
                     ("landOrPropertyCYA.section2.landPropertyIndependentValuation.hidden", address)
                   )
                 )
-            )
-          ).flatten
+              )
+            ).flatten
       )
     )
 

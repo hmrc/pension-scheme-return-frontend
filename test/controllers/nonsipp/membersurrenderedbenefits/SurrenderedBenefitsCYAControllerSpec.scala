@@ -17,9 +17,10 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import pages.nonsipp.membersurrenderedbenefits._
 import models._
@@ -28,12 +29,10 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo300
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
+class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -45,7 +44,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
     when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
-  private val memberIndex = refineMV[OneTo300](1)
+  private val memberIndex = 1
   private val page = 1
   private val whenSurrenderedBenefits = localDate
 
@@ -97,10 +96,10 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -156,9 +155,8 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only tasklist")
     )
   }
 }

@@ -16,9 +16,10 @@
 
 package controllers.nonsipp.employercontributions
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.ContributionsFromAnotherEmployerPage
@@ -26,17 +27,15 @@ import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.{Max300, Max50}
-import controllers.ControllerBaseSpec
 import models.NormalMode
 import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmployerController.{form, viewModel}
 
 import scala.concurrent.Future
 
-class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec {
+class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
@@ -75,18 +74,22 @@ class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec 
     })
 
     act.like(
-      renderPrePopView(onPageLoad, ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true, userAnswers) {
-        implicit app => implicit request =>
-          injected[YesNoPageView].apply(
-            form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(
-              srn,
-              index,
-              secondaryIndex,
-              NormalMode,
-              memberDetails.fullName
-            )
+      renderPrePopView(
+        onPageLoad,
+        ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex),
+        true,
+        userAnswers
+      ) { implicit app => implicit request =>
+        injected[YesNoPageView].apply(
+          form(injected[YesNoPageFormProvider]).fill(true),
+          viewModel(
+            srn,
+            index,
+            secondaryIndex,
+            NormalMode,
+            memberDetails.fullName
           )
+        )
       }
     )
 

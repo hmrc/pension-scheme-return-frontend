@@ -19,6 +19,7 @@ package controllers.nonsipp.bondsdisposal
 import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -44,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class HowWereBondsDisposedOfController @Inject()(
+class HowWereBondsDisposedOfController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -57,12 +58,14 @@ class HowWereBondsDisposedOfController @Inject()(
 
   private val form = HowWereBondsDisposedOfController.form(formProvider)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       // If this page is reached in CheckMode and there is no PointOfEntry set
-      if (mode == CheckMode && request.userAnswers
+      if (
+        mode == CheckMode && request.userAnswers
           .get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex))
-          .contains(NoPointOfEntry)) {
+          .contains(NoPointOfEntry)
+      ) {
         // Set this page as the PointOfEntry
         saveService.save(
           request.userAnswers
@@ -80,7 +83,7 @@ class HowWereBondsDisposedOfController @Inject()(
       Ok(view(preparedForm, viewModel(srn, bondIndex, disposalIndex, mode)))
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

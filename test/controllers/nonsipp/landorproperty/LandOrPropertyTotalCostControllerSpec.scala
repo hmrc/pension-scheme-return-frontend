@@ -16,18 +16,17 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
-import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
 import models.NormalMode
 import controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController._
 
-class LandOrPropertyTotalCostControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyTotalCostControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyTotalCostController.onSubmit(srn, index, NormalMode)
 

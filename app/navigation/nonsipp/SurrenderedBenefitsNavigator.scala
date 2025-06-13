@@ -18,6 +18,7 @@ package navigation.nonsipp
 
 import play.api.mvc.Call
 import pages.Page
+import utils.IntUtils.toInt
 import navigation.JourneyNavigator
 import pages.nonsipp.membersurrenderedbenefits._
 import models.{NormalMode, UserAnswers}

@@ -27,11 +27,11 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito._
 import config.RefinedTypes.Max3
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 
-class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
+class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.TotalValueQuotedSharesCYAController.onPageLoad(srn)
   private lazy val onSubmit = routes.TotalValueQuotedSharesCYAController.onSubmit(srn)
@@ -125,19 +125,22 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[CYAWithRemove].apply(
-              viewModel(
-                srn,
-                Some(money),
-                Left(dateRange),
-                defaultSchemeDetails,
-                ViewOnlyMode,
-                Some(viewOnlyViewModel),
-                showBackLink = true
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[CYAWithRemove].apply(
+            viewModel(
+              srn,
+              Some(money),
+              Left(dateRange),
+              defaultSchemeDetails,
+              ViewOnlyMode,
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
+          )
         }.before(mockTaxYear(dateRange))
           .withName("OnPageLoadViewOnly renders ok with no changed flag")
       )
@@ -188,19 +191,22 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
         .unsafeSet(TotalValueQuotedSharesPage(srn), otherMoney)
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[CYAWithRemove].apply(
-              viewModel(
-                srn,
-                Some(otherMoney),
-                Left(dateRange),
-                defaultSchemeDetails,
-                ViewOnlyMode,
-                Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-                showBackLink = true
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = updatedUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[CYAWithRemove].apply(
+            viewModel(
+              srn,
+              Some(otherMoney),
+              Left(dateRange),
+              defaultSchemeDetails,
+              ViewOnlyMode,
+              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
+          )
         }.before(mockTaxYear(dateRange))
           .withName("OnPageLoadViewOnly renders ok with changed flag")
       )
@@ -211,9 +217,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
           controllers.nonsipp.routes.ViewOnlyTaskListController
             .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
         ).after(
-            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          )
-          .withName("Submit redirects to view only tasklist")
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        ).withName("Submit redirects to view only tasklist")
       )
 
       act.like(

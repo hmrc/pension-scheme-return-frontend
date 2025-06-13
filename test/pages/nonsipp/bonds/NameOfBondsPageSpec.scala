@@ -16,28 +16,27 @@
 
 package pages.nonsipp.bonds
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.UserAnswers
 import pages.nonsipp.bondsdisposal._
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class NameOfBondsPageSpec extends PageBehaviours with TestValues {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val index2 = refineMV[Max5000.Refined](2)
-  private val disposalIndex1 = refineMV[Max50.Refined](1)
-  private val disposalIndex2 = refineMV[Max50.Refined](2)
+  private val index = 1
+  private val index2 = 2
+  private val disposalIndex1 = 1
+  private val disposalIndex2 = 2
 
   "NameOfBondsPage" - {
 
-    beRetrievable[String](NameOfBondsPage(srn, refineMV(1)))
+    beRetrievable[String](NameOfBondsPage(srn, 1))
 
-    beSettable[String](NameOfBondsPage(srn, refineMV(1)))
+    beSettable[String](NameOfBondsPage(srn, 1))
 
-    beRemovable[String](NameOfBondsPage(srn, refineMV(1)))
+    beRemovable[String](NameOfBondsPage(srn, 1))
   }
 
   "cleanup list size of 1" - {

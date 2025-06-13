@@ -19,7 +19,7 @@ package controllers.nonsipp.declaration
 import services._
 import controllers.nonsipp.declaration.PspDeclarationController._
 import connectors.EmailConnector
-import controllers.{ControllerBaseSpec, TestUserAnswers}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
 import play.api.inject.bind
 import views.html.PsaIdInputView
 import forms.TextFormProvider
@@ -43,6 +43,7 @@ import java.time.LocalDateTime
 
 class PspDeclarationControllerSpec
     extends ControllerBaseSpec
+    with ControllerBehaviours
     with BeforeAndAfterEach
     with TestUserAnswers
     with CommonTestValues {
@@ -96,7 +97,7 @@ class PspDeclarationControllerSpec
 
     act.like(
       agreeAndContinue(onSubmit, populatedUserAnswers, emptyUserAnswers, "value" -> psaId.value)
-        .before({
+        .before {
           MockPsrSubmissionService.submitPsrDetails()
           MockEmailConnector.sendEmail(email, templateId)
           when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
@@ -106,14 +107,14 @@ class PspDeclarationControllerSpec
 
           when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
-        })
-        .after({
+        }
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           verify(mockEmailConnector, times(1))
             .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
           verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
           emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
-        })
+        }
         .withName("agree and continue should submit PSR details, send email and audit")
     )
 
@@ -125,34 +126,32 @@ class PspDeclarationControllerSpec
           .unsafeSet(LoansMadeOrOutstandingPage(srn), false),
         emptyUserAnswers,
         "value" -> psaId.value
-      ).before({
-          when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
-          when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
-          when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
-          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
-          when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
-            .thenReturn(Future.successful(AuditResult.Success))
-          when(
-            mockPsrRetrievalService
-              .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-          ).thenReturn(Future.successful(emptyUserAnswers))
-            .thenReturn(Future.successful(emptyUserAnswers))
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(versionsResponse))
-          MockPsrSubmissionService.submitPsrDetailsBypassed()
-          MockEmailConnector.sendEmail(email, templateId)
-        })
-        .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsBypassed(any(), any())(any(), any(), any())
-          verify(mockEmailConnector, times(1))
-            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
-          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-          emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
-        })
-        .withName(
-          "when there are no members in the previous returns, agree and continue should submit PSR details bypassed, send email and audit "
-        )
+      ).before {
+        when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
+        when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
+        when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
+        when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+        when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
+          .thenReturn(Future.successful(AuditResult.Success))
+        when(
+          mockPsrRetrievalService
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+        ).thenReturn(Future.successful(emptyUserAnswers))
+          .thenReturn(Future.successful(emptyUserAnswers))
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(versionsResponse))
+        MockPsrSubmissionService.submitPsrDetailsBypassed()
+        MockEmailConnector.sendEmail(email, templateId)
+      }.after {
+        verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, times(1)).submitPsrDetailsBypassed(any(), any())(any(), any(), any())
+        verify(mockEmailConnector, times(1))
+          .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
+        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+        emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
+      }.withName(
+        "when there are no members in the previous returns, agree and continue should submit PSR details bypassed, send email and audit "
+      )
     )
 
     act.like(
@@ -163,34 +162,32 @@ class PspDeclarationControllerSpec
           .unsafeSet(LoansMadeOrOutstandingPage(srn), false),
         emptyUserAnswers,
         "value" -> psaId.value
-      ).before({
-          when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
-          when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
-          when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
-          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
-          when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
-            .thenReturn(Future.successful(AuditResult.Success))
-          when(
-            mockPsrRetrievalService
-              .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-          ).thenReturn(Future.successful(fullUserAnswers))
-            .thenReturn(Future.successful(fullUserAnswers))
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(versionsResponse))
-          MockPsrSubmissionService.submitPsrDetails()
-          MockEmailConnector.sendEmail(email, templateId)
-        })
-        .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          verify(mockPsrSubmissionService, never).submitPsrDetailsBypassed(any(), any())(any(), any(), any())
-          verify(mockEmailConnector, times(1))
-            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
-          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-          emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
-        })
-        .withName(
-          "when there are members in the previous returns, agree and continue should submit PSR details, send email and audit "
-        )
+      ).before {
+        when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
+        when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
+        when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
+        when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+        when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
+          .thenReturn(Future.successful(AuditResult.Success))
+        when(
+          mockPsrRetrievalService
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+        ).thenReturn(Future.successful(fullUserAnswers))
+          .thenReturn(Future.successful(fullUserAnswers))
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(versionsResponse))
+        MockPsrSubmissionService.submitPsrDetails()
+        MockEmailConnector.sendEmail(email, templateId)
+      }.after {
+        verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never).submitPsrDetailsBypassed(any(), any())(any(), any(), any())
+        verify(mockEmailConnector, times(1))
+          .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
+        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+        emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
+      }.withName(
+        "when there are members in the previous returns, agree and continue should submit PSR details, send email and audit "
+      )
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

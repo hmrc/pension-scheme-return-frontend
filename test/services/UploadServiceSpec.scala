@@ -73,7 +73,7 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
     }
 
     "registerUploadResult should call updateStatus and return unit" in {
-      when(mockUploadRepository.updateStatus(any(), any())).thenReturn(Future.successful(UploadStatus.Failed))
+      when(mockUploadRepository.updateStatus(any(), any())).thenReturn(Future.successful(()))
       val result = service.registerUploadResult(reference, failure)
       result.futureValue mustBe ()
     }

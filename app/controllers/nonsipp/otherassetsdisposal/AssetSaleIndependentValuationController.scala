@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.SaveService
 import pages.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class AssetSaleIndependentValuationController @Inject()(
+class AssetSaleIndependentValuationController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -51,22 +52,21 @@ class AssetSaleIndependentValuationController @Inject()(
 
   private val form = AssetSaleIndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex)).fold(form)(form.fill)
       Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, mode)))
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode))))
-          },
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode)))),
           value =>
             for {
               updatedAnswers <- Future

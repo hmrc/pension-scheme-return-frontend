@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class SharesFromConnectedPartyController @Inject()(
+class SharesFromConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class SharesFromConnectedPartyController @Inject()(
 
   private val form = SharesFromConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { schemeHoldShare =>
         if (!schemeHoldShare.name.equals("01")) {
@@ -98,7 +99,7 @@ class SharesFromConnectedPartyController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).async { schemeHoldShare =>
         request.usingAnswer(CompanyNameRelatedSharesPage(srn, index)).async { companyName =>

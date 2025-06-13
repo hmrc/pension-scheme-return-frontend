@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import utils.ListUtils.ListOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import cats.implicits._
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
@@ -53,7 +54,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class ReportedSharesDisposalListController @Inject()(
+class ReportedSharesDisposalListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -104,8 +105,8 @@ class ReportedSharesDisposalListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -158,11 +159,10 @@ class ReportedSharesDisposalListController @Inject()(
           val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
-          val allSharesFullyDisposed: Boolean = completedDisposals.forall {
-            case (shareIndex, disposalIndexes) =>
-              disposalIndexes.exists { disposalIndex =>
-                request.userAnswers.get(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex)).contains(0)
-              }
+          val allSharesFullyDisposed: Boolean = completedDisposals.forall { case (shareIndex, disposalIndexes) =>
+            disposalIndexes.exists { disposalIndex =>
+              request.userAnswers.get(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex)).contains(0)
+            }
           }
 
           val maximumDisposalsReached = numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare ||
@@ -231,16 +231,15 @@ class ReportedSharesDisposalListController @Inject()(
         .map(_.merge)
   }
 
-  private def getSharesDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
-    implicit request: DataRequest[_]
+  private def getSharesDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
+    request: DataRequest[_]
   ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
     disposals
-      .map {
-        case indexes @ (index, _) =>
-          index -> request.userAnswers
-            .get(SharesCompleted(srn, index))
-            .toRight(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            .map(sharesDisposal => (indexes, sharesDisposal))
+      .map { case indexes @ (index, _) =>
+        index -> request.userAnswers
+          .get(SharesCompleted(srn, index))
+          .toRight(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          .map(sharesDisposal => (indexes, sharesDisposal))
       }
       .toList
       .sortBy { case (index, _) => index.value }
@@ -324,48 +323,47 @@ object ReportedSharesDisposalListController {
         )
       )
     } else {
-      disposals.flatMap {
-        case (shareIndex, disposalIndexes) =>
-          disposalIndexes.sortBy(_.value).map { disposalIndex =>
-            val sharesDisposalData = SharesDisposalData(
-              shareIndex,
-              disposalIndex,
-              userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
-              userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
-              userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
-            )
+      disposals.flatMap { case (shareIndex, disposalIndexes) =>
+        disposalIndexes.sortBy(_.value).map { disposalIndex =>
+          val sharesDisposalData = SharesDisposalData(
+            shareIndex,
+            disposalIndex,
+            userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
+            userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
+            userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
+          )
 
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
-                ListRow.view(
-                  buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
-                  routes.SharesDisposalCYAController
-                    .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, currentVersion, previousVersion)
-                    .url,
-                  buildMessage(
-                    "sharesDisposal.reportedSharesDisposalList.row.view.hidden",
-                    sharesDisposalData
-                  )
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
+              ListRow.view(
+                buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
+                routes.SharesDisposalCYAController
+                  .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, currentVersion, previousVersion)
+                  .url,
+                buildMessage(
+                  "sharesDisposal.reportedSharesDisposalList.row.view.hidden",
+                  sharesDisposalData
                 )
-              case (_, _) =>
-                ListRow(
-                  buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
-                  changeUrl = routes.SharesDisposalCYAController
-                    .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
-                    .url,
-                  changeHiddenText = buildMessage(
-                    "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
-                    sharesDisposalData
-                  ),
-                  removeUrl =
-                    routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
-                  removeHiddenText = buildMessage(
-                    "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
-                    sharesDisposalData
-                  )
+              )
+            case (_, _) =>
+              ListRow(
+                buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
+                changeUrl = routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+                  .url,
+                changeHiddenText = buildMessage(
+                  "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
+                  sharesDisposalData
+                ),
+                removeUrl =
+                  routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
+                removeHiddenText = buildMessage(
+                  "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
+                  sharesDisposalData
                 )
-            }
+              )
           }
+        }
       }.toList
     }
 
@@ -449,7 +447,7 @@ object ReportedSharesDisposalListController {
       }
     )
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare) {
         Message("sharesDisposal.reportedSharesDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals || allSharesFullyDisposed) {
@@ -458,7 +456,6 @@ object ReportedSharesDisposalListController {
       } else {
         Message("")
       }
-    }
 
     val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode &&
       numberOfDisposals < maxPossibleNumberOfDisposals && !allSharesFullyDisposed

@@ -20,7 +20,7 @@ import play.api.test.FakeRequest
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
 import models.HowDisposed.{Other, Sold, Transferred}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import pages.nonsipp.bondsdisposal._
@@ -62,7 +62,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         costOfBonds = money.value,
         optConnectedPartyStatus = Some(true),
         bondsUnregulated = false,
-        optTotalIncomeOrReceipts = None, //not coming back from ETMP
+        optTotalIncomeOrReceipts = None, // not coming back from ETMP
         optBondsDisposed = None
       )
     )
@@ -102,15 +102,15 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         val userAnswers = emptyUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           .unsafeSet(BondsRecordVersionPage(srn), "001")
-          .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "nameOfBonds")
-          .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(1)), Acquisition)
-          .unsafeSet(CostOfBondsPage(srn, refineMV(1)), money)
-          .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(1)), true)
-          .unsafeSet(IncomeFromBondsPage(srn, refineMV(1)), money)
-          .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(1)), localDate)
-          .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(1)), false)
-          .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(NameOfBondsPage(srn, 1), "nameOfBonds")
+          .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfBondsPage(srn, 1), money)
+          .unsafeSet(AreBondsUnregulatedPage(srn, 1), true)
+          .unsafeSet(IncomeFromBondsPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, 1), localDate)
+          .unsafeSet(BondsFromConnectedPartyPage(srn, 1), false)
+          .unsafeSet(BondsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -142,25 +142,25 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           .unsafeSet(BondsDisposalPage(srn), true)
           .unsafeSet(BondsRecordVersionPage(srn), "001")
-          .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "nameOfBonds")
-          .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(1)), Acquisition)
-          .unsafeSet(CostOfBondsPage(srn, refineMV(1)), money)
-          .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(1)), true)
-          .unsafeSet(IncomeFromBondsPage(srn, refineMV(1)), money)
-          .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(1)), localDate)
-          .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(1)), false)
-          .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(1)), Sold)
-          .unsafeSet(BondsStillHeldPage(srn, refineMV(1), refineMV(1)), 1)
-          .unsafeSet(BondsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-          .unsafeSet(WhenWereBondsSoldPage(srn, refineMV(1), refineMV(1)), localDate)
-          .unsafeSet(TotalConsiderationSaleBondsPage(srn, refineMV(1), refineMV(1)), money)
-          .unsafeSet(BuyerNamePage(srn, refineMV(1), refineMV(1)), "BuyerName")
-          .unsafeSet(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)), false)
-          .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(2)), Other("OtherMethod"))
-          .unsafeSet(BondsStillHeldPage(srn, refineMV(1), refineMV(2)), 2)
-          .unsafeSet(BondsDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
-          .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(NameOfBondsPage(srn, 1), "nameOfBonds")
+          .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfBondsPage(srn, 1), money)
+          .unsafeSet(AreBondsUnregulatedPage(srn, 1), true)
+          .unsafeSet(IncomeFromBondsPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, 1), localDate)
+          .unsafeSet(BondsFromConnectedPartyPage(srn, 1), false)
+          .unsafeSet(HowWereBondsDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(BondsStillHeldPage(srn, 1, 1), 1)
+          .unsafeSet(BondsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(WhenWereBondsSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleBondsPage(srn, 1, 1), money)
+          .unsafeSet(BuyerNamePage(srn, 1, 1), "BuyerName")
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), false)
+          .unsafeSet(HowWereBondsDisposedOfPage(srn, 1, 2), Other("OtherMethod"))
+          .unsafeSet(BondsStillHeldPage(srn, 1, 2), 2)
+          .unsafeSet(BondsDisposalProgress(srn, 1, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(BondsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -230,21 +230,21 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       val userAnswers = emptyUserAnswers
         .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
         .unsafeSet(BondsRecordVersionPage(srn), "001")
-        .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "incomplete")
-        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(1)), Acquisition)
-        .unsafeSet(CostOfBondsPage(srn, refineMV(1)), money)
-        .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(1)), true)
-        .unsafeSet(IncomeFromBondsPage(srn, refineMV(1)), money)
-        .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.InProgress("someUrl"))
-        .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "nameOfBonds")
-        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(2)), Acquisition)
-        .unsafeSet(CostOfBondsPage(srn, refineMV(2)), money)
-        .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(2)), true)
-        .unsafeSet(IncomeFromBondsPage(srn, refineMV(2)), money)
-        .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(2)), localDate)
-        .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(2)), false)
-        .unsafeSet(BondsCompleted(srn, refineMV(2)), SectionCompleted)
-        .unsafeSet(BondsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+        .unsafeSet(NameOfBondsPage(srn, 1), "incomplete")
+        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, 1), Acquisition)
+        .unsafeSet(CostOfBondsPage(srn, 1), money)
+        .unsafeSet(AreBondsUnregulatedPage(srn, 1), true)
+        .unsafeSet(IncomeFromBondsPage(srn, 1), money)
+        .unsafeSet(BondsProgress(srn, 1), SectionJourneyStatus.InProgress("someUrl"))
+        .unsafeSet(NameOfBondsPage(srn, 2), "nameOfBonds")
+        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, 2), Acquisition)
+        .unsafeSet(CostOfBondsPage(srn, 2), money)
+        .unsafeSet(AreBondsUnregulatedPage(srn, 2), true)
+        .unsafeSet(IncomeFromBondsPage(srn, 2), money)
+        .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, 2), localDate)
+        .unsafeSet(BondsFromConnectedPartyPage(srn, 2), false)
+        .unsafeSet(BondsCompleted(srn, 2), SectionCompleted)
+        .unsafeSet(BondsProgress(srn, 2), SectionJourneyStatus.Completed)
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -354,23 +354,23 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(BondsRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn)) mustBe Some(true)
           userAnswers.get(BondsDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(NameOfBondsPage(srn, refineMV(1))) mustBe Some("nameOfBonds")
-          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, refineMV(1))) mustBe Some(Contribution)
-          userAnswers.get(CostOfBondsPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(AreBondsUnregulatedPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(BondsFromConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(BondsCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
-          userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(1)
-          userAnswers.get(WhenWereBondsSoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(TotalConsiderationSaleBondsPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(BuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some("BondsPurchaserName")
-          userAnswers.get(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(2))) mustBe Some(Transferred)
-          userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(2))) mustBe Some(2)
-          userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(3))) mustBe Some(Other("OtherMethod"))
-          userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(3))) mustBe Some(3)
+          userAnswers.get(NameOfBondsPage(srn, 1)) mustBe Some("nameOfBonds")
+          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, 1)) mustBe Some(Contribution)
+          userAnswers.get(CostOfBondsPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(AreBondsUnregulatedPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(BondsFromConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(BondsCompleted(srn, 1)) mustBe Some(SectionCompleted)
+          userAnswers.get(HowWereBondsDisposedOfPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(BondsStillHeldPage(srn, 1, 1)) mustBe Some(1)
+          userAnswers.get(WhenWereBondsSoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(TotalConsiderationSaleBondsPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(BuyerNamePage(srn, 1, 1)) mustBe Some("BondsPurchaserName")
+          userAnswers.get(IsBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(HowWereBondsDisposedOfPage(srn, 1, 2)) mustBe Some(Transferred)
+          userAnswers.get(BondsStillHeldPage(srn, 1, 2)) mustBe Some(2)
+          userAnswers.get(HowWereBondsDisposedOfPage(srn, 1, 3)) mustBe Some(Other("OtherMethod"))
+          userAnswers.get(BondsStillHeldPage(srn, 1, 3)) mustBe Some(3)
         }
       )
     }
@@ -391,9 +391,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(IncomeFromBondsPage(srn, 1)) mustBe None
       )
     }
 
@@ -413,9 +411,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
-        }
+        userAnswers => userAnswers.get(IncomeFromBondsPage(srn, 1)) mustBe Some(moneyZero)
       )
     }
 
@@ -436,9 +432,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
-        }
+        userAnswers => userAnswers.get(IncomeFromBondsPage(srn, 1)) mustBe Some(moneyZero)
       )
     }
 
@@ -472,14 +466,14 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(BondsRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn)) mustBe Some(true)
           userAnswers.get(BondsDisposalPage(srn)) mustBe Some(true)
-          userAnswers.get(NameOfBondsPage(srn, refineMV(1))) mustBe Some("nameOfBonds")
-          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, refineMV(1))) mustBe Some(Contribution)
-          userAnswers.get(CostOfBondsPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(AreBondsUnregulatedPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(BondsFromConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(BondsCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
-          userAnswers.get(BondsProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
+          userAnswers.get(NameOfBondsPage(srn, 1)) mustBe Some("nameOfBonds")
+          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, 1)) mustBe Some(Contribution)
+          userAnswers.get(CostOfBondsPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(AreBondsUnregulatedPage(srn, 1)) mustBe Some(false)
+          userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(BondsFromConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(BondsCompleted(srn, 1)) mustBe Some(SectionCompleted)
+          userAnswers.get(BondsProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }

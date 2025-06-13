@@ -21,12 +21,15 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.DateTimeUtils
 import viewmodels.implicits._
 import play.api.mvc.Call
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import pages.nonsipp.WhichTaxYearPage
 import models.NormalMode
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 
-class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks { self =>
+class CheckReturnDatesControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with ScalaCheckPropertyChecks { self =>
 
   private implicit val mockSaveService: SaveService = mock[SaveService]
 

@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RecipientSponsoringEmployerConnectedPartyController @Inject()(
+class RecipientSponsoringEmployerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
 
   val form: Form[SponsoringOrConnectedParty] = RecipientSponsoringEmployerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       recipientName(srn, index)
         .map { recipientName =>
@@ -69,7 +70,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -96,9 +97,9 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
                 .nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield {
-              Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers))
-            }
+            } yield Redirect(
+              navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers)
+            )
         )
   }
 

@@ -18,33 +18,32 @@ package controllers.nonsipp.memberdetails
 
 import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.toRefined300
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import controllers.nonsipp.memberdetails.routes
-import controllers.ControllerBaseSpec
 
-class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
+class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, 1, NormalMode)
 
   private val userAnswersWithMemberDetails =
-    defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
+    defaultUserAnswers.set(MemberDetailsPage(srn, 1), memberDetails).success.value
 
   "NationalInsuranceNumberController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithMemberDetails) { implicit app => implicit request =>
       val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName)
-      injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
+      injected[YesNoPageView].apply(preparedForm, viewModel(1, memberDetails.fullName, srn, NormalMode))
     })
 
     act.like(
-      renderPrePopView(onPageLoad, DoesMemberHaveNinoPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
+      renderPrePopView(onPageLoad, DoesMemberHaveNinoPage(srn, 1), true, userAnswersWithMemberDetails) {
         implicit app => implicit request =>
           val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
-          injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
+          injected[YesNoPageView].apply(preparedForm, viewModel(1, memberDetails.fullName, srn, NormalMode))
       }
     )
 

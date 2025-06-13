@@ -20,7 +20,9 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
 import config.Constants
+import utils.IntUtils.toRefined5000
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -28,8 +30,6 @@ import forms.DatePageFormProvider
 import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import forms.mappings.errors.DateFormErrors
-import config.RefinedTypes.Max5000
-import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
@@ -45,7 +45,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class WhenDidSchemeAcquireBondsController @Inject()(
+class WhenDidSchemeAcquireBondsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -62,18 +62,17 @@ class WhenDidSchemeAcquireBondsController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenDidSchemeAcquireBondsController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        val preparedForm = {
+        val preparedForm =
           request.userAnswers.fillForm(WhenDidSchemeAcquireBondsPage(srn, index), form(date.to, request))
-        }
         Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName)))
 
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to, request)
@@ -131,7 +130,7 @@ object WhenDidSchemeAcquireBondsController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     schemeName: String
   ): FormPageViewModel[DatePageViewModel] =

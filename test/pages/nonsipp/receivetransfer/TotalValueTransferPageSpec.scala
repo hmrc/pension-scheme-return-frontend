@@ -16,8 +16,7 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -27,8 +26,8 @@ class TotalValueTransferPageSpec extends PageBehaviours {
 
   "TotalValueTransferPage" - {
 
-    val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max5.Refined](1)
+    val index = 1
+    val secondaryIndex = 1
 
     beRetrievable[Money](TotalValueTransferPage(srn, index, secondaryIndex))
 

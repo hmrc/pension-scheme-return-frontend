@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import controllers.nonsipp.shares.SharesCheckAndUpdateController._
 import viewmodels.implicits._
 import com.google.inject.Inject
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import models._
 import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
@@ -33,14 +34,14 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
 import viewmodels.models._
 
-class SharesCheckAndUpdateController @Inject()(
+class SharesCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
         typeOfShares <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney
@@ -60,7 +61,7 @@ class SharesCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode))
   }
 }

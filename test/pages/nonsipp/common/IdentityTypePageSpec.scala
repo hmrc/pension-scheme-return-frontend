@@ -16,21 +16,20 @@
 
 package pages.nonsipp.common
 
-import config.RefinedTypes.OneTo5000
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
 import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansMadeOrOutstandingPage, LoansProgress}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 
 import java.time.LocalDate
 
 class IdentityTypePageSpec extends PageBehaviours {
-  private val indexOne = refineMV[OneTo5000](1)
-  private val indexTwo = refineMV[OneTo5000](2)
-  private val indexThree = refineMV[OneTo5000](3)
+  private val indexOne = 1
+  private val indexTwo = 2
+  private val indexThree = 3
 
   private val srn = srnGen.sample.value
 
@@ -74,7 +73,10 @@ class IdentityTypePageSpec extends PageBehaviours {
                 CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LandOrPropertySeller),
                 ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
               )
-              .unsafeSet(IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
+              .unsafeSet(
+                IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient),
+                IdentityType.UKCompany
+              ) // part of loans journey
               .unsafeSet(LandPropertyInUKPage(srn, indexOne), true) // part of land or property journey
               .unsafeSet(LoansMadeOrOutstandingPage(srn), true) // part of loans journey
 
@@ -114,8 +116,14 @@ class IdentityTypePageSpec extends PageBehaviours {
             .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true) // part of land or property journey
             .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
             .unsafeSet(DatePeriodLoanPage(srn, indexTwo), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-            .unsafeSet(IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
-            .unsafeSet(IdentityTypePage(srn, indexTwo, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
+            .unsafeSet(
+              IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient),
+              IdentityType.UKCompany
+            ) // part of loans journey
+            .unsafeSet(
+              IdentityTypePage(srn, indexTwo, IdentitySubject.LoanRecipient),
+              IdentityType.UKCompany
+            ) // part of loans journey
             .unsafeSet(
               CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LoanRecipient),
               ConditionalYesNo.yes[String, Crn](crnGen.sample.value)

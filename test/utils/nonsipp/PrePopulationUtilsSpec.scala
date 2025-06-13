@@ -19,13 +19,13 @@ package utils.nonsipp
 import play.api.test.FakeRequest
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import org.scalatest.OptionValues
 import models.requests.DataRequest
 import utils.nonsipp.PrePopulationUtils._
 import config.Constants.PREPOPULATION_FLAG
 
-class PrePopulationUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
+class PrePopulationUtilsSpec extends ControllerBaseSpec with ControllerBehaviours with Matchers with OptionValues {
 
   implicit val request: DataRequest[AnyContentAsEmpty.type] =
     DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, defaultUserAnswers)

@@ -28,8 +28,7 @@ import org.scalatest.OptionValues
 
 import java.time.{LocalDate, LocalDateTime}
 
-trait TestUserAnswers extends ControllerBaseSpec with TestValues {
-  _: OptionValues =>
+trait TestUserAnswers extends ControllerBaseSpec with ControllerBehaviours with TestValues with OptionValues {
   // Test data for various UserAnswers
   val currentReturnTaxYear: DateRange = DateRange(
     from = LocalDate.of(2022, 4, 6),

@@ -71,9 +71,8 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
           case p: Product =>
             p.productElementNames
               .zip(p.productIterator)
-              .map {
-                case (name, value) =>
-                  s"$name: ${value.toString}"
+              .map { case (name, value) =>
+                s"$name: ${value.toString}"
               }
               .mkString(", ")
           case _ => "No parameters available"
@@ -111,17 +110,16 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
 
   def getSubmitter(response: PsrVersionsResponse): String = {
     val emptySubmitterName = ""
-    response.reportSubmitterDetails.fold(emptySubmitterName)(
-      submitter =>
-        submitter.individualDetails match {
-          case Some(individualDetails: IndividualDetails) =>
-            individualDetails.firstName + " " + individualDetails.lastName
-          case None =>
-            submitter.organisationOrPartnershipDetails match {
-              case Some(orgDetails) => orgDetails.organisationOrPartnershipName
-              case None => emptySubmitterName
-            }
-        }
+    response.reportSubmitterDetails.fold(emptySubmitterName)(submitter =>
+      submitter.individualDetails match {
+        case Some(individualDetails: IndividualDetails) =>
+          individualDetails.firstName + " " + individualDetails.lastName
+        case None =>
+          submitter.organisationOrPartnershipDetails match {
+            case Some(orgDetails) => orgDetails.organisationOrPartnershipName
+            case None => emptySubmitterName
+          }
+      }
     )
   }
 
@@ -184,7 +182,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
   }
 
   implicit class ListIndexOps[A](l: List[A]) {
-    def zipWithRefinedIndex[I: Validate[Int, *]]: Either[Result, List[(Refined[Int, I], A)]] =
+    def zipWithRefinedIndex[I](using Validate[Int, I]): Either[Result, List[(Refined[Int, I], A)]] =
       l.zipWithIndex.traverse { case (a, index) => refineIndex(index).map(_ -> a).getOrRecoverJourney }
   }
 
@@ -199,15 +197,14 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     def buildMemberDetails(srn: Srn, index: Max300): Option[MemberPersonalDetails] =
       userAnswers
         .get(MemberDetailsPage(srn, index))
-        .map(
-          memberDetails =>
-            MemberPersonalDetails(
-              firstName = memberDetails.firstName,
-              lastName = memberDetails.lastName,
-              nino = userAnswers.get(MemberDetailsNinoPage(srn, index)).map(_.value),
-              reasonNoNINO = userAnswers.get(NoNINOPage(srn, index)),
-              dateOfBirth = memberDetails.dob
-            )
+        .map(memberDetails =>
+          MemberPersonalDetails(
+            firstName = memberDetails.firstName,
+            lastName = memberDetails.lastName,
+            nino = userAnswers.get(MemberDetailsNinoPage(srn, index)).map(_.value),
+            reasonNoNINO = userAnswers.get(NoNINOPage(srn, index)),
+            dateOfBirth = memberDetails.dob
+          )
         )
 
     def buildEmployerContributions(
@@ -221,32 +218,31 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
           .toList
           .flatMap(_.toIntOption.flatMap(i => refineV[Max50.Refined](i + 1).leftMap(new Exception(_)).toOption))
 
-      secondaryIndexes.traverse(
-        secondaryIndex =>
-          for {
-            employerName <- userAnswers.get(EmployerNamePage(srn, index, secondaryIndex))
-            identityType <- userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
-            employerType <- identityType match {
-              case IdentityType.Individual => None
-              case IdentityType.UKCompany =>
-                userAnswers
-                  .get(EmployerCompanyCrnPage(srn, index, secondaryIndex))
-                  .map(v => EmployerType.UKCompany(v.value.map(_.value)))
-              case IdentityType.UKPartnership =>
-                userAnswers
-                  .get(PartnershipEmployerUtrPage(srn, index, secondaryIndex))
-                  .map(v => EmployerType.UKPartnership(v.value.map(_.value)))
-              case IdentityType.Other =>
-                userAnswers
-                  .get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex))
-                  .map(EmployerType.Other)
-            }
-            total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
-          } yield EmployerContributions(
-            employerName,
-            employerType,
-            totalTransferValue = total.value
-          )
+      secondaryIndexes.traverse(secondaryIndex =>
+        for {
+          employerName <- userAnswers.get(EmployerNamePage(srn, index, secondaryIndex))
+          identityType <- userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
+          employerType <- identityType match {
+            case IdentityType.Individual => None
+            case IdentityType.UKCompany =>
+              userAnswers
+                .get(EmployerCompanyCrnPage(srn, index, secondaryIndex))
+                .map(v => EmployerType.UKCompany(v.value.map(_.value)))
+            case IdentityType.UKPartnership =>
+              userAnswers
+                .get(PartnershipEmployerUtrPage(srn, index, secondaryIndex))
+                .map(v => EmployerType.UKPartnership(v.value.map(_.value)))
+            case IdentityType.Other =>
+              userAnswers
+                .get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex))
+                .map(EmployerType.Other)
+          }
+          total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
+        } yield EmployerContributions(
+          employerName,
+          employerType,
+          totalTransferValue = total.value
+        )
       )
     }
 
@@ -261,21 +257,20 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
           .toList
           .flatMap(_.toIntOption.flatMap(i => refineV[Max5.Refined](i + 1).leftMap(new Exception(_)).toOption))
 
-      secondaryIndexes.traverse(
-        secondaryIndex =>
-          for {
-            schemeName <- userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
-            dateOfTransfer <- userAnswers.get(WhenWasTransferReceivedPage(srn, index, secondaryIndex))
-            transferValue <- userAnswers.get(TotalValueTransferPage(srn, index, secondaryIndex))
-            transferIncludedAsset <- userAnswers.get(DidTransferIncludeAssetPage(srn, index, secondaryIndex))
-            transferSchemeType <- userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
-          } yield TransfersIn(
-            schemeName = schemeName,
-            dateOfTransfer = dateOfTransfer,
-            transferSchemeType = transferSchemeType,
-            transferValue = transferValue.value,
-            transferIncludedAsset = transferIncludedAsset
-          )
+      secondaryIndexes.traverse(secondaryIndex =>
+        for {
+          schemeName <- userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+          dateOfTransfer <- userAnswers.get(WhenWasTransferReceivedPage(srn, index, secondaryIndex))
+          transferValue <- userAnswers.get(TotalValueTransferPage(srn, index, secondaryIndex))
+          transferIncludedAsset <- userAnswers.get(DidTransferIncludeAssetPage(srn, index, secondaryIndex))
+          transferSchemeType <- userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
+        } yield TransfersIn(
+          schemeName = schemeName,
+          dateOfTransfer = dateOfTransfer,
+          transferSchemeType = transferSchemeType,
+          transferValue = transferValue.value,
+          transferIncludedAsset = transferIncludedAsset
+        )
       )
     }
 
@@ -290,17 +285,16 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
           .toList
           .flatMap(_.toIntOption.flatMap(i => refineV[Max5.Refined](i + 1).leftMap(new Exception(_)).toOption))
 
-      secondaryIndexes.traverse(
-        secondaryIndex =>
-          for {
-            schemeName <- userAnswers.get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
-            dateOfTransfer <- userAnswers.get(WhenWasTransferMadePage(srn, index, secondaryIndex))
-            transferSchemeType <- userAnswers.get(ReceivingSchemeTypePage(srn, index, secondaryIndex))
-          } yield TransfersOut(
-            schemeName = schemeName,
-            dateOfTransfer = dateOfTransfer,
-            transferSchemeType = transferSchemeType
-          )
+      secondaryIndexes.traverse(secondaryIndex =>
+        for {
+          schemeName <- userAnswers.get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
+          dateOfTransfer <- userAnswers.get(WhenWasTransferMadePage(srn, index, secondaryIndex))
+          transferSchemeType <- userAnswers.get(ReceivingSchemeTypePage(srn, index, secondaryIndex))
+        } yield TransfersOut(
+          schemeName = schemeName,
+          dateOfTransfer = dateOfTransfer,
+          transferSchemeType = transferSchemeType
+        )
       )
     }
 

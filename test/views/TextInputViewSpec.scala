@@ -21,7 +21,7 @@ import views.html.TextInputView
 import play.api.data
 import viewmodels.models.TextInputViewModel
 
-class TextInputViewSpec extends ViewSpec with Mappings {
+class TextInputViewSpec extends ViewSpec with ViewBehaviours with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[TextInputView]

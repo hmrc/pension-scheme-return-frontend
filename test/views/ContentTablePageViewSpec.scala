@@ -19,7 +19,7 @@ package views
 import views.html.ContentTablePageView
 import viewmodels.models.ContentTablePageViewModel
 
-class ContentTablePageViewSpec extends ViewSpec {
+class ContentTablePageViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     val view = injected[ContentTablePageView]
@@ -44,8 +44,8 @@ class ContentTablePageViewSpec extends ViewSpec {
 
       "render the table rows" in {
         forAll(viewModelGen) { viewModel =>
-          tr(view(viewModel)) must contain allElementsOf viewModel.page.rows.map {
-            case (k, v) => List(messageKey(k), messageKey(v))
+          tr(view(viewModel)) must contain allElementsOf viewModel.page.rows.map { case (k, v) =>
+            List(messageKey(k), messageKey(v))
           }
         }
       }

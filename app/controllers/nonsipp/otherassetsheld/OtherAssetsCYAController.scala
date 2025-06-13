@@ -21,6 +21,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.common._
@@ -47,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class OtherAssetsCYAController @Inject()(
+class OtherAssetsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -58,10 +59,10 @@ class OtherAssetsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       if (request.userAnswers.get(OtherAssetsProgress(srn, index)).contains(Completed)) {
-        //Clear any PointOfEntry
+        // Clear any PointOfEntry
         saveService.save(
           request.userAnswers
             .set(OtherAssetsCYAPointOfEntry(srn, index), NoPointOfEntry)
@@ -73,7 +74,7 @@ class OtherAssetsCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -212,7 +213,7 @@ class OtherAssetsCYAController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index))
       for {
@@ -412,19 +413,18 @@ object OtherAssetsCYAController {
             ).withVisuallyHiddenContent(Message("otherAssets.cya.section1.baseRow3.hidden", schemeName))
           )
         ) :?+
-          acquisitionOrContributionDate.map(
-            date =>
-              CheckYourAnswersRowViewModel(
-                Message("otherAssets.cya.section1.conditionalRow1.key", schemeName),
-                date.show
-              ).withAction(
-                SummaryAction(
-                  "site.change",
-                  controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                    .onPageLoad(srn, index, CheckMode)
-                    .url
-                ).withVisuallyHiddenContent(Message("otherAssets.cya.section1.conditionalRow1.hidden", schemeName))
-              )
+          acquisitionOrContributionDate.map(date =>
+            CheckYourAnswersRowViewModel(
+              Message("otherAssets.cya.section1.conditionalRow1.key", schemeName),
+              date.show
+            ).withAction(
+              SummaryAction(
+                "site.change",
+                controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+                  .onPageLoad(srn, index, CheckMode)
+                  .url
+              ).withVisuallyHiddenContent(Message("otherAssets.cya.section1.conditionalRow1.hidden", schemeName))
+            )
           ) :+
           CheckYourAnswersRowViewModel(
             Message("otherAssets.cya.section1.baseRow4.key"),
@@ -437,19 +437,18 @@ object OtherAssetsCYAController {
                 .url
             ).withVisuallyHiddenContent("otherAssets.cya.section1.baseRow4.hidden")
           ) :?+
-          isIndependentValuation.map(
-            isIndependentValuation =>
-              CheckYourAnswersRowViewModel(
-                Message("otherAssets.cya.section1.conditionalRow2.key"),
-                if (isIndependentValuation) "site.yes" else "site.no"
-              ).withAction(
-                SummaryAction(
-                  "site.change",
-                  controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                    .onPageLoad(srn, index, CheckMode)
-                    .url
-                ).withVisuallyHiddenContent("otherAssets.cya.section1.conditionalRow2.hidden")
-              )
+          isIndependentValuation.map(isIndependentValuation =>
+            CheckYourAnswersRowViewModel(
+              Message("otherAssets.cya.section1.conditionalRow2.key"),
+              if (isIndependentValuation) "site.yes" else "site.no"
+            ).withAction(
+              SummaryAction(
+                "site.change",
+                controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
+                  .onPageLoad(srn, index, CheckMode)
+                  .url
+              ).withVisuallyHiddenContent("otherAssets.cya.section1.conditionalRow2.hidden")
+            )
           ) :+
           CheckYourAnswersRowViewModel(
             Message("otherAssets.cya.section1.baseRow5.key"),
@@ -557,26 +556,24 @@ object OtherAssetsCYAController {
               sellerNameUrl
             ).withVisuallyHiddenContent("otherAssets.cya.section2.baseRow2.hidden")
           )
-        ) :?+ sellerDetails.map(
-          details =>
-            CheckYourAnswersRowViewModel(
-              Message("otherAssets.cya.section2.conditionalRow1.details.key", sellerName, sellerDetailsType),
-              details
-            ).withAction(
-              SummaryAction("site.change", sellerDetailsUrl)
-                .withVisuallyHiddenContent(
-                  Message("otherAssets.cya.section2.conditionalRow1.details.hidden", sellerDetailsType)
-                )
-            )
-        ) :?+ sellerReasonNoDetails.map(
-          reasonNoDetails =>
-            CheckYourAnswersRowViewModel(
-              Message("otherAssets.cya.section2.conditionalRow1.noDetails.key", sellerName, sellerDetailsType),
-              reasonNoDetails
-            ).withAction(
-              SummaryAction("site.change", sellerDetailsUrl)
-                .withVisuallyHiddenContent(sellerNoDetailsHiddenText)
-            )
+        ) :?+ sellerDetails.map(details =>
+          CheckYourAnswersRowViewModel(
+            Message("otherAssets.cya.section2.conditionalRow1.details.key", sellerName, sellerDetailsType),
+            details
+          ).withAction(
+            SummaryAction("site.change", sellerDetailsUrl)
+              .withVisuallyHiddenContent(
+                Message("otherAssets.cya.section2.conditionalRow1.details.hidden", sellerDetailsType)
+              )
+          )
+        ) :?+ sellerReasonNoDetails.map(reasonNoDetails =>
+          CheckYourAnswersRowViewModel(
+            Message("otherAssets.cya.section2.conditionalRow1.noDetails.key", sellerName, sellerDetailsType),
+            reasonNoDetails
+          ).withAction(
+            SummaryAction("site.change", sellerDetailsUrl)
+              .withVisuallyHiddenContent(sellerNoDetailsHiddenText)
+          )
         ) :+
           CheckYourAnswersRowViewModel(
             Message("otherAssets.cya.section2.baseRow3.key", sellerName),

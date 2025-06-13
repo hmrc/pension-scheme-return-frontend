@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
@@ -28,7 +27,7 @@ class IndividualSellerNiPageSpec extends PageBehaviours {
 
   "IndividualSellerNiPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[ConditionalYesNo[String, Nino]](
       IndividualSellerNiPage(srn, index)

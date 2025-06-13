@@ -18,9 +18,10 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import services.{PsrSubmissionService, SchemeDateService}
 import models.ConditionalYesNo._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
@@ -30,10 +31,8 @@ import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class LoansCYAControllerSpec extends ControllerBaseSpec {
+class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -48,7 +47,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
   }
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val page = 1
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.LoanRecipient
@@ -131,10 +130,10 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in ${mode.toString} mode")
       )
 
@@ -223,9 +222,8 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to loans list page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to loans list page")
     )
   }
 }

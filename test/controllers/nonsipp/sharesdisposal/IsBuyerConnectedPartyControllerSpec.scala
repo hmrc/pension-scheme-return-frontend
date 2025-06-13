@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
 import controllers.nonsipp.sharesdisposal.IsBuyerConnectedPartyController._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val shareIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.IsBuyerConnectedPartyController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -53,32 +52,31 @@ class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
       ("individual", individualUserAnswers),
       ("company", companyUserAnswers),
       ("partnership", partnershipUserAnswers)
-    ).foreach {
-      case (testScenario, userAnswers) =>
-        act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    ).foreach { case (testScenario, userAnswers) =>
+      act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+        injected[YesNoPageView]
+          .apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(srn, shareIndex, disposalIndex, buyerName, NormalMode)
+          )
+      }.updateName(_ + s" as $testScenario"))
+
+      act.like(
+        renderPrePopView(
+          onPageLoad,
+          IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
+          true,
+          userAnswers
+        ) { implicit app => implicit request =>
           injected[YesNoPageView]
             .apply(
-              form(injected[YesNoPageFormProvider]),
+              form(injected[YesNoPageFormProvider]).fill(true),
               viewModel(srn, shareIndex, disposalIndex, buyerName, NormalMode)
             )
-        }.updateName(_ + s" as $testScenario"))
+        }.updateName(_ + s" as $testScenario")
+      )
 
-        act.like(
-          renderPrePopView(
-            onPageLoad,
-            IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
-            true,
-            userAnswers
-          ) { implicit app => implicit request =>
-            injected[YesNoPageView]
-              .apply(
-                form(injected[YesNoPageFormProvider]).fill(true),
-                viewModel(srn, shareIndex, disposalIndex, buyerName, NormalMode)
-              )
-          }.updateName(_ + s" as $testScenario")
-        )
-
-        act.like(invalidForm(onSubmit, userAnswers).updateName(_ + s" as $testScenario"))
+      act.like(invalidForm(onSubmit, userAnswers).updateName(_ + s" as $testScenario"))
     }
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))

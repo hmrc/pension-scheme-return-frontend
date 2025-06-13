@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController._
 import models.NormalMode
 
-class FileUploadErrorMissingInformationControllerSpec extends ControllerBaseSpec {
+class FileUploadErrorMissingInformationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.FileUploadErrorMissingInformationController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.FileUploadErrorMissingInformationController.onSubmit(srn, NormalMode)

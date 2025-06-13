@@ -19,6 +19,7 @@ package controllers.nonsipp.bondsdisposal
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
 import forms.MoneyFormProvider
@@ -40,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalConsiderationSaleBondsController @Inject()(
+class TotalConsiderationSaleBondsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -53,7 +54,7 @@ class TotalConsiderationSaleBondsController @Inject()(
 
   private val form = TotalConsiderationSaleBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex), form)
@@ -61,12 +62,12 @@ class TotalConsiderationSaleBondsController @Inject()(
       Ok(view(preparedForm, viewModel(srn, bondIndex, disposalIndex, form, mode)))
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future.successful(
               BadRequest(
                 view(
@@ -74,8 +75,7 @@ class TotalConsiderationSaleBondsController @Inject()(
                   viewModel(srn, bondIndex, disposalIndex, form, mode)
                 )
               )
-            )
-          },
+            ),
           value =>
             for {
               updatedAnswers <- Future

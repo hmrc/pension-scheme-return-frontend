@@ -16,9 +16,10 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.PostcodeLookupView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.AddressLookupFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
@@ -26,14 +27,12 @@ import services.AddressService
 import controllers.nonsipp.landorproperty.LandOrPropertyPostcodeLookupController._
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class LandOrPropertyPostcodeLookupControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyPostcodeLookupControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.LandOrPropertyPostcodeLookupController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyPostcodeLookupController.onSubmit(srn, index, NormalMode)

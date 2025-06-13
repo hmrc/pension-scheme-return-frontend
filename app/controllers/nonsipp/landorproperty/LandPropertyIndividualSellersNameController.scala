@@ -20,7 +20,6 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -28,6 +27,8 @@ import models.Mode
 import play.api.data.Form
 import views.html.TextInputView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
@@ -37,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandPropertyIndividualSellersNameController @Inject()(
+class LandPropertyIndividualSellersNameController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -51,7 +52,7 @@ class LandPropertyIndividualSellersNameController @Inject()(
 
   private def form = LandPropertyIndividualSellersNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
@@ -61,7 +62,7 @@ class LandPropertyIndividualSellersNameController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -70,7 +71,7 @@ class LandPropertyIndividualSellersNameController @Inject()(
             Future.successful(
               BadRequest(view(formWithErrors, LandPropertyIndividualSellersNameController.viewModel(srn, index, mode)))
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(LandPropertyIndividualSellersNamePage(srn, index), answer))
@@ -78,7 +79,6 @@ class LandPropertyIndividualSellersNameController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
   }
 }

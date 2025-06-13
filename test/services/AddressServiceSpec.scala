@@ -72,13 +72,19 @@ class AddressServiceSpec extends BaseSpec with TestValues {
       addresses(4) mustEqual ("Flat 3", Some("9 Haughton Road"), Some("Haughton Road"), Some(9), Some(3), Some("Flat"))
       addresses(5) mustEqual ("11 Haughton Road", None, Some("Haughton Road"), Some(11), None, None)
       addresses(6) mustEqual ("11a", Some("Haughton Road"), Some("Haughton Road"), Some(11), None, None)
-      addresses(7) mustEqual ("Flat 1, Wilmore House", Some("15 Haughton Road"), Some("Haughton Road"), Some(15), None, Some(
+      addresses(7) mustEqual ("Flat 1, Wilmore House", Some("15 Haughton Road"), Some("Haughton Road"), Some(
+        15
+      ), None, Some(
         "Flat 1, Wilmore House"
       ))
-      addresses(8) mustEqual ("Flat 2, Wilmore House", Some("15 Haughton Road"), Some("Haughton Road"), Some(15), None, Some(
+      addresses(8) mustEqual ("Flat 2, Wilmore House", Some("15 Haughton Road"), Some("Haughton Road"), Some(
+        15
+      ), None, Some(
         "Flat 2, Wilmore House"
       ))
-      addresses(9) mustEqual ("Flat 3, Wilmore House", Some("15 Haughton Road"), Some("Haughton Road"), Some(15), None, Some(
+      addresses(9) mustEqual ("Flat 3, Wilmore House", Some("15 Haughton Road"), Some("Haughton Road"), Some(
+        15
+      ), None, Some(
         "Flat 3, Wilmore House"
       ))
       // skipped a few as they are repetitive

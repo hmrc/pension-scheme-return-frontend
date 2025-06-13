@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -26,8 +25,8 @@ class TotalConsiderationSaleAssetPageSpec extends PageBehaviours {
   "TotalConsiderationSaleAssetPage" - {
 
     val srn = srnGen.sample.value
-    val assetIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Money](TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex))
 

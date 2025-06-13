@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.shares
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedSharesControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedSharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedSharesController" - {
 

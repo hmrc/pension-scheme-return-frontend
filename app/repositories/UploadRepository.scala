@@ -18,7 +18,6 @@ package repositories
 
 import org.mongodb.scala.model.Updates.{combine, set}
 import uk.gov.hmrc.mongo.MongoComponent
-import repositories.UploadRepository.MongoUpload
 import uk.gov.hmrc.mongo.play.json.Codecs._
 import play.api.libs.json._
 import models._
@@ -26,7 +25,6 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import org.mongodb.scala.model.Filters.equal
 import models.UploadKey.separator
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import repositories.UploadRepository.MongoUpload.{SensitiveUpload, SensitiveUploadStatus}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import org.mongodb.scala.model._
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -44,16 +42,16 @@ import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class UploadRepository @Inject()(
+class UploadRepository @Inject() (
   mongoComponent: MongoComponent,
   clock: Clock,
   appConfig: FrontendAppConfig,
   crypto: Crypto
 )(implicit ec: ExecutionContext)
-    extends PlayMongoRepository[MongoUpload](
+    extends PlayMongoRepository[repositories.UploadRepository.MongoUpload](
       collectionName = "upload",
       mongoComponent = mongoComponent,
-      domainFormat = MongoUpload.format(crypto.getCrypto),
+      domainFormat = repositories.UploadRepository.MongoUpload.format(crypto.getCrypto),
       indexes = Seq(
         IndexModel(Indexes.ascending("id"), IndexOptions().unique(true)),
         IndexModel(Indexes.ascending("reference"), IndexOptions().unique(true)),
@@ -61,7 +59,7 @@ class UploadRepository @Inject()(
           Indexes.ascending("lastUpdated"),
           IndexOptions()
             .name("lastUpdatedIdx")
-            .expireAfter(appConfig.uploadTtl, TimeUnit.SECONDS)
+            .expireAfter(appConfig.uploadTtl.toLong, TimeUnit.SECONDS)
         )
       ),
       replaceIndexes = false
@@ -75,7 +73,7 @@ class UploadRepository @Inject()(
   def insert(details: UploadDetails): Future[Unit] =
     collection
       .insertOne(toMongoUpload(details))
-      .toFuture()
+      .head()
       .map(_ => ())
 
   def getUploadDetails(key: UploadKey): Future[Option[UploadDetails]] =
@@ -91,7 +89,7 @@ class UploadRepository @Inject()(
         ),
         options = FindOneAndUpdateOptions().upsert(false)
       )
-      .toFuture()
+      .head()
       .map(_ => ())
 
   def setUploadResult(key: UploadKey, result: Upload): Future[Unit] =
@@ -103,7 +101,7 @@ class UploadRepository @Inject()(
           set("lastUpdated", Instant.now(clock).toBson)
         )
       )
-      .toFuture()
+      .head()
       .map(_ => ())
 
   def getUploadResult(key: UploadKey): Future[Option[Upload]] =
@@ -115,7 +113,7 @@ class UploadRepository @Inject()(
   def remove(key: UploadKey): Future[Unit] =
     collection
       .deleteOne(equal("id", key.toBson))
-      .toFuture()
+      .head()
       .map(_ => ())
 
   private def toMongoUpload(details: UploadDetails): MongoUpload = MongoUpload(
@@ -135,6 +133,15 @@ class UploadRepository @Inject()(
 }
 
 object UploadRepository {
+  case class SensitiveUploadStatus(override val decryptedValue: UploadStatus) extends Sensitive[UploadStatus]
+
+  case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
+
+  implicit def sensitiveUploadFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
+    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
+
+  implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUploadStatus] =
+    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUploadStatus.apply)
 
   case class MongoUpload(
     key: UploadKey,
@@ -145,16 +152,6 @@ object UploadRepository {
   )
 
   object MongoUpload {
-
-    case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
-
-    implicit def sensitiveUploadFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
-      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
-
-    case class SensitiveUploadStatus(override val decryptedValue: UploadStatus) extends Sensitive[UploadStatus]
-
-    implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUploadStatus] =
-      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUploadStatus.apply)
 
     def reads(implicit crypto: Encrypter with Decrypter): Reads[MongoUpload] =
       (__ \ "id")
@@ -171,7 +168,7 @@ object UploadRepository {
         .and((__ \ "status").write[SensitiveUploadStatus])
         .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))
         .and((__ \ "result").writeNullable[SensitiveUpload])(
-          unlift(MongoUpload.unapply)
+          unlift((x: MongoUpload) => Some(x._1, x._2, x._3, x._4, x._5))
         )
 
     implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[MongoUpload] = OFormat(reads, writes)

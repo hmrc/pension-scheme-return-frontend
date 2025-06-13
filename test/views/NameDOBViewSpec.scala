@@ -21,7 +21,7 @@ import forms.NameDOBFormProvider
 import viewmodels.models.NameDOBViewModel
 import forms.mappings.errors.DateFormErrors
 
-class NameDOBViewSpec extends ViewSpec {
+class NameDOBViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     val view = injected[NameDOBView]

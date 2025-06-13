@@ -45,7 +45,7 @@ import play.api.data.Form
 import java.time.LocalDate
 import javax.inject.Named
 
-class SharesDisposalListController @Inject()(
+class SharesDisposalListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -75,11 +75,10 @@ class SharesDisposalListController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        errors => {
+        errors =>
           sharesDisposalData(srn, indexes).map { sharesList =>
             BadRequest(view(errors, viewModel(srn, page, sharesList, request.userAnswers)))
-          }.merge
-        },
+          }.merge,
         answer => {
           val inProgressUrl = request.userAnswers
             .map(SharesDisposalProgress.all(srn, answer))
@@ -99,8 +98,8 @@ class SharesDisposalListController @Inject()(
       )
   }
 
-  private def sharesDisposalData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
+  private def sharesDisposalData(srn: Srn, indexes: List[Max5000])(implicit
+    req: DataRequest[_]
   ): Either[Result, List[SharesDisposalData]] =
     indexes.map { index =>
       for {
@@ -134,8 +133,8 @@ object SharesDisposalListController {
           .map(_.toIntOption)
           .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
           .flatMap(
-            _.map(
-              disposalIndex => userAnswers.get(HowManyDisposalSharesPage(srn, sharesDisposalData.index, disposalIndex))
+            _.map(disposalIndex =>
+              userAnswers.get(HowManyDisposalSharesPage(srn, sharesDisposalData.index, disposalIndex))
             )
           )
           .exists(optValue => optValue.fold(false)(value => value == 0))

@@ -19,6 +19,7 @@ package controllers.nonsipp.receivetransfer
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import controllers.actions._
 import navigation.Navigator
 import forms.DatePageFormProvider
@@ -46,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class WhenWasTransferReceivedController @Inject()(
+class WhenWasTransferReceivedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -61,7 +62,7 @@ class WhenWasTransferReceivedController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferReceivedController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         (
@@ -85,13 +86,13 @@ class WhenWasTransferReceivedController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)
           .bindFromRequest()
           .fold(
-            formWithErrors => {
+            formWithErrors =>
               Future.successful(
                 (
                   for {
@@ -99,17 +100,14 @@ class WhenWasTransferReceivedController @Inject()(
                     schemeName <- request.userAnswers
                       .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
                       .getOrRecoverJourney
-                  } yield {
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
-                      )
+                  } yield BadRequest(
+                    view(
+                      formWithErrors,
+                      viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
                     )
-                  }
+                  )
                 ).merge
-              )
-            },
+              ),
             value =>
               for {
                 updatedAnswers <- request.userAnswers

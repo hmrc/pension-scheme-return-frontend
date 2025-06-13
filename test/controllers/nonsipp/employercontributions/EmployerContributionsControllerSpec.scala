@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
@@ -32,7 +32,7 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class EmployerContributionsControllerSpec extends ControllerBaseSpec {
+class EmployerContributionsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsController.onSubmit(srn, NormalMode)

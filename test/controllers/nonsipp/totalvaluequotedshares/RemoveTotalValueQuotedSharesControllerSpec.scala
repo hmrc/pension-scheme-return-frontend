@@ -17,7 +17,7 @@
 package controllers.nonsipp.totalvaluequotedshares
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -29,7 +29,7 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class RemoveTotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
+class RemoveTotalValueQuotedSharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.RemoveTotalValueQuotedSharesController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.RemoveTotalValueQuotedSharesController.onSubmit(srn, NormalMode)

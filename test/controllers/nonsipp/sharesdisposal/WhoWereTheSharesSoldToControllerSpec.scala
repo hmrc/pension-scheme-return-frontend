@@ -18,18 +18,17 @@ package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import models.IdentityType._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
 import forms.RadioListFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class WhoWereTheSharesSoldToControllerSpec extends ControllerBaseSpec {
+class WhoWereTheSharesSoldToControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.WhoWereTheSharesSoldToController.onPageLoad(srn, index, disposalIndex, NormalMode)

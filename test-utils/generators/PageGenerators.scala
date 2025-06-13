@@ -17,12 +17,12 @@
 package generators
 
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
-import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import org.scalacheck.Arbitrary
 import pages.nonsipp.CheckReturnDatesPage
 import models.NormalMode
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 
 trait PageGenerators {
 
@@ -34,7 +34,7 @@ trait PageGenerators {
     Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))
 
   implicit lazy val arbitraryAccountingPeriodPage: Arbitrary[AccountingPeriodPage] =
-    Arbitrary(ModelGenerators.srnGen.map(AccountingPeriodPage(_, refineMV(1), NormalMode)))
+    Arbitrary(ModelGenerators.srnGen.map(AccountingPeriodPage(_, 1, NormalMode)))
 
   implicit lazy val arbitraryHowMuchCashPage: Arbitrary[HowMuchCashPage] =
     Arbitrary(ModelGenerators.srnGen.map(HowMuchCashPage(_, NormalMode)))

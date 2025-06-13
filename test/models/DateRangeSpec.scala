@@ -27,10 +27,9 @@ class DateRangeSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "sort latest first by `to` date" in {
 
       forAll(Gen.listOf(dateRangeGen)) { dates =>
-        dates.sorted.map(_.to).foldLeft(latestDate) {
-          case (prev, curr) =>
-            assert(!curr.isAfter(prev), s"$curr is before $prev")
-            curr
+        dates.sorted.map(_.to).foldLeft(latestDate) { case (prev, curr) =>
+          assert(!curr.isAfter(prev), s"$curr is before $prev")
+          curr
         }
       }
     }

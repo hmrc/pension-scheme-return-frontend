@@ -21,7 +21,7 @@ import services.{PrePopulationService, PsrRetrievalService}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.mockito.Mockito._
 import play.api.mvc.AnyContentAsEmpty
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import repositories.SessionRepository
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers
@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers.any
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
-class PrePopulationDataActionSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks {
+class PrePopulationDataActionSpec extends ControllerBaseSpec with ControllerBehaviours with ScalaCheckPropertyChecks {
 
   val prePopulationDataAction =
     new PrePopulationDataActionProviderImpl(

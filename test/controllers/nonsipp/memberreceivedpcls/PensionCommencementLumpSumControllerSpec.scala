@@ -18,7 +18,7 @@ package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberreceivedpcls.{Paths, PensionCommencementLumpSumPage}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -31,7 +31,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
+class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.PensionCommencementLumpSumController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.PensionCommencementLumpSumController.onSubmit(srn, NormalMode)
@@ -64,16 +64,16 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

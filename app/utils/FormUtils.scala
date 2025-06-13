@@ -34,8 +34,8 @@ object FormUtils {
 
     // removes any additional form errors that use the same key
     val uniqueFormErrors: Form[A] = {
-      val formErrors = form.errors.foldLeft[List[FormError]](Nil)(
-        (errors, err) => if (errors.map(_.key).contains(err.key)) errors else errors :+ err
+      val formErrors = form.errors.foldLeft[List[FormError]](Nil)((errors, err) =>
+        if (errors.map(_.key).contains(err.key)) errors else errors :+ err
       )
 
       form.copy(errors = formErrors)

@@ -16,8 +16,7 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -26,8 +25,8 @@ class WhenWereSharesSoldPageSpec extends PageBehaviours {
 
   "WhenWereSharesSoldPage" - {
     val srn = srnGen.sample.value
-    val shareIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val shareIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[LocalDate](WhenWereSharesSoldPage(srn, shareIndex, disposalIndex))
 

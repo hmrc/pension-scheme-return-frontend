@@ -18,7 +18,8 @@ package controllers.nonsipp.shares
 
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import models.ConditionalYesNo._
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
 import models._
@@ -29,8 +30,6 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import pages.nonsipp.shares._
 import play.api.mvc.Call
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import models.SchemeHoldShare.Contribution
 import views.html.CheckYourAnswersView
@@ -38,7 +37,7 @@ import models.TypeOfShares.ConnectedParty
 
 import scala.concurrent.Future
 
-class SharesCYAControllerSpec extends ControllerBaseSpec {
+class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -55,7 +54,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
   }
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.SharesSeller
 
@@ -100,7 +99,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       SharesProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.shares.routes.CostOfSharesController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )
@@ -139,16 +138,16 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       )
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before({
+          .before {
             when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
             MockPsrSubmissionService.submitPsrDetailsWithUA()
-          })
-          .after({
+          }
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             verify(mockSaveService, times(1)).save(any())(any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
       act.like(
@@ -218,9 +217,8 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.shares.routes.SharesListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only SharesListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only SharesListController page")
     )
   }
 }

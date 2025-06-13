@@ -15,7 +15,6 @@
  */
 
 package controllers.nonsipp
-
 import pages.nonsipp.bonds.BondsProgress
 import play.api.mvc.Call
 import config.RefinedTypes.Max5000
@@ -32,7 +31,7 @@ package object bonds {
 
     val isCyaPage: Boolean = {
       val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-)?check-answers-bonds\\/(?!.*\\/\\d+\\/\\d+$$).*"
+        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-)?check-answers-bonds(?!.*\\/\\d+\\/\\d+$$).*"
 
       call.url.matches(pattern)
     }

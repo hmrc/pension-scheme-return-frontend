@@ -19,6 +19,7 @@ package controllers.nonsipp.membertransferout
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
@@ -37,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class ReceivingSchemeNameController @Inject()(
+class ReceivingSchemeNameController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -50,13 +51,13 @@ class ReceivingSchemeNameController @Inject()(
 
   private val form = ReceivingSchemeNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, transferIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm = request.userAnswers.fillForm(ReceivingSchemeNamePage(srn, index, transferIndex), form)
       Ok(view(preparedForm, ReceivingSchemeNameController.viewModel(srn, index, transferIndex, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, transferIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

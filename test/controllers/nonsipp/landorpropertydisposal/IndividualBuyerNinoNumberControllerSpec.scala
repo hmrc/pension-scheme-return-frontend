@@ -17,19 +17,18 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
-import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
+class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController

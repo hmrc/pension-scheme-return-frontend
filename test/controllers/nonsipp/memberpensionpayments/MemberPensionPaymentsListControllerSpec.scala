@@ -19,18 +19,21 @@ package controllers.nonsipp.memberpensionpayments
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import views.html.TwoColumnsTripleAction
+import utils.IntUtils.given
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import config.RefinedTypes.Max300
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
-import eu.timepit.refined.refineMV
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
-class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class MemberPensionPaymentsListControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.MemberPensionPaymentsListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.MemberPensionPaymentsListController.onSubmit(srn, page = 1, NormalMode)
@@ -54,25 +57,25 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   val userAnswers: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
   val userAnswersWithOnePayment: UserAnswers = userAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-    .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+    .unsafeSet(TotalAmountPensionPaymentsPage(srn, 1), money)
     .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
   private val testMemberList: List[(Max300, NameDOB, Option[Money])] = List(
-    (refineMV[Max300.Refined](1), memberDetails, Some(money))
+    (1, memberDetails, Some(money))
   )
   private val testMemberListNoPayment: List[(Max300, NameDOB, Option[Money])] = List(
-    (refineMV[Max300.Refined](1), memberDetails, None)
+    (1, memberDetails, None)
   )
   private val memberDetails2: NameDOB = NameDOB(
     "testFirstNameSecond",
@@ -80,8 +83,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     LocalDate.of(1991, 6, 15)
   )
   private val testMemberListTwoMembers: List[(Max300, NameDOB, Option[Money])] = List(
-    (refineMV[Max300.Refined](1), memberDetails, Some(money)),
-    (refineMV[Max300.Refined](2), memberDetails2, Some(money))
+    (1, memberDetails, Some(money)),
+    (2, memberDetails2, Some(money))
   )
 
   "MemberPensionPaymentsListController" - {
@@ -130,12 +133,12 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
       val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
 
       val userAnswersWithTwoPayments = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
-        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(2)), money)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails1)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, 1), money)
+        .unsafeSet(MemberDetailsPage(srn, 2), memberDetails2)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 2), SectionCompleted)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, 2), money)
         .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
       val result = MemberPensionPaymentsListController.viewModel(

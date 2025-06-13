@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import pages.nonsipp.receivetransfer.{
   DidTransferIncludeAssetPage,
   TransferringSchemeNamePage,
@@ -44,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class DidTransferIncludeAssetController @Inject()(
+class DidTransferIncludeAssetController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -57,7 +58,7 @@ class DidTransferIncludeAssetController @Inject()(
 
   private val form = DidTransferIncludeAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(DidTransferIncludeAssetPage(srn, index, secondaryIndex)).fold(form)(form.fill)
@@ -76,12 +77,12 @@ class DidTransferIncludeAssetController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future.successful(
               (for {
                 schemeName <- request.userAnswers
@@ -101,8 +102,7 @@ class DidTransferIncludeAssetController @Inject()(
                   )
                 )
               )).merge
-            )
-          },
+            ),
           value =>
             for {
               updatedAnswers <- request.userAnswers

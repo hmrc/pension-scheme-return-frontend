@@ -18,7 +18,7 @@ package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -28,7 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-class MoneyBorrowedControllerSpec extends ControllerBaseSpec {
+class MoneyBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.MoneyBorrowedController.onSubmit(srn, NormalMode)
@@ -54,19 +54,19 @@ class MoneyBorrowedControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

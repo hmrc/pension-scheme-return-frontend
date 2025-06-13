@@ -23,6 +23,7 @@ import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import cats.syntax.applicative._
 import controllers.actions._
@@ -45,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalValueTransferController @Inject()(
+class TotalValueTransferController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -59,7 +60,7 @@ class TotalValueTransferController @Inject()(
   private implicit val logger: Logger = Logger(getClass)
   private val form = TotalValueTransferController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -80,7 +81,7 @@ class TotalValueTransferController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

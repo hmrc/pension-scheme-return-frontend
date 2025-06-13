@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class EmployerContributionsController @Inject()(
+class EmployerContributionsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -68,18 +68,19 @@ class EmployerContributionsController @Inject()(
                 .set(EmployerContributionsPage(srn), value)
             )
             _ <- saveService.save(updatedAnswers)
-            submissionResult <- if (value) {
-              Future.successful(Some(()))
-            } else {
-              psrSubmissionService.submitPsrDetailsWithUA(
-                srn,
-                updatedAnswers,
-                fallbackCall =
-                  controllers.nonsipp.employercontributions.routes.EmployerContributionsController.onPageLoad(srn, mode)
-              )
-            }
-          } yield submissionResult.getOrRecoverJourney(
-            _ => Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))
+            submissionResult <-
+              if (value) {
+                Future.successful(Some(()))
+              } else {
+                psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  fallbackCall = controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+                    .onPageLoad(srn, mode)
+                )
+              }
+          } yield submissionResult.getOrRecoverJourney(_ =>
+            Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))
           )
       )
   }

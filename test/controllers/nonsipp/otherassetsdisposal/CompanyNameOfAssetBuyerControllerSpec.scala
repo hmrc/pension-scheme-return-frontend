@@ -17,18 +17,17 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
 
-class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
+class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
   private lazy val onPageLoad =
     routes.CompanyNameOfAssetBuyerController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
   private lazy val onSubmit =
@@ -44,13 +43,16 @@ class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), companyNameOfAssetBuyer) {
-        implicit app => implicit request =>
-          injected[TextInputView]
-            .apply(
-              form(injected[TextFormProvider]).fill(companyNameOfAssetBuyer),
-              viewModel(srn, assetIndex, disposalIndex, NormalMode)
-            )
+      renderPrePopView(
+        onPageLoad,
+        CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+        companyNameOfAssetBuyer
+      ) { implicit app => implicit request =>
+        injected[TextInputView]
+          .apply(
+            form(injected[TextFormProvider]).fill(companyNameOfAssetBuyer),
+            viewModel(srn, assetIndex, disposalIndex, NormalMode)
+          )
       }
     )
 

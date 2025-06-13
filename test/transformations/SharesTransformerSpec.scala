@@ -22,7 +22,7 @@ import models.IdentityType.UKCompany
 import controllers.TestValues
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
@@ -41,8 +41,9 @@ import models.HowSharesDisposed._
 
 class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
       .withSession((PREPOPULATION_FLAG, "true"))
@@ -157,7 +158,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
     "should omit share transaction details when DidSchemeHoldAnySharesPage was 'No'" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
-        .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), SponsoringEmployer)
+        .unsafeSet(TypeOfSharesHeldPage(srn, 1), SponsoringEmployer)
 
       val initialUserAnswer = emptyUserAnswers
         .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
@@ -191,25 +192,25 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TotalValueQuotedSharesPage(srn), money)
           .unsafeSet(SharesRecordVersionPage(srn), "001")
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), Unquoted)
-          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(1)), Contribution)
-          .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(1)), "nameOfSharesCompany")
-          .unsafeSet(SharesCompanyCrnPage(srn, refineMV(1)), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
-          .unsafeSet(ClassOfSharesPage(srn, refineMV(1)), "classOfShares")
-          .unsafeSet(HowManySharesPage(srn, refineMV(1)), 123)
-          .unsafeSet(CostOfSharesPage(srn, refineMV(1)), money)
-          .unsafeSet(SharesIndependentValuationPage(srn, refineMV(1)), true)
-          .unsafeSet(SharesTotalIncomePage(srn, refineMV(1)), money)
-          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
-          .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 1), Unquoted)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, 1), Contribution)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, 1), "nameOfSharesCompany")
+          .unsafeSet(SharesCompanyCrnPage(srn, 1), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+          .unsafeSet(ClassOfSharesPage(srn, 1), "classOfShares")
+          .unsafeSet(HowManySharesPage(srn, 1), 123)
+          .unsafeSet(CostOfSharesPage(srn, 1), money)
+          .unsafeSet(SharesIndependentValuationPage(srn, 1), true)
+          .unsafeSet(SharesTotalIncomePage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, 1), localDate)
+          .unsafeSet(SharesFromConnectedPartyPage(srn, 1), false)
           .unsafeSet(SharesDisposalPage(srn), true)
-          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), Redeemed)
-          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 123)
-          .unsafeSet(WhenWereSharesRedeemedPage(srn, refineMV(1), refineMV(1)), localDate)
-          .unsafeSet(HowManySharesRedeemedPage(srn, refineMV(1), refineMV(1)), 123)
-          .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, refineMV(1), refineMV(1)), money)
-          .unsafeSet(SharesProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(HowWereSharesDisposedPage(srn, 1, 1), Redeemed)
+          .unsafeSet(HowManyDisposalSharesPage(srn, 1, 1), 123)
+          .unsafeSet(WhenWereSharesRedeemedPage(srn, 1, 1), localDate)
+          .unsafeSet(HowManySharesRedeemedPage(srn, 1, 1), 123)
+          .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, 1, 1), money)
+          .unsafeSet(SharesProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
         val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
         result mustBe Some(
@@ -266,30 +267,30 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       "should return Share Transactions in pre-population" in {
         val userAnswers = emptyUserAnswers
           .unsafeSet(SharesRecordVersionPage(srn), "001")
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), Unquoted)
-          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(1)), Contribution)
-          .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(1)), "nameOfSharesCompany")
-          .unsafeSet(SharesCompanyCrnPage(srn, refineMV(1)), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
-          .unsafeSet(ClassOfSharesPage(srn, refineMV(1)), "classOfShares")
-          .unsafeSet(HowManySharesPage(srn, refineMV(1)), 123)
-          .unsafeSet(CostOfSharesPage(srn, refineMV(1)), money)
-          .unsafeSet(SharesIndependentValuationPage(srn, refineMV(1)), true)
-          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
-          .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
-          .unsafeSet(SharePrePopulated(srn, refineMV(1)), true)
-          .unsafeSet(SharesProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), Unquoted)
-          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(2)), Contribution)
-          .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(2)), "nameOfSharesCompany2")
-          .unsafeSet(SharesCompanyCrnPage(srn, refineMV(2)), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
-          .unsafeSet(ClassOfSharesPage(srn, refineMV(2)), "classOfShares")
-          .unsafeSet(HowManySharesPage(srn, refineMV(2)), 123)
-          .unsafeSet(CostOfSharesPage(srn, refineMV(2)), money)
-          .unsafeSet(SharesIndependentValuationPage(srn, refineMV(2)), true)
-          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(2)), localDate)
-          .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(2)), false)
-          .unsafeSet(SharePrePopulated(srn, refineMV(2)), false)
-          .unsafeSet(SharesProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 1), Unquoted)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, 1), Contribution)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, 1), "nameOfSharesCompany")
+          .unsafeSet(SharesCompanyCrnPage(srn, 1), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+          .unsafeSet(ClassOfSharesPage(srn, 1), "classOfShares")
+          .unsafeSet(HowManySharesPage(srn, 1), 123)
+          .unsafeSet(CostOfSharesPage(srn, 1), money)
+          .unsafeSet(SharesIndependentValuationPage(srn, 1), true)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, 1), localDate)
+          .unsafeSet(SharesFromConnectedPartyPage(srn, 1), false)
+          .unsafeSet(SharePrePopulated(srn, 1), true)
+          .unsafeSet(SharesProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(TypeOfSharesHeldPage(srn, 2), Unquoted)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, 2), Contribution)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, 2), "nameOfSharesCompany2")
+          .unsafeSet(SharesCompanyCrnPage(srn, 2), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+          .unsafeSet(ClassOfSharesPage(srn, 2), "classOfShares")
+          .unsafeSet(HowManySharesPage(srn, 2), 123)
+          .unsafeSet(CostOfSharesPage(srn, 2), money)
+          .unsafeSet(SharesIndependentValuationPage(srn, 2), true)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, 2), localDate)
+          .unsafeSet(SharesFromConnectedPartyPage(srn, 2), false)
+          .unsafeSet(SharePrePopulated(srn, 2), false)
+          .unsafeSet(SharesProgress(srn, 2), SectionJourneyStatus.Completed)
 
         val result = transformer.transformToEtmp(srn = srn, userAnswers)(
           DataRequest(allowedAccessRequestPrePopulation, userAnswers)
@@ -360,10 +361,10 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
         .unsafeSet(TotalValueQuotedSharesPage(srn), money)
         .unsafeSet(SharesRecordVersionPage(srn), "001")
-        .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), Unquoted)
+        .unsafeSet(TypeOfSharesHeldPage(srn, 1), Unquoted)
         .unsafeSet(
-          SharesProgress(srn, refineMV(1)),
-          SectionJourneyStatus.InProgress(WhyDoesSchemeHoldSharesPage(srn, refineMV(1)))
+          SharesProgress(srn, 1),
+          SectionJourneyStatus.InProgress(WhyDoesSchemeHoldSharesPage(srn, 1))
         )
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
@@ -541,99 +542,99 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(DidSchemeHoldAnySharesPage(srn)) mustBe Some(true)
 
           // share-index-1
-          userAnswers.get(SharesCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
-          userAnswers.get(TypeOfSharesHeldPage(srn, refineMV(1))) mustBe Some(SponsoringEmployer)
-          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, refineMV(1))) mustBe Some(Acquisition)
-          userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(CompanyNameRelatedSharesPage(srn, refineMV(1))) mustBe Some("nameOfSharesCompany")
-          userAnswers.get(SharesCompanyCrnPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.no("optReasonNoCRN"))
-          userAnswers.get(ClassOfSharesPage(srn, refineMV(1))) mustBe Some("classOfShares")
-          userAnswers.get(HowManySharesPage(srn, refineMV(1))) mustBe Some(totalShares)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.SharesSeller)) mustBe Some(
+          userAnswers.get(SharesCompleted(srn, 1)) mustBe Some(SectionCompleted)
+          userAnswers.get(TypeOfSharesHeldPage(srn, 1)) mustBe Some(SponsoringEmployer)
+          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, 1)) mustBe Some(Acquisition)
+          userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, 1)) mustBe Some(localDate)
+          userAnswers.get(CompanyNameRelatedSharesPage(srn, 1)) mustBe Some("nameOfSharesCompany")
+          userAnswers.get(SharesCompanyCrnPage(srn, 1)) mustBe Some(ConditionalYesNo.no("optReasonNoCRN"))
+          userAnswers.get(ClassOfSharesPage(srn, 1)) mustBe Some("classOfShares")
+          userAnswers.get(HowManySharesPage(srn, 1)) mustBe Some(totalShares)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.SharesSeller)) mustBe Some(
             IdentityType.Individual
           )
-          userAnswers.get(IndividualNameOfSharesSellerPage(srn, refineMV(1))) mustBe Some("optAcquiredFromName")
-          userAnswers.get(SharesIndividualSellerNINumberPage(srn, refineMV(1))) mustBe Some(
+          userAnswers.get(IndividualNameOfSharesSellerPage(srn, 1)) mustBe Some("optAcquiredFromName")
+          userAnswers.get(SharesIndividualSellerNINumberPage(srn, 1)) mustBe Some(
             ConditionalYesNo.no(noninoReason)
           )
-          userAnswers.get(SharesFromConnectedPartyPage(srn, refineMV(1))) mustBe None
-          userAnswers.get(CostOfSharesPage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(SharesIndependentValuationPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(TotalAssetValuePage(srn, refineMV(1))) mustBe Some(money)
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
+          userAnswers.get(SharesFromConnectedPartyPage(srn, 1)) mustBe None
+          userAnswers.get(CostOfSharesPage(srn, 1)) mustBe Some(money)
+          userAnswers.get(SharesIndependentValuationPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(TotalAssetValuePage(srn, 1)) mustBe Some(money)
+          userAnswers.get(SharesTotalIncomePage(srn, 1)) mustBe Some(money)
           // share-dispose-index-1-1
-          userAnswers.get(SharesDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(SharesDisposalProgress(srn, 1, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
-          userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1))) mustBe Some(totalShares)
-          userAnswers.get(WhenWereSharesSoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
-          userAnswers.get(HowManySharesSoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(123)
-          userAnswers.get(TotalConsiderationSharesSoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
-          userAnswers.get(WhoWereTheSharesSoldToPage(srn, refineMV(1), refineMV(1))) mustBe Some(UKCompany)
-          userAnswers.get(CompanyBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some("nameOfPurchaser")
-          userAnswers.get(CompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+          userAnswers.get(HowWereSharesDisposedPage(srn, 1, 1)) mustBe Some(Sold)
+          userAnswers.get(HowManyDisposalSharesPage(srn, 1, 1)) mustBe Some(totalShares)
+          userAnswers.get(WhenWereSharesSoldPage(srn, 1, 1)) mustBe Some(localDate)
+          userAnswers.get(HowManySharesSoldPage(srn, 1, 1)) mustBe Some(123)
+          userAnswers.get(TotalConsiderationSharesSoldPage(srn, 1, 1)) mustBe Some(money)
+          userAnswers.get(WhoWereTheSharesSoldToPage(srn, 1, 1)) mustBe Some(UKCompany)
+          userAnswers.get(CompanyBuyerNamePage(srn, 1, 1)) mustBe Some("nameOfPurchaser")
+          userAnswers.get(CompanyBuyerCrnPage(srn, 1, 1)) mustBe Some(
             ConditionalYesNo.no("UKCompanyNoReason")
           )
-          userAnswers.get(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
-          userAnswers.get(IndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(false)
+          userAnswers.get(IsBuyerConnectedPartyPage(srn, 1, 1)) mustBe Some(true)
+          userAnswers.get(IndependentValuationPage(srn, 1, 1)) mustBe Some(false)
           // share-dispose-index-1-2
-          userAnswers.get(SharesDisposalProgress(srn, refineMV(1), refineMV(2))) mustBe Some(
+          userAnswers.get(SharesDisposalProgress(srn, 1, 2)) mustBe Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(2))) mustBe Some(Redeemed)
-          userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(2))) mustBe Some(totalShares)
-          userAnswers.get(WhenWereSharesRedeemedPage(srn, refineMV(1), refineMV(2))) mustBe Some(localDate)
-          userAnswers.get(HowManySharesRedeemedPage(srn, refineMV(1), refineMV(2))) mustBe Some(456)
-          userAnswers.get(TotalConsiderationSharesRedeemedPage(srn, refineMV(1), refineMV(2))) mustBe Some(money)
+          userAnswers.get(HowWereSharesDisposedPage(srn, 1, 2)) mustBe Some(Redeemed)
+          userAnswers.get(HowManyDisposalSharesPage(srn, 1, 2)) mustBe Some(totalShares)
+          userAnswers.get(WhenWereSharesRedeemedPage(srn, 1, 2)) mustBe Some(localDate)
+          userAnswers.get(HowManySharesRedeemedPage(srn, 1, 2)) mustBe Some(456)
+          userAnswers.get(TotalConsiderationSharesRedeemedPage(srn, 1, 2)) mustBe Some(money)
 
           // share-index-2
-          userAnswers.get(SharesCompleted(srn, refineMV(2))) mustBe Some(SectionCompleted)
-          userAnswers.get(TypeOfSharesHeldPage(srn, refineMV(2))) mustBe Some(Unquoted)
-          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, refineMV(2))) mustBe Some(Contribution)
-          userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, refineMV(2))) mustBe Some(localDate)
-          userAnswers.get(CompanyNameRelatedSharesPage(srn, refineMV(2))) mustBe Some("nameOfSharesCompany")
-          userAnswers.get(SharesCompanyCrnPage(srn, refineMV(2))) mustBe Some(ConditionalYesNo.no("optReasonNoCRN"))
-          userAnswers.get(ClassOfSharesPage(srn, refineMV(2))) mustBe Some("classOfShares")
-          userAnswers.get(HowManySharesPage(srn, refineMV(2))) mustBe Some(totalShares)
-          userAnswers.get(IdentityTypePage(srn, refineMV(2), IdentitySubject.SharesSeller)) mustBe None
-          userAnswers.get(IndividualNameOfSharesSellerPage(srn, refineMV(2))) mustBe None
-          userAnswers.get(SharesIndividualSellerNINumberPage(srn, refineMV(2))) mustBe None
-          userAnswers.get(SharesFromConnectedPartyPage(srn, refineMV(2))) mustBe Some(true)
-          userAnswers.get(CostOfSharesPage(srn, refineMV(2))) mustBe Some(money)
-          userAnswers.get(SharesIndependentValuationPage(srn, refineMV(2))) mustBe Some(true)
-          userAnswers.get(TotalAssetValuePage(srn, refineMV(2))) mustBe None
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(2))) mustBe Some(money)
+          userAnswers.get(SharesCompleted(srn, 2)) mustBe Some(SectionCompleted)
+          userAnswers.get(TypeOfSharesHeldPage(srn, 2)) mustBe Some(Unquoted)
+          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, 2)) mustBe Some(Contribution)
+          userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, 2)) mustBe Some(localDate)
+          userAnswers.get(CompanyNameRelatedSharesPage(srn, 2)) mustBe Some("nameOfSharesCompany")
+          userAnswers.get(SharesCompanyCrnPage(srn, 2)) mustBe Some(ConditionalYesNo.no("optReasonNoCRN"))
+          userAnswers.get(ClassOfSharesPage(srn, 2)) mustBe Some("classOfShares")
+          userAnswers.get(HowManySharesPage(srn, 2)) mustBe Some(totalShares)
+          userAnswers.get(IdentityTypePage(srn, 2, IdentitySubject.SharesSeller)) mustBe None
+          userAnswers.get(IndividualNameOfSharesSellerPage(srn, 2)) mustBe None
+          userAnswers.get(SharesIndividualSellerNINumberPage(srn, 2)) mustBe None
+          userAnswers.get(SharesFromConnectedPartyPage(srn, 2)) mustBe Some(true)
+          userAnswers.get(CostOfSharesPage(srn, 2)) mustBe Some(money)
+          userAnswers.get(SharesIndependentValuationPage(srn, 2)) mustBe Some(true)
+          userAnswers.get(TotalAssetValuePage(srn, 2)) mustBe None
+          userAnswers.get(SharesTotalIncomePage(srn, 2)) mustBe Some(money)
           // share-dispose-index-2-1
-          userAnswers.get(SharesDisposalProgress(srn, refineMV(2), refineMV(1))) mustBe Some(
+          userAnswers.get(SharesDisposalProgress(srn, 2, 1)) mustBe Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(2), refineMV(1))) mustBe Some(Transferred)
-          userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(2), refineMV(1))) mustBe Some(totalShares)
+          userAnswers.get(HowWereSharesDisposedPage(srn, 2, 1)) mustBe Some(Transferred)
+          userAnswers.get(HowManyDisposalSharesPage(srn, 2, 1)) mustBe Some(totalShares)
           // share-dispose-index-2-2
-          userAnswers.get(SharesDisposalProgress(srn, refineMV(2), refineMV(2))) mustBe Some(
+          userAnswers.get(SharesDisposalProgress(srn, 2, 2)) mustBe Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(2), refineMV(2))) mustBe Some(Other("OtherMethod"))
-          userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(2), refineMV(2))) mustBe Some(totalShares)
+          userAnswers.get(HowWereSharesDisposedPage(srn, 2, 2)) mustBe Some(Other("OtherMethod"))
+          userAnswers.get(HowManyDisposalSharesPage(srn, 2, 2)) mustBe Some(totalShares)
 
           // share-index-3
-          userAnswers.get(SharesCompleted(srn, refineMV(3))) mustBe Some(SectionCompleted)
-          userAnswers.get(TypeOfSharesHeldPage(srn, refineMV(3))) mustBe Some(ConnectedParty)
-          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, refineMV(3))) mustBe Some(Transfer)
-          userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, refineMV(3))) mustBe None
-          userAnswers.get(CompanyNameRelatedSharesPage(srn, refineMV(3))) mustBe Some("nameOfSharesCompany")
-          userAnswers.get(SharesCompanyCrnPage(srn, refineMV(3))) mustBe Some(ConditionalYesNo.no("optReasonNoCRN"))
-          userAnswers.get(ClassOfSharesPage(srn, refineMV(3))) mustBe Some("classOfShares")
-          userAnswers.get(HowManySharesPage(srn, refineMV(3))) mustBe Some(totalShares)
-          userAnswers.get(IdentityTypePage(srn, refineMV(3), IdentitySubject.SharesSeller)) mustBe None
-          userAnswers.get(IndividualNameOfSharesSellerPage(srn, refineMV(3))) mustBe None
-          userAnswers.get(SharesIndividualSellerNINumberPage(srn, refineMV(3))) mustBe None
-          userAnswers.get(SharesFromConnectedPartyPage(srn, refineMV(3))) mustBe None
-          userAnswers.get(CostOfSharesPage(srn, refineMV(3))) mustBe Some(money)
-          userAnswers.get(SharesIndependentValuationPage(srn, refineMV(3))) mustBe Some(false)
-          userAnswers.get(TotalAssetValuePage(srn, refineMV(3))) mustBe None
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe Some(money)
+          userAnswers.get(SharesCompleted(srn, 3)) mustBe Some(SectionCompleted)
+          userAnswers.get(TypeOfSharesHeldPage(srn, 3)) mustBe Some(ConnectedParty)
+          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, 3)) mustBe Some(Transfer)
+          userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, 3)) mustBe None
+          userAnswers.get(CompanyNameRelatedSharesPage(srn, 3)) mustBe Some("nameOfSharesCompany")
+          userAnswers.get(SharesCompanyCrnPage(srn, 3)) mustBe Some(ConditionalYesNo.no("optReasonNoCRN"))
+          userAnswers.get(ClassOfSharesPage(srn, 3)) mustBe Some("classOfShares")
+          userAnswers.get(HowManySharesPage(srn, 3)) mustBe Some(totalShares)
+          userAnswers.get(IdentityTypePage(srn, 3, IdentitySubject.SharesSeller)) mustBe None
+          userAnswers.get(IndividualNameOfSharesSellerPage(srn, 3)) mustBe None
+          userAnswers.get(SharesIndividualSellerNINumberPage(srn, 3)) mustBe None
+          userAnswers.get(SharesFromConnectedPartyPage(srn, 3)) mustBe None
+          userAnswers.get(CostOfSharesPage(srn, 3)) mustBe Some(money)
+          userAnswers.get(SharesIndependentValuationPage(srn, 3)) mustBe Some(false)
+          userAnswers.get(TotalAssetValuePage(srn, 3)) mustBe None
+          userAnswers.get(SharesTotalIncomePage(srn, 3)) mustBe Some(money)
           userAnswers.get(TotalValueQuotedSharesPage(srn)) mustBe Some(money)
         }
       )
@@ -731,13 +732,13 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(DidSchemeHoldAnySharesPage(srn)) mustBe None
 
           // share-index-1
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0.0))
+          userAnswers.get(SharesTotalIncomePage(srn, 1)) mustBe Some(Money(0.0))
 
           // share-index-2
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(2))) mustBe Some(Money(0.0))
+          userAnswers.get(SharesTotalIncomePage(srn, 2)) mustBe Some(Money(0.0))
 
           // share-index-3
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe Some(Money(0.0))
+          userAnswers.get(SharesTotalIncomePage(srn, 3)) mustBe Some(Money(0.0))
         }
       )
     }
@@ -750,9 +751,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(SharesTotalIncomePage(srn, 1)) mustBe None
       )
     }
 
@@ -764,9 +763,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(SharesTotalIncomePage(srn, 1)) mustBe Some(Money(0))
       )
     }
 
@@ -778,9 +775,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(SharesTotalIncomePage(srn, 1)) mustBe Some(Money(0))
       )
     }
   }

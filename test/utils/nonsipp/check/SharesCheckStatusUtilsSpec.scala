@@ -24,9 +24,9 @@ import models.IdentitySubject._
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
+class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with ControllerBehaviours with Matchers with OptionValues {
 
   private val didSchemeHoldAnySharesTrue = defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
   private val didSchemeHoldAnySharesFalse = defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), false)

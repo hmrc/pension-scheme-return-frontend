@@ -23,6 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.viewModel
 import config.RefinedTypes.Max5000
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsLenderConnectedPartyController @Inject()(
+class IsLenderConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -57,7 +58,7 @@ class IsLenderConnectedPartyController @Inject()(
   private def form: Form[Boolean] =
     IsLenderConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(LenderNamePage(srn, index)).sync { lenderName =>
         Ok(
@@ -69,7 +70,7 @@ class IsLenderConnectedPartyController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -86,9 +87,7 @@ class IsLenderConnectedPartyController @Inject()(
               nextPage = navigator.nextPage(IsLenderConnectedPartyPage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield {
-              Redirect(nextPage)
-            }
+            } yield Redirect(nextPage)
         )
     }
 }

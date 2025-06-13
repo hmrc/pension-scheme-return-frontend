@@ -35,7 +35,7 @@ import scala.util.Try
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class BondsPrePopulationProcessor @Inject()() {
+class BondsPrePopulationProcessor @Inject() () {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -61,24 +61,22 @@ class BondsPrePopulationProcessor @Inject()() {
           .toList
           .flatten
           .refine[Max5000.Refined]
-          .map(
-            index =>
-              (
-                BondPrePopulated(srn, index),
-                BondsProgress(srn, index)
-              )
+          .map(index =>
+            (
+              BondPrePopulated(srn, index),
+              BondsProgress(srn, index)
+            )
           )
-          .foldLeft(Try(uaWithBondsData)) {
-            case (ua, (bondsPrePopulated, bondsProgress)) =>
-              ua.flatMap(_.set(bondsPrePopulated, false))
-                .flatMap(_.set(bondsProgress, SectionJourneyStatus.Completed))
+          .foldLeft(Try(uaWithBondsData)) { case (ua, (bondsPrePopulated, bondsProgress)) =>
+            ua.flatMap(_.set(bondsPrePopulated, false))
+              .flatMap(_.set(bondsProgress, SectionJourneyStatus.Completed))
           }
         updatedUA
       case _ => Try(currentUA)
     }
 
     totalBondsNowHeldOptMap.fold(transformedResult) { totalBondsNowHeldMap =>
-      totalBondsNowHeldMap.foldLeft(transformedResult)((uaResult, totalBondsNowHeldEntry) => {
+      totalBondsNowHeldMap.foldLeft(transformedResult) { (uaResult, totalBondsNowHeldEntry) =>
         val isFullyDisposed = totalBondsNowHeldEntry._2.exists(_._2 == 0)
         if (isFullyDisposed) {
           totalBondsNowHeldEntry._1.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
@@ -88,7 +86,7 @@ class BondsPrePopulationProcessor @Inject()() {
         } else {
           uaResult
         }
-      })
+      }
     }
   }
 }

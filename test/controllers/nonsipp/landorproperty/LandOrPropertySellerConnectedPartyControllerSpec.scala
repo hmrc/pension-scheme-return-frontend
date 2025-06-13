@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
-import eu.timepit.refined.refineMV
 import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.IdentityTypePage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 
-class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"

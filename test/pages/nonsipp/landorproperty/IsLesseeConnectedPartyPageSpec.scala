@@ -16,9 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class IsLesseeConnectedPartyPageSpec extends PageBehaviours {
@@ -27,7 +25,7 @@ class IsLesseeConnectedPartyPageSpec extends PageBehaviours {
 
   "IsLesseeConnectedPartyPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](IsLesseeConnectedPartyPage(srn, index))
 

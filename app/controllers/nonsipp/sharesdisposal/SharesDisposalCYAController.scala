@@ -22,6 +22,7 @@ import models.PointOfEntry.NoPointOfEntry
 import utils.ListUtils.ListOps
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import models.SchemeHoldShare.Transfer
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalsPerShare
 import controllers.actions.IdentifyAndRequireData
@@ -50,7 +51,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class SharesDisposalCYAController @Inject()(
+class SharesDisposalCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -61,7 +62,7 @@ class SharesDisposalCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       if (request.userAnswers.get(SharesDisposalProgress(srn, shareIndex, disposalIndex)).contains(Completed)) {
         // Clear any PointOfEntry
@@ -77,8 +78,8 @@ class SharesDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    shareIndex: Max5000,
-    disposalIndex: Max50,
+    shareIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -88,12 +89,14 @@ class SharesDisposalCYAController @Inject()(
       onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(SharesDisposalProgress(srn, shareIndex, disposalIndex))
-        .exists(_.completed)) {
+        .exists(_.completed)
+    ) {
       Future.successful(Redirect(routes.SharesDisposalListController.onPageLoad(srn, 1)))
     } else {
       (
@@ -239,7 +242,7 @@ class SharesDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- request.userAnswers
@@ -252,11 +255,10 @@ class SharesDisposalCYAController @Inject()(
           fallbackCall = controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
             .onPageLoad(srn, shareIndex, disposalIndex, mode)
         )
-      } yield submissionResult.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator.nextPage(SharesDisposalCYAPage(srn), mode, request.userAnswers)
-          )
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator.nextPage(SharesDisposalCYAPage(srn), mode, request.userAnswers)
+        )
       )
     }
 
@@ -609,26 +611,24 @@ object SharesDisposalCYAController {
           buyerNameUrl
         ).withVisuallyHiddenContent("sharesDisposal.cya.conditionalSoldRow5.hidden")
       )
-    ) :?+ buyerDetails.map(
-      details =>
-        CheckYourAnswersRowViewModel(
-          Message("sharesDisposal.cya.conditionalSoldRow6.details.key", buyerName, buyerDetailsType),
-          details
-        ).withAction(
-          SummaryAction("site.change", buyerDetailsUrl)
-            .withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", buyerDetailsType)
-            )
-        )
-    ) :?+ buyerReasonNoDetails.map(
-      reasonNoDetails =>
-        CheckYourAnswersRowViewModel(
-          Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.key", buyerName, buyerDetailsType),
-          reasonNoDetails
-        ).withAction(
-          SummaryAction("site.change", buyerDetailsUrl)
-            .withVisuallyHiddenContent(buyerNoDetailsHidden)
-        )
+    ) :?+ buyerDetails.map(details =>
+      CheckYourAnswersRowViewModel(
+        Message("sharesDisposal.cya.conditionalSoldRow6.details.key", buyerName, buyerDetailsType),
+        details
+      ).withAction(
+        SummaryAction("site.change", buyerDetailsUrl)
+          .withVisuallyHiddenContent(
+            Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", buyerDetailsType)
+          )
+      )
+    ) :?+ buyerReasonNoDetails.map(reasonNoDetails =>
+      CheckYourAnswersRowViewModel(
+        Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.key", buyerName, buyerDetailsType),
+        reasonNoDetails
+      ).withAction(
+        SummaryAction("site.change", buyerDetailsUrl)
+          .withVisuallyHiddenContent(buyerNoDetailsHidden)
+      )
     ) :+
       CheckYourAnswersRowViewModel(
         Message("sharesDisposal.cya.conditionalSoldRow7.key", buyerName),

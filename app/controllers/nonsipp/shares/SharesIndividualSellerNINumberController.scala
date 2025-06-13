@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import forms.mappings.Mappings
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class SharesIndividualSellerNINumberController @Inject()(
+class SharesIndividualSellerNINumberController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class SharesIndividualSellerNINumberController @Inject()(
 
   private val form: Form[Either[String, Nino]] = SharesIndividualSellerNINumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(IndividualNameOfSharesSellerPage(srn, index)).sync { individualName =>
         val preparedForm =
@@ -65,7 +66,7 @@ class SharesIndividualSellerNINumberController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

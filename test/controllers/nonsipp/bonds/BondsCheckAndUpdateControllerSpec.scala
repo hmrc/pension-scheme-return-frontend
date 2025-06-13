@@ -18,16 +18,16 @@ package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import views.html.ContentTablePageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.NormalMode
 import controllers.nonsipp.bonds.BondsCheckAndUpdateController._
 import eu.timepit.refined.api.Refined
 import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class BondsCheckAndUpdateControllerSpec extends ControllerBaseSpec {
+class BondsCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  private val index: Refined[Int, OneTo5000] = 1
 
   private def onPageLoad = routes.BondsCheckAndUpdateController.onPageLoad(srn, index)
   private def onSubmit = routes.BondsCheckAndUpdateController.onSubmit(srn, index)

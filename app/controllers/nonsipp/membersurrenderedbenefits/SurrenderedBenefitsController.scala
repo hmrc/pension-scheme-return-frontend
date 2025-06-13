@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class SurrenderedBenefitsController @Inject()(
+class SurrenderedBenefitsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -78,16 +78,17 @@ class SurrenderedBenefitsController @Inject()(
               .set(SurrenderedBenefitsPage(srn), value)
               .mapK[Future]
             _ <- saveService.save(updatedAnswers)
-            submissionResult <- if (!value) {
-              psrSubmissionService.submitPsrDetailsWithUA(
-                srn,
-                updatedAnswers,
-                fallbackCall = controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
-                  .onPageLoad(srn, mode)
-              )
-            } else {
-              Future.successful(Some(()))
-            }
+            submissionResult <-
+              if (!value) {
+                psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  fallbackCall = controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
+                    .onPageLoad(srn, mode)
+                )
+              } else {
+                Future.successful(Some(()))
+              }
           } yield submissionResult
             .getOrRecoverJourney(_ => Redirect(navigator.nextPage(SurrenderedBenefitsPage(srn), mode, updatedAnswers)))
       )

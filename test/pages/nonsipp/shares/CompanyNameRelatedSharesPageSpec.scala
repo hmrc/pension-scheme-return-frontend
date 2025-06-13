@@ -16,15 +16,14 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class CompanyNameRelatedSharesPageSpec extends PageBehaviours {
 
   "CompanyNameRelatedSharesPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[String](CompanyNameRelatedSharesPage(srn, index))
 

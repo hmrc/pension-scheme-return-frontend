@@ -16,26 +16,25 @@
 
 package controllers.nonsipp.accountingperiod
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
 import views.html.YesNoPageView
-import controllers.nonsipp.accountingperiod.routes
-import eu.timepit.refined._
+import utils.IntUtils.given
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import forms.YesNoPageFormProvider
 import models.NormalMode
 
-class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
+class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.RemoveAccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.RemoveAccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.RemoveAccountingPeriodController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.RemoveAccountingPeriodController.onSubmit(srn, 1, NormalMode)
 
   private val period = dateRangeGen.sample.value
   private val otherPeriod = dateRangeGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), period)
-    .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), otherPeriod)
+    .unsafeSet(AccountingPeriodPage(srn, 1, NormalMode), period)
+    .unsafeSet(AccountingPeriodPage(srn, 2, NormalMode), otherPeriod)
 
   "RemoveAccountingPeriodController" - {
 
@@ -44,7 +43,7 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
 
       view(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, refineMV(1), period, NormalMode)
+        viewModel(srn, 1, period, NormalMode)
       )
     })
 

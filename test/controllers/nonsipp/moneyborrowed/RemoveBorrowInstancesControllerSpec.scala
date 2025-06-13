@@ -17,32 +17,31 @@
 package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class RemoveBorrowInstancesControllerSpec extends ControllerBaseSpec {
+class RemoveBorrowInstancesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.RemoveBorrowInstancesController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveBorrowInstancesController.onSubmit(srn, index, NormalMode)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(LenderNamePage(srn, refineMV(1)), "lenderName")
-    .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(1)), true)
-    .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(1)), (money, percentage))
-    .unsafeSet(WhenBorrowedPage(srn, refineMV(1)), localDate)
-    .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1)), money)
-    .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), "reason")
+    .unsafeSet(LenderNamePage(srn, 1), "lenderName")
+    .unsafeSet(IsLenderConnectedPartyPage(srn, 1), true)
+    .unsafeSet(BorrowedAmountAndRatePage(srn, 1), (money, percentage))
+    .unsafeSet(WhenBorrowedPage(srn, 1), localDate)
+    .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, 1), money)
+    .unsafeSet(WhySchemeBorrowedMoneyPage(srn, 1), "reason")
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -63,18 +62,18 @@ class RemoveBorrowInstancesControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

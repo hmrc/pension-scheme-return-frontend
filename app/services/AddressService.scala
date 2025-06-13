@@ -26,22 +26,21 @@ import scala.util.Try
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AddressService @Inject()(connector: AddressLookupConnector)(
-  implicit ec: ExecutionContext
+class AddressService @Inject() (connector: AddressLookupConnector)(implicit
+  ec: ExecutionContext
 ) {
 
   def postcodeLookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[Address]] =
     connector.lookup(postcode, filter).map(_.map(addressFromALFAddress)).map(sortAddresses)
 
   private def sortAddresses(unsorted: List[Address]): List[Address] =
-    unsorted.sortBy(
-      s =>
-        (
-          s.street.getOrElse(""),
-          s.houseNumber.getOrElse(Int.MaxValue),
-          s.flatNumber.getOrElse(Int.MaxValue),
-          s.flat.getOrElse("")
-        )
+    unsorted.sortBy(s =>
+      (
+        s.street.getOrElse(""),
+        s.houseNumber.getOrElse(Int.MaxValue),
+        s.flatNumber.getOrElse(Int.MaxValue),
+        s.flat.getOrElse("")
+      )
     )
 
   private def getAddressSortingDetails(
@@ -57,16 +56,16 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
 
     (firstLine, secondLine) match {
       case (line1, None) if startsWithNumberRegex.matches(line1) =>
-        //line1 starts with number, line2 not present
+        // line1 starts with number, line2 not present
         val houseNumber = numberRegex.findFirstIn(line1).map(toIntOrMaxValue)
         val street = houseNumber.fold(line1)(_ => firstLineSplit.drop(1).mkString(" "))
 
         (Some(street), houseNumber, None, None)
       case (line1, None) if !startsWithNumberRegex.matches(line1) =>
-        //line1 doesn't start with number, line2 not present
+        // line1 doesn't start with number, line2 not present
         (Some(line1), None, None, None)
       case (line1, Some(line2)) if startsWithNumberRegex.matches(line2) =>
-        //line1 present, line2 starts with number
+        // line1 present, line2 starts with number
         val houseNumber = numberRegex.findFirstIn(line2).map(toIntOrMaxValue)
         val street = houseNumber.fold(line2)(_ => secondLineSplit.drop(1).mkString(" "))
         val flatNumber = endsWithNumberRegex.findFirstIn(line1).map(toIntOrMaxValue)
@@ -75,13 +74,13 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
         (Some(street), houseNumber, flatNumber, Some(flat))
       case (line1, Some(line2))
           if firstLineSplit.length > 1 && startsWithNumberRegex.matches(line1) && !containsNumberRegex.matches(line2) =>
-        //line1 present and ends with number, line2 doesn't contain number
+        // line1 present and ends with number, line2 doesn't contain number
         val houseNumber = numberRegex.findFirstIn(line1).map(toIntOrMaxValue)
         val street = houseNumber.fold(line1)(_ => firstLineSplit.drop(1).mkString(" "))
 
         (Some(street), houseNumber, None, None)
       case (line1, Some(line2)) if !startsWithNumberRegex.matches(line2) =>
-        //line1 present, line2 doesn't start with number
+        // line1 present, line2 doesn't start with number
         val houseNumber = numberRegex.findFirstIn(line1).map(toIntOrMaxValue)
         val street = line2
 

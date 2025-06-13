@@ -18,7 +18,7 @@ package controllers.auth
 
 import play.api.test.FakeRequest
 import org.mockito.Mockito.{times, verify, when}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import repositories.SessionRepository
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import play.api.inject.bind
@@ -26,7 +26,7 @@ import config.FrontendAppConfig
 
 import scala.concurrent.Future
 
-class AuthControllerSpec extends ControllerBaseSpec {
+class AuthControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "signOut" - {
 

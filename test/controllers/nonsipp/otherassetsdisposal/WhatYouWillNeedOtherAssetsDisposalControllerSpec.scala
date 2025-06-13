@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedOtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedOtherAssetsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedOtherAssetsController" - {
 

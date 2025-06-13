@@ -16,16 +16,15 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class IsBuyerConnectedPartyPageSpec extends PageBehaviours {
 
   "IsBuyerConnectedPartyPage" - {
     val srn = srnGen.sample.value
-    val assetIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Boolean](IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex))
 

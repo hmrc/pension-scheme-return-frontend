@@ -25,9 +25,9 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import config.RefinedTypes.OneToThree
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
+class AccountingPeriodListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "AccountingPeriodListController" - {
 
@@ -35,10 +35,9 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
     val userAnswers =
       dateRanges.zipWithIndex
-        .foldLeft(defaultUserAnswers) {
-          case (userAnswers, (range, index)) =>
-            val refinedIndex = refineV[OneToThree](index + 1).toOption.value
-            userAnswers.set(AccountingPeriodPage(srn, refinedIndex, NormalMode), range).get
+        .foldLeft(defaultUserAnswers) { case (userAnswers, (range, index)) =>
+          val refinedIndex = refineV[OneToThree](index + 1).toOption.value
+          userAnswers.set(AccountingPeriodPage(srn, refinedIndex, NormalMode), range).get
         }
 
     val form = AccountingPeriodListController.form(new YesNoPageFormProvider())

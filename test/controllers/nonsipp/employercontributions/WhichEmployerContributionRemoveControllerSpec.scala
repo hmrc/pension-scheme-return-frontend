@@ -24,53 +24,53 @@ import pages.nonsipp.employercontributions.{
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
 import views.html.ListRadiosView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.{Money, NameDOB}
 import viewmodels.models.SectionJourneyStatus
 import config.RefinedTypes.Max50
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
+class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.WhichEmployerContributionRemoveController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.WhichEmployerContributionRemoveController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.WhichEmployerContributionRemoveController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.WhichEmployerContributionRemoveController.onSubmit(srn, 1)
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
   private val memberDetailsMap: List[(Max50, Money, String)] =
-    List((refineMV(1), money, employerName), (refineMV(2), money, employerName + "2"))
+    List((1, money, employerName), (2, money, employerName + "2"))
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
-    .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(1)), money)
-    .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
-    .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(2)), money)
-    .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(2)), employerName + "2")
-    .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetail1)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetail2)
+    .unsafeSet(TotalEmployerContributionPage(srn, 1, 1), money)
+    .unsafeSet(EmployerNamePage(srn, 1, 1), employerName)
+    .unsafeSet(EmployerContributionsProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(TotalEmployerContributionPage(srn, 1, 2), money)
+    .unsafeSet(EmployerNamePage(srn, 1, 2), employerName + "2")
+    .unsafeSet(EmployerContributionsProgress(srn, 1, 2), SectionJourneyStatus.Completed)
 
   private val userAnswersWithOneContributionOnly = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
-    .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(1)), money)
-    .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
-    .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetail1)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetail2)
+    .unsafeSet(TotalEmployerContributionPage(srn, 1, 1), money)
+    .unsafeSet(EmployerNamePage(srn, 1, 1), employerName)
+    .unsafeSet(EmployerContributionsProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
   "WhichEmployerContributionRemoveController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListRadiosView].apply(
         form(injected[RadioListFormProvider]),
-        viewModel(srn, refineMV(1), memberDetail1.fullName, memberDetailsMap)
+        viewModel(srn, 1, memberDetail1.fullName, memberDetailsMap)
       )
     })
 
     act.like(
       redirectToPage(
         onPageLoad,
-        routes.RemoveEmployerContributionsController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveEmployerContributionsController.onPageLoad(srn, 1, 1),
         userAnswersWithOneContributionOnly
       ).withName("should redirect to RemoveEmployerContributions page when only one contribution")
     )
@@ -80,7 +80,7 @@ class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.RemoveEmployerContributionsController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveEmployerContributionsController.onPageLoad(srn, 1, 1),
         userAnswers,
         "value" -> "1"
       )

@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedMoneyBorrowedControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedMoneyBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedMoneyBorrowedController" - {
 

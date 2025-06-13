@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal.TypeOfAssetBuyerPage
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TypeOfAssetBuyerController @Inject()(
+class TypeOfAssetBuyerController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -52,7 +53,7 @@ class TypeOfAssetBuyerController @Inject()(
 
   private val form = TypeOfAssetBuyerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
@@ -62,7 +63,7 @@ class TypeOfAssetBuyerController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -77,7 +78,7 @@ class TypeOfAssetBuyerController @Inject()(
                   )
                 )
               ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), answer)
@@ -87,7 +88,6 @@ class TypeOfAssetBuyerController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

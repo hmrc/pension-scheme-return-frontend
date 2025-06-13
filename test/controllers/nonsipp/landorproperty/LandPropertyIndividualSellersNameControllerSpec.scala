@@ -17,17 +17,16 @@
 package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.{form, viewModel}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 
-class LandPropertyIndividualSellersNameControllerSpec extends ControllerBaseSpec {
+class LandPropertyIndividualSellersNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.LandPropertyIndividualSellersNameController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandPropertyIndividualSellersNameController.onSubmit(srn, index, NormalMode)
 

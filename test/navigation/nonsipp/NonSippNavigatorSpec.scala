@@ -19,8 +19,8 @@ package navigation.nonsipp
 import pages.nonsipp.schemedesignatory._
 import utils.BaseSpec
 import controllers.nonsipp
+import utils.IntUtils.given
 import controllers.nonsipp._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import models.{NormalMode, SchemeMemberNumbers}
 import utils.UserAnswersUtils.UserAnswersOps
@@ -65,7 +65,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             CheckReturnDatesPage,
             Gen.const(false),
-            accountingperiod.routes.AccountingPeriodController.onPageLoad(_, refineMV(1), _)
+            accountingperiod.routes.AccountingPeriodController.onPageLoad(_, 1, _)
           )
           .withName("go from check return dates page to accounting period page when no is selected")
       )
@@ -144,7 +144,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad,
             srn =>
               defaultUserAnswers
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), dateRangeGen.sample.value)
+                .unsafeSet(AccountingPeriodPage(srn, 1, NormalMode), dateRangeGen.sample.value)
           )
           .withName(
             "go from CheckReturnDates page to AccountingPeriodsList when No selected and accounting periods not empty"
@@ -156,7 +156,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             CheckReturnDatesPage,
             Gen.const(false),
-            (srn, mode) => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode)
+            (srn, mode) => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, 1, mode)
           )
           .withName(
             "go from CheckReturnDates page to AccountingPeriods when No selected and AccountingPeriods is empty"

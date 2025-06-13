@@ -17,27 +17,26 @@
 package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models.{NormalMode, PensionSchemeType, ViewOnlyMode}
 import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
-class TransfersInCYAControllerSpec extends ControllerBaseSpec {
+class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private val page = 1
   private lazy val onPageLoad = routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, NormalMode)
@@ -154,9 +153,8 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to TransferReceivedMemberListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to TransferReceivedMemberListController page")
     )
   }
 }

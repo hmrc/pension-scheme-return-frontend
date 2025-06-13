@@ -16,8 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.AmountOfTheLoan
 import pages.behaviours.PageBehaviours
 
@@ -25,7 +24,7 @@ class AmountOfTheLoanPageSpec extends PageBehaviours {
 
   "AmountOfTheLoanPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[AmountOfTheLoan](AmountOfTheLoanPage(srn, index))
 

@@ -22,6 +22,7 @@ import models.ConditionalYesNo._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.MultipleQuestionFormProvider
@@ -46,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class InterestOnLoanController @Inject()(
+class InterestOnLoanController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -57,15 +58,13 @@ class InterestOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val previousAnswer = request.userAnswers.get(InterestOnLoanPage(srn, index))
       val form = InterestOnLoanController.form()
 
       val preparedForm = if (isPrePopulation) {
-        previousAnswer.fold(partialAnswersForm)(
-          interestOnLoan => partialAnswersForm.fill(interestOnLoan.asTuple)
-        )
+        previousAnswer.fold(partialAnswersForm)(interestOnLoan => partialAnswersForm.fill(interestOnLoan.asTuple))
       } else {
         request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form)
       }
@@ -81,7 +80,7 @@ class InterestOnLoanController @Inject()(
       Ok(view(preparedForm, viewModel))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = InterestOnLoanController.form()
 

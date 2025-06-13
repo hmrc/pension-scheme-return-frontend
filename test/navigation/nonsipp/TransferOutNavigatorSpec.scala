@@ -19,7 +19,7 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
 import pages.nonsipp.membertransferout._
@@ -31,8 +31,8 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index: Max300 = 1
+  private val secondaryIndex: Max5 = 1
 
   "TransferOutNavigator" - {
 
@@ -91,7 +91,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           ReceivingSchemeNamePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -107,7 +107,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           WhenWasTransferMadePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
           srn => defaultUserAnswers.unsafeSet(WhenWasTransferMadePage(srn, index, secondaryIndex), localDate)
@@ -125,45 +125,44 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           secondaryIndex,
           ReportAnotherTransferOutPage,
           Gen.const(false),
-          (srn, index: Max300, _: Max5, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from report another transfer in page to CYA page")
     )
 
     List(
-      (List("0"), refineMV[Max5.Refined](2)),
-      (List("0", "1", "2"), refineMV[Max5.Refined](4)),
-      (List("1", "2"), refineMV[Max5.Refined](1)), // deleted first entry
-      (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
-      (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
-      (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
-            .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
-            .unsafeSet(
-              MemberTransferOutProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+      (List("0"), 2),
+      (List("0", "1", "2"), 4),
+      (List("1", "2"), 1), // deleted first entry
+      (List("0", "1", "3"), 3), // deleted one entry in the middle
+      (List("0", "1", "2", "5", "6"), 4), // deleted two entry in the middle
+      (List("0", "1", "3", "5", "6"), 3) // deleted entry in the middle of two sections
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
+          .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
+          .unsafeSet(
+            MemberTransferOutProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          normalmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ReportAnotherTransferOutPage,
-              (srn, index: Max300, _: Max5, _) =>
-                controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ReportAnotherTransferOutPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 
@@ -175,7 +174,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           ReceivingSchemeNamePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
               .onPageLoad(srn, index, NormalMode)
         )
@@ -191,7 +190,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           WhenWasTransferMadePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
           srn => defaultUserAnswers.unsafeSet(WhenWasTransferMadePage(srn, index, secondaryIndex), localDate)
@@ -209,45 +208,44 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           secondaryIndex,
           ReportAnotherTransferOutPage,
           Gen.const(false),
-          (srn, index: Max300, _: Max5, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from report another transfer in page to CYA page")
     )
 
     List(
-      (List("0"), refineMV[Max5.Refined](2)),
-      (List("0", "1", "2"), refineMV[Max5.Refined](4)),
-      (List("1", "2"), refineMV[Max5.Refined](1)), // deleted first entry
-      (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
-      (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
-      (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
-            .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
-            .unsafeSet(
-              MemberTransferOutProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+      (List("0"), 2),
+      (List("0", "1", "2"), 4),
+      (List("1", "2"), 1), // deleted first entry
+      (List("0", "1", "3"), 3), // deleted one entry in the middle
+      (List("0", "1", "2", "5", "6"), 4), // deleted two entry in the middle
+      (List("0", "1", "3", "5", "6"), 3) // deleted entry in the middle of two sections
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
+          .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
+          .unsafeSet(
+            MemberTransferOutProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          checkmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ReportAnotherTransferOutPage,
-              (srn, index: Max300, _: Max5, _) =>
-                controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ReportAnotherTransferOutPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 
@@ -258,7 +256,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           RemoveTransferOutPage,
-          (srn, _: Max300, _) =>
+          (srn, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransferOutMemberListController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from remove transfer out page to transfer out member list page")

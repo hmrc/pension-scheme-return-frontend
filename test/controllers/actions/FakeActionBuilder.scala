@@ -21,11 +21,11 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeActionBuilder[F[_]](fa: F[_]) extends ActionBuilder[F, AnyContent] {
+class FakeActionBuilder[F[_], A](fa: F[A]) extends ActionBuilder[F, AnyContent] {
   override def parser: BodyParser[AnyContent] = stubBodyParser[AnyContent]()
 
-  override def invokeBlock[A](request: Request[A], block: F[A] => Future[Result]): Future[Result] =
-    block(fa.asInstanceOf[F[A]])
+  override def invokeBlock[B](request: Request[B], block: F[B] => Future[Result]): Future[Result] =
+    block(fa.asInstanceOf[F[B]])
 
   override protected def executionContext: ExecutionContext = ExecutionContext.global
 }

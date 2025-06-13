@@ -33,7 +33,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SharesPrePopulationProcessor @Inject()() {
+class SharesPrePopulationProcessor @Inject() () {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 

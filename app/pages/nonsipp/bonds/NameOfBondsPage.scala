@@ -67,10 +67,9 @@ case class NameOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[String
       .map(HowWereBondsDisposedOfPagesForEachBond(srn, index))
       .keys
       .toList
-      .flatMap(
-        key =>
-          refineV[OneTo50](key.toInt + 1)
-            .fold(_ => Nil, ind => List(HowWereBondsDisposedOfPage(srn, index, ind)))
+      .flatMap(key =>
+        refineV[OneTo50](key.toInt + 1)
+          .fold(_ => Nil, ind => List(HowWereBondsDisposedOfPage(srn, index, ind)))
       )
 }
 

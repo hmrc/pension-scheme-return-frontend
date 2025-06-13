@@ -27,7 +27,7 @@ import models.{CheckMode, SchemeMemberNumbers}
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
 
-class WhatYouWillNeedControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   def onwardRoute: Call = Call("GET", "/foo")
 

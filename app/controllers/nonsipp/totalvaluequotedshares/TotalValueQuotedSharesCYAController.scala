@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class TotalValueQuotedSharesCYAController @Inject()(
+class TotalValueQuotedSharesCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -123,8 +123,8 @@ class TotalValueQuotedSharesCYAController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ) =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>

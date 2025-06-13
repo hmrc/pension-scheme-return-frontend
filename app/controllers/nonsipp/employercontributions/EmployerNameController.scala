@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import viewmodels.implicits._
 import controllers.nonsipp.employercontributions.EmployerNameController._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300, toRefined50}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class EmployerNameController @Inject()(
+class EmployerNameController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -51,13 +52,13 @@ class EmployerNameController @Inject()(
 
   private val form = EmployerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm = request.userAnswers.fillForm(EmployerNamePage(srn, memberIndex, index), form)
       Ok(view(preparedForm, viewModel(srn, memberIndex, index, mode)))
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

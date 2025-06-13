@@ -34,8 +34,7 @@ import navigation.{FakeNavigator, Navigator}
 
 import scala.concurrent.Future
 
-trait ControllerBehaviours {
-  _: ControllerBaseSpec =>
+trait ControllerBehaviours extends ControllerBaseSpec {
 
   import Behaviours._
 

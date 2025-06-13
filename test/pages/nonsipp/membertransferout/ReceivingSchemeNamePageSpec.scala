@@ -17,7 +17,7 @@
 package pages.nonsipp.membertransferout
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
@@ -26,13 +26,13 @@ import controllers.TestValues
 
 class ReceivingSchemeNamePageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  val index: Refined[Int, Max5.Refined] = refineMV[Max5.Refined](1)
+  private val memberIndex = 1
+  val index: Refined[Int, Max5.Refined] = 1
 
   "ReceivingSchemeNamePage" - {
 
-    val index = refineMV[OneTo300](1)
-    val transferIndex = refineMV[OneTo5](1)
+    val index = 1
+    val transferIndex = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[String](ReceivingSchemeNamePage(srnSample, index, transferIndex))

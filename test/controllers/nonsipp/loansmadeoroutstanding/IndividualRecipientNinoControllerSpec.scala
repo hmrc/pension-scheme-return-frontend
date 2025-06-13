@@ -17,18 +17,17 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
+class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController

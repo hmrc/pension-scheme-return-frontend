@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedSurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedSurrenderedBenefitsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedSurrenderedBenefitsController" - {
 

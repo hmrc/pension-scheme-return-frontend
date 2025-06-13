@@ -18,18 +18,17 @@ package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.{WhenDidSchemeAcquireAssetsPage, WhyDoesSchemeHoldAssetsPage}
 import views.html.RadioListView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.IdentitySubject.OtherAssetSeller
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import models.{CheckMode, NormalMode}
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 
-class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
+class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private val schemeHoldAssets = schemeHoldAssetsGen.sample.value
 
   private lazy val onPageLoad =

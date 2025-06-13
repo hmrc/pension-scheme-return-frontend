@@ -18,31 +18,30 @@ package controllers.nonsipp.bonds
 
 import controllers.nonsipp.bonds.NameOfBondsController._
 import pages.nonsipp.bonds.NameOfBondsPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextAreaView
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 
-class NameOfBondsControllerSpec extends ControllerBaseSpec {
+class NameOfBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.NameOfBondsController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.NameOfBondsController.onSubmit(srn, 1, NormalMode)
 
   "NameOfBondsController" - {
 
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[TextAreaView].apply(
         form(injected[TextFormProvider]),
-        viewModel(srn, refineMV(1), NormalMode)
+        viewModel(srn, 1, NormalMode)
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, NameOfBondsPage(srn, refineMV(1)), "test text", defaultUserAnswers) {
+    act.like(renderPrePopView(onPageLoad, NameOfBondsPage(srn, index1of5000), "test text", defaultUserAnswers) {
       implicit app => implicit request =>
         injected[TextAreaView].apply(
           form(injected[TextFormProvider]).fill("test text"),
-          viewModel(srn, refineMV(1), NormalMode)
+          viewModel(srn, 1, NormalMode)
         )
     })
 

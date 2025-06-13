@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
+import utils.IntUtils.given
 import controllers.nonsipp.sharesdisposal.SharesIndividualBuyerNameController._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.SharesIndividualBuyerNamePage
 import forms.TextFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class SharesIndividualBuyerNameControllerSpec extends ControllerBaseSpec {
+class SharesIndividualBuyerNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   "IndividualRecipientNameController" - {
 

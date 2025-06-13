@@ -16,8 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes.Max5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
@@ -26,7 +25,7 @@ class SharesIndividualSellerNINumberPageSpec extends PageBehaviours {
 
   "SharesIndividualSellerNINumberPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnSample, index))

@@ -16,14 +16,13 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class IndividualNameOfAssetBuyerPageSpec extends PageBehaviours {
   private val srn = srnGen.sample.value
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   "IndividualNameOfAssetBuyerPage" - {
 

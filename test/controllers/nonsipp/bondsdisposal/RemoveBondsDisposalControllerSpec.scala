@@ -17,9 +17,10 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
 import forms.YesNoPageFormProvider
 import models.HowDisposed
@@ -28,13 +29,11 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.NameOfBondsPage
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
+class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val bondIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndex = 1
+  private val disposalIndex = 1
   private val methodOfDisposal = HowDisposed.Transferred
 
   private lazy val onPageLoad =
@@ -77,10 +76,10 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

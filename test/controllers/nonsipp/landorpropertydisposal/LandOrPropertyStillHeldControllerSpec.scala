@@ -17,18 +17,17 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class LandOrPropertyStillHeldControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyStillHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
   private lazy val onPageLoad =
     routes.LandOrPropertyStillHeldController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyStillHeldController.onSubmit(srn, index, disposalIndex, NormalMode)

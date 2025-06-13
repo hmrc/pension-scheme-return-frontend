@@ -16,8 +16,7 @@
 
 package pages.nonsipp.moneyborrowed
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class WhySchemeBorrowedMoneyPageSpec extends PageBehaviours {
@@ -25,7 +24,7 @@ class WhySchemeBorrowedMoneyPageSpec extends PageBehaviours {
   private val srn = srnGen.sample.value
 
   "WhySchemeBorrowedMoneyPage" - {
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[String](WhySchemeBorrowedMoneyPage(srn, index))
 

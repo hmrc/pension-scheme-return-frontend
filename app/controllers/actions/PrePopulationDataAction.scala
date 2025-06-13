@@ -32,13 +32,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PrePopulationDataAction @Inject()(
+class PrePopulationDataAction @Inject() (
   optLastSubmittedPsrFbInPreviousYears: Option[String],
   sessionRepository: SessionRepository,
   psrRetrievalService: PsrRetrievalService,
   prePopulationService: PrePopulationService
-)(
-  implicit val ec: ExecutionContext
+)(implicit
+  val ec: ExecutionContext
 ) extends ActionTransformer[DataRequest, DataRequest] {
 
   override def transform[A](existingDataRequest: DataRequest[A]): Future[DataRequest[A]] =
@@ -61,9 +61,7 @@ class PrePopulationDataAction @Inject()(
             prePopulationService.buildPrePopulatedUserAnswers(baseReturnUA, existingDataRequest.userAnswers)(srn)
           )
           _ <- sessionRepository.set(prePoppedUA.copy(id = UNCHANGED_SESSION_PREFIX + prePoppedUA.id))
-        } yield {
-          DataRequest(allowedAccessRequest, prePoppedUA)
-        }
+        } yield DataRequest(allowedAccessRequest, prePoppedUA)
 
       }
       .getOrElse(Future.successful(existingDataRequest))
@@ -80,7 +78,7 @@ trait PrePopulationDataActionProvider {
   def apply(optLastSubmittedPsrFbInPreviousYears: Option[String]): ActionTransformer[DataRequest, DataRequest]
 }
 
-class PrePopulationDataActionProviderImpl @Inject()(
+class PrePopulationDataActionProviderImpl @Inject() (
   sessionRepository: SessionRepository,
   psrRetrievalService: PsrRetrievalService,
   prePopulationService: PrePopulationService

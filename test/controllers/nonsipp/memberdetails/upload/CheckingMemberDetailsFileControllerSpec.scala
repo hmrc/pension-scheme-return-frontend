@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberdetails.upload
 
 import services.UploadService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 import play.api.inject
 import pages.nonsipp.memberdetails.upload.UploadStatusPage
@@ -29,7 +29,7 @@ import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileControl
 
 import scala.concurrent.Future
 
-class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec {
+class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.CheckingMemberDetailsFileController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.CheckingMemberDetailsFileController.onSubmit(srn, NormalMode)

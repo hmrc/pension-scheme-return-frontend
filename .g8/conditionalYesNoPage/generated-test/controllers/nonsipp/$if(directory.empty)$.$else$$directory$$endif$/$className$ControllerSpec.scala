@@ -22,18 +22,18 @@ import pages.nonsipp.$directory$.$className$Page
 $endif$
 $if(!index.empty)$
 import config.RefinedTypes.$index$
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 $endif$
 
 import scala.concurrent.Future
 
-class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
+class $className;format="cap"$ControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   $if(index.empty)$
   private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode)
   $else$
-  private val index = refineMV[$index$.Refined](1)
+  private val index = 1
   private lazy val onPageLoad = routes.$className; format = "cap" $Controller.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.$className; format = "cap" $Controller.onSubmit(srn, index, NormalMode)
   $endif$

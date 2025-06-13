@@ -18,7 +18,7 @@ package controllers.nonsipp.schemedesignatory
 
 import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.MultipleQuestionView
 import controllers.nonsipp.schemedesignatory.HowManyMembersController._
@@ -30,7 +30,7 @@ import org.mockito.Mockito.when
 
 import java.time.LocalDate
 
-class HowManyMembersControllerSpec extends ControllerBaseSpec {
+class HowManyMembersControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.HowManyMembersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.HowManyMembersController.onSubmit(srn, NormalMode)

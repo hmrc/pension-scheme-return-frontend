@@ -16,8 +16,7 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -25,8 +24,8 @@ class TotalConsiderationSharesRedeemedPageSpec extends PageBehaviours {
 
   "TotalConsiderationSharesRedeemedPage" - {
     val srn = srnGen.sample.value
-    val shareIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val shareIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Money](TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex))
 

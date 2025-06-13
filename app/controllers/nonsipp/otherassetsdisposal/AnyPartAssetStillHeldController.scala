@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.SaveService
 import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, OtherAssetsDisposalProgress}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class AnyPartAssetStillHeldController @Inject()(
+class AnyPartAssetStillHeldController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -52,7 +53,7 @@ class AnyPartAssetStillHeldController @Inject()(
 
   private val form = AnyPartAssetStillHeldController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), form)
@@ -70,7 +71,7 @@ class AnyPartAssetStillHeldController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

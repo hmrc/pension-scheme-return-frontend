@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -40,7 +41,7 @@ import scala.util.Try
 
 import javax.inject.Named
 
-class RemoveBorrowInstancesController @Inject()(
+class RemoveBorrowInstancesController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -54,7 +55,7 @@ class RemoveBorrowInstancesController @Inject()(
 
   private val form = RemoveBorrowInstancesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       (
         for {
@@ -72,28 +73,25 @@ class RemoveBorrowInstancesController @Inject()(
       ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          errors => {
+          errors =>
             Future.successful {
               (
                 for {
                   borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
                   lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
-                } yield {
-                  BadRequest(
-                    view(
-                      errors,
-                      RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
-                    )
+                } yield BadRequest(
+                  view(
+                    errors,
+                    RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
                   )
-                }
+                )
               ).merge
-            }
-          },
+            },
           value =>
             if (value) {
               for {

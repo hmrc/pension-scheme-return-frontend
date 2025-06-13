@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import utils.ListUtils.ListOps
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.shares.SharesCYAController._
@@ -45,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class SharesCYAController @Inject()(
+class SharesCYAController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -58,7 +59,7 @@ class SharesCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -67,7 +68,7 @@ class SharesCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -77,8 +78,8 @@ class SharesCYAController @Inject()(
       onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
     }
 
-  def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     request.userAnswers.get(SharesProgress(srn, index)) match {
       case Some(value) if value.inProgress =>
@@ -198,7 +199,7 @@ class SharesCYAController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val prePopulated = request.userAnswers.get(SharePrePopulated(srn, index)).isDefined
 
@@ -236,7 +237,7 @@ class SharesCYAController @Inject()(
 }
 
 case class ViewModelParameters(
-  )
+)
 object SharesCYAController {
   def viewModel(
     srn: Srn,
@@ -460,11 +461,14 @@ object SharesCYAController {
               "site.change",
               routes.TypeOfSharesHeldController.onPageLoad(srn, index, mode).url + "#typeOfShare"
             ).withVisuallyHiddenContent(
-              ("sharesCYA.section1.typeOfShare.hidden", typeOfShare match {
-                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                case Unquoted => "sharesCYA.section1.Unquoted"
-                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
-              })
+              (
+                "sharesCYA.section1.typeOfShare.hidden",
+                typeOfShare match {
+                  case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
+                  case Unquoted => "sharesCYA.section1.Unquoted"
+                  case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                }
+              )
             )
           )
         ) ++ List(
@@ -576,11 +580,14 @@ object SharesCYAController {
               "site.change",
               routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, mode).url + "#companyNameRelatedShares"
             ).withVisuallyHiddenContent(
-              ("sharesCYA.section2.companyNameRelatedShares.hidden", typeOfShare match {
-                case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
-                case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
-                case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
-              })
+              (
+                "sharesCYA.section2.companyNameRelatedShares.hidden",
+                typeOfShare match {
+                  case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                  case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                  case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
+                }
+              )
             )
           ),
           companySharesCrn.value match {

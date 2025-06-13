@@ -16,18 +16,17 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class CompanyRecipientNameControllerSpec extends ControllerBaseSpec {
+class CompanyRecipientNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   "IndividualRecipientNameController" - {
 

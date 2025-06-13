@@ -18,23 +18,22 @@ package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharePrePopulated}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import controllers.nonsipp.shares.RemoveSharesController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 
-class RemoveSharesControllerSpec extends ControllerBaseSpec {
+class RemoveSharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.RemoveSharesController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveSharesController.onSubmit(srn, index, NormalMode)
@@ -44,8 +43,8 @@ class RemoveSharesControllerSpec extends ControllerBaseSpec {
   private val userAnswers = defaultUserAnswers
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 
-  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(SharePrePopulated(srn, refineMV(1)), true)
-  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(SharePrePopulated(srn, refineMV(1)), false)
+  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(SharePrePopulated(srn, 1), true)
+  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(SharePrePopulated(srn, 1), false)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)

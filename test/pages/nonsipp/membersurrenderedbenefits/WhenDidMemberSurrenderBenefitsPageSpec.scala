@@ -16,8 +16,7 @@
 
 package pages.nonsipp.membersurrenderedbenefits
 
-import config.RefinedTypes.Max300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -26,7 +25,7 @@ class WhenDidMemberSurrenderBenefitsPageSpec extends PageBehaviours {
 
   "WhenDidMemberSurrenderBenefitsPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnSample, index))

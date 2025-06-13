@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpayments
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -29,7 +29,7 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class RemoveUnallocatedAmountControllerSpec extends ControllerBaseSpec {
+class RemoveUnallocatedAmountControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.RemoveUnallocatedAmountController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.RemoveUnallocatedAmountController.onSubmit(srn, NormalMode)

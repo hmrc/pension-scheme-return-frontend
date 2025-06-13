@@ -18,9 +18,9 @@ package controllers.nonsipp.accountingperiod
 
 import services.TaxYearService
 import org.mockito.Mockito.reset
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DateRangeView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.toRefined3
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, Paths}
 import pages.nonsipp.WhichTaxYearPage
 import forms.DateRangeFormProvider
@@ -28,7 +28,7 @@ import models.{DateRange, NormalMode}
 
 import java.time.LocalDate
 
-class AccountingPeriodControllerSpec extends ControllerBaseSpec {
+class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val mockTaxYearService = mock[TaxYearService]
   private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), allowedDateRange)
@@ -47,16 +47,16 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
       defaultTaxYear,
       List(),
       LocalDate.of(2021, 4, 6),
-      refineMV(1)
+      1
     )
-    lazy val viewModel = AccountingPeriodController.viewModel(srn, refineMV(1), NormalMode)
+    lazy val viewModel = AccountingPeriodController.viewModel(srn, 1, NormalMode)
 
     val rangeGen = dateRangeWithinRangeGen(allowedDateRange)
     val dateRangeData = rangeGen.sample.value
     val otherDateRangeData = rangeGen.sample.value
 
-    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
+    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, 1, NormalMode)
+    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, 1, NormalMode)
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[DateRangeView]
@@ -64,7 +64,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1), NormalMode), dateRangeData, userAnswers) {
+      renderPrePopView(onPageLoad, AccountingPeriodPage(srn, 1, NormalMode), dateRangeData, userAnswers) {
         implicit app => implicit request =>
           val view = injected[DateRangeView]
           view(form.fill(dateRangeData), viewModel)
@@ -95,9 +95,9 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
         emptyUserAnswers
           .set(WhichTaxYearPage(srn), dateRange)
           .get
-          .set(AccountingPeriodPage(srn, refineMV(1), NormalMode), otherDateRangeData)
+          .set(AccountingPeriodPage(srn, 1, NormalMode), otherDateRangeData)
           .get
-          .set(AccountingPeriodPage(srn, refineMV(2), NormalMode), dateRangeData)
+          .set(AccountingPeriodPage(srn, 2, NormalMode), dateRangeData)
           .get
 
       act.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData): _*))

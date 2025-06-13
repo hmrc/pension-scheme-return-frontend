@@ -16,8 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.{ConditionalYesNo, Crn}
 import pages.behaviours.PageBehaviours
 
@@ -25,7 +24,7 @@ class SharesCompanyCrnPageSpec extends PageBehaviours {
 
   "SharesCompanyCrnPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[ConditionalYesNo[String, Crn]](SharesCompanyCrnPage(srnGen.sample.value, index))
 

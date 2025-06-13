@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import pages.nonsipp.receivetransfer._
 import controllers.actions._
 import navigation.Navigator
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveTransferInController @Inject()(
+class RemoveTransferInController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,7 +55,7 @@ class RemoveTransferInController @Inject()(
 
   private val form = RemoveTransferInController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -68,12 +69,12 @@ class RemoveTransferInController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
@@ -83,9 +84,8 @@ class RemoveTransferInController @Inject()(
               } yield BadRequest(
                 view(formWithErrors, viewModel(srn, memberIndex, index, nameDOB.fullName, transferringSchemeName))
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
@@ -103,12 +103,11 @@ class RemoveTransferInController @Inject()(
                   fallbackCall = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -119,7 +118,6 @@ class RemoveTransferInController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

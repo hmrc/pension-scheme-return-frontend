@@ -17,17 +17,16 @@
 package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.BondsFromConnectedPartyPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import models.NormalMode
 import controllers.nonsipp.bonds.BondsFromConnectedPartyController._
 
-class BondsFromConnectedPartyControllerSpec extends ControllerBaseSpec {
+class BondsFromConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.BondsFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.BondsFromConnectedPartyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"

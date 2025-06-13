@@ -16,8 +16,7 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.RefinedTypes.Max5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -26,7 +25,7 @@ class WhenDidSchemeAcquireAssetsPageSpec extends PageBehaviours {
 
   "WhenDidSchemeAcquireAssetsPage" - {
     val srn = srnGen.sample.value
-    val shareIndex = refineMV[Max5000.Refined](1)
+    val shareIndex = 1
 
     beRetrievable[LocalDate](WhenDidSchemeAcquireAssetsPage(srn, shareIndex))
 

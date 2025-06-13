@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveShareDisposalController @Inject()(
+class RemoveShareDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -53,7 +54,7 @@ class RemoveShareDisposalController @Inject()(
 
   private val form = RemoveShareDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -63,13 +64,11 @@ class RemoveShareDisposalController @Inject()(
           nameOfSharesCompany <- request.userAnswers
             .get(CompanyNameRelatedSharesPage(srn, shareIndex))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
-        }
+        } yield Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
       ).merge
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -107,8 +106,8 @@ class RemoveShareDisposalController @Inject()(
                   fallbackCall =
                     controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPageLoad(srn, 1)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ => Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))
               )
             } else {
               Future.successful(

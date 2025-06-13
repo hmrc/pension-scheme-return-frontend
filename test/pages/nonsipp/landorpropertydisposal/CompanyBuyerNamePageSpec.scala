@@ -17,15 +17,15 @@
 package pages.nonsipp.landorpropertydisposal
 
 import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 class CompanyBuyerNamePageSpec extends PageBehaviours {
 
   "CompanyBuyerNamePage" - {
 
-    val index: Refined[Int, Max5000.Refined] = refineMV[Max5000.Refined](1)
-    val disposalIndex: Refined[Int, Max50.Refined] = refineMV[Max50.Refined](1)
+    val index: Refined[Int, Max5000.Refined] = 1
+    val disposalIndex: Refined[Int, Max50.Refined] = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[String](CompanyBuyerNamePage(srnSample, index, disposalIndex))

@@ -16,14 +16,13 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemoveLoanPageSpec extends PageBehaviours {
 
   "RemoveLoanPage" - {
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[Boolean](RemoveLoanPage(srnSample, index))
