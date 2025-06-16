@@ -615,7 +615,8 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               index,
               srn,
               ua19,
-              otherAssetTransaction.optOtherAssetDisposed
+              otherAssetTransaction.optOtherAssetDisposed,
+              otherAssets.optOtherAssetsWereDisposed
             )
           }
           triedUA.flatten
@@ -627,11 +628,12 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     index: Max5000,
     srn: Srn,
     userAnswers: UserAnswers,
-    optOtherAssetDisposed: Option[Seq[OtherAssetDisposed]]
+    optOtherAssetDisposed: Option[Seq[OtherAssetDisposed]],
+    optOtherAssetsWereDisposed: Option[Boolean]
   ): Try[UserAnswers] = {
     val initialUserAnswersOfDisposal = Option
-      .when(optOtherAssetDisposed.nonEmpty)(
-        userAnswers.set(OtherAssetsDisposalPage(srn), optOtherAssetDisposed.isDefined)
+      .when(optOtherAssetsWereDisposed.nonEmpty)(
+        userAnswers.set(OtherAssetsDisposalPage(srn), optOtherAssetsWereDisposed.get)
       )
       .getOrElse(Try(userAnswers))
 

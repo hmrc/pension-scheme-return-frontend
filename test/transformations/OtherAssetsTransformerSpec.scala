@@ -453,6 +453,7 @@ class OtherAssetsTransformerSpec
         userAnswers => {
           userAnswers.get(OtherAssetsRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(OtherAssetsHeldPage(srn)) mustBe Some(false)
+          userAnswers.get(OtherAssetsDisposalPage(srn)) mustBe None
         }
       )
     }
