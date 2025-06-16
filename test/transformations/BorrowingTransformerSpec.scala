@@ -55,10 +55,12 @@ class BorrowingTransformerSpec
     "should omit Record Version when there is a change in userAnswers" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(MoneyBorrowedPage(srn), false)
+        .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
         .unsafeSet(BorrowingRecordVersionPage(srn), "001")
 
       val initialUserAnswer = emptyUserAnswers
         .unsafeSet(MoneyBorrowedPage(srn), true)
+        .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
         .unsafeSet(BorrowingRecordVersionPage(srn), "001")
 
       val result =
@@ -68,11 +70,36 @@ class BorrowingTransformerSpec
       result mustBe Some(Borrowing(recordVersion = None, moneyWasBorrowed = false, moneyBorrowed = Seq.empty))
     }
 
+    "should return None when MoneyBorrowedPage is true but there is no MoneyBorrowedProgress" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(MoneyBorrowedPage(srn), true)
+        .unsafeSet(LenderNamePage(srn, 1), "borrowingFromName")
+
+      val result =
+        transformer.transformToEtmp(srn = srn, Some(true), userAnswers)(
+          DataRequest(allowedAccessRequest, userAnswers)
+        )
+      result mustBe None
+    }
+
+    "should return Some when MoneyBorrowedPage is false but there is no MoneyBorrowedProgress" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(MoneyBorrowedPage(srn), false)
+        .unsafeSet(BorrowingRecordVersionPage(srn), "001")
+
+      val result =
+        transformer.transformToEtmp(srn = srn, Some(false), userAnswers)(
+          DataRequest(allowedAccessRequest, userAnswers)
+        )
+      result mustBe Some(Borrowing(recordVersion = Some("001"), moneyWasBorrowed = false, moneyBorrowed = Seq.empty))
+    }
+
     "should return recordVersion when there is no change among UAs" - {
       "should return empty List when index as string not a valid number" in {
         val userAnswers = emptyUserAnswers
           .unsafeSet(MoneyBorrowedPage(srn), true)
           .unsafeSet(BorrowingRecordVersionPage(srn), "001")
+          .unsafeSet(MoneyBorrowedProgress(srn, 1), SectionJourneyStatus.Completed)
           .unsafeSet(
             Paths.moneyBorrowed \ "borrowingFromName",
             Json.obj("InvalidIntValue" -> true)

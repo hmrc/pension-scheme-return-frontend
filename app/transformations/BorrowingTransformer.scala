@@ -38,15 +38,27 @@ class BorrowingTransformer @Inject() extends Transformer {
   def transformToEtmp(srn: Srn, optMoneyWasBorrowed: Option[Boolean], initialUA: UserAnswers)(implicit
     request: DataRequest[_]
   ): Option[Borrowing] =
-    optMoneyWasBorrowed.map(moneyWasBorrowed =>
-      Borrowing(
-        recordVersion = Option.when(request.userAnswers.get(borrowing) == initialUA.get(borrowing))(
-          request.userAnswers.get(BorrowingRecordVersionPage(srn)).get
-        ),
-        moneyWasBorrowed = moneyWasBorrowed,
-        moneyBorrowed = moneyBorrowedTransformToEtmp(srn)
+    if (
+      optMoneyWasBorrowed.isEmpty ||
+      (
+        optMoneyWasBorrowed.getOrElse(false) && !request.userAnswers
+          .map(MoneyBorrowedProgress.all(srn))
+          .toList
+          .exists(_._2.completed)
       )
-    )
+    ) {
+      None
+    } else {
+      optMoneyWasBorrowed.map(moneyWasBorrowed =>
+        Borrowing(
+          recordVersion = Option.when(request.userAnswers.get(borrowing) == initialUA.get(borrowing))(
+            request.userAnswers.get(BorrowingRecordVersionPage(srn)).get
+          ),
+          moneyWasBorrowed = moneyWasBorrowed,
+          moneyBorrowed = moneyBorrowedTransformToEtmp(srn)
+        )
+      )
+    }
 
   private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
     request.userAnswers
