@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300}
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.{Money, NormalMode}
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemovePensionPaymentsController @Inject()(
+class RemovePensionPaymentsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -53,7 +54,7 @@ class RemovePensionPaymentsController @Inject()(
 
   private val form = RemovePensionPaymentsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -61,28 +62,26 @@ class RemovePensionPaymentsController @Inject()(
           totalAmountPensionPayment <- request.userAnswers
             .get(TotalAmountPensionPaymentsPage(srn, index))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemovePensionPaymentsController.viewModel(
-                srn,
-                index: Max300,
-                totalAmountPensionPayment,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemovePensionPaymentsController.viewModel(
+              srn,
+              index: Max300,
+              totalAmountPensionPayment,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -95,9 +94,8 @@ class RemovePensionPaymentsController @Inject()(
                   RemovePensionPaymentsController.viewModel(srn, index, total, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
@@ -113,12 +111,11 @@ class RemovePensionPaymentsController @Inject()(
                   fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemovePensionPaymentsPage(srn, index), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemovePensionPaymentsPage(srn, index), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -129,7 +126,6 @@ class RemovePensionPaymentsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

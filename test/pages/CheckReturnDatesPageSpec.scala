@@ -16,7 +16,7 @@
 
 package pages
 
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.CheckReturnDatesPage
@@ -39,9 +39,9 @@ class CheckReturnDatesPageSpec extends PageBehaviours {
 
       val userAnswers =
         UserAnswers("id")
-          .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), dateRangeGen.sample.value)
-          .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), dateRangeGen.sample.value)
-          .unsafeSet(AccountingPeriodPage(srn, refineMV(3), NormalMode), dateRangeGen.sample.value)
+          .unsafeSet(AccountingPeriodPage(srn, 1, NormalMode), dateRangeGen.sample.value)
+          .unsafeSet(AccountingPeriodPage(srn, 2, NormalMode), dateRangeGen.sample.value)
+          .unsafeSet(AccountingPeriodPage(srn, 3, NormalMode), dateRangeGen.sample.value)
 
       List(Some(true), None).foreach { answer =>
         s"remove accounting periods when answer is $answer" in {

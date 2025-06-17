@@ -30,7 +30,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
   def fieldThatBindsValidData(form: Form[_], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "bind valid data" in {
 
-      forAll(validDataGenerator -> "validDataItem") { dataItem: String =>
+      forAll(validDataGenerator -> "validDataItem") { (dataItem: String) =>
         val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
         result.value.value mustBe dataItem
         result.errors mustBe empty
@@ -112,7 +112,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
 
   def trimmedField(form: Form[_], fieldName: String, gen: Gen[String]): Unit =
     "trim field value when bound" in {
-      forAll(gen -> "validDataItem") { value: String =>
+      forAll(gen -> "validDataItem") { (value: String) =>
         val result = form.bind(Map(fieldName -> value))
         result.errors mustBe empty
         result.value mustBe Some(value.trim)
@@ -130,7 +130,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
 
   def errorField(testName: String, form: Form[_], fieldName: String, error: FormError, gen: Gen[String]): Unit =
     s"not bind when $testName" in {
-      forAll(gen -> "validDataItem") { value: String =>
+      forAll(gen -> "validDataItem") { (value: String) =>
         val result = form.bind(Map(fieldName -> value))(fieldName)
         result.errors mustEqual Seq(error)
       }
@@ -139,7 +139,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
   def fieldThatBindsValidDate(form: Form[_], fieldName: String): Unit =
     "bind valid date" in {
 
-      forAll(date -> "valid date") { localDate: LocalDate =>
+      forAll(date -> "valid date") { (localDate: LocalDate) =>
         val result = form
           .bind(
             Map(
@@ -157,7 +157,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
   def fieldThatBindsTooEarlyDate(form: Form[_], fieldName: String, formError: FormError): Unit =
     "bind too early date" in {
 
-      forAll(tooEarlyDateGen -> "invalid date") { localDate: LocalDate =>
+      forAll(tooEarlyDateGen -> "invalid date") { (localDate: LocalDate) =>
         val result = form
           .bind(
             Map(

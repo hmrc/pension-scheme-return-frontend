@@ -27,7 +27,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import javax.inject.Inject
 
-class FakeDataRetrievalETMPActionProvider @Inject()(
+class FakeDataRetrievalETMPActionProvider @Inject() (
   userAnswers: Option[UserAnswers],
   pureUserAnswers: Option[UserAnswers],
   previousUserAnswers: Option[UserAnswers]

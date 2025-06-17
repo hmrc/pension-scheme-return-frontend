@@ -11,7 +11,7 @@ import pages.QuestionPage
 $if(!index.empty)$
 import config.RefinedTypes.$index$
 import utils.RefinedUtils._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 $endif$
 
 $if(index.empty)$

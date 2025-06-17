@@ -23,7 +23,7 @@ import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import config.Constants.SRN
 
-class JourneyRecoveryControllerSpec extends ControllerBaseSpec with TestValues {
+class JourneyRecoveryControllerSpec extends ControllerBaseSpec with ControllerBehaviours with TestValues {
   implicit val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   override def beforeEach(): Unit =

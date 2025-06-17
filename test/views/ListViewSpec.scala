@@ -23,7 +23,7 @@ import models.Pagination
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.PaginatedViewModel
 
-class ListViewSpec extends ViewSpec {
+class ListViewSpec extends ViewSpec with ViewBehaviours {
 
   runningApplication { implicit app =>
     implicit val view: ListView = injected[ListView]

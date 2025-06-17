@@ -19,6 +19,7 @@ package controllers.nonsipp.membercontributions
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveMemberContributionController @Inject()(
+class RemoveMemberContributionController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,34 +55,32 @@ class RemoveMemberContributionController @Inject()(
 
   private val form = RemoveMemberContributionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
           totalContrib <- request.userAnswers.get(TotalMemberContributionPage(srn, index)).getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemoveMemberContributionController.viewModel(
-                srn,
-                index: Max300,
-                totalContrib,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemoveMemberContributionController.viewModel(
+              srn,
+              index: Max300,
+              totalContrib,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -94,9 +93,8 @@ class RemoveMemberContributionController @Inject()(
                   RemoveMemberContributionController.viewModel(srn, index, total, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- request.userAnswers
@@ -110,12 +108,11 @@ class RemoveMemberContributionController @Inject()(
                   fallbackCall = controllers.nonsipp.membercontributions.routes.MemberContributionListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -126,7 +123,6 @@ class RemoveMemberContributionController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

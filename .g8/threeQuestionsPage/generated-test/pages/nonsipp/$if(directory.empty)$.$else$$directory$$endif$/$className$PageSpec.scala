@@ -4,7 +4,7 @@ import pages.behaviours.PageBehaviours
 import models._
 $if(!index.empty)$
 import config.RefinedTypes.$index$
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 $endif$
 
 class $className$PageSpec extends PageBehaviours {
@@ -14,7 +14,7 @@ class $className$PageSpec extends PageBehaviours {
   "$className$Page" - {
 
     $if(!index.empty) $
-    val index = refineMV[$index$.Refined](1)
+    val index = 1
 
     beRetrievable[($field1Type$, $field2Type$, $field3Type$)]($className;format="cap"$Page(srn, index))
 

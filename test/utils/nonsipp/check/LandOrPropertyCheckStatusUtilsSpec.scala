@@ -26,9 +26,13 @@ import models.IdentitySubject._
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class LandOrPropertyCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
+class LandOrPropertyCheckStatusUtilsSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with Matchers
+    with OptionValues {
 
   private val conditionalYesNoLRTN: ConditionalYesNo[String, String] = ConditionalYesNo.yes("landRegistryTitleNumber")
 

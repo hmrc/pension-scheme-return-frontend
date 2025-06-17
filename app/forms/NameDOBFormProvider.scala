@@ -57,6 +57,6 @@ class NameDOBFormProvider @Inject() extends Mappings {
           )
         ),
         dateOfBirth -> localDate(dateFormErrors)
-      )(NameDOB.apply)(NameDOB.unapply)
+      )(NameDOB.apply)(x => Some(x._1, x._2, x._3))
     )
 }

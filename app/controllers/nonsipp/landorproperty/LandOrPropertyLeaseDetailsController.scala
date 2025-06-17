@@ -23,7 +23,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import viewmodels.models.MultipleQuestionsViewModel._
 import config.Constants
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 import cats.implicits._
 import controllers.actions._
 import navigation.Navigator
@@ -35,6 +34,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage.Message
@@ -46,7 +47,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyLeaseDetailsController @Inject()(
+class LandOrPropertyLeaseDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -57,7 +58,7 @@ class LandOrPropertyLeaseDetailsController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val result = for {
         endDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourneyT
@@ -73,34 +74,32 @@ class LandOrPropertyLeaseDetailsController @Inject()(
       result.merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val result = for {
         endDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourneyT
         address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourneyT
-      } yield {
-        form(endDate.to)
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    viewModel(srn, index, address.addressLine1, form(endDate.to), mode)
-                  )
+      } yield form(endDate.to)
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  viewModel(srn, index, address.addressLine1, form(endDate.to), mode)
                 )
-              ),
-            value =>
-              for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(LandOrPropertyLeaseDetailsPage(srn, index), value))
-                nextPage = navigator.nextPage(LandOrPropertyLeaseDetailsPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-                _ <- saveService.save(updatedProgressAnswers)
-              } yield Redirect(nextPage)
-          )
-      }
+              )
+            ),
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(LandOrPropertyLeaseDetailsPage(srn, index), value))
+              nextPage = navigator.nextPage(LandOrPropertyLeaseDetailsPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
+        )
 
       result.leftMap(_.pure[Future]).merge.flatten
   }

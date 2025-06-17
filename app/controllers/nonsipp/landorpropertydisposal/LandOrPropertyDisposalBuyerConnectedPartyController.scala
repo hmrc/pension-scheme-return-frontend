@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
 import navigation.Navigator
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
+class LandOrPropertyDisposalBuyerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -52,7 +53,7 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
 
   private val form = LandOrPropertyDisposalBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex), form)
@@ -61,7 +62,7 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
         .merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -69,8 +70,8 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
           formWithErrors =>
             Future.successful(
               getBuyersName(srn, index, disposalIndex)
-                .map(
-                  buyersName => BadRequest(view(formWithErrors, viewModel(srn, buyersName, index, disposalIndex, mode)))
+                .map(buyersName =>
+                  BadRequest(view(formWithErrors, viewModel(srn, buyersName, index, disposalIndex, mode)))
                 )
                 .merge
             ),
@@ -92,8 +93,8 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
         )
     }
 
-  private def getBuyersName(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)(
-    implicit request: DataRequest[_]
+  private def getBuyersName(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)(implicit
+    request: DataRequest[_]
   ): Either[Result, String] =
     for {
       buyerType <- request.userAnswers

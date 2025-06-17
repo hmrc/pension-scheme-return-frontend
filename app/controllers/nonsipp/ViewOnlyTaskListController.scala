@@ -41,7 +41,7 @@ import viewmodels.models._
 
 import scala.concurrent.Future
 
-class ViewOnlyTaskListController @Inject()(
+class ViewOnlyTaskListController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,

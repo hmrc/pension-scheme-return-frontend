@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.Max5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -27,7 +26,7 @@ class LandOrPropertyTotalIncomePageSpec extends PageBehaviours {
 
   "LandOrPropertyTotalIncomePage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val index = 1
 
     beRetrievable[Money](LandOrPropertyTotalIncomePage(srn, index))
 

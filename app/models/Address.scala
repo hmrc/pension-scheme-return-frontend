@@ -23,15 +23,16 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 
 case class ALFCountry(code: String, name: String)
 
-case class ALFAddress(lines: Seq[String], town: String, postcode: String, country: ALFCountry) extends {
+case class ALFAddress(lines: Seq[String], town: String, postcode: String, country: ALFCountry) {
   val firstLine: String = lines.head
   val secondLine: Option[String] = lines.drop(1).headOption
   val thirdLine: Option[String] = lines.drop(2).headOption
 }
 
 /**
- * Based on this schema: https://github.com/hmrc/address-lookup/blob/main/public/api/conf/1.0/docs/uk-address-object.json
- * First line, town, postcode and country are required
+ * Based on this schema:
+ * https://github.com/hmrc/address-lookup/blob/main/public/api/conf/1.0/docs/uk-address-object.json First line, town,
+ * postcode and country are required
  */
 case class ALFAddressResponse(id: String, address: ALFAddress)
 
@@ -64,8 +65,10 @@ case class Address(
   canRemove: Boolean = true
 ) {
   val asString: String =
-    s"""$addressLine1, ${addressLine2.fold("")(al2 => s"$al2, ")}${addressLine3.fold("")(al3 => s"$al3, ")}$town${postCode
-      .fold("")(postcode => s", $postcode")}"""
+    s"""$addressLine1, ${addressLine2.fold("")(al2 => s"$al2, ")}${addressLine3.fold("")(al3 =>
+        s"$al3, "
+      )}$town${postCode
+        .fold("")(postcode => s", $postcode")}"""
 
   val asNel: NonEmptyList[String] = NonEmptyList.of(addressLine1) ++ List(addressLine2, addressLine3).flatten ++ List(
     town
@@ -98,14 +101,14 @@ object Address {
       .and((JsPath \ "town").read[String])
       .and((JsPath \ "postCode").readNullable[String])
       .and((JsPath \ "countryCode").read[String])
-      .and((JsPath \ "addressType").readWithDefault(ManualAddress))
+      .and((JsPath \ "addressType").readWithDefault[AddressType](ManualAddress))
       .and((JsPath \ "street").readNullable[String])
       .and((JsPath \ "houseNumber").readNullable[Int])
       .and((JsPath \ "flatNumber").readNullable[Int])
       .and((JsPath \ "flat").readNullable[String])
 
   implicit val addressReads: Reads[Address] =
-    addressReadsBuilder.apply(
+    addressReadsBuilder.apply {
       (
         id,
         addressLine1,
@@ -119,7 +122,7 @@ object Address {
         houseNumber,
         flatNumber,
         flat
-      ) => {
+      ) =>
         Address(
           id,
           addressLine1,
@@ -135,8 +138,7 @@ object Address {
           flatNumber,
           flat
         )
-      }
-    )
+    }
 
   implicit val addressWrites: Writes[Address] = Json.writes[Address]
 

@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class UploadMemberDetailsController @Inject()(
+class UploadMemberDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -114,8 +114,8 @@ class UploadMemberDetailsController @Inject()(
         }
       }
 
-  private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(
-    implicit req: DataRequest[_]
+  private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(implicit
+    req: DataRequest[_]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
@@ -154,14 +154,13 @@ object UploadMemberDetailsController {
       "uploadMemberDetails.title",
       "uploadMemberDetails.heading",
       UploadViewModel(
-        detailsContent =
-          ParagraphMessage("uploadMemberDetails.details.paragraph") ++
-            ListMessage(
-              ListType.Bullet,
-              "uploadMemberDetails.list1",
-              "uploadMemberDetails.list2",
-              "uploadMemberDetails.list3"
-            ),
+        detailsContent = ParagraphMessage("uploadMemberDetails.details.paragraph") ++
+          ListMessage(
+            ListType.Bullet,
+            "uploadMemberDetails.list1",
+            "uploadMemberDetails.list2",
+            "uploadMemberDetails.list3"
+          ),
         acceptedFileType = ".csv",
         maxFileSize = maxFileSize,
         formFields,

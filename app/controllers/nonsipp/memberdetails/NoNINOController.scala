@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class NoNINOController @Inject()(
+class NoNINOController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -53,7 +54,7 @@ class NoNINOController @Inject()(
 
   private def form(memberFullName: String): Form[String] = NoNINOController.form(formProvider, memberFullName)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index) { memberDetails =>
         val preparedForm =
@@ -64,7 +65,7 @@ class NoNINOController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index) { memberDetails =>
         form(memberDetails.fullName)

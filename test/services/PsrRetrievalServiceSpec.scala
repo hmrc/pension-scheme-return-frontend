@@ -55,8 +55,9 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
     reset(mockDeclarationTransformer)
   }
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockConnector = mock[PSRConnector]
@@ -93,7 +94,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -130,7 +131,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -170,7 +171,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -210,7 +211,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
@@ -251,7 +252,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
@@ -292,7 +293,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
@@ -332,7 +333,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { (result: UserAnswers) =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())

@@ -17,20 +17,19 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.Money
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.Max300
-import controllers.TestValues
 
 class SurrenderedBenefitsAmountPageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
+  private val memberIndex = 1
 
   "SurrenderedBenefitsAmountPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val index = 1
 
     val srnSample = srnGen.sample.value
     beRetrievable[Money](SurrenderedBenefitsAmountPage(srnSample, index))

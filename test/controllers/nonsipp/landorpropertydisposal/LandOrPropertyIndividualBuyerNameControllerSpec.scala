@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNamePage
-import eu.timepit.refined.refineMV
 import models.NormalMode
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNameController._
 import forms.TextFormProvider
 
-class LandOrPropertyIndividualBuyerNameControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyIndividualBuyerNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   "IndividualRecipientNameController" - {
 

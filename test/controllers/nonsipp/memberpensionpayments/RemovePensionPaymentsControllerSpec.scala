@@ -17,33 +17,33 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
+import utils.IntUtils.given
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import forms.YesNoPageFormProvider
 import models.NameDOB
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import eu.timepit.refined.refineMV
 
 import scala.concurrent.Future
 
-class RemovePensionPaymentsControllerSpec extends ControllerBaseSpec {
+class RemovePensionPaymentsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.RemovePensionPaymentsController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.RemovePensionPaymentsController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.RemovePensionPaymentsController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.RemovePensionPaymentsController.onSubmit(srn, 1)
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-    .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+    .unsafeSet(TotalAmountPensionPaymentsPage(srn, 1), money)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -62,7 +62,7 @@ class RemovePensionPaymentsControllerSpec extends ControllerBaseSpec {
 
       view(
         RemovePensionPaymentsController.form(injected[YesNoPageFormProvider]),
-        RemovePensionPaymentsController.viewModel(srn, refineMV(1), money, memberDetails.fullName)
+        RemovePensionPaymentsController.viewModel(srn, 1, money, memberDetails.fullName)
       )
     })
 

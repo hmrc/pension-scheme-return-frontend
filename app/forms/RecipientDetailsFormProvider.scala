@@ -54,6 +54,6 @@ class RecipientDetailsFormProvider @Inject() extends Mappings {
             maxLength(maxOtherDescriptionLength, descriptionLength)
           )
         )
-      )(RecipientDetails.apply)(RecipientDetails.unapply)
+      )(RecipientDetails.apply)(x => Some((x.name, x.description)))
     )
 }

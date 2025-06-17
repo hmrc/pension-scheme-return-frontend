@@ -24,6 +24,7 @@ import play.api.mvc._
 import _root_.config.RefinedTypes._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import controllers.PSRController
+import utils.IntUtils.{toInt, toRefined300}
 import _root_.config.Constants
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -42,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalAmountPensionPaymentsController @Inject()(
+class TotalAmountPensionPaymentsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class TotalAmountPensionPaymentsController @Inject()(
 
   private val form = TotalAmountPensionPaymentsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         val preparedForm =
@@ -67,13 +68,13 @@ class TotalAmountPensionPaymentsController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => {
+            formWithErrors =>
               Future.successful(
                 BadRequest(
                   view(
@@ -81,8 +82,7 @@ class TotalAmountPensionPaymentsController @Inject()(
                     viewModel(srn, index, memberName.fullName, form, mode)
                   )
                 )
-              )
-            },
+              ),
             value =>
               for {
                 updatedAnswers <- Future

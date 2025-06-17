@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class CheckMemberDetailsFileController @Inject()(
+class CheckMemberDetailsFileController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -169,8 +169,8 @@ class CheckMemberDetailsFileController @Inject()(
     duration
   )
 
-  private def auditUpload(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(
-    implicit request: DataRequest[_]
+  private def auditUpload(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(implicit
+    request: DataRequest[_]
   ): Unit = {
     val endTime = System.currentTimeMillis
     val duration = endTime - startTime
@@ -178,10 +178,9 @@ class CheckMemberDetailsFileController @Inject()(
       .taxYearOrAccountingPeriods(srn)
       .merge
       .getOrRecoverJourney
-      .flatMap(
-        taxYear =>
-          loggedInUserNameOrRedirect
-            .map(userName => auditService.sendEvent(buildUploadAuditEvent(taxYear, uploadStatus, duration, userName)))
+      .flatMap(taxYear =>
+        loggedInUserNameOrRedirect
+          .map(userName => auditService.sendEvent(buildUploadAuditEvent(taxYear, uploadStatus, duration, userName)))
       )
   }
 
@@ -202,35 +201,33 @@ class CheckMemberDetailsFileController @Inject()(
     duration
   )
 
-  private def auditDownload(srn: Srn, responseStatus: Int, duration: Long)(
-    implicit request: DataRequest[_]
+  private def auditDownload(srn: Srn, responseStatus: Int, duration: Long)(implicit
+    request: DataRequest[_]
   ): Unit =
     schemeDateService
       .taxYearOrAccountingPeriods(srn)
       .merge
       .getOrRecoverJourney
-      .flatMap(
-        taxYear =>
-          loggedInUserNameOrRedirect.map(
-            userName => auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration, userName))
-          )
+      .flatMap(taxYear =>
+        loggedInUserNameOrRedirect.map(userName =>
+          auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration, userName))
+        )
       )
 
-  private def auditValidation(srn: Srn, outcome: (Upload, Int, Long))(
-    implicit request: DataRequest[_]
+  private def auditValidation(srn: Srn, outcome: (Upload, Int, Long))(implicit
+    request: DataRequest[_]
   ): Unit =
     schemeDateService
       .taxYearOrAccountingPeriods(srn)
       .merge
       .getOrRecoverJourney
-      .flatMap(
-        taxYear =>
-          loggedInUserNameOrRedirect
-            .map(userName => auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome, userName)))
+      .flatMap(taxYear =>
+        loggedInUserNameOrRedirect
+          .map(userName => auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome, userName)))
       )
 
-  private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int, Long), userName: String)(
-    implicit req: DataRequest[_]
+  private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int, Long), userName: String)(implicit
+    req: DataRequest[_]
   ) = PSRFileValidationAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
@@ -272,6 +269,7 @@ object CheckMemberDetailsFileController {
       "checkMemberDetailsFile.heading",
       YesNoPageViewModel(
         legend = Some("checkMemberDetailsFile.legend"),
+        hint = None,
         yes = Some("checkMemberDetailsFile.yes"),
         no = Some("checkMemberDetailsFile.no"),
         showRadios = doNotRefresh

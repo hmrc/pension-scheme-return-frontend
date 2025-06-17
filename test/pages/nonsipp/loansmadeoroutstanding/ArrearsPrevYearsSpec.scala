@@ -16,15 +16,14 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class ArrearsPrevYearsSpec extends PageBehaviours {
 
   "ArrearsPrevYears" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](ArrearsPrevYears(srnGen.sample.value, index))
 

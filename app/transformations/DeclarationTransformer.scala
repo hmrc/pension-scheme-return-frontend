@@ -55,7 +55,5 @@ class DeclarationTransformer @Inject() {
           optAuthorisingPSAID = psrDeclaration.optAuthorisingPSAID
         )
       )
-    } yield {
-      resultUA
-    }
+    } yield resultUA
 }

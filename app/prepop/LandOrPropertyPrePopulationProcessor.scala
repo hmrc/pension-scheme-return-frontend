@@ -35,7 +35,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LandOrPropertyPrePopulationProcessor @Inject()() {
+class LandOrPropertyPrePopulationProcessor @Inject() () {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -60,7 +60,7 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
     }
 
     val cleanedUA = portionStillHeldOptMap.fold(transformedResult) { portionStillHeldMap =>
-      portionStillHeldMap.foldLeft(transformedResult)((uaResult, portionStillHeldEntry) => {
+      portionStillHeldMap.foldLeft(transformedResult) { (uaResult, portionStillHeldEntry) =>
         val isFullyDisposed = portionStillHeldEntry._2.exists(!_._2)
         if (isFullyDisposed) {
           portionStillHeldEntry._1.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
@@ -70,7 +70,7 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
         } else {
           uaResult
         }
-      })
+      }
     }
     cleanedUA.flatMap { ua =>
       ua.get(LandOrPropertyAddressLookupPages(srn))
@@ -78,17 +78,15 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
         .toList
         .flatten
         .refine[Max5000.Refined]
-        .map(
-          index =>
-            (
-              LandOrPropertyPrePopulated(srn, index),
-              LandOrPropertyProgress(srn, index)
-            )
+        .map(index =>
+          (
+            LandOrPropertyPrePopulated(srn, index),
+            LandOrPropertyProgress(srn, index)
+          )
         )
-        .foldLeft(Try(ua)) {
-          case (ua, (landOrPropertyPrePopulated, landOrPropertyProgress)) =>
-            ua.flatMap(_.set(landOrPropertyPrePopulated, false))
-              .flatMap(_.set(landOrPropertyProgress, SectionJourneyStatus.Completed))
+        .foldLeft(Try(ua)) { case (ua, (landOrPropertyPrePopulated, landOrPropertyProgress)) =>
+          ua.flatMap(_.set(landOrPropertyPrePopulated, false))
+            .flatMap(_.set(landOrPropertyProgress, SectionJourneyStatus.Completed))
         }
 
     }

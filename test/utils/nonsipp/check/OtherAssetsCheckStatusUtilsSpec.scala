@@ -25,9 +25,13 @@ import models._
 import pages.nonsipp.common._
 import models.IdentitySubject._
 import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
-class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
+class OtherAssetsCheckStatusUtilsSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with Matchers
+    with OptionValues {
 
   private def addOtherAssetsBaseAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers

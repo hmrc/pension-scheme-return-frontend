@@ -17,18 +17,17 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.{AssetCompanyBuyerCrnPage, CompanyNameOfAssetBuyerPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.given
 import controllers.nonsipp.otherassetsdisposal.AssetCompanyBuyerCrnController._
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class AssetCompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
+class AssetCompanyBuyerCrnControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.AssetCompanyBuyerCrnController

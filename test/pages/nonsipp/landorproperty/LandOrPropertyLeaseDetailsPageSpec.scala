@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import pages.behaviours.PageBehaviours
 
@@ -29,7 +28,7 @@ class LandOrPropertyLeaseDetailsPageSpec extends PageBehaviours {
 
   "LandOrPropertyLeaseDetailsPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srn, index))
 

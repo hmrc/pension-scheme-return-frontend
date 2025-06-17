@@ -16,8 +16,7 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class PartnershipBuyerNamePageSpec extends PageBehaviours {
@@ -25,8 +24,8 @@ class PartnershipBuyerNamePageSpec extends PageBehaviours {
 
   "Share disposal - PartnershipBuyerNamePage" - {
 
-    val index = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val index = 1
+    val disposalIndex = 1
 
     beRetrievable[String](PartnershipBuyerNamePage(srn, index, disposalIndex))
 

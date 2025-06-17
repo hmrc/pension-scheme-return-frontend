@@ -16,14 +16,13 @@
 
 package pages.nonsipp.membertransferout
 
-import config.RefinedTypes.{Max300, Max5}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class ReportAnotherTransferOutPageSpec extends PageBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
 
   "ReportAnotherTransferOutPage" - {
 

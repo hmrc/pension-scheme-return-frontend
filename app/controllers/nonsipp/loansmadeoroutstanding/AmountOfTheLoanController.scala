@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -49,7 +50,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class AmountOfTheLoanController @Inject()(
+class AmountOfTheLoanController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -62,16 +63,14 @@ class AmountOfTheLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
         val previousAnswer = request.userAnswers.get(AmountOfTheLoanPage(srn, index))
         val form = AmountOfTheLoanController.form(formProvider, period)
 
         val preparedForm = if (isPrePopulation) {
-          previousAnswer.fold(partialAnswersForm)(
-            amountOfTheLoan => partialAnswersForm.fill(amountOfTheLoan.asTuple)
-          )
+          previousAnswer.fold(partialAnswersForm)(amountOfTheLoan => partialAnswersForm.fill(amountOfTheLoan.asTuple))
         } else {
           request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
         }
@@ -89,7 +88,7 @@ class AmountOfTheLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       usingSchemeDate(srn) { period =>
         val form = AmountOfTheLoanController.form(formProvider, period)

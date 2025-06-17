@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
 import views.html.RadioListView
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
-import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class HowWasPropertyDisposedOfControllerSpec extends ControllerBaseSpec {
+class HowWasPropertyDisposedOfControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.HowWasPropertyDisposedOfController.onPageLoad(srn, index, disposalIndex, NormalMode)

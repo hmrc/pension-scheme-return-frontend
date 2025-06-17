@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -27,7 +26,7 @@ class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
 
   "LandOrPropertyTotalCostPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Money](LandOrPropertyTotalCostPage(srn, index))
 

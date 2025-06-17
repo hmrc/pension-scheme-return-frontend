@@ -28,7 +28,7 @@ trait Crypto {
   def getCrypto: Encrypter with Decrypter
 }
 
-class CryptoImpl @Inject()(config: Configuration) extends Crypto {
+class CryptoImpl @Inject() (config: Configuration) extends Crypto {
   override def getCrypto: Encrypter with Decrypter =
     SymmetricCryptoFactory.aesGcmCryptoFromConfig("mongodb.encryption", config.underlying)
 }

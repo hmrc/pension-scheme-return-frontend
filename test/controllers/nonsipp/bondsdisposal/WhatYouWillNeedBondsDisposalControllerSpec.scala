@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedBondsDisposalControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedBondsDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedBondsDisposalController" - {
 

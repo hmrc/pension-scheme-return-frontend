@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class MinimalDetailsConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) extends Logging {
+class MinimalDetailsConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) extends Logging {
 
   private val url = s"${appConfig.pensionsAdministrator}/pension-administrator/get-minimal-details-self"
 
@@ -51,8 +51,8 @@ class MinimalDetailsConnector @Inject()(appConfig: FrontendAppConfig, http: Http
         case e @ WithStatusCode(FORBIDDEN) if e.message.contains(Constants.delimitedPSA) =>
           Left(DelimitedAdmin)
       }
-      .tapError(
-        _ => Future.successful(logger.warn(s"Failed to fetch minimal details for loggedInAsPsa and $loggedInAsPsa"))
+      .tapError(_ =>
+        Future.successful(logger.warn(s"Failed to fetch minimal details for loggedInAsPsa and $loggedInAsPsa"))
       )
 }
 

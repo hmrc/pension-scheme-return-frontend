@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemoveLandPropertyDisposalPageSpec extends PageBehaviours {
@@ -25,8 +24,8 @@ class RemoveLandPropertyDisposalPageSpec extends PageBehaviours {
   "RemoveAssetDisposalPage" - {
 
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
-    val disposalIndex = refineMV[OneTo50](1)
+    val index = 1
+    val disposalIndex = 1
 
     beRetrievable[Boolean](RemoveLandPropertyDisposalPage(srn, index, disposalIndex))
 

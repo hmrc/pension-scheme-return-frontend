@@ -17,7 +17,7 @@
 package controllers.nonsipp.totalvaluequotedshares
 
 import services.{PsrSubmissionService, SchemeDateService}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
@@ -28,7 +28,7 @@ import controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldCo
 import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
 import org.mockito.Mockito._
 
-class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec {
+class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.QuotedSharesManagedFundsHeldController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.QuotedSharesManagedFundsHeldController.onSubmit(srn, NormalMode)
@@ -77,19 +77,19 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

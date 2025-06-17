@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
 import forms.MoneyFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec {
+class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val bondIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.TotalConsiderationSaleBondsController.onPageLoad(srn, bondIndex, disposalIndex, NormalMode)

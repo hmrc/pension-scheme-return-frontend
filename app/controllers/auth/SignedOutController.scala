@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 
-class SignedOutController @Inject()(
+class SignedOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SignedOutView
 ) extends FrontendBaseController

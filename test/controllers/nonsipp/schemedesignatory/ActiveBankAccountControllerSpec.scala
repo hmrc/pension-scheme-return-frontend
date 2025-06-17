@@ -17,14 +17,14 @@
 package controllers.nonsipp.schemedesignatory
 
 import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
 import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.schemedesignatory.ActiveBankAccountController._
 
-class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
+class ActiveBankAccountControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.ActiveBankAccountController.onSubmit(srn, NormalMode)

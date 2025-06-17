@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SessionRepository @Inject()(
+class SessionRepository @Inject() (
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig,
   clock: Clock,
@@ -49,7 +49,7 @@ class SessionRepository @Inject()(
           Indexes.ascending("lastUpdated"),
           IndexOptions()
             .name("lastUpdatedIdx")
-            .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+            .expireAfter(appConfig.cacheTtl.toLong, TimeUnit.SECONDS)
         )
       ),
       replaceIndexes = false
@@ -70,7 +70,7 @@ class SessionRepository @Inject()(
         filter = bySessionIds(id),
         update = Updates.set("lastUpdated", Instant.now(clock))
       )
-      .toFuture()
+      .head()
       .as(())
 
   def get(id: String): Future[Option[UserAnswers]] =
@@ -90,13 +90,13 @@ class SessionRepository @Inject()(
         replacement = updatedAnswers,
         options = ReplaceOptions().upsert(true)
       )
-      .toFuture()
+      .head()
       .as(())
   }
 
   def clear(id: String): Future[Unit] =
     collection
       .deleteMany(bySessionIds(id))
-      .toFuture()
+      .head()
       .as(())
 }

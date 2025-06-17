@@ -16,11 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.nonsipp.loansmadeoroutstanding.routes
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedLoansControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedLoansControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedLoansController" - {
 

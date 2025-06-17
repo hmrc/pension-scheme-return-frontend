@@ -17,8 +17,8 @@
 package pages.nonsipp.landorproperty
 
 import config.RefinedTypes.{OneTo50, OneTo5000}
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyDisposalPage}
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -30,14 +30,14 @@ import java.time.LocalDate
 class LandPropertyInUKPageSpec extends PageBehaviours {
 
   private val srn: SchemeId.Srn = srnGen.sample.value
-  val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
-  val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
-  val disposalIndexOne: Refined[Int, OneTo50] = refineMV[OneTo50](1)
-  val disposalIndexTwo: Refined[Int, OneTo50] = refineMV[OneTo50](2)
+  val indexOne: Refined[Int, OneTo5000] = 1
+  val indexTwo: Refined[Int, OneTo5000] = 2
+  val disposalIndexOne: Refined[Int, OneTo50] = 1
+  val disposalIndexTwo: Refined[Int, OneTo50] = 2
 
   "LandPropertyInUKPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](LandPropertyInUKPage(srn, index))
 

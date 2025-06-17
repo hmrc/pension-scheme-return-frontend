@@ -27,8 +27,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class DataSavingActionImpl @Inject()(sessionRepository: SessionRepository)(
-  implicit val executionContext: ExecutionContext
+class DataSavingActionImpl @Inject() (sessionRepository: SessionRepository)(implicit
+  val executionContext: ExecutionContext
 ) extends DataSavingAction {
 
   override protected def transform[A](request: DataRequest[A]): Future[DataRequest[A]] = {
@@ -36,9 +36,8 @@ class DataSavingActionImpl @Inject()(sessionRepository: SessionRepository)(
     for {
       _ <- sessionRepository.set(request.userAnswers)
       _ <- sessionRepository.set(request.userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswersKey))
-      _ <- request.previousUserAnswers.fold(Future.unit)(
-        previousUserAnswers =>
-          sessionRepository.set(previousUserAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + userAnswersKey))
+      _ <- request.previousUserAnswers.fold(Future.unit)(previousUserAnswers =>
+        sessionRepository.set(previousUserAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + userAnswersKey))
       )
     } yield request
   }

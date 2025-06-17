@@ -19,7 +19,7 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.bondsdisposal._
@@ -29,9 +29,9 @@ import org.scalacheck.Gen
 class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val bondIndexOne = refineMV[Max5000.Refined](1)
-  private val bondIndexTwo = refineMV[Max5000.Refined](2)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndexOne: Max5000 = 1
+  private val bondIndexTwo: Max5000 = 2
+  private val disposalIndex: Max50 = 1
 
   "BondsDisposalNavigator" - {
 
@@ -78,7 +78,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndex(
               bondIndexOne,
               BondsDisposalListPage,
-              (srn, bondIndex: Max5000, _) =>
+              (srn, bondIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.HowWereBondsDisposedOfController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -95,7 +95,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowWereBondsDisposedOfPage.apply,
               Gen.const(HowDisposed.Sold),
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
                   .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -109,7 +109,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowWereBondsDisposedOfPage.apply,
               Gen.const(HowDisposed.Transferred),
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
                   .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -123,7 +123,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowWereBondsDisposedOfPage.apply,
               Gen.const(HowDisposed.Other("test details")),
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
                   .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -139,7 +139,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               WhenWereBondsSoldPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.TotalConsiderationSaleBondsController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -156,7 +156,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               TotalConsiderationSaleBondsPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BuyerNameController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -172,7 +172,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               BuyerNamePage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -187,7 +187,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               IsBuyerConnectedPartyPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -203,7 +203,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               BondsStillHeldPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )
@@ -235,7 +235,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+                (srn, bondIndex: Int, disposalIndex: Int, _) =>
                   controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode)
               )
               .withName("go from RemoveBondsDisposal to BondsDisposal")
@@ -256,7 +256,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+                (srn, bondIndex: Int, disposalIndex: Int, _) =>
                   controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
@@ -278,7 +278,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+                (srn, bondIndex: Int, disposalIndex: Int, _) =>
                   controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
@@ -299,7 +299,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowWereBondsDisposedOfPage.apply,
               Gen.const(HowDisposed.Sold),
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
             )
@@ -343,7 +343,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               WhenWereBondsSoldPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
               srn =>
@@ -361,7 +361,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               WhenWereBondsSoldPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.TotalConsiderationSaleBondsController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
               srn =>
@@ -382,7 +382,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               TotalConsiderationSaleBondsPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
               srn =>
@@ -400,7 +400,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               TotalConsiderationSaleBondsPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BuyerNameController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
               srn =>
@@ -421,7 +421,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               BuyerNamePage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
               srn =>
@@ -439,7 +439,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               BuyerNamePage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
               srn =>
@@ -460,7 +460,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               IsBuyerConnectedPartyPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
             )
@@ -475,7 +475,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               bondIndexOne,
               disposalIndex,
               BondsStillHeldPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
             )

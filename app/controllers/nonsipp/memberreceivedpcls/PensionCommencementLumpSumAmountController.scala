@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import com.google.inject.Inject
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
+import utils.IntUtils.{toInt, toRefined300}
 import config.Constants.{maxPCLSAmount, minPosMoneyValue}
 import controllers.actions._
 import navigation.Navigator
@@ -44,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class PensionCommencementLumpSumAmountController @Inject()(
+class PensionCommencementLumpSumAmountController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -59,7 +60,7 @@ class PensionCommencementLumpSumAmountController @Inject()(
   private def form: Form[(Money, Money)] =
     PensionCommencementLumpSumAmountController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         val preparedForm =
@@ -71,7 +72,7 @@ class PensionCommencementLumpSumAmountController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         form

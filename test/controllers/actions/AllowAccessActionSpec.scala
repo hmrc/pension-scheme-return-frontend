@@ -26,6 +26,7 @@ import models.SchemeId.Srn
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import models.PensionSchemeId.{PsaId, PspId}
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import models.{MinimalDetails, SchemeDetails}
 import models.requests.IdentifierRequest
 import play.api.mvc.Results.Ok
@@ -35,8 +36,6 @@ import play.api.test.Helpers._
 import org.mockito.Mockito.{reset, when}
 import play.api.Application
 import play.api.libs.json.Json
-import play.api.http.Status.OK
-import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 

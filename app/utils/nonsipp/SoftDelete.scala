@@ -43,7 +43,7 @@ import controllers.PSRController
 
 import scala.util.{Failure, Success, Try}
 
-trait SoftDelete { _: PSRController =>
+trait SoftDelete extends PSRController {
 
   protected def softDeleteMember(srn: Srn, index: Max300)(implicit req: DataRequest[_]): Try[UserAnswers] =
     softDeleteMember(srn, index, req.userAnswers)
@@ -52,18 +52,18 @@ trait SoftDelete { _: PSRController =>
    * Moves member payments user answers to a "soft deleted" array and hard deletes the original answers
    *
    * Member is only soft deleted when a NewMember flag is NOT set against a member index. This is set when:
-   * - a member is newly added in a journey (manual or upload), prior to declaration
-   * - during GET from ETMP in the member transformer (new members are identified)
+   *   - a member is newly added in a journey (manual or upload), prior to declaration
+   *   - during GET from ETMP in the member transformer (new members are identified)
    *
-   * - Only remove completed flags when the member is soft deleted
-   * - Return None when something has gone wrong - todo: change to type that can store the error for logging
-   * - When hard deleting members after moving them to the soft delete group, the function checks
-   *   to see if any section journeys still exist (e.g. employer contributions).
-   *   If they don't, delete that sections completed flag.
-   * - For the member payments section, the function checks to see if the initial section page has been completed:
-   *   - if true (user wants to add to the section): check to see if any completed flags exist for the section.
-   *                                                 If none, delete all flags for this section so the task list shows "Not Started"
-   *   - if false: check if any members still exist, if they don't, remove all flags for this section so the task list shows "Not Started"
+   *   - Only remove completed flags when the member is soft deleted
+   *   - Return None when something has gone wrong - todo: change to type that can store the error for logging
+   *   - When hard deleting members after moving them to the soft delete group, the function checks to see if any
+   *     section journeys still exist (e.g. employer contributions). If they don't, delete that sections completed flag.
+   *   - For the member payments section, the function checks to see if the initial section page has been completed:
+   *     - if true (user wants to add to the section): check to see if any completed flags exist for the section. If
+   *       none, delete all flags for this section so the task list shows "Not Started"
+   *     - if false: check if any members still exist, if they don't, remove all flags for this section so the task list
+   *       shows "Not Started"
    */
   protected def softDeleteMember(srn: Srn, index: Max300, userAnswers: UserAnswers): Try[UserAnswers] = {
     val ua = userAnswers
@@ -147,65 +147,56 @@ trait SoftDelete { _: PSRController =>
 
     val employerContributions: List[EmployerContributions] = ua
       .employerContributionsCompleted(srn, index)
-      .foldLeft(List.empty[EmployerContributions])(
-        (acc, secondaryIndex) => {
-          def get[A: Reads](f: (Srn, Max300, Max50) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
-          (
-            get(EmployerNamePage),
-            get(EmployerTypeOfBusinessPage),
-            get(TotalEmployerContributionPage)
-          ).flatMapN {
-              (employerName, employerTypeOfBusiness, totalEmployerContribution) =>
-                val employerType: Option[EmployerType] = employerTypeOfBusiness match {
-                  case IdentityType.Individual => None
-                  case IdentityType.UKCompany =>
-                    get(EmployerCompanyCrnPage).map(v => EmployerType.UKCompany(v.value.map(_.value)))
-                  case IdentityType.UKPartnership =>
-                    get(PartnershipEmployerUtrPage).map(v => EmployerType.UKPartnership(v.value.map(_.value)))
-                  case IdentityType.Other =>
-                    get(OtherEmployeeDescriptionPage).map(EmployerType.Other)
-                }
+      .foldLeft(List.empty[EmployerContributions]) { (acc, secondaryIndex) =>
+        def get[A: Reads](f: (Srn, Max300, Max50) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
+        (
+          get(EmployerNamePage),
+          get(EmployerTypeOfBusinessPage),
+          get(TotalEmployerContributionPage)
+        ).flatMapN { (employerName, employerTypeOfBusiness, totalEmployerContribution) =>
+          val employerType: Option[EmployerType] = employerTypeOfBusiness match {
+            case IdentityType.Individual => None
+            case IdentityType.UKCompany =>
+              get(EmployerCompanyCrnPage).map(v => EmployerType.UKCompany(v.value.map(_.value)))
+            case IdentityType.UKPartnership =>
+              get(PartnershipEmployerUtrPage).map(v => EmployerType.UKPartnership(v.value.map(_.value)))
+            case IdentityType.Other =>
+              get(OtherEmployeeDescriptionPage).map(EmployerType.Other)
+          }
 
-                employerType.map(
-                  empType =>
-                    EmployerContributions(
-                      employerName = employerName,
-                      employerType = empType,
-                      totalTransferValue = totalEmployerContribution.value
-                    )
-                )
-            }
-            .fold(List.empty[EmployerContributions])(acc :+ _)
-        }
-      )
+          employerType.map(empType =>
+            EmployerContributions(
+              employerName = employerName,
+              employerType = empType,
+              totalTransferValue = totalEmployerContribution.value
+            )
+          )
+        }.fold(List.empty[EmployerContributions])(acc :+ _)
+      }
 
     val transfersIn: List[TransfersIn] = ua
       .transfersInSectionCompleted(srn, index)
-      .foldLeft(List.empty[TransfersIn])(
-        (acc, secondaryIndex) => {
-          def get[A: Reads](f: (Srn, Max300, Max5) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
-          (
-            get(TransferringSchemeNamePage),
-            get(WhenWasTransferReceivedPage),
-            get(TransferringSchemeTypePage),
-            get(TotalValueTransferPage).map(_.value),
-            get(DidTransferIncludeAssetPage)
-          ).mapN(TransfersIn.apply).fold(List.empty[TransfersIn])(acc :+ _)
-        }
-      )
+      .foldLeft(List.empty[TransfersIn]) { (acc, secondaryIndex) =>
+        def get[A: Reads](f: (Srn, Max300, Max5) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
+        (
+          get(TransferringSchemeNamePage),
+          get(WhenWasTransferReceivedPage),
+          get(TransferringSchemeTypePage),
+          get(TotalValueTransferPage).map(_.value),
+          get(DidTransferIncludeAssetPage)
+        ).mapN(TransfersIn.apply).fold(List.empty[TransfersIn])(acc :+ _)
+      }
 
     val transfersOut: List[TransfersOut] = ua
       .transfersOutSectionCompleted(srn, index)
-      .foldLeft(List.empty[TransfersOut])(
-        (acc, secondaryIndex) => {
-          def get[A: Reads](f: (Srn, Max300, Max5) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
-          (
-            get(ReceivingSchemeNamePage),
-            get(WhenWasTransferMadePage),
-            get(ReceivingSchemeTypePage)
-          ).mapN(TransfersOut.apply).fold(List.empty[TransfersOut])(acc :+ _)
-        }
-      )
+      .foldLeft(List.empty[TransfersOut]) { (acc, secondaryIndex) =>
+        def get[A: Reads](f: (Srn, Max300, Max5) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
+        (
+          get(ReceivingSchemeNamePage),
+          get(WhenWasTransferMadePage),
+          get(ReceivingSchemeTypePage)
+        ).mapN(TransfersOut.apply).fold(List.empty[TransfersOut])(acc :+ _)
+      }
 
     val surrenderedBenefits: Option[SurrenderedBenefits] = (
       get(SurrenderedBenefitsAmountPage).map(_.value),
@@ -213,13 +204,13 @@ trait SoftDelete { _: PSRController =>
       get(WhyDidMemberSurrenderBenefitsPage)
     ).mapN(SurrenderedBenefits.apply)
 
-    val memberLumpSumReceived: Option[MemberLumpSumReceived] = get(PensionCommencementLumpSumAmountPage.apply).map(
-      lumpSum =>
+    val memberLumpSumReceived: Option[MemberLumpSumReceived] =
+      get(PensionCommencementLumpSumAmountPage.apply).map(lumpSum =>
         MemberLumpSumReceived(
           lumpSumAmount = lumpSum.lumpSumAmount.value,
           designatedPensionAmount = lumpSum.designatedPensionAmount.value
         )
-    )
+      )
 
     val memberToDelete: Try[SoftDeletedMember] = memberDetails.map(
       SoftDeletedMember(
@@ -235,89 +226,85 @@ trait SoftDelete { _: PSRController =>
       )
     )
 
-    memberToDelete.flatMap(
-      member =>
-        userAnswers
-          .setWhen(userAnswers.get(SafeToHardDelete(srn, index)).isEmpty)(
-            SoftDeletedMembers(srn), {
-              val existingSoftDeletedMembers = userAnswers.get(SoftDeletedMembers(srn)).getOrElse(Nil)
-              existingSoftDeletedMembers :+ member
-            }
-          )
-          .remove(memberDetailsPages)
-          .flatMap { ua =>
-            ua.employerContributionsCompleted(srn, index)
-              .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(employerContributionsPages(secondaryIndex)))
-              .when(_.get(EmployerContributionsPage(srn)))(
-                ifTrue = _.removeOnlyWhen(!EmployerContributionsProgress.exist(srn, _))(EmployerContributionsPage(srn)),
-                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(EmployerContributionsPage(srn))
-              )
+    memberToDelete.flatMap(member =>
+      userAnswers
+        .setWhen(userAnswers.get(SafeToHardDelete(srn, index)).isEmpty)(
+          SoftDeletedMembers(srn), {
+            val existingSoftDeletedMembers = userAnswers.get(SoftDeletedMembers(srn)).getOrElse(Nil)
+            existingSoftDeletedMembers :+ member
           }
-          .flatMap(
-            ua =>
-              ua.transfersInSectionCompleted(srn, index)
-                .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersInPages(secondaryIndex)))
-                .when(_.get(DidSchemeReceiveTransferPage(srn)))(
-                  ifTrue =
-                    _.removeOnlyWhen(!TransfersInSectionCompleted.exists(srn, _))(DidSchemeReceiveTransferPage(srn)),
-                  ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(DidSchemeReceiveTransferPage(srn))
-                )
-          )
-          .flatMap(
-            ua =>
-              ua.transfersOutSectionCompleted(srn, index)
-                .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersOutPages(secondaryIndex)))
-                .when(_.get(SchemeTransferOutPage(srn)))(
-                  ifTrue = _.removeOnlyWhen(!TransfersOutSectionCompleted.exists(srn, _))(SchemeTransferOutPage(srn)),
-                  ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SchemeTransferOutPage(srn))
-                )
-          )
-          .flatMap { ua =>
-            ua.removeOnly(surrenderedBenefitsPages)
-              .when(_.get(SurrenderedBenefitsPage(srn)))(
-                ifTrue = _.removeOnlyWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(SurrenderedBenefitsPage(srn)),
-                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SurrenderedBenefitsPage(srn))
-              )
-          }
-          .flatMap { ua =>
-            ua.removeOnly(memberCommencementLumpSumPages)
-              .when(_.get(PensionCommencementLumpSumPage(srn)))(
-                ifTrue = _.removeOnlyWhen(_.map(PensionCommencementLumpSumAmountPage.all(srn)).isEmpty)(
-                  PensionCommencementLumpSumPage(srn)
-                ),
-                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
-                  PensionCommencementLumpSumPage(srn)
-                )
-              )
-          }
-          .flatMap { ua =>
-            ua.removeOnly(memberPensionPaymentsPages)
-              .when(_.get(PensionPaymentsReceivedPage(srn)))(
-                ifTrue = _.removeOnlyWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
-                  PensionPaymentsReceivedPage(srn)
-                ),
-                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(PensionPaymentsReceivedPage(srn))
-              )
-          }
-          .flatMap { ua =>
-            ua.removeOnly(memberContributionsPages)
-              .when(_.get(MemberContributionsPage(srn)))(
-                ifTrue = _.removeOnlyWhen(_.map(AllTotalMemberContributionPages(srn)).isEmpty)(
-                  MemberContributionsPage(srn)
-                ),
-                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
-                  MemberContributionsPage(srn)
-                )
-              )
-          }
-          .flatMap {
-            _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
-              UnallocatedEmployerContributionsPage(srn),
-              UnallocatedEmployerAmountPage(srn)
+        )
+        .remove(memberDetailsPages)
+        .flatMap { ua =>
+          ua.employerContributionsCompleted(srn, index)
+            .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(employerContributionsPages(secondaryIndex)))
+            .when(_.get(EmployerContributionsPage(srn)))(
+              ifTrue = _.removeOnlyWhen(!EmployerContributionsProgress.exist(srn, _))(EmployerContributionsPage(srn)),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(EmployerContributionsPage(srn))
             )
-          }
-          .remove(MemberStatus(srn, index))
-          .remove(MemberPsrVersionPage(srn, index))
+        }
+        .flatMap(ua =>
+          ua.transfersInSectionCompleted(srn, index)
+            .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersInPages(secondaryIndex)))
+            .when(_.get(DidSchemeReceiveTransferPage(srn)))(
+              ifTrue = _.removeOnlyWhen(!TransfersInSectionCompleted.exists(srn, _))(DidSchemeReceiveTransferPage(srn)),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(DidSchemeReceiveTransferPage(srn))
+            )
+        )
+        .flatMap(ua =>
+          ua.transfersOutSectionCompleted(srn, index)
+            .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersOutPages(secondaryIndex)))
+            .when(_.get(SchemeTransferOutPage(srn)))(
+              ifTrue = _.removeOnlyWhen(!TransfersOutSectionCompleted.exists(srn, _))(SchemeTransferOutPage(srn)),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SchemeTransferOutPage(srn))
+            )
+        )
+        .flatMap { ua =>
+          ua.removeOnly(surrenderedBenefitsPages)
+            .when(_.get(SurrenderedBenefitsPage(srn)))(
+              ifTrue = _.removeOnlyWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(SurrenderedBenefitsPage(srn)),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SurrenderedBenefitsPage(srn))
+            )
+        }
+        .flatMap { ua =>
+          ua.removeOnly(memberCommencementLumpSumPages)
+            .when(_.get(PensionCommencementLumpSumPage(srn)))(
+              ifTrue = _.removeOnlyWhen(_.map(PensionCommencementLumpSumAmountPage.all(srn)).isEmpty)(
+                PensionCommencementLumpSumPage(srn)
+              ),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
+                PensionCommencementLumpSumPage(srn)
+              )
+            )
+        }
+        .flatMap { ua =>
+          ua.removeOnly(memberPensionPaymentsPages)
+            .when(_.get(PensionPaymentsReceivedPage(srn)))(
+              ifTrue = _.removeOnlyWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
+                PensionPaymentsReceivedPage(srn)
+              ),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(PensionPaymentsReceivedPage(srn))
+            )
+        }
+        .flatMap { ua =>
+          ua.removeOnly(memberContributionsPages)
+            .when(_.get(MemberContributionsPage(srn)))(
+              ifTrue = _.removeOnlyWhen(_.map(AllTotalMemberContributionPages(srn)).isEmpty)(
+                MemberContributionsPage(srn)
+              ),
+              ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
+                MemberContributionsPage(srn)
+              )
+            )
+        }
+        .flatMap {
+          _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
+            UnallocatedEmployerContributionsPage(srn),
+            UnallocatedEmployerAmountPage(srn)
+          )
+        }
+        .remove(MemberStatus(srn, index))
+        .remove(MemberPsrVersionPage(srn, index))
     )
   }
 }

@@ -53,13 +53,12 @@ trait CharacterCountFluency {
       )
 
     def withLabel(maybeLabel: Option[Html]): CharacterCount =
-      maybeLabel.fold(characterCount)(
-        label =>
-          characterCount.copy(
-            label = LabelViewModel(
-              HtmlContent(label)
-            )
+      maybeLabel.fold(characterCount)(label =>
+        characterCount.copy(
+          label = LabelViewModel(
+            HtmlContent(label)
           )
+        )
       )
 
     def withLabelAsHeading(label: Html): CharacterCount =

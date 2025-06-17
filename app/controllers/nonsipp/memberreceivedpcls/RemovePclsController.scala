@@ -19,6 +19,7 @@ package controllers.nonsipp.memberreceivedpcls
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemovePclsController @Inject()(
+class RemovePclsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -53,7 +54,7 @@ class RemovePclsController @Inject()(
 
   private val form = RemovePclsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -61,28 +62,26 @@ class RemovePclsController @Inject()(
           total <- request.userAnswers
             .get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemovePclsController.viewModel(
-                srn,
-                memberIndex: Max300,
-                total.lumpSumAmount,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemovePclsController.viewModel(
+              srn,
+              memberIndex: Max300,
+              total.lumpSumAmount,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -95,9 +94,8 @@ class RemovePclsController @Inject()(
                   RemovePclsController.viewModel(srn, memberIndex, total.lumpSumAmount, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future.fromTry(
@@ -112,12 +110,11 @@ class RemovePclsController @Inject()(
                   fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -128,7 +125,6 @@ class RemovePclsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

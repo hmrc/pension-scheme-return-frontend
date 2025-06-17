@@ -17,23 +17,22 @@
 package pages.nonsipp.employercontributions
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{ConditionalYesNo, Crn}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max300, Max50}
-import controllers.TestValues
 
 class EmployerNamePageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val indexOne = refineMV[Max50.Refined](1)
-  private val indexTwo = refineMV[Max50.Refined](2)
+  private val memberIndex = 1
+  private val indexOne = 1
+  private val indexTwo = 2
 
   "EmployerNamePage" - {
 
-    val index = refineMV[Max50.Refined](1)
+    val index = 1
     val srn = srnGen.sample.value
 
     beRetrievable[String](EmployerNamePage(srn, memberIndex, index))

@@ -67,10 +67,9 @@ trait Formatters {
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[A]] =
         l.collectFirst {
-            case (condition, Some(mapping)) if condition(data) =>
-              mapping.bind(data).map(Some(_))
-          }
-          .getOrElse(Right(None))
+          case (condition, Some(mapping)) if condition(data) =>
+            mapping.bind(data).map(Some(_))
+        }.getOrElse(Right(None))
 
       override def unbind(key: String, value: Option[A]): Map[String, String] =
         value
@@ -144,14 +143,13 @@ trait Formatters {
               nonFatalCatch
                 .either(s.toInt)
                 .fold(
-                  _ => {
+                  _ =>
                     if (s.matches(intRegex)) {
                       Left(Seq(FormError(key, errors.max._2, args)))
                     } else {
                       Left(Seq(FormError(key, errors.nonNumericKey, args)))
-                    }
-                  },
-                  value => {
+                    },
+                  value =>
                     if (value > errors.max._1) {
                       Left(Seq(FormError(key, errors.max._2, args)))
                     } else if (value < errors.min._1 && errors.min._1 == 0) {
@@ -162,7 +160,6 @@ trait Formatters {
                     } else {
                       Right(value)
                     }
-                  }
                 )
           }
           .flatMap { int =>

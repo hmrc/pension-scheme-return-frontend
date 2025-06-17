@@ -31,7 +31,7 @@ $endif$
 
 $if(!index.empty)$
 import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 $endif$
 
 import models.NormalMode
@@ -45,19 +45,19 @@ import services.SchemeDateService
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 
-class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
+class $className;format="cap"$ControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   $! Generic !$
   $if(index.empty)$
   private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode)
   $else$
-  private val index = refineMV[$index$.Refined](1)
+  private val index = 1
   $if(secondaryIndex.empty)$
   private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, index, NormalMode)
   $else$
-  private val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
+  private val secondaryIndex = 1
   private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, index, secondaryIndex, NormalMode)
   $endif$

@@ -44,7 +44,7 @@ import play.api.data.Form
 
 import javax.inject.Named
 
-class StartReportingAssetsDisposalController @Inject()(
+class StartReportingAssetsDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,11 +76,10 @@ class StartReportingAssetsDisposalController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        errors => {
+        errors =>
           assetsData(srn, assetsCompletedIndexes).map { assets =>
             BadRequest(view(errors, viewModel(srn, page, assets, userAnswers)))
-          }.merge
-        },
+          }.merge,
         answer => {
           val inProgressUrl = request.userAnswers
             .map(OtherAssetsDisposalProgress.all(srn, answer))
@@ -100,8 +99,8 @@ class StartReportingAssetsDisposalController @Inject()(
       )
   }
 
-  private def assetsData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
+  private def assetsData(srn: Srn, indexes: List[Max5000])(implicit
+    req: DataRequest[_]
   ): Either[Result, List[AssetData]] =
     indexes.traverse { index =>
       for {

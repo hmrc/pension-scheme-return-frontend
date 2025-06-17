@@ -17,8 +17,9 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.SchemeDateService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DatePageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import play.api.inject
 import forms.DatePageFormProvider
 import models.{DateRange, NormalMode}
@@ -26,15 +27,13 @@ import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenWereBondsSoldControllerSpec extends ControllerBaseSpec {
+class WhenWereBondsSoldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val bondIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.WhenWereBondsSoldController.onPageLoad(srn, bondIndex, disposalIndex, NormalMode)

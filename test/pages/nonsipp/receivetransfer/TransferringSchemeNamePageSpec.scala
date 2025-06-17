@@ -17,18 +17,18 @@
 package pages.nonsipp.receivetransfer
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionCompleted
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max300, Max5}
+import config.RefinedTypes.Max5
 import controllers.TestValues
 
 class TransferringSchemeNamePageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  val index: Refined[Int, Max5.Refined] = refineMV[Max5.Refined](1)
+  private val memberIndex = 1
+  val index: Refined[Int, Max5.Refined] = 1
 
   "TransferringSchemeNamePage" - {
 

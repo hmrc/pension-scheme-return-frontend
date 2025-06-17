@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
-import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.landorproperty.IndividualSellerNiController._
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
 
-class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
+class IndividualSellerNiControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorproperty.routes.IndividualSellerNiController

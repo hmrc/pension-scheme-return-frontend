@@ -16,25 +16,24 @@
 
 package pages.nonsipp.sharesdisposal
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.HowSharesDisposed.HowSharesDisposed
 import models.{HowSharesDisposed, IdentityType, PointOfEntry}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
-  private val shareIndexOne = refineMV[Max5000.Refined](1)
-  private val shareIndexTwo = refineMV[Max5000.Refined](2)
-  private val indexOne = refineMV[Max50.Refined](1)
-  private val indexTwo = refineMV[Max50.Refined](2)
+  private val shareIndexOne = 1
+  private val shareIndexTwo = 2
+  private val indexOne = 1
+  private val indexTwo = 2
 
   "HowWereSharesDisposedPage" - {
     val srn = srnGen.sample.value
-    val shareIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val shareIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[HowSharesDisposed](HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
 
@@ -115,7 +114,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexTwo)) must not be empty
-      result.get(SharesDisposalProgress(srn, shareIndexOne, indexTwo)) must not be (empty)
+      result.get(SharesDisposalProgress(srn, shareIndexOne, indexTwo)) must not be empty
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other shares" in {
@@ -135,7 +134,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(HowWereSharesDisposedPage(srn, shareIndexTwo, indexOne)) must not be empty
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexTwo, indexOne)) must not be empty
       result.get(SharesDisposalPage(srn)) must not be empty
-      result.get(SharesDisposalProgress(srn, shareIndexTwo, indexOne)) must not be (empty)
+      result.get(SharesDisposalProgress(srn, shareIndexTwo, indexOne)) must not be empty
     }
 
     "cleanup relevant fields when changing the answer on this page in CheckMode" in {
@@ -160,7 +159,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       userAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(HowManySharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(TotalConsiderationSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
-      userAnswers.get(SharesDisposalProgress(srn, shareIndexOne, indexOne)) must not be (empty)
+      userAnswers.get(SharesDisposalProgress(srn, shareIndexOne, indexOne)) must not be empty
     }
   }
 }

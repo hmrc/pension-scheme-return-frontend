@@ -50,9 +50,8 @@ case class ClassOfSharesPage(srn: Srn, index: Max5000) extends QuestionPage[Stri
       .map(HowWereSharesDisposedPagesForShare(srn, index))
       .keys
       .toList
-      .flatMap(
-        key =>
-          refineV[OneTo50](key.toInt + 1)
-            .fold(_ => Nil, ind => List(HowWereSharesDisposedPage(srn, index, ind)))
+      .flatMap(key =>
+        refineV[OneTo50](key.toInt + 1)
+          .fold(_ => Nil, ind => List(HowWereSharesDisposedPage(srn, index, ind)))
       )
 }

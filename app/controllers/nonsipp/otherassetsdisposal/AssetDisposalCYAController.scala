@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerOtherAsset
 import controllers.actions._
@@ -47,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class AssetDisposalCYAController @Inject()(
+class AssetDisposalCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -60,8 +61,8 @@ class AssetDisposalCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -70,8 +71,8 @@ class AssetDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -81,12 +82,14 @@ class AssetDisposalCYAController @Inject()(
       onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(OtherAssetsDisposalProgress(srn, index, disposalIndex))
-        .exists(_.completed)) {
+        .exists(_.completed)
+    ) {
       Future.successful(Redirect(routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)))
     } else {
       (
@@ -208,7 +211,7 @@ class AssetDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- request.userAnswers
@@ -221,11 +224,10 @@ class AssetDisposalCYAController @Inject()(
           fallbackCall = controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
             .onPageLoad(srn, index, disposalIndex, mode)
         )
-      } yield submissionResult.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator.nextPage(OtherAssetsDisposalCYAPage(srn), mode, request.userAnswers)
-          )
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator.nextPage(OtherAssetsDisposalCYAPage(srn), mode, request.userAnswers)
+        )
       )
     }
 
@@ -577,20 +579,18 @@ object AssetDisposalCYAController {
           SummaryAction("site.change", recipientNameUrl)
             .withVisuallyHiddenContent("assetDisposalCYA.section1.recipientName.hidden")
         )
-    ) :?+ recipientDetails.map(
-      reason =>
-        CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
-          .withAction(
-            SummaryAction("site.change", recipientDetailsUrl)
-              .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
-          )
-    ) :?+ recipientReasonNoDetails.map(
-      noreason =>
-        CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
-          .withAction(
-            SummaryAction("site.change", recipientNoDetailsUrl)
-              .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
-          )
+    ) :?+ recipientDetails.map(reason =>
+      CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
+        .withAction(
+          SummaryAction("site.change", recipientDetailsUrl)
+            .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+        )
+    ) :?+ recipientReasonNoDetails.map(noreason =>
+      CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
+        .withAction(
+          SummaryAction("site.change", recipientNoDetailsUrl)
+            .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+        )
     ) :+
       CheckYourAnswersRowViewModel(
         Message("assetDisposalCYA.section1.assetDisposalBuyerConnectedParty", recipientName),

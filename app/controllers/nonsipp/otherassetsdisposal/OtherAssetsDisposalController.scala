@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OtherAssetsDisposalController @Inject()(
+class OtherAssetsDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -86,8 +86,8 @@ class OtherAssetsDisposalController @Inject()(
                   controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, mode)
               )
             } yield submissionResult
-              .getOrRecoverJourney(
-                _ => Redirect(navigator.nextPage(OtherAssetsDisposalPage(srn), mode, updatedAnswers))
+              .getOrRecoverJourney(_ =>
+                Redirect(navigator.nextPage(OtherAssetsDisposalPage(srn), mode, updatedAnswers))
               )
           }
       )

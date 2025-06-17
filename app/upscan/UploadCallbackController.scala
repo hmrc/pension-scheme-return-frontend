@@ -26,14 +26,14 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
-class UploadCallbackController @Inject()(
+class UploadCallbackController @Inject() (
   uploadService: UploadService,
   mcc: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendController(mcc) {
 
   def callback: Action[JsValue] = Action.async(parse.json) { implicit request =>
-    withJsonBody[CallbackBody] { callback: CallbackBody =>
+    withJsonBody[CallbackBody] { (callback: CallbackBody) =>
       val uploadStatus = callback match {
         case s: ReadyCallbackBody =>
           UploadStatus.Success(

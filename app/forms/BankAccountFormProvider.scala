@@ -24,7 +24,7 @@ import forms.mappings.implicits._
 
 import javax.inject.Inject
 
-class BankAccountFormProvider @Inject()() extends Mappings {
+class BankAccountFormProvider @Inject() () extends Mappings {
 
   val bankNameMaxLength = 28
   val bankNameRegex = "^[a-zA-Z\\-' ]+$"
@@ -73,6 +73,6 @@ class BankAccountFormProvider @Inject()() extends Mappings {
           regexp(sortCodeSimpleRegex, sortCodeInvalidFormat).or(regexp(sortCodeFullRegex, sortCodeInvalidFormat))
         )
       )
-    )(BankAccount.apply)(BankAccount.unapply)
+    )(BankAccount.apply)(x => Some(x._1, x._2, x._3))
   )
 }

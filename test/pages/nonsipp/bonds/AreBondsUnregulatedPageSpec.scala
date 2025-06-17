@@ -16,8 +16,7 @@
 
 package pages.nonsipp.bonds
 
-import config.RefinedTypes.Max5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class AreBondsUnregulatedPageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class AreBondsUnregulatedPageSpec extends PageBehaviours {
 
   "AreBondsUnregulatedPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val index = 1
 
     beRetrievable[Boolean](AreBondsUnregulatedPage(srn, index))
 

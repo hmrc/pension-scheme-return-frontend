@@ -32,7 +32,7 @@ package object loansmadeoroutstanding {
 
     val isCyaPage: Boolean = {
       val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-check-answers|check-answers)-loan\\/(?!.*\\/\\d+\\/\\d+$$).*"
+        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-check-answers|check-answers)-loan(?!.*\\/\\d+\\/\\d+$$).*"
 
       call.url.matches(pattern)
     }

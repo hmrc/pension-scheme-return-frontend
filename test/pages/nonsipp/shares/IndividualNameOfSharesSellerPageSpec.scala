@@ -16,16 +16,15 @@
 
 package pages.nonsipp.shares
 
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import config.RefinedTypes.OneTo5000
 import controllers.TestValues
+import utils.IntUtils.given
+import pages.behaviours.PageBehaviours
 
 class IndividualNameOfSharesSellerPageSpec extends PageBehaviours with TestValues {
 
   "IndividualNameOfSharesSellerPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[String](IndividualNameOfSharesSellerPage(srnSample, index))

@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedLandPropertyDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedLandPropertyDisposalController" - {
 

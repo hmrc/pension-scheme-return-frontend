@@ -26,8 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(
-  implicit val executionContext: ExecutionContext
+class DataCreationActionImpl @Inject() (sessionRepository: SessionRepository)(implicit
+  val executionContext: ExecutionContext
 ) extends DataCreationAction {
 
   override protected def transform[A](request: AllowedAccessRequest[A]): Future[DataRequest[A]] = {

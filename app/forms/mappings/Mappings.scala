@@ -187,9 +187,8 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[String] =
     regexChecks
-      .foldLeft(text(requiredKey, args.toList)) {
-        case (mapping, (regex, key)) =>
-          mapping.verifying(verify[String](key, _.matches(regex), args: _*))
+      .foldLeft(text(requiredKey, args.toList)) { case (mapping, (regex, key)) =>
+        mapping.verifying(verify[String](key, _.matches(regex), args: _*))
       }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
@@ -200,9 +199,8 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[String] =
     regexChecks
-      .foldLeft(optionalText()) {
-        case (mapping, (regex, key)) =>
-          mapping.verifying(verify[String](key, s => s.trim.isEmpty || s.matches(regex), args: _*))
+      .foldLeft(optionalText()) { case (mapping, (regex, key)) =>
+        mapping.verifying(verify[String](key, s => s.trim.isEmpty || s.matches(regex), args: _*))
       }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
@@ -215,9 +213,8 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[String] =
     regexChecks
-      .foldLeft(textWithKey(fieldKey, requiredKey, args.toList)) {
-        case (mapping, (regex, key)) =>
-          mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).matches(regex), args: _*))
+      .foldLeft(textWithKey(fieldKey, requiredKey, args.toList)) { case (mapping, (regex, key)) =>
+        mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).matches(regex), args: _*))
       }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
@@ -231,9 +228,8 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[String] =
     regexChecks
-      .foldLeft(text(requiredKey, args.toList)) {
-        case (mapping, (regex, key)) =>
-          mapping.verifying(verify[String](key, _.matches(regex), args: _*))
+      .foldLeft(text(requiredKey, args.toList)) { case (mapping, (regex, key)) =>
+        mapping.verifying(verify[String](key, _.matches(regex), args: _*))
       }
       .verifying(isEqual(authorisingPSAID, noMatchKey))
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
@@ -323,11 +319,10 @@ trait Mappings extends Formatters with Constraints {
 
   def postCode(inputFormErrors: InputFormErrors): Mapping[String] =
     inputFormErrors.regexChecks
-      .foldLeft(text(inputFormErrors.requiredKey, inputFormErrors.args.toList)) {
-        case (mapping, (regex, key)) =>
-          mapping.verifying(
-            verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), inputFormErrors.args: _*)
-          )
+      .foldLeft(text(inputFormErrors.requiredKey, inputFormErrors.args.toList)) { case (mapping, (regex, key)) =>
+        mapping.verifying(
+          verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), inputFormErrors.args: _*)
+        )
       }
       .verifying(
         verify[String](
@@ -345,9 +340,8 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[String] =
     regexChecks
-      .foldLeft(optionalText()) {
-        case (mapping, (regex, key)) =>
-          mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), args: _*))
+      .foldLeft(optionalText()) { case (mapping, (regex, key)) =>
+        mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), args: _*))
       }
       .verifying(verify[String](maxLengthErrorKey, _.filterNot(_.isWhitespace).length <= maxLength, args))
       .transform[String](_.filterNot(_.isWhitespace).toUpperCase, _.filterNot(_.isWhitespace).toUpperCase)

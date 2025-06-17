@@ -22,7 +22,7 @@ import play.api.data
 import viewmodels.models.TextAreaViewModel
 import play.api.data.FormError
 
-class TextAreaViewSpec extends ViewSpec with Mappings {
+class TextAreaViewSpec extends ViewSpec with ViewBehaviours with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[TextAreaView]

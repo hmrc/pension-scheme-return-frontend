@@ -45,13 +45,11 @@ trait BasicGenerators extends EitherValues {
     for {
       seq1 <- gen
       seq2 <- Gen.listOfN(seq1.length, genValue)
-    } yield {
-      seq1.toSeq.zip(seq2).foldLeft("") {
-        case (acc, (n, Some(v))) =>
-          acc + n + v
-        case (acc, (n, _)) =>
-          acc + n
-      }
+    } yield seq1.toSeq.zip(seq2).foldLeft("") {
+      case (acc, (n, Some(v))) =>
+        acc + n + v
+      case (acc, (n, _)) =>
+        acc + n
     }
   }
 
@@ -100,15 +98,13 @@ trait BasicGenerators extends EitherValues {
     for {
       c <- alphaChar
       s <- alphaStr
-    } yield {
-      s"$c$s"
-    }
+    } yield s"$c$s"
 
   val uniqueStringGen: Gen[String] = Gen.uuid.map(_.toString)
 
   def nonEmptyListOf[A](gen: Gen[A]): Gen[NonEmptyList[A]] =
-    Gen.nonEmptyListOf(gen).map {
-      case head :: tail => NonEmptyList(head, tail)
+    Gen.nonEmptyListOf(gen).map { case head :: tail =>
+      NonEmptyList(head, tail)
     }
 
   def stringLengthBetween(minLength: Int, maxLength: Int, charGen: Gen[Char]): Gen[String] =
@@ -179,9 +175,7 @@ trait BasicGenerators extends EitherValues {
     for {
       message <- nonEmptyMessage
       url <- relativeUrl
-    } yield {
-      LinkMessage(message, url)
-    }
+    } yield LinkMessage(message, url)
 
   val nonEmptyInlineMessage: Gen[InlineMessage] = Gen.oneOf(nonEmptyMessage, nonEmptyLinkMessage)
 
@@ -222,19 +216,18 @@ trait BasicGenerators extends EitherValues {
     } yield s"$a.$b.$c.$d"
 
   val httpMethod: Gen[String] = Gen.oneOf("GET", "POST")
-  val call: Gen[Call] = {
+  val call: Gen[Call] =
     for {
       method <- httpMethod
       url <- relativeUrl
     } yield Call(method, url)
-  }
 
   val postCall: Gen[Call] =
     for {
       url <- relativeUrl
     } yield Call("POST", url)
 
-  val paginationGen: Gen[PaginatedViewModel] = {
+  val paginationGen: Gen[PaginatedViewModel] =
     for {
       label <- nonEmptyMessage
       totalSize <- Gen.chooseNum(0, 100)
@@ -243,7 +236,6 @@ trait BasicGenerators extends EitherValues {
       currentPage <- Gen.chooseNum(1, maxPages)
       call <- call
     } yield PaginatedViewModel(label, Pagination(currentPage, pageSize, totalSize, _ => call))
-  }
 
   implicit val max99: Gen[Max300] = chooseNum(1, 99).map(refineV[OneTo300](_).value)
 
@@ -266,17 +258,13 @@ trait BasicGenerators extends EitherValues {
     for {
       size <- Gen.chooseNum(1, 10)
       obj <- Gen.listOfN(size, tupleOf(nonEmptyString, jsValueGen(maxDepth - 1)))
-    } yield {
-      obj.foldLeft(Json.obj())(_ + _)
-    }
+    } yield obj.foldLeft(Json.obj())(_ + _)
 
   def jsArrayGen(maxDepth: Int): Gen[JsArray] =
     for {
       size <- Gen.chooseNum(1, 10)
       array <- Gen.listOfN(size, jsValueGen(maxDepth - 1)).map(JsArray(_))
-    } yield {
-      array
-    }
+    } yield array
 
   def jsValueGen(maxDepth: Int): Gen[JsValue] =
     if (maxDepth <= 0) {

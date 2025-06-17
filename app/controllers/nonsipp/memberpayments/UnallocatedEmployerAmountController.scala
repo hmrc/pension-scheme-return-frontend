@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class UnallocatedEmployerAmountController @Inject()(
+class UnallocatedEmployerAmountController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -65,7 +65,7 @@ class UnallocatedEmployerAmountController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future.successful(
               BadRequest(
                 view(
@@ -73,8 +73,7 @@ class UnallocatedEmployerAmountController @Inject()(
                   viewModel(srn, request.schemeDetails.schemeName, form, mode)
                 )
               )
-            )
-          },
+            ),
           value =>
             for {
               updatedAnswers <- Future

@@ -17,9 +17,10 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -27,32 +28,30 @@ import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 
-class RemoveLoanControllerSpec extends ControllerBaseSpec {
+class RemoveLoanControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index, NormalMode)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-    .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
-    .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKPartnership)
-    .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), amountOfTheLoan)
-    .unsafeSet(IdentityTypePage(srn, refineMV(3), IdentitySubject.LoanRecipient), IdentityType.Individual)
-    .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), amountOfTheLoan)
-    .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+    .unsafeSet(CompanyRecipientNamePage(srn, 1), "recipientName1")
+    .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+    .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipRecipientNamePage(srn, 2), "recipientName2")
+    .unsafeSet(AmountOfTheLoanPage(srn, 2), amountOfTheLoan)
+    .unsafeSet(IdentityTypePage(srn, 3, IdentitySubject.LoanRecipient), IdentityType.Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, 3), "recipientName3")
+    .unsafeSet(AmountOfTheLoanPage(srn, 3), amountOfTheLoan)
+    .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
 
-  val prePopUserAnswersChecked: UserAnswers = filledUserAnswers.unsafeSet(LoanPrePopulated(srn, refineMV(1)), true)
-  val prePopUserAnswersNotChecked: UserAnswers = filledUserAnswers.unsafeSet(LoanPrePopulated(srn, refineMV(1)), false)
+  val prePopUserAnswersChecked: UserAnswers = filledUserAnswers.unsafeSet(LoanPrePopulated(srn, 1), true)
+  val prePopUserAnswersNotChecked: UserAnswers = filledUserAnswers.unsafeSet(LoanPrePopulated(srn, 1), false)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -73,21 +72,21 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
           defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
           filledUserAnswers.get(LoansProgress(srn, index)) mustBe Some(SectionJourneyStatus.Completed)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -97,11 +96,11 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     act.like(
       saveAndContinue(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
           defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
-        })
+        }
     )
 
     act.like(invalidForm(onSubmit, filledUserAnswers))

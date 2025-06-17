@@ -25,12 +25,7 @@ import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import viewmodels.DisplayMessage
 
-trait ViewSpec
-    extends BaseSpec
-    with ScalaCheckPropertyChecks
-    with HtmlHelper
-    with ViewBehaviours
-    with DisplayMessageUtils {
+trait ViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper with DisplayMessageUtils {
 
   implicit val request: FakeRequest[_] = FakeRequest("GET", "/test")
 

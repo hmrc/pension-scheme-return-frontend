@@ -111,9 +111,12 @@ object UploadMemberDetails {
 }
 
 /**
- * @param key = csv header key e.g. First name
- * @param cell = letter identifying column e.g A,B,C ... BA,BB ...
- * @param index = column number
+ * @param key
+ *   \= csv header key e.g. First name
+ * @param cell
+ *   \= letter identifying column e.g A,B,C ... BA,BB ...
+ * @param index
+ *   \= column number
  */
 case class CsvHeaderKey(key: String, cell: String, index: Int)
 

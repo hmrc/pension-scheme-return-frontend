@@ -41,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class QuotedSharesManagedFundsHeldController @Inject()(
+class QuotedSharesManagedFundsHeldController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -87,24 +87,25 @@ class QuotedSharesManagedFundsHeldController @Inject()(
                 finalUpdate
               }
               _ <- saveService.save(updatedAnswers)
-              redirectTo <- if (value) {
-                Future.successful(
-                  Redirect(navigator.nextPage(QuotedSharesManagedFundsHeldPage(srn), mode, updatedAnswers))
-                )
-              } else {
-                psrSubmissionService
-                  .submitPsrDetailsWithUA(
-                    srn,
-                    updatedAnswers,
-                    fallbackCall =
-                      controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, mode)
-                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                  .map {
-                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    case Some(_) =>
-                      Redirect(navigator.nextPage(QuotedSharesManagedFundsHeldPage(srn), mode, updatedAnswers))
-                  }
-              }
+              redirectTo <-
+                if (value) {
+                  Future.successful(
+                    Redirect(navigator.nextPage(QuotedSharesManagedFundsHeldPage(srn), mode, updatedAnswers))
+                  )
+                } else {
+                  psrSubmissionService
+                    .submitPsrDetailsWithUA(
+                      srn,
+                      updatedAnswers,
+                      fallbackCall =
+                        controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, mode)
+                    )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                    .map {
+                      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                      case Some(_) =>
+                        Redirect(navigator.nextPage(QuotedSharesManagedFundsHeldPage(srn), mode, updatedAnswers))
+                    }
+                }
             } yield redirectTo
         )
     }

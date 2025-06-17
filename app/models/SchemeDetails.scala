@@ -61,8 +61,7 @@ object Establisher {
   private val partnershipEstablisherReads: Reads[Establisher] =
     (__ \ "partnershipDetails" \ "name").read[String].map(name => Establisher(name, EstablisherKind.Partnership))
 
-  private val individualEstablisherReads: Reads[Establisher] = {
-
+  private val individualEstablisherReads: Reads[Establisher] =
     (__ \ "establisherDetails" \ "firstName")
       .read[String]
       .and((__ \ "establisherDetails" \ "middleName").readNullable[String])
@@ -70,7 +69,6 @@ object Establisher {
         val name = s"$first ${middle.fold("")(m => s"$m ")}$last"
         Establisher(name, EstablisherKind.Individual)
       }
-  }
 
   implicit val reads: Reads[Establisher] =
     (__ \ "establisherKind").read[EstablisherKind].flatMap {
@@ -94,13 +92,12 @@ object SchemeDetails {
       .and(
         (__ \ "establishers")
           .readWithDefault[JsArray](JsArray.empty)
-          .map[List[Establisher]](
-            l =>
-              if (l.value.isEmpty) {
-                Nil
-              } else {
-                l.as[List[Establisher]]
-              }
+          .map[List[Establisher]](l =>
+            if (l.value.isEmpty) {
+              Nil
+            } else {
+              l.as[List[Establisher]]
+            }
           )
       )(SchemeDetails.apply _)
 }

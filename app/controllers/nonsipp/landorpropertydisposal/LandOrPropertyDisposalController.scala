@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyDisposalController @Inject()(
+class LandOrPropertyDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -69,21 +69,22 @@ class LandOrPropertyDisposalController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(LandOrPropertyDisposalPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers)))
-            } else {
-              psrSubmissionService
-                .submitPsrDetailsWithUA(
-                  srn,
-                  updatedAnswers,
-                  fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
-                    .onPageLoad(srn, mode)
-                )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                .map {
-                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(_) => Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers))
-                }
-            }
+            redirectTo <-
+              if (value) {
+                Future.successful(Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers)))
+              } else {
+                psrSubmissionService
+                  .submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
+                      .onPageLoad(srn, mode)
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) => Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers))
+                  }
+              }
           } yield redirectTo
       )
   }

@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerBond
 import controllers.actions.IdentifyAndRequireData
@@ -47,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class BondsDisposalCYAController @Inject()(
+class BondsDisposalCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -58,7 +59,7 @@ class BondsDisposalCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       if (request.userAnswers.get(BondsDisposalProgress(srn, bondIndex, disposalIndex)).contains(Completed)) {
         saveService.save(
@@ -72,8 +73,8 @@ class BondsDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    bondIndex: Max5000,
-    disposalIndex: Max50,
+    bondIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -83,12 +84,14 @@ class BondsDisposalCYAController @Inject()(
       onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(BondsDisposalProgress(srn, bondIndex, disposalIndex))
-        .exists(_.completed)) {
+        .exists(_.completed)
+    ) {
       Future.successful(Redirect(routes.ReportBondsDisposalListController.onPageLoad(srn, 1)))
     } else {
       (
@@ -165,7 +168,7 @@ class BondsDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         _ <- saveService.save(request.userAnswers)
@@ -175,11 +178,10 @@ class BondsDisposalCYAController @Inject()(
           fallbackCall = controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
             .onPageLoad(srn, bondIndex, disposalIndex, mode)
         )
-      } yield submissionResult.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator.nextPage(BondsDisposalCYAPage(srn), mode, request.userAnswers)
-          )
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator.nextPage(BondsDisposalCYAPage(srn), mode, request.userAnswers)
+        )
       )
     }
 

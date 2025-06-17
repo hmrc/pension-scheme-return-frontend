@@ -45,9 +45,9 @@ object JsonUtils {
      * Prunes a path from a JsResult[JsObject]
      *
      * @param path
-     * The path to the value being pruned
+     *   The path to the value being pruned
      * @return
-     * A new json object with the path removed
+     *   A new json object with the path removed
      */
     def prune(path: JsPath): JsResult[JsObject] =
       result.flatMap(_.transform(path.prune(_)))
@@ -56,11 +56,11 @@ object JsonUtils {
      * Conditionally prunes a path from a JsResult[JsObject]
      *
      * @param path
-     * The path to the value being pruned
+     *   The path to the value being pruned
      * @param condition
-     * The condition that controls whether the path is pruned or not
+     *   The condition that controls whether the path is pruned or not
      * @return
-     * A new json object with the path removed
+     *   A new json object with the path removed
      */
     def pruneIf(path: JsPath, condition: Boolean): JsResult[JsObject] =
       if (condition) {

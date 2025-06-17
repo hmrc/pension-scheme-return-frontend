@@ -16,8 +16,7 @@
 
 package pages.nonsipp.bondsdisposal
 
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemoveBondsDisposalPageSpec extends PageBehaviours {
@@ -25,8 +24,8 @@ class RemoveBondsDisposalPageSpec extends PageBehaviours {
   "RemoveBondsDisposalPage" - {
 
     val srn = srnGen.sample.value
-    val bondIndex = refineMV[OneTo5000](1)
-    val disposalIndex = refineMV[OneTo50](1)
+    val bondIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Boolean](RemoveBondsDisposalPage(srn, bondIndex, disposalIndex))
 

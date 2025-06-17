@@ -18,10 +18,10 @@ package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NameDOB
 import org.mockito.ArgumentMatchers.any
@@ -31,19 +31,19 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class RemovePclsControllerSpec extends ControllerBaseSpec {
+class RemovePclsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.RemovePclsController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.RemovePclsController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.RemovePclsController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.RemovePclsController.onSubmit(srn, 1)
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pcls)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, 1), pcls)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -62,7 +62,7 @@ class RemovePclsControllerSpec extends ControllerBaseSpec {
 
       view(
         RemovePclsController.form(injected[YesNoPageFormProvider]),
-        RemovePclsController.viewModel(srn, refineMV(1), money, memberDetails.fullName)
+        RemovePclsController.viewModel(srn, 1, money, memberDetails.fullName)
       )
     })
 

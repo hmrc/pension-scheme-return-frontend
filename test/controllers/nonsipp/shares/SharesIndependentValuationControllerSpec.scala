@@ -17,17 +17,16 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesIndependentValuationPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import controllers.nonsipp.shares.SharesIndependentValuationController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class SharesIndependentValuationControllerSpec extends ControllerBaseSpec {
+class SharesIndependentValuationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
   private lazy val onPageLoad = routes.SharesIndependentValuationController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.SharesIndependentValuationController.onSubmit(srn, index, NormalMode)
 

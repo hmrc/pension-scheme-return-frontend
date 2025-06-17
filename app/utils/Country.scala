@@ -38,9 +38,8 @@ object Country {
       .fromJson[Array[(String, String)]](locationJsValue)
       .asOpt
       .map {
-        _.map {
-          case (name, code) =>
-            SelectInput(code.split(":")(1).trim, name)
+        _.map { case (name, code) =>
+          SelectInput(code.split(":")(1).trim, name)
         }.toList
       }
       .get

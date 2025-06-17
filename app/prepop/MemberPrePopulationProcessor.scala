@@ -31,7 +31,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class MemberPrePopulationProcessor @Inject()() {
+class MemberPrePopulationProcessor @Inject() () {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -43,8 +43,8 @@ class MemberPrePopulationProcessor @Inject()() {
         _.transform(
           (personalDetails \ MemberStatus.key).json.update(
             JsPath.read[JsObject].map { statusObject =>
-              JsObject(statusObject.fields.map {
-                case (key, _) => key -> JsString("New")
+              JsObject(statusObject.fields.map { case (key, _) =>
+                key -> JsString("New")
               })
             }
           )
@@ -61,17 +61,16 @@ class MemberPrePopulationProcessor @Inject()() {
       (baseUaJson \ "membersPayments" \ "memberDetails" \ "personalDetails" \ MemberStatus.key)
         .asOpt[Map[String, String]]
 
-    memberStatusOptMap.fold(transformedResultWithCheckedFlag)(
-      memberStatusMap =>
-        memberStatusMap.foldLeft(transformedResultWithCheckedFlag)((uaResult, memberStatusEntry) => {
-          memberStatusEntry._1.toIntOption.flatMap(i => refineV[OneTo300](i + 1).toOption) match {
-            case None => uaResult
-            case Some(index) =>
-              uaResult
-                .flatMap(_.set(SafeToHardDelete(srn, index)))
-                .flatMap(_.set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed))
-          }
-        })
+    memberStatusOptMap.fold(transformedResultWithCheckedFlag)(memberStatusMap =>
+      memberStatusMap.foldLeft(transformedResultWithCheckedFlag) { (uaResult, memberStatusEntry) =>
+        memberStatusEntry._1.toIntOption.flatMap(i => refineV[OneTo300](i + 1).toOption) match {
+          case None => uaResult
+          case Some(index) =>
+            uaResult
+              .flatMap(_.set(SafeToHardDelete(srn, index)))
+              .flatMap(_.set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed))
+        }
+      }
     )
   }
 }

@@ -17,24 +17,23 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import services.PsrSubmissionService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import pages.nonsipp.landorpropertydisposal._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 
 import scala.concurrent.Future
 
-class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
+class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -69,8 +68,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
     submissionNumberOne
   )
 
-  private val assetIndex = refineMV[OneTo5000](1)
-  private val disposalIndex = refineMV[OneTo50](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
   private val page = 1
 
   private val dateSold = Some(localDate)
@@ -135,9 +134,9 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
             when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(())))
           )
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -212,9 +211,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to land or property disposal list page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to land or property disposal list page")
     )
   }
 }

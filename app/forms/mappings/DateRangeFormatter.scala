@@ -75,18 +75,16 @@ private[mappings] class DateRangeFormatter(
     val validateStartDate: Either[Seq[FormError], DateRange] =
       duplicateRanges
         .find(_.contains(range.from))
-        .map(
-          startError =>
-            Seq(FormError(s"$key.startDate", overlappedStartDateError, List(startError.from.show, startError.to.show)))
+        .map(startError =>
+          Seq(FormError(s"$key.startDate", overlappedStartDateError, List(startError.from.show, startError.to.show)))
         )
         .toLeft(range)
 
     val validateEndDate: Either[Seq[FormError], DateRange] =
       duplicateRanges
         .find(_.contains(range.to))
-        .map(
-          endError =>
-            Seq(FormError(s"$key.endDate", overlappedEndDateError, List(endError.from.show, endError.to.show)))
+        .map(endError =>
+          Seq(FormError(s"$key.endDate", overlappedEndDateError, List(endError.from.show, endError.to.show)))
         )
         .toLeft(range)
 
@@ -153,9 +151,7 @@ private[mappings] class DateRangeFormatter(
       _ <- verifyPreviousDateRange(key, dateRange, index)
       _ <- verifyRangeBounds(s"$key.startDate", dateRange.from, startDateAllowedDateRangeError)
       _ <- verifyRangeBounds(s"$key.endDate", dateRange.to, endDateAllowedDateRangeError)
-    } yield {
-      dateRange
-    }
+    } yield dateRange
 
   override def unbind(key: String, value: DateRange): Map[String, String] =
     startDateFormatter.unbind(s"$key.startDate", value.from) ++

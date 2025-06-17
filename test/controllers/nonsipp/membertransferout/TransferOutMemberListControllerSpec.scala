@@ -17,19 +17,18 @@
 package controllers.nonsipp.membertransferout
 
 import play.api.test.FakeRequest
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import views.html.TwoColumnsTripleAction
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import pages.nonsipp.membertransferout._
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import config.RefinedTypes.{Max300, Max5}
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
-class TransferOutMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class TransferOutMemberListControllerSpec extends ControllerBaseSpec with ControllerBehaviours with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.TransferOutMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.TransferOutMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -53,22 +52,22 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec with Member
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   val userAnswers: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(SchemeTransferOutPage(srn), true)
-    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(MemberTransferOutProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
   val testMemberList: List[MemberWithTransferOut] = List(
     MemberWithTransferOut(
-      memberIndex = refineMV(1),
+      memberIndex = 1,
       transferFullName = memberDetails.fullName,
       transfer = List(
         TransferOut(
-          memberIndex = refineMV(1),
+          memberIndex = 1,
           status = SectionJourneyStatus.Completed
         )
       )
@@ -114,11 +113,11 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec with Member
 
       val memberList: List[MemberWithTransferOut] = List.fill(2)(
         MemberWithTransferOut(
-          memberIndex = refineMV(1),
+          memberIndex = 1,
           transferFullName = "Test Member",
           transfer = List(
             TransferOut(
-              memberIndex = refineMV(1),
+              memberIndex = 1,
               status = SectionJourneyStatus.Completed
             )
           )
@@ -186,53 +185,59 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec with Member
       }
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[TwoColumnsTripleAction].apply(
-              viewModel(
-                srn,
-                page,
-                mode = ViewOnlyMode,
-                testMemberList,
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo),
-                schemeName = schemeName,
-                noPageEnabled = false
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              testMemberList,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with no changed flag")
       )
 
       val updatedUserAnswers = currentUserAnswers
-        .unsafeSet(WhenWasTransferMadePage(srn, index, refineMV[Max5.Refined](1)), localDate)
+        .unsafeSet(WhenWasTransferMadePage(srn, index, 1), localDate)
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[TwoColumnsTripleAction].apply(
-              viewModel(
-                srn,
-                page,
-                mode = ViewOnlyMode,
-                testMemberList,
-                viewOnlyUpdated = true,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo),
-                schemeName = schemeName,
-                noPageEnabled = false
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = updatedUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              testMemberList,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with changed flag")
       )
 
       val noUserAnswers = defaultUserAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
         .unsafeSet(SchemeTransferOutPage(srn), false)
         .unsafeSet(FbVersionPage(srn), "002")
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)

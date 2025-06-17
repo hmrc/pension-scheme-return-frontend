@@ -27,12 +27,15 @@ import viewmodels.models._
 object MemberCountUtils {
 
   /**
-   * Check if the current submission of the return has more than 99 members now but previously in the same submission was less than 99 members
+   * Check if the current submission of the return has more than 99 members now but previously in the same submission
+   * was less than 99 members
    *
    * @param userAnswers
    * @param srn
    * @param pensionSchemeId
-   * @return true if total active and deferred member number > 99 AND some other data input is present that is normally accessible from the task list
+   * @return
+   *   true if total active and deferred member number > 99 AND some other data input is present that is normally
+   *   accessible from the task list
    */
   def hasMemberNumbersChangedToOver99(
     userAnswers: UserAnswers,

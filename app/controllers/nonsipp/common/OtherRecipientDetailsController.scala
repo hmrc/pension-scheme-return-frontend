@@ -20,7 +20,6 @@ import services.SaveService
 import controllers.nonsipp.common.OtherRecipientDetailsController.viewModel
 import viewmodels.implicits._
 import utils.FormUtils._
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
 import forms.RecipientDetailsFormProvider
@@ -34,6 +33,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
@@ -42,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OtherRecipientDetailsController @Inject()(
+class OtherRecipientDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,7 +55,7 @@ class OtherRecipientDetailsController @Inject()(
     extends PSRController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       subject match {
         case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
@@ -69,7 +70,7 @@ class OtherRecipientDetailsController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val form = OtherRecipientDetailsController.form(formProvider, subject)
       form
@@ -79,14 +80,13 @@ class OtherRecipientDetailsController @Inject()(
             Future.successful(
               BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- request.userAnswers.set(OtherRecipientDetailsPage(srn, index, subject), answer).mapK
               nextPage = navigator.nextPage(OtherRecipientDetailsPage(srn, index, subject), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

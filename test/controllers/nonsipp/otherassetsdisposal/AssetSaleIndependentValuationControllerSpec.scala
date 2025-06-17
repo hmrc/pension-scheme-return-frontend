@@ -18,17 +18,16 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationPage
 import controllers.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class AssetSaleIndependentValuationControllerSpec extends ControllerBaseSpec {
+class AssetSaleIndependentValuationControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val assetIndex = 1
+  private val disposalIndex = 1
   private lazy val onPageLoad =
     routes.AssetSaleIndependentValuationController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
   private lazy val onSubmit =

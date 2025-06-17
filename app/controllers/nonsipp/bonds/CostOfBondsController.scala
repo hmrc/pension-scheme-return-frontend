@@ -22,7 +22,9 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import controllers.PSRController
 import config.Constants
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -31,8 +33,6 @@ import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.RefinedTypes.Max5000
-import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}
@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class CostOfBondsController @Inject()(
+class CostOfBondsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -55,7 +55,7 @@ class CostOfBondsController @Inject()(
 
   private def form: Form[Money] = CostOfBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
@@ -65,7 +65,7 @@ class CostOfBondsController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -79,7 +79,7 @@ class CostOfBondsController @Inject()(
                 )
               )
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(CostOfBondsPage(srn, index), answer))
@@ -87,7 +87,6 @@ class CostOfBondsController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
   }
 }
@@ -104,7 +103,7 @@ object CostOfBondsController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     form: Form[Money],
     mode: Mode
   ): FormPageViewModel[SingleQuestion[Money]] =

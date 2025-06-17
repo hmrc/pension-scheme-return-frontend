@@ -16,17 +16,16 @@
 
 package controllers.nonsipp.common
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RecipientDetailsView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RecipientDetailsFormProvider
 import models.{IdentitySubject, NormalMode, RecipientDetails}
 import pages.nonsipp.common.OtherRecipientDetailsPage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
+class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   private val validForm = List(
     "name" -> "name",

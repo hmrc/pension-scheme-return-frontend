@@ -17,19 +17,18 @@
 package controllers.nonsipp.receivetransfer
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
+import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
 
-class DidTransferIncludeAssetControllerSpec extends ControllerBaseSpec {
+class DidTransferIncludeAssetControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private lazy val onPageLoad =
     routes.DidTransferIncludeAssetController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.DidTransferIncludeAssetController.onSubmit(srn, index, secondaryIndex, NormalMode)

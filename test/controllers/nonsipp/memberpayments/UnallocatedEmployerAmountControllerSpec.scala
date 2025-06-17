@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberpayments
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
 import forms.MoneyFormProvider
 import controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController._
 import models.NormalMode
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 
-class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
+class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.UnallocatedEmployerAmountController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.UnallocatedEmployerAmountController.onSubmit(srn, NormalMode)

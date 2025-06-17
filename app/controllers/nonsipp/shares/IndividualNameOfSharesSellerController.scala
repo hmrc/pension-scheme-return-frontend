@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -37,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IndividualNameOfSharesSellerController @Inject()(
+class IndividualNameOfSharesSellerController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -50,13 +51,13 @@ class IndividualNameOfSharesSellerController @Inject()(
 
   private val form = IndividualNameOfSharesSellerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm = request.userAnswers.fillForm(IndividualNameOfSharesSellerPage(srn, index), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class MoneyBorrowedController @Inject()(
+class MoneyBorrowedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -69,20 +69,22 @@ class MoneyBorrowedController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(MoneyBorrowedPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(Redirect(navigator.nextPage(MoneyBorrowedPage(srn), mode, updatedAnswers)))
-            } else {
-              psrSubmissionService
-                .submitPsrDetailsWithUA(
-                  srn,
-                  updatedAnswers,
-                  fallbackCall = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode)
-                )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                .map {
-                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(_) => Redirect(navigator.nextPage(MoneyBorrowedPage(srn), mode, updatedAnswers))
-                }
-            }
+            redirectTo <-
+              if (value) {
+                Future.successful(Redirect(navigator.nextPage(MoneyBorrowedPage(srn), mode, updatedAnswers)))
+              } else {
+                psrSubmissionService
+                  .submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall =
+                      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode)
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) => Redirect(navigator.nextPage(MoneyBorrowedPage(srn), mode, updatedAnswers))
+                  }
+              }
           } yield redirectTo
       )
   }
