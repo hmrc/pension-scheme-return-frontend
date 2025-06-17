@@ -83,8 +83,12 @@ class SharesTransformer @Inject() extends Transformer {
     sharesDisposal: Boolean
   )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] = {
     val optSchemeHadShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    val anyCompleted = request.userAnswers.map(SharesProgress.all(srn)).toList.exists(_._2.completed)
     if (optSchemeHadShares.nonEmpty && !optSchemeHadShares.get) {
       // don't build any share transactions if DidSchemeHoldAnySharesPage was 'No'
+      None
+    } else if (optSchemeHadShares.nonEmpty && optSchemeHadShares.get && !anyCompleted) {
+      // don't build any share transactions if DidSchemeHoldAnySharesPage was 'Yes' and there were no completed shares
       None
     } else {
       // build share transactions if DidSchemeHoldAnySharesPage was 'Yes' or not answered (pre-population)
