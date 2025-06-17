@@ -16,8 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class SharesIndependentValuationPageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class SharesIndependentValuationPageSpec extends PageBehaviours {
 
   "SharesIndependentValuationPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val index = 1
 
     beRetrievable[Boolean](SharesIndependentValuationPage(srn, index))
 

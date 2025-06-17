@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class BondsDisposalController @Inject()(
+class BondsDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -61,30 +61,31 @@ class BondsDisposalController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => {
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode))))
-        },
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BondsDisposalPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(
-                Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
-              )
-            } else {
-              psrSubmissionService
-                .submitPsrDetailsWithUA(
-                  srn,
-                  updatedAnswers,
-                  fallbackCall = controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, mode)
-                )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                .map {
-                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(_) =>
-                    Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
-                }
-            }
+            redirectTo <-
+              if (value) {
+                Future.successful(
+                  Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
+                )
+              } else {
+                psrSubmissionService
+                  .submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall =
+                      controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, mode)
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) =>
+                      Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
+                  }
+              }
           } yield redirectTo
       )
   }

@@ -20,10 +20,9 @@ import services.{PsrSubmissionService, SaveService}
 import models.ConditionalYesNo._
 import play.api.mvc.Call
 import models.SchemeHoldLandProperty.Transfer
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import pages.nonsipp.landorproperty._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
@@ -31,10 +30,10 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty._
 
-class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
   private implicit val mockSaveService: SaveService = mock[SaveService]
@@ -50,7 +49,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
     MockSaveService.save()
   }
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val page = 1
 
   private def onPageLoad(mode: Mode): Call = routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
@@ -90,7 +89,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       LandOrPropertyProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )
@@ -130,10 +129,10 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -228,9 +227,8 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to land or property list")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to land or property list")
     )
   }
 }

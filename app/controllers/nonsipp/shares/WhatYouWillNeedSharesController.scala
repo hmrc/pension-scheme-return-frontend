@@ -32,7 +32,7 @@ import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 
-class WhatYouWillNeedSharesController @Inject()(
+class WhatYouWillNeedSharesController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
@@ -65,7 +65,7 @@ object WhatYouWillNeedSharesController {
       controllers.nonsipp.shares.routes.WhatYouWillNeedSharesController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
-        (ParagraphMessage("shares.whatYouWillNeed.paragraph1") ++
+        ParagraphMessage("shares.whatYouWillNeed.paragraph1") ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph2") ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph3") ++
           ListMessage(
@@ -90,6 +90,6 @@ object WhatYouWillNeedSharesController {
             "shares.whatYouWillNeed.paragraph5.listItem2",
             "shares.whatYouWillNeed.paragraph5.listItem3",
             "shares.whatYouWillNeed.paragraph5.listItem4"
-          ))
+          )
       )
 }

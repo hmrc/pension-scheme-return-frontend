@@ -20,6 +20,7 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IndividualRecipientNameController @Inject()(
+class IndividualRecipientNameController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -52,7 +53,7 @@ class IndividualRecipientNameController @Inject()(
 
   private def form = IndividualRecipientNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
@@ -62,7 +63,7 @@ class IndividualRecipientNameController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -71,14 +72,13 @@ class IndividualRecipientNameController @Inject()(
             Future.successful(
               BadRequest(view(formWithErrors, IndividualRecipientNameController.viewModel(srn, index, mode)))
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- request.userAnswers.set(IndividualRecipientNamePage(srn, index), answer).mapK
               nextPage = navigator.nextPage(IndividualRecipientNamePage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
   }
 }

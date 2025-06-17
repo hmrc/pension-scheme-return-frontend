@@ -25,6 +25,7 @@ import com.google.inject.Inject
 import utils.ListUtils.ListOps
 import config.RefinedTypes.Max3
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, toRefined3}
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import forms.DateRangeFormProvider
@@ -47,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.Named
 
-class AccountingPeriodController @Inject()(
+class AccountingPeriodController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
@@ -68,7 +69,7 @@ class AccountingPeriodController @Inject()(
 
   private val viewModel = AccountingPeriodController.viewModel _
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       getWhichTaxYear(srn) { taxYear =>
         Ok(
@@ -80,7 +81,7 @@ class AccountingPeriodController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
       val usedAccountingPeriods = duplicateAccountingPeriods(srn, index)
       request.userAnswers.get(WhichTaxYearPage(srn)) match {

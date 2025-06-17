@@ -16,8 +16,7 @@
 
 package pages.nonsipp.bondsdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -25,8 +24,8 @@ class TotalConsiderationSaleBondsPageSpec extends PageBehaviours {
 
   "TotalConsiderationSaleBondsPage" - {
     val srn = srnGen.sample.value
-    val bondIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val bondIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Money](TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex))
 

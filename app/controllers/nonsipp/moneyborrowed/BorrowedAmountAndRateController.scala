@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -43,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class BorrowedAmountAndRateController @Inject()(
+class BorrowedAmountAndRateController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,23 +55,21 @@ class BorrowedAmountAndRateController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      {
-        val form = BorrowedAmountAndRateController.form()
-        val viewModel = BorrowedAmountAndRateController.viewModel(
-          srn,
-          index,
-          mode,
-          request.schemeDetails.schemeName,
-          form
-        )
+      val form = BorrowedAmountAndRateController.form()
+      val viewModel = BorrowedAmountAndRateController.viewModel(
+        srn,
+        index,
+        mode,
+        request.schemeDetails.schemeName,
+        form
+      )
 
-        Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form), viewModel))
-      }
+      Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form), viewModel))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = BorrowedAmountAndRateController.form()
 
@@ -92,9 +91,7 @@ class BorrowedAmountAndRateController @Inject()(
               nextPage = navigator.nextPage(BorrowedAmountAndRatePage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield {
-              Redirect(nextPage)
-            }
+            } yield Redirect(nextPage)
         )
   }
 }

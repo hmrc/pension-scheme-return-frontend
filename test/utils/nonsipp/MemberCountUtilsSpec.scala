@@ -20,8 +20,6 @@ import pages.nonsipp.schemedesignatory._
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import pages.nonsipp.landorproperty._
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.OptionValues
 import generators.ModelGenerators.pensionSchemeIdGen
@@ -33,10 +31,12 @@ import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import config.RefinedTypes._
 import controllers.TestValues
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty._
 
 class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  private val index: Max300 = refineMV(1)
+  private val index: Max300 = 1
   private val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
   private val userAnswersOverThresholdNumbers: UserAnswers = defaultUserAnswers
     .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)

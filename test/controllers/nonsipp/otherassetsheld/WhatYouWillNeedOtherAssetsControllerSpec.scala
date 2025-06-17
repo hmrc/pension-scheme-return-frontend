@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 
-class WhatYouWillNeedOtherAssetsControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedOtherAssetsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "WhatYouWillNeedOtherAssetsController" - {
 

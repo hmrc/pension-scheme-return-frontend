@@ -18,13 +18,13 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.RefinedTypes.OneToThree
-import generators.IndexGen
 import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.accountingperiod.routes
-import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod._
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
+import generators.IndexGen
+import utils.IntUtils.given
 
 class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -35,8 +35,8 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodPage(_, refineMV(1), NormalMode),
-          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
+          AccountingPeriodPage(_, 1, NormalMode),
+          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from accounting period page to check answers page")
     )

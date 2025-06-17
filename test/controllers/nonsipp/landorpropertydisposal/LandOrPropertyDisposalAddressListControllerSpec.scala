@@ -17,16 +17,16 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import play.api.mvc.Call
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListRadiosView
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalProgress
-import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
+import utils.IntUtils.given
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted, LandOrPropertyProgress}
 
-class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page = 1)
   private lazy val onSubmit = routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, page = 1)
@@ -34,32 +34,32 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
   private val address1 = addressGen.sample.value
   private val address2 = addressGen.sample.value
 
-  private val addresses = List(LandOrPropertyData(refineMV(1), address1), LandOrPropertyData(refineMV(2), address2))
+  private val addresses = List(LandOrPropertyData(1, address1), LandOrPropertyData(2, address2))
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
-    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
-    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 1), address1)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 2), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, 1), SectionCompleted)
+    .unsafeSet(LandOrPropertyCompleted(srn, 2), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, 2), SectionJourneyStatus.Completed)
 
   private val incompleteUserAnswers = defaultUserAnswers
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
-    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.InProgress("some-url"))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 1), address1)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 2), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, 1), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, 2), SectionJourneyStatus.InProgress("some-url"))
 
   private val incompleteDisposalUserAnswers = defaultUserAnswers
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
-    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
-    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 1), address1)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, 2), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, 1), SectionCompleted)
+    .unsafeSet(LandOrPropertyCompleted(srn, 2), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, 1), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, 2), SectionJourneyStatus.Completed)
     .unsafeSet(
-      LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)),
+      LandOrPropertyDisposalProgress(srn, 1, 1),
       SectionJourneyStatus.InProgress("some-url")
     )
 
@@ -74,7 +74,7 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
       injected[ListRadiosView]
         .apply(
           form(injected[RadioListFormProvider]),
-          viewModel(srn, page = 1, List(LandOrPropertyData(refineMV(1), address1)), userAnswers)
+          viewModel(srn, page = 1, List(LandOrPropertyData(1, address1)), userAnswers)
         )
     }.updateName(_ + " - hide incomplete disposals"))
 

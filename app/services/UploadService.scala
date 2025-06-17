@@ -30,14 +30,14 @@ import java.time.{Clock, Instant}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class UploadService @Inject()(
+class UploadService @Inject() (
   upscanConnector: UpscanConnector,
   repository: UploadRepository,
   clock: Clock
 )(implicit ec: ExecutionContext) {
 
-  def initiateUpscan(callBackUrl: String, successRedirectUrl: String, failureRedirectUrl: String)(
-    implicit hc: HeaderCarrier
+  def initiateUpscan(callBackUrl: String, successRedirectUrl: String, failureRedirectUrl: String)(implicit
+    hc: HeaderCarrier
   ): Future[UpscanInitiateResponse] =
     upscanConnector.initiate(callBackUrl, successRedirectUrl, failureRedirectUrl)
 

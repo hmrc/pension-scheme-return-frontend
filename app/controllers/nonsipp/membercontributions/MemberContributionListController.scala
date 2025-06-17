@@ -21,7 +21,6 @@ import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import controllers.nonsipp.membercontributions.MemberContributionListController._
 import cats.implicits.toShow
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
@@ -38,6 +37,8 @@ import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
+import controllers.nonsipp.membercontributions.MemberContributionListController._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -50,7 +51,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class MemberContributionListController @Inject()(
+class MemberContributionListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -77,8 +78,8 @@ class MemberContributionListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -154,55 +155,54 @@ object MemberContributionListController {
     optPreviousVersion: Option[Int]
   ): List[List[TableElemBase]] =
     memberList
-      .map {
-        case (index, memberName, memberContribution) =>
-          if (memberContribution.exists(!_.isZero)) {
-            List(
-              TableElem(memberName.fullName),
-              TableElem("Member contributions reported"),
-              TableElemDoubleLink(
-                (
-                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                      TableElem.view(
-                        controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                          .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
-                        Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
-                      )
-                    case _ =>
-                      TableElem.change(
-                        controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                          .onPageLoad(srn, index, CheckMode),
-                        Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
-                      )
-                  },
-                  if (mode == ViewOnlyMode) {
-                    TableElem.empty
-                  } else {
-                    TableElem.remove(
-                      controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-                        .onPageLoad(srn, index),
+      .map { case (index, memberName, memberContribution) =>
+        if (memberContribution.exists(!_.isZero)) {
+          List(
+            TableElem(memberName.fullName),
+            TableElem("Member contributions reported"),
+            TableElemDoubleLink(
+              (
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                        .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
                       Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
                     )
-                  }
-                )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                        .onPageLoad(srn, index, CheckMode),
+                      Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
+                    )
+                },
+                if (mode == ViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+                      .onPageLoad(srn, index),
+                    Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
+                  )
+                }
               )
             )
-          } else {
-            List(
-              TableElem(memberName.fullName),
-              TableElem("No member contributions"),
-              if (mode != ViewOnlyMode) {
-                TableElem.add(
-                  controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                    .onSubmit(srn, index, mode),
-                  Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
-                )
-              } else {
-                TableElem.empty
-              }
-            )
-          }
+          )
+        } else {
+          List(
+            TableElem(memberName.fullName),
+            TableElem("No member contributions"),
+            if (mode != ViewOnlyMode) {
+              TableElem.add(
+                controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+                  .onSubmit(srn, index, mode),
+                Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
+              )
+            } else {
+              TableElem.empty
+            }
+          )
+        }
       }
       .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
@@ -229,13 +229,12 @@ object MemberContributionListController {
       }
 
     val membersWithContributions: List[(Max300, NameDOB, Option[Money])] = memberList
-      .map {
-        case (index, memberName) =>
-          (index, memberName, userAnswers.get(TotalMemberContributionPage(srn, index)))
+      .map { case (index, memberName) =>
+        (index, memberName, userAnswers.get(TotalMemberContributionPage(srn, index)))
       }
 
-    val sumMemberContributions = membersWithContributions.count {
-      case (_, _, contribution) => contribution.exists(!_.isZero)
+    val sumMemberContributions = membersWithContributions.count { case (_, _, contribution) =>
+      contribution.exists(!_.isZero)
     }
 
     // in view-only mode or with direct url edit page value can be higher than needed

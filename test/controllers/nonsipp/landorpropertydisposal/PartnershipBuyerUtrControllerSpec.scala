@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerUtrController._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
+class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.PartnershipBuyerUtrController

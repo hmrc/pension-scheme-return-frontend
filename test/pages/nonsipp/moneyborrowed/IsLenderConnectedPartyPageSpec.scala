@@ -16,8 +16,7 @@
 
 package pages.nonsipp.moneyborrowed
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class IsLenderConnectedPartyPageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class IsLenderConnectedPartyPageSpec extends PageBehaviours {
 
   "IsLenderConnectedPartyPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Boolean](IsLenderConnectedPartyPage(srn, index))
 

@@ -17,24 +17,23 @@
 package pages.nonsipp.landorpropertydisposal
 
 import models.HowDisposed.HowDisposed
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{HowDisposed, IdentityType}
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.TestValues
 
 class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
-  private val landOrPropertyIndexOne = refineMV[Max5000.Refined](1)
-  private val landOrPropertyIndexTwo = refineMV[Max5000.Refined](2)
-  private val indexOne = refineMV[Max50.Refined](1)
-  private val indexTwo = refineMV[Max50.Refined](2)
+  private val landOrPropertyIndexOne = 1
+  private val landOrPropertyIndexTwo = 2
+  private val indexOne = 1
+  private val indexTwo = 2
 
   "HowWasPropertyDisposedOfPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val index = 1
+    val disposalIndex = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[HowDisposed](HowWasPropertyDisposedOfPage(srnSample, index, disposalIndex))

@@ -18,25 +18,24 @@ package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ListView
+import utils.IntUtils.given
 import controllers.nonsipp.shares.SharesListController._
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
-class SharesListControllerSpec extends ControllerBaseSpec {
+class SharesListControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val indexOne = refineMV[Max5000.Refined](1)
-  private val indexTwo = refineMV[Max5000.Refined](2)
-  private val indexThree = refineMV[Max5000.Refined](3)
+  private val indexOne = 1
+  private val indexTwo = 2
+  private val indexThree = 3
 
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -386,9 +385,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only taskList")
     )
 
     act.like(

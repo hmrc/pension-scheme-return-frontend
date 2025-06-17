@@ -50,7 +50,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class BasicDetailsCheckYourAnswersController @Inject()(
+class BasicDetailsCheckYourAnswersController @Inject() (
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   schemeDateService: SchemeDateService,
@@ -80,67 +80,66 @@ class BasicDetailsCheckYourAnswersController @Inject()(
       onPageLoadCommon(srn, mode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] = {
     val journeyByPassedF =
       if (isUserAnswersAlreadySubmittedAndNotModified(srn)) isJourneyBypassed(srn) else Future.successful(Right(false))
-    journeyByPassedF.map(
-      eitherJourneyNavigationResultOrRecovery =>
-        schemeDateService.taxYearOrAccountingPeriods(srn) match {
-          case Some(periods) =>
-            val currentUserAnswers = request.userAnswers
-            (
-              for {
-                schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-                activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
-                whyNoBankAccount = currentUserAnswers.get(WhyNoBankAccountPage(srn))
-                whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
-                userName <- loggedInUserNameOrRedirect
-                journeyByPassed <- eitherJourneyNavigationResultOrRecovery
-              } yield {
-                val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
-                val result = Ok(
-                  view(
-                    viewModel(
-                      srn,
-                      mode,
-                      schemeMemberNumbers,
-                      activeBankAccount,
-                      whyNoBankAccount,
-                      whichTaxYearPage,
-                      periods,
-                      userName,
-                      request.schemeDetails,
-                      request.pensionSchemeId,
-                      request.pensionSchemeId.isPSP,
-                      viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                        getBasicDetailsCompletedOrUpdated(currentUserAnswers, request.previousUserAnswers.get) == Updated
-                      } else {
-                        false
-                      },
-                      optYear = request.year,
-                      optCurrentVersion = request.currentVersion,
-                      optPreviousVersion = request.previousVersion,
-                      compilationOrSubmissionDate = compilationOrSubmissionDate,
-                      journeyByPassed = journeyByPassed,
-                      showBackLink = showBackLink
-                    )
+    journeyByPassedF.map(eitherJourneyNavigationResultOrRecovery =>
+      schemeDateService.taxYearOrAccountingPeriods(srn) match {
+        case Some(periods) =>
+          val currentUserAnswers = request.userAnswers
+          (
+            for {
+              schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
+              activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
+              whyNoBankAccount = currentUserAnswers.get(WhyNoBankAccountPage(srn))
+              whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
+              userName <- loggedInUserNameOrRedirect
+              journeyByPassed <- eitherJourneyNavigationResultOrRecovery
+            } yield {
+              val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
+              val result = Ok(
+                view(
+                  viewModel(
+                    srn,
+                    mode,
+                    schemeMemberNumbers,
+                    activeBankAccount,
+                    whyNoBankAccount,
+                    whichTaxYearPage,
+                    periods,
+                    userName,
+                    request.schemeDetails,
+                    request.pensionSchemeId,
+                    request.pensionSchemeId.isPSP,
+                    viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                      getBasicDetailsCompletedOrUpdated(currentUserAnswers, request.previousUserAnswers.get) == Updated
+                    } else {
+                      false
+                    },
+                    optYear = request.year,
+                    optCurrentVersion = request.currentVersion,
+                    optPreviousVersion = request.previousVersion,
+                    compilationOrSubmissionDate = compilationOrSubmissionDate,
+                    journeyByPassed = journeyByPassed,
+                    showBackLink = showBackLink
                   )
                 )
-                if (journeyByPassed) {
-                  result
-                    .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-                    .addingToSession(
-                      (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
-                    )
-                } else {
-                  result
-                }
+              )
+              if (journeyByPassed) {
+                result
+                  .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+                  .addingToSession(
+                    (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
+                  )
+              } else {
+                result
               }
-            ).merge
-          case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+            }
+          ).merge
+        case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
     )
   }
 
@@ -200,8 +199,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     }
   }
 
-  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(
-    implicit req: DataRequest[_]
+  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(implicit
+    req: DataRequest[_]
   ) = PSRStartAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
@@ -331,8 +330,8 @@ object BasicDetailsCheckYourAnswersController {
     schemeDetails: SchemeDetails,
     pensionSchemeId: PensionSchemeId,
     isPSP: Boolean
-  )(
-    implicit messages: Messages
+  )(implicit
+    messages: Messages
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
       Some(Heading2.medium("basicDetailsCheckYourAnswersController.schemeDetails.heading")),
@@ -369,10 +368,9 @@ object BasicDetailsCheckYourAnswersController {
                 "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
                 taxYear.show
               ).withChangeAction(
-                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
-                  hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
-                )
-                .withOneHalfWidth()
+                controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
+                hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
+              ).withOneHalfWidth()
             )
           case Right(accountingPeriods) =>
             List(
@@ -380,42 +378,37 @@ object BasicDetailsCheckYourAnswersController {
                 "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
                 whichTaxYearPage.get.show
               ).withChangeAction(
-                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
-                  hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
-                )
-                .withOneHalfWidth()
+                controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
+                hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
+              ).withOneHalfWidth()
             ) ++
               List(
                 CheckYourAnswersRowViewModel(
                   Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod"),
                   accountingPeriods.map(_._1.show).toList.mkString("\n")
                 ).withChangeAction(
-                    controllers.nonsipp.accountingperiod.routes.AccountingPeriodListController
-                      .onPageLoad(srn, CheckMode)
-                      .url,
-                    hidden = "basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden"
-                  )
-                  .withOneHalfWidth()
+                  controllers.nonsipp.accountingperiod.routes.AccountingPeriodListController
+                    .onPageLoad(srn, CheckMode)
+                    .url,
+                  hidden = "basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden"
+                ).withOneHalfWidth()
               )
         })
         :+ CheckYourAnswersRowViewModel(
           Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"),
           if (activeBankAccount: Boolean) "site.yes" else "site.no"
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, CheckMode).url,
-            hidden = "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden"
-          )
-          .withOneHalfWidth()
-        :?+ whyNoBankAccount.map(
-          reason =>
-            CheckYourAnswersRowViewModel(
-              Message("basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount"),
-              reason
-            ).withChangeAction(
-                controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode).url,
-                hidden = "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount.hidden"
-              )
-              .withOneHalfWidth()
+          controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, CheckMode).url,
+          hidden = "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden"
+        ).withOneHalfWidth()
+        :?+ whyNoBankAccount.map(reason =>
+          CheckYourAnswersRowViewModel(
+            Message("basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount"),
+            reason
+          ).withChangeAction(
+            controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode).url,
+            hidden = "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount.hidden"
+          ).withOneHalfWidth()
         )
     ),
     CheckYourAnswersSection(
@@ -429,15 +422,14 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.noOfActiveMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
-              .onPageLoad(srn, mode)
-              .url + "#activeMembers",
-            hidden = Message(
-              "basicDetailsCheckYourAnswersController.memberDetails.activeMembers.hidden",
-              taxEndDate(taxYearOrAccountingPeriods).show
-            )
+          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
+            .onPageLoad(srn, mode)
+            .url + "#activeMembers",
+          hidden = Message(
+            "basicDetailsCheckYourAnswersController.memberDetails.activeMembers.hidden",
+            taxEndDate(taxYearOrAccountingPeriods).show
           )
-          .withOneHalfWidth(),
+        ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
           Message(
             "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers",
@@ -446,15 +438,14 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.noOfDeferredMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
-              .onPageLoad(srn, mode)
-              .url + "#deferredMembers",
-            hidden = Message(
-              "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden",
-              taxEndDate(taxYearOrAccountingPeriods).show
-            )
+          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
+            .onPageLoad(srn, mode)
+            .url + "#deferredMembers",
+          hidden = Message(
+            "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden",
+            taxEndDate(taxYearOrAccountingPeriods).show
           )
-          .withOneHalfWidth(),
+        ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
           Message(
             "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers",
@@ -463,15 +454,14 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.noOfPensionerMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
-              .onPageLoad(srn, mode)
-              .url + "#pensionerMembers",
-            hidden = Message(
-              "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden",
-              taxEndDate(taxYearOrAccountingPeriods).show
-            )
+          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
+            .onPageLoad(srn, mode)
+            .url + "#pensionerMembers",
+          hidden = Message(
+            "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden",
+            taxEndDate(taxYearOrAccountingPeriods).show
           )
-          .withOneHalfWidth()
+        ).withOneHalfWidth()
       )
     )
   )

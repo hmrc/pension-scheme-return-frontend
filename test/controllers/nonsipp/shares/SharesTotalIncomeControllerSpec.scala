@@ -17,17 +17,16 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesTotalIncomePage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
+import utils.IntUtils.given
 import controllers.nonsipp.shares.SharesTotalIncomeController._
-import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class SharesTotalIncomeControllerSpec extends ControllerBaseSpec {
+class SharesTotalIncomeControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val userAnswers = defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 
   "SharesTotalIncomeController" - {

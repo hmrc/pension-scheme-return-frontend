@@ -22,7 +22,7 @@ import play.api.i18n.Lang
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 import com.google.inject.Inject
 
-class LanguageSwitchController @Inject()(
+class LanguageSwitchController @Inject() (
   appConfig: FrontendAppConfig,
   languageUtils: LanguageUtils,
   cc: ControllerComponents

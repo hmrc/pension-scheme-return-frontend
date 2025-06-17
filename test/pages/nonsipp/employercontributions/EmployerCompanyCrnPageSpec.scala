@@ -16,18 +16,17 @@
 
 package pages.nonsipp.employercontributions
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import models.{ConditionalYesNo, Crn}
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{Max300, Max50}
-import controllers.TestValues
 
 class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
 
   "CompanyBuyerCRNPage" - {
 
-    val memberIndex = refineMV[Max300.Refined](1)
-    val index = refineMV[Max50.Refined](1)
+    val memberIndex = 1
+    val index = 1
     val srn = srnGen.sample.value
 
     beRetrievable[ConditionalYesNo[String, Crn]](EmployerCompanyCrnPage(srn, memberIndex, index))

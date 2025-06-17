@@ -17,6 +17,7 @@
 package controllers.nonsipp.bondsdisposal
 
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -43,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class WhenWereBondsSoldController @Inject()(
+class WhenWereBondsSoldController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -59,7 +60,7 @@ class WhenWereBondsSoldController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenWereBondsSoldController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         val preparedForm = request.userAnswers
@@ -74,7 +75,7 @@ class WhenWereBondsSoldController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)

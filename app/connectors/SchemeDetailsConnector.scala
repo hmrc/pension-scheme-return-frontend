@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2)
+class SchemeDetailsConnectorImpl @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2)
     extends SchemeDetailsConnector {
 
   private def url(relativePath: String) = s"${appConfig.pensionsScheme}$relativePath"
@@ -87,13 +87,13 @@ trait SchemeDetailsConnector {
 
   protected val logger: Logger = Logger(classOf[SchemeDetailsConnector])
 
-  def details(psaId: PsaId, schemeId: SchemeId)(
-    implicit hc: HeaderCarrier,
+  def details(psaId: PsaId, schemeId: SchemeId)(implicit
+    hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[SchemeDetails]]
 
-  def details(pspId: PspId, schemeId: Srn)(
-    implicit hc: HeaderCarrier,
+  def details(pspId: PspId, schemeId: Srn)(implicit
+    hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[SchemeDetails]]
 

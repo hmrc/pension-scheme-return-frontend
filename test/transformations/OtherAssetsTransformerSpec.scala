@@ -22,7 +22,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import models.IdentityType.{Individual, UKCompany}
 import controllers.TestValues
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
@@ -47,8 +47,9 @@ class OtherAssetsTransformerSpec
     with TestValues
     with DiffShouldMatcher {
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   private val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
       .withSession((PREPOPULATION_FLAG, "true"))
@@ -120,43 +121,43 @@ class OtherAssetsTransformerSpec
     "should return recordVersion when there is no change among UAs" - {
       "should return transformed List without disposed other assets" in {
         val userAnswers = emptyUserAnswers
-        //index-1
+          // index-1
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "assetDescription")
-          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(1)), Acquisition)
-          .unsafeSet(CostOfOtherAssetPage(srn, refineMV(1)), money)
-          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(1)), true)
-          .unsafeSet(IncomeFromAssetPage(srn, refineMV(1)), money)
-          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, refineMV(1)), localDate)
-          .unsafeSet(IndependentValuationPage(srn, refineMV(1)), false)
-          .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.OtherAssetSeller), Individual)
-          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, refineMV(1)), true)
-          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, refineMV(1)), "individualSellerName")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
           .unsafeSet(
-            OtherAssetIndividualSellerNINumberPage(srn, refineMV(1)),
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
             ConditionalYesNo.no[String, Nino]("reason")
           )
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-          //index-2
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "assetDescription")
-          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(2)), Contribution)
-          .unsafeSet(CostOfOtherAssetPage(srn, refineMV(2)), money)
-          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(2)), false)
-          .unsafeSet(IncomeFromAssetPage(srn, refineMV(2)), money)
-          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, refineMV(2)), localDate)
-          .unsafeSet(IndependentValuationPage(srn, refineMV(2)), true)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
-          //index-3
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
-          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3)), Transfer)
-          .unsafeSet(CostOfOtherAssetPage(srn, refineMV(3)), money)
-          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(3)), false)
-          .unsafeSet(IncomeFromAssetPage(srn, refineMV(3)), money)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(3)), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -223,65 +224,65 @@ class OtherAssetsTransformerSpec
 
       "should return transformed List with disposed other assets" in {
         val userAnswers = emptyUserAnswers
-        //index-1
+          // index-1
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "assetDescription")
-          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(1)), Acquisition)
-          .unsafeSet(CostOfOtherAssetPage(srn, refineMV(1)), money)
-          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(1)), true)
-          .unsafeSet(IncomeFromAssetPage(srn, refineMV(1)), money)
-          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, refineMV(1)), localDate)
-          .unsafeSet(IndependentValuationPage(srn, refineMV(1)), false)
-          .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.OtherAssetSeller), Individual)
-          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, refineMV(1)), true)
-          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, refineMV(1)), "individualSellerName")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
           .unsafeSet(
-            OtherAssetIndividualSellerNINumberPage(srn, refineMV(1)),
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
             ConditionalYesNo.no[String, Nino]("reason")
           )
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), Sold)
-          .unsafeSet(WhenWasAssetSoldPage(srn, refineMV(1), refineMV(1)), localDate)
-          .unsafeSet(TotalConsiderationSaleAssetPage(srn, refineMV(1), refineMV(1)), money)
-          .unsafeSet(TypeOfAssetBuyerPage(srn, refineMV(1), refineMV(1)), Individual)
-          .unsafeSet(IndividualNameOfAssetBuyerPage(srn, refineMV(1), refineMV(1)), "individualBuyerName")
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(WhenWasAssetSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleAssetPage(srn, 1, 1), money)
+          .unsafeSet(TypeOfAssetBuyerPage(srn, 1, 1), Individual)
+          .unsafeSet(IndividualNameOfAssetBuyerPage(srn, 1, 1), "individualBuyerName")
           .unsafeSet(
-            AssetIndividualBuyerNiNumberPage(srn, refineMV(1), refineMV(1)),
+            AssetIndividualBuyerNiNumberPage(srn, 1, 1),
             ConditionalYesNo.no[String, Nino]("reason")
           )
-          .unsafeSet(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)), true)
-          .unsafeSet(AssetSaleIndependentValuationPage(srn, refineMV(1), refineMV(1)), false)
-          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+          .unsafeSet(AssetSaleIndependentValuationPage(srn, 1, 1), false)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
-          //index-2
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "assetDescription")
-          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(2)), Contribution)
-          .unsafeSet(CostOfOtherAssetPage(srn, refineMV(2)), money)
-          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(2)), false)
-          .unsafeSet(IncomeFromAssetPage(srn, refineMV(2)), money)
-          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, refineMV(2)), localDate)
-          .unsafeSet(IndependentValuationPage(srn, refineMV(2)), true)
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(2), refineMV(1)), Transferred)
-          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(2), refineMV(1)), false)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(2), refineMV(1)), SectionJourneyStatus.Completed)
-          //index-3
-          .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
-          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3)), Transfer)
-          .unsafeSet(CostOfOtherAssetPage(srn, refineMV(3)), money)
-          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(3)), false)
-          .unsafeSet(IncomeFromAssetPage(srn, refineMV(3)), money)
-          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(3), refineMV(1)), Other("OtherMethod"))
-          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(3), refineMV(1)), true)
-          .unsafeSet(OtherAssetsProgress(srn, refineMV(3)), SectionJourneyStatus.Completed)
-          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(3), refineMV(1)), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 2, 1), Transferred)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 2, 1), false)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 2, 1), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 3, 1), Other("OtherMethod"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 3, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 3, 1), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -399,12 +400,12 @@ class OtherAssetsTransformerSpec
 
         val incompleteUserAnswers = emptyUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), true)
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "assetDescription")
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
           .unsafeSet(
-            OtherAssetsProgress(srn, refineMV(1)),
+            OtherAssetsProgress(srn, 1),
             SectionJourneyStatus.InProgress(
               controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-                .onPageLoad(srn, index1of5000, NormalMode)
+                .onPageLoad(srn, 1, NormalMode)
                 .url
             )
           )
@@ -572,77 +573,77 @@ class OtherAssetsTransformerSpec
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
-          //index-1
+          // index-1
           userAnswers.get(OtherAssetsHeldPage(srn)) shouldMatchTo Some(true)
           userAnswers.get(OtherAssetsRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(1))) shouldMatchTo Some("assetDescription")
-          userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, refineMV(1))) shouldMatchTo Some(Acquisition)
-          userAnswers.get(CostOfOtherAssetPage(srn, refineMV(1))) shouldMatchTo Some(money)
-          userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, refineMV(1))) shouldMatchTo Some(true)
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) shouldMatchTo Some(money)
-          userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, refineMV(1))) shouldMatchTo Some(localDate)
-          userAnswers.get(IndependentValuationPage(srn, refineMV(1))) shouldMatchTo Some(false)
-          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.OtherAssetSeller)) shouldMatchTo Some(
+          userAnswers.get(WhatIsOtherAssetPage(srn, 1)) shouldMatchTo Some("assetDescription")
+          userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, 1)) shouldMatchTo Some(Acquisition)
+          userAnswers.get(CostOfOtherAssetPage(srn, 1)) shouldMatchTo Some(money)
+          userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, 1)) shouldMatchTo Some(true)
+          userAnswers.get(IncomeFromAssetPage(srn, 1)) shouldMatchTo Some(money)
+          userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, 1)) shouldMatchTo Some(localDate)
+          userAnswers.get(IndependentValuationPage(srn, 1)) shouldMatchTo Some(false)
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller)) shouldMatchTo Some(
             IdentityType.Other
           )
-          userAnswers.get(OtherAssetSellerConnectedPartyPage(srn, refineMV(1))) shouldMatchTo Some(true)
+          userAnswers.get(OtherAssetSellerConnectedPartyPage(srn, 1)) shouldMatchTo Some(true)
           userAnswers
-            .get(OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.OtherAssetSeller)) shouldMatchTo Some(
+            .get(OtherRecipientDetailsPage(srn, 1, IdentitySubject.OtherAssetSeller)) shouldMatchTo Some(
             RecipientDetails(name = "PropertyAcquiredFromName", description = "otherDescription")
           )
-          userAnswers.get(OtherAssetsCompleted(srn, refineMV(1))) shouldMatchTo Some(SectionCompleted)
+          userAnswers.get(OtherAssetsCompleted(srn, 1)) shouldMatchTo Some(SectionCompleted)
           userAnswers.get(OtherAssetsDisposalPage(srn)) shouldMatchTo Some(true)
           userAnswers.get(OtherAssetsDisposalCompleted(srn)) shouldMatchTo Some(SectionCompleted)
-          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(OtherAssetsDisposalProgress(srn, 1, 1)) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(Sold)
-          userAnswers.get(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(true)
-          userAnswers.get(TypeOfAssetBuyerPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(UKCompany)
-          userAnswers.get(WhenWasAssetSoldPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(localDate)
-          userAnswers.get(TotalConsiderationSaleAssetPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(money)
-          userAnswers.get(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(true)
-          userAnswers.get(AssetSaleIndependentValuationPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(false)
-          userAnswers.get(CompanyNameOfAssetBuyerPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(HowWasAssetDisposedOfPage(srn, 1, 1)) shouldMatchTo Some(Sold)
+          userAnswers.get(AnyPartAssetStillHeldPage(srn, 1, 1)) shouldMatchTo Some(true)
+          userAnswers.get(TypeOfAssetBuyerPage(srn, 1, 1)) shouldMatchTo Some(UKCompany)
+          userAnswers.get(WhenWasAssetSoldPage(srn, 1, 1)) shouldMatchTo Some(localDate)
+          userAnswers.get(TotalConsiderationSaleAssetPage(srn, 1, 1)) shouldMatchTo Some(money)
+          userAnswers.get(IsBuyerConnectedPartyPage(srn, 1, 1)) shouldMatchTo Some(true)
+          userAnswers.get(AssetSaleIndependentValuationPage(srn, 1, 1)) shouldMatchTo Some(false)
+          userAnswers.get(CompanyNameOfAssetBuyerPage(srn, 1, 1)) shouldMatchTo Some(
             "nameOfPurchaser"
           )
-          userAnswers.get(AssetCompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(AssetCompanyBuyerCrnPage(srn, 1, 1)) shouldMatchTo Some(
             ConditionalYesNo.no("optReasonNoCRN")
           )
-          userAnswers.get(OtherAssetsProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
+          userAnswers.get(OtherAssetsProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
 
-          //index-2
-          userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(2))) shouldMatchTo Some("assetDescription")
-          userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, refineMV(2))) shouldMatchTo Some(Contribution)
-          userAnswers.get(CostOfOtherAssetPage(srn, refineMV(2))) shouldMatchTo Some(money)
-          userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, refineMV(2))) shouldMatchTo Some(false)
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(2))) shouldMatchTo Some(money)
-          userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, refineMV(2))) shouldMatchTo Some(localDate)
-          userAnswers.get(IndependentValuationPage(srn, refineMV(2))) shouldMatchTo Some(true)
-          userAnswers.get(OtherAssetsCompleted(srn, refineMV(1))) shouldMatchTo Some(SectionCompleted)
-          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(
+          // index-2
+          userAnswers.get(WhatIsOtherAssetPage(srn, 2)) shouldMatchTo Some("assetDescription")
+          userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, 2)) shouldMatchTo Some(Contribution)
+          userAnswers.get(CostOfOtherAssetPage(srn, 2)) shouldMatchTo Some(money)
+          userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, 2)) shouldMatchTo Some(false)
+          userAnswers.get(IncomeFromAssetPage(srn, 2)) shouldMatchTo Some(money)
+          userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, 2)) shouldMatchTo Some(localDate)
+          userAnswers.get(IndependentValuationPage(srn, 2)) shouldMatchTo Some(true)
+          userAnswers.get(OtherAssetsCompleted(srn, 1)) shouldMatchTo Some(SectionCompleted)
+          userAnswers.get(OtherAssetsDisposalProgress(srn, 1, 1)) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWasAssetDisposedOfPage(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(Transferred)
-          userAnswers.get(AnyPartAssetStillHeldPage(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(true)
-          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(HowWasAssetDisposedOfPage(srn, 2, 1)) shouldMatchTo Some(Transferred)
+          userAnswers.get(AnyPartAssetStillHeldPage(srn, 2, 1)) shouldMatchTo Some(true)
+          userAnswers.get(OtherAssetsDisposalProgress(srn, 2, 1)) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
-          //index-3
-          userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(3))) shouldMatchTo Some("assetDescription")
-          userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3))) shouldMatchTo Some(Transfer)
-          userAnswers.get(CostOfOtherAssetPage(srn, refineMV(3))) shouldMatchTo Some(money)
-          userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, refineMV(3))) shouldMatchTo Some(true)
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(3))) shouldMatchTo Some(money)
-          userAnswers.get(OtherAssetsCompleted(srn, refineMV(3))) shouldMatchTo Some(SectionCompleted)
-          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(3), refineMV(1))) shouldMatchTo Some(
+          // index-3
+          userAnswers.get(WhatIsOtherAssetPage(srn, 3)) shouldMatchTo Some("assetDescription")
+          userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, 3)) shouldMatchTo Some(Transfer)
+          userAnswers.get(CostOfOtherAssetPage(srn, 3)) shouldMatchTo Some(money)
+          userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, 3)) shouldMatchTo Some(true)
+          userAnswers.get(IncomeFromAssetPage(srn, 3)) shouldMatchTo Some(money)
+          userAnswers.get(OtherAssetsCompleted(srn, 3)) shouldMatchTo Some(SectionCompleted)
+          userAnswers.get(OtherAssetsDisposalProgress(srn, 3, 1)) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
-          userAnswers.get(HowWasAssetDisposedOfPage(srn, refineMV(3), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(HowWasAssetDisposedOfPage(srn, 3, 1)) shouldMatchTo Some(
             Other("OtherMethod")
           )
-          userAnswers.get(AnyPartAssetStillHeldPage(srn, refineMV(3), refineMV(1))) shouldMatchTo Some(false)
-          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(3), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(AnyPartAssetStillHeldPage(srn, 3, 1)) shouldMatchTo Some(false)
+          userAnswers.get(OtherAssetsDisposalProgress(srn, 3, 1)) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
         }
@@ -657,9 +658,7 @@ class OtherAssetsTransformerSpec
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(IncomeFromAssetPage(srn, 1)) mustBe None
       )
     }
 
@@ -671,9 +670,7 @@ class OtherAssetsTransformerSpec
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(IncomeFromAssetPage(srn, 1)) mustBe Some(Money(0))
       )
     }
 
@@ -685,9 +682,7 @@ class OtherAssetsTransformerSpec
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(IncomeFromAssetPage(srn, 1)) mustBe Some(Money(0))
       )
     }
   }

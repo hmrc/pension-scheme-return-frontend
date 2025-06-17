@@ -17,11 +17,11 @@
 package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.receivetransfer.RemoveTransferInController._
 import models.NameDOB
@@ -32,19 +32,19 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class RemoveTransferInControllerSpec extends ControllerBaseSpec {
+class RemoveTransferInControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.RemoveTransferInController.onPageLoad(srn, refineMV(1), refineMV(1))
-  private lazy val onSubmit = routes.RemoveTransferInController.onSubmit(srn, refineMV(1), refineMV(1))
+  private lazy val onPageLoad = routes.RemoveTransferInController.onPageLoad(srn, 1, 1)
+  private lazy val onSubmit = routes.RemoveTransferInController.onSubmit(srn, 1, 1)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-    .unsafeSet(TransferringSchemeNamePage(srn, refineMV(1), refineMV(1)), transferringSchemeName)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
+    .unsafeSet(TransferringSchemeNamePage(srn, 1, 1), transferringSchemeName)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -63,7 +63,7 @@ class RemoveTransferInControllerSpec extends ControllerBaseSpec {
 
       view(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, refineMV(1), refineMV(1), memberDetails.fullName, transferringSchemeName)
+        viewModel(srn, 1, 1, memberDetails.fullName, transferringSchemeName)
       )
     })
 

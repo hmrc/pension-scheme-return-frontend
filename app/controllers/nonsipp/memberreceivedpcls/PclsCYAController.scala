@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import models._
 import play.api.i18n.MessagesApi
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class PclsCYAController @Inject()(
+class PclsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -52,14 +53,14 @@ class PclsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       onPageLoadCommon(srn, index, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -76,27 +77,25 @@ class PclsCYAController @Inject()(
         amounts <- request.userAnswers
           .get(PensionCommencementLumpSumAmountPage(srn, index))
           .getOrRecoverJourney
-      } yield {
-        Ok(
-          view(
-            viewModel(
-              srn,
-              memberDetails.fullName,
-              index,
-              amounts,
-              mode,
-              viewOnlyUpdated = false, // flag is not displayed on this tier
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-            )
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            memberDetails.fullName,
+            index,
+            amounts,
+            mode,
+            viewOnlyUpdated = false, // flag is not displayed on this tier
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      }
+      )
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val pclsChanged: Boolean =
         request.userAnswers.changed(_.buildPCLS(srn, index))
@@ -112,8 +111,8 @@ class PclsCYAController @Inject()(
             updatedAnswers,
             fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, mode)
           )
-      } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
       )
     }
 

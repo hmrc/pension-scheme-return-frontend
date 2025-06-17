@@ -16,8 +16,7 @@
 
 package pages.nonsipp.common
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.{ConditionalYesNo, Crn, IdentitySubject}
 import pages.behaviours.PageBehaviours
 
@@ -27,7 +26,7 @@ class CompanyRecipientCrnPageSpec extends PageBehaviours {
 
   "CompanyRecipientCrnPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     IdentitySubject.values.foreach { identitySubject =>
       s"for $identitySubject" - {

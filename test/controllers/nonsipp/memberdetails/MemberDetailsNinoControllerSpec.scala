@@ -17,35 +17,34 @@
 package controllers.nonsipp.memberdetails
 
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.toRefined300
 import forms.TextFormProvider
 import models.NormalMode
-import controllers.nonsipp.memberdetails.routes
-import controllers.ControllerBaseSpec
 
-class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
+class MemberDetailsNinoControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   "MemberDetailsNinoController" - {
 
     val memberDetails = nameDobGen.sample.value
-    val populatedUserAnswers = defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).get
+    val populatedUserAnswers = defaultUserAnswers.set(MemberDetailsPage(srn, 1), memberDetails).get
 
     val form = MemberDetailsNinoController.form(new TextFormProvider(), memberDetails.fullName, List())
-    lazy val viewModel = MemberDetailsNinoController.viewModel(srn, refineMV(1), NormalMode, memberDetails.fullName)
+    lazy val viewModel = MemberDetailsNinoController.viewModel(srn, 1, NormalMode, memberDetails.fullName)
 
     val validNino = ninoGen.sample.value
     val otherValidNino = ninoGen.sample.value
 
-    lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, refineMV(1), NormalMode)
-    lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, refineMV(1), NormalMode)
+    lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, 1, NormalMode)
+    lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, 1, NormalMode)
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TextInputView]
       view(form, viewModel)
     })
 
-    act.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, refineMV(1)), validNino, populatedUserAnswers) {
+    act.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, 1), validNino, populatedUserAnswers) {
       implicit app => implicit request =>
         val view = injected[TextInputView]
         view(form.fill(validNino), viewModel)
@@ -70,15 +69,15 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow nino to be updated" - {
-      val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, refineMV(1)), validNino).get
+      val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, 1), validNino).get
       act.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
     }
 
     "return a 400 if nino has already been entered" - {
       val userAnswers =
         populatedUserAnswers
-          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
-          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
+          .unsafeSet(MemberDetailsNinoPage(srn, 1), otherValidNino)
+          .unsafeSet(MemberDetailsNinoPage(srn, 2), validNino)
 
       act.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
     }

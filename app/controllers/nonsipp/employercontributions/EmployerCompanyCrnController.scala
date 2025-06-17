@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
+import utils.IntUtils.{toInt, toRefined300, toRefined50}
 import cats.implicits.catsSyntaxApplicativeId
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.employercontributions.EmployerCompanyCrnController._
@@ -42,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class EmployerCompanyCrnController @Inject()(
+class EmployerCompanyCrnController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class EmployerCompanyCrnController @Inject()(
 
   val form: Form[Either[String, Crn]] = EmployerCompanyCrnController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(EmployerNamePage(srn, memberIndex, index)).sync { companyName =>
         val preparedForm =
@@ -64,7 +65,7 @@ class EmployerCompanyCrnController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -72,8 +73,8 @@ class EmployerCompanyCrnController @Inject()(
           formWithErrors =>
             request.userAnswers
               .get(EmployerNamePage(srn, memberIndex, index))
-              .getOrRecoverJourney(
-                companyName => BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode, companyName)))
+              .getOrRecoverJourney(companyName =>
+                BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode, companyName)))
               )
               .pure[Future],
           value =>

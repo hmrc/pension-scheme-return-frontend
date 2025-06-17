@@ -19,9 +19,7 @@ package transformations
 import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage}
 import models.requests.psr._
-import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import generators.ModelGenerators.allowedAccessRequestGen
@@ -36,6 +34,8 @@ import transformations.AssetsTransformerSpec._
 import org.scalatest.matchers.must.Matchers
 import config.RefinedTypes.Max5000
 import controllers.TestValues
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage}
 
 import scala.util.Try
 
@@ -47,9 +47,10 @@ class AssetsTransformerSpec
     with TestValues
     with BeforeAndAfterEach {
 
-  private val index: Max5000 = refineMV(1)
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  private val index: Max5000 = 1
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockBondsTransformer = mock[BondsTransformer]

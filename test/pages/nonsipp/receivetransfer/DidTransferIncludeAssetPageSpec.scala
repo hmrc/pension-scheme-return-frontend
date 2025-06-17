@@ -16,8 +16,7 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class DidTransferIncludeAssetPageSpec extends PageBehaviours {
@@ -25,8 +24,8 @@ class DidTransferIncludeAssetPageSpec extends PageBehaviours {
   private val srn = srnGen.sample.value
   "DidTransferIncludeAssetPage" - {
 
-    val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max5.Refined](1)
+    val index = 1
+    val secondaryIndex = 1
 
     beRetrievable[Boolean](DidTransferIncludeAssetPage(srn, index, secondaryIndex))
 

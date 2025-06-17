@@ -16,17 +16,16 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import pages.nonsipp.landorproperty.PartnershipSellerNamePage
-import eu.timepit.refined.refineMV
 import forms.TextFormProvider
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import controllers.nonsipp.landorproperty.PartnershipSellerNameController.{form, viewModel}
 import models.NormalMode
-class PartnershipSellerNameControllerSpec extends ControllerBaseSpec {
+class PartnershipSellerNameControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.PartnershipSellerNameController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.PartnershipSellerNameController.onSubmit(srn, index, NormalMode)
 

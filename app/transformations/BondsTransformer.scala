@@ -48,8 +48,8 @@ class BondsTransformer @Inject() extends Transformer {
     optUnregulatedOrConnectedBondsHeld: Option[Boolean],
     initialUA: UserAnswers,
     isSubmitted: Boolean = false
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ): Option[Bonds] =
     if (optUnregulatedOrConnectedBondsHeld.nonEmpty || request.userAnswers.map(NameOfBondsPages(srn)).toList.nonEmpty) {
       val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
@@ -75,8 +75,8 @@ class BondsTransformer @Inject() extends Transformer {
     } else {
       None
     }
-  private def bondTransactionsTransformToEtmp(srn: Srn, bondsDisposal: Boolean)(
-    implicit request: DataRequest[_]
+  private def bondTransactionsTransformToEtmp(srn: Srn, bondsDisposal: Boolean)(implicit
+    request: DataRequest[_]
   ): List[BondTransactions] =
     request.userAnswers
       .map(BondsProgress.all(srn))
@@ -121,8 +121,8 @@ class BondsTransformer @Inject() extends Transformer {
   private def buildOptBondsDisposed(
     srn: Srn,
     bondIndex: Refined[Int, OneTo5000]
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ): Seq[BondDisposed] =
     request.userAnswers
       .map(
@@ -143,46 +143,43 @@ class BondsTransformer @Inject() extends Transformer {
                 BondsStillHeldPage(srn, bondIndex, index)
               )
 
-            } yield {
-
-              BondDisposed(
-                methodOfDisposal = howWereBondsDisposed.name,
-                optOtherMethod = howWereBondsDisposed match {
-                  case Other(details) => Some(details)
-                  case _ => None
-                },
-                optDateSold = Option.when(howWereBondsDisposed == Sold)(
-                  request.userAnswers
-                    .get(
-                      WhenWereBondsSoldPage(srn, bondIndex, index)
-                    )
-                    .get
-                ),
-                optAmountReceived = Option.when(howWereBondsDisposed == Sold)(
-                  request.userAnswers
-                    .get(
-                      TotalConsiderationSaleBondsPage(srn, bondIndex, index)
-                    )
-                    .get
-                    .value
-                ),
-                optBondsPurchaserName = Option.when(howWereBondsDisposed == Sold)(
-                  request.userAnswers
-                    .get(
-                      BuyerNamePage(srn, bondIndex, index)
-                    )
-                    .get
-                ),
-                optConnectedPartyStatus = Option.when(howWereBondsDisposed == Sold)(
-                  request.userAnswers
-                    .get(
-                      IsBuyerConnectedPartyPage(srn, bondIndex, index)
-                    )
-                    .get
-                ),
-                totalNowHeld = bondsStillHeldPage
-              )
-            }
+            } yield BondDisposed(
+              methodOfDisposal = howWereBondsDisposed.name,
+              optOtherMethod = howWereBondsDisposed match {
+                case Other(details) => Some(details)
+                case _ => None
+              },
+              optDateSold = Option.when(howWereBondsDisposed == Sold)(
+                request.userAnswers
+                  .get(
+                    WhenWereBondsSoldPage(srn, bondIndex, index)
+                  )
+                  .get
+              ),
+              optAmountReceived = Option.when(howWereBondsDisposed == Sold)(
+                request.userAnswers
+                  .get(
+                    TotalConsiderationSaleBondsPage(srn, bondIndex, index)
+                  )
+                  .get
+                  .value
+              ),
+              optBondsPurchaserName = Option.when(howWereBondsDisposed == Sold)(
+                request.userAnswers
+                  .get(
+                    BuyerNamePage(srn, bondIndex, index)
+                  )
+                  .get
+              ),
+              optConnectedPartyStatus = Option.when(howWereBondsDisposed == Sold)(
+                request.userAnswers
+                  .get(
+                    IsBuyerConnectedPartyPage(srn, bondIndex, index)
+                  )
+                  .get
+              ),
+              totalNowHeld = bondsStillHeldPage
+            )
         }
       }
 
@@ -198,74 +195,68 @@ class BondsTransformer @Inject() extends Transformer {
 
     for {
       indexes <- buildIndexesForMax5000(bondTransactions.size)
-      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
-        case (ua, index) =>
-          val bondTransaction = bondTransactions(index.value - 1)
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) { case (ua, index) =>
+        val bondTransaction = bondTransactions(index.value - 1)
 
-          val nameOfBonds = NameOfBondsPage(srn, index) -> bondTransaction.nameOfBonds
-          val methodOfHolding = WhyDoesSchemeHoldBondsPage(srn, index) -> bondTransaction.methodOfHolding
-          val costOfBonds = CostOfBondsPage(srn, index) -> Money(bondTransaction.costOfBonds)
-          val bondsUnregulated = AreBondsUnregulatedPage(srn, index) -> bondTransaction.bondsUnregulated
+        val nameOfBonds = NameOfBondsPage(srn, index) -> bondTransaction.nameOfBonds
+        val methodOfHolding = WhyDoesSchemeHoldBondsPage(srn, index) -> bondTransaction.methodOfHolding
+        val costOfBonds = CostOfBondsPage(srn, index) -> Money(bondTransaction.costOfBonds)
+        val bondsUnregulated = AreBondsUnregulatedPage(srn, index) -> bondTransaction.bondsUnregulated
 
-          val optTotalIncomeOrReceipts =
-            if (bondTransaction.optTotalIncomeOrReceipts.isEmpty &&
-              shouldDefaultToZeroIfMissing(
-                userAnswers = userAnswers,
-                srn = srn,
-                index = index,
-                transactionPrepopulated = bondTransaction.prePopulated,
-                nameToLog = nameOfBonds._2
-              )) {
-              logger.info(s"bond index: $index, name: ${nameOfBonds._2} - defaulting to zero")
-              Some(IncomeFromBondsPage(srn, index) -> Money(0))
-            } else {
-              logger.info(s"bond index: $index, name: ${nameOfBonds._2} - NOT defaulting to zero")
-              bondTransaction.optTotalIncomeOrReceipts
-                .map(t => IncomeFromBondsPage(srn, index) -> Money(t))
-            }
-
-          val optDateOfAcqOrContrib = bondTransaction.optDateOfAcqOrContrib.map(
-            date => WhenDidSchemeAcquireBondsPage(srn, index) -> date
-          )
-          val optConnectedPartyStatus = bondTransaction.optConnectedPartyStatus.map(
-            connectedPartyStatus => BondsFromConnectedPartyPage(srn, index) -> connectedPartyStatus
-          )
-          val bondsCompleted = BondsCompleted(srn, index) -> SectionCompleted
-
-          val bondsPrePopulated = indexes
-            .filter(
-              index => {
-                bondTransactions(index.value - 1).prePopulated.nonEmpty
-              }
+        val optTotalIncomeOrReceipts =
+          if (
+            bondTransaction.optTotalIncomeOrReceipts.isEmpty &&
+            shouldDefaultToZeroIfMissing(
+              userAnswers = userAnswers,
+              srn = srn,
+              index = index,
+              transactionPrepopulated = bondTransaction.prePopulated,
+              nameToLog = nameOfBonds._2
             )
-            .map(
-              index => BondPrePopulated(srn, index) -> bondTransactions(index.value - 1).prePopulated.get
-            )
-
-          val bondsProgress = BondsProgress(srn, index) -> SectionJourneyStatus.Completed
-
-          val triedUA = for {
-            ua0 <- ua
-            ua1 <- ua0.set(nameOfBonds._1, nameOfBonds._2)
-            ua2 <- ua1.set(methodOfHolding._1, methodOfHolding._2)
-            ua3 <- ua2.set(costOfBonds._1, costOfBonds._2)
-            ua4 <- ua3.set(bondsUnregulated._1, bondsUnregulated._2)
-            ua5 <- optTotalIncomeOrReceipts.map(t => ua4.set(t._1, t._2)).getOrElse(Try(ua4))
-            ua6 <- optDateOfAcqOrContrib.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
-            ua7 <- optConnectedPartyStatus.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
-            ua8 <- ua7.set(bondsCompleted._1, bondsCompleted._2)
-            ua9 <- bondsPrePopulated.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-            ua10 <- ua9.set(bondsProgress._1, bondsProgress._2)
-          } yield {
-            buildOptDisposedBondsUA(
-              index,
-              srn,
-              ua10,
-              bondTransaction.optBondsDisposed,
-              bond.optBondsWereDisposed
-            )
+          ) {
+            logger.info(s"bond index: $index, name: ${nameOfBonds._2} - defaulting to zero")
+            Some(IncomeFromBondsPage(srn, index) -> Money(0))
+          } else {
+            logger.info(s"bond index: $index, name: ${nameOfBonds._2} - NOT defaulting to zero")
+            bondTransaction.optTotalIncomeOrReceipts
+              .map(t => IncomeFromBondsPage(srn, index) -> Money(t))
           }
-          triedUA.flatten
+
+        val optDateOfAcqOrContrib =
+          bondTransaction.optDateOfAcqOrContrib.map(date => WhenDidSchemeAcquireBondsPage(srn, index) -> date)
+        val optConnectedPartyStatus = bondTransaction.optConnectedPartyStatus.map(connectedPartyStatus =>
+          BondsFromConnectedPartyPage(srn, index) -> connectedPartyStatus
+        )
+        val bondsCompleted = BondsCompleted(srn, index) -> SectionCompleted
+
+        val bondsPrePopulated = indexes
+          .filter { index =>
+            bondTransactions(index.value - 1).prePopulated.nonEmpty
+          }
+          .map(index => BondPrePopulated(srn, index) -> bondTransactions(index.value - 1).prePopulated.get)
+
+        val bondsProgress = BondsProgress(srn, index) -> SectionJourneyStatus.Completed
+
+        val triedUA = for {
+          ua0 <- ua
+          ua1 <- ua0.set(nameOfBonds._1, nameOfBonds._2)
+          ua2 <- ua1.set(methodOfHolding._1, methodOfHolding._2)
+          ua3 <- ua2.set(costOfBonds._1, costOfBonds._2)
+          ua4 <- ua3.set(bondsUnregulated._1, bondsUnregulated._2)
+          ua5 <- optTotalIncomeOrReceipts.map(t => ua4.set(t._1, t._2)).getOrElse(Try(ua4))
+          ua6 <- optDateOfAcqOrContrib.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
+          ua7 <- optConnectedPartyStatus.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
+          ua8 <- ua7.set(bondsCompleted._1, bondsCompleted._2)
+          ua9 <- bondsPrePopulated.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+          ua10 <- ua9.set(bondsProgress._1, bondsProgress._2)
+        } yield buildOptDisposedBondsUA(
+          index,
+          srn,
+          ua10,
+          bondTransaction.optBondsDisposed,
+          bond.optBondsWereDisposed
+        )
+        triedUA.flatten
       }
     } yield resultUA
   }
@@ -283,7 +274,7 @@ class BondsTransformer @Inject() extends Transformer {
       )
       .getOrElse(Try(userAnswers))
     optBondsDisposed
-      .map(bondsDisposed => {
+      .map { bondsDisposed =>
         val initialUserAnswersOfDisposalWithCompleted =
           initialUserAnswersOfDisposal.set(BondsDisposalCompleted(srn), SectionCompleted)
         for {
@@ -301,17 +292,16 @@ class BondsTransformer @Inject() extends Transformer {
               val howWereBondsDisposed = HowWereBondsDisposedOfPage(srn, index, disposalIndex) -> methodOfDisposal
               val totalNowHeld = BondsStillHeldPage(srn, index, disposalIndex) -> bondDisposed.totalNowHeld
 
-              val optWhenWereBondsSoldPage = bondDisposed.optDateSold.map(
-                date => WhenWereBondsSoldPage(srn, index, disposalIndex) -> date
+              val optWhenWereBondsSoldPage =
+                bondDisposed.optDateSold.map(date => WhenWereBondsSoldPage(srn, index, disposalIndex) -> date)
+              val optAmountReceived = bondDisposed.optAmountReceived.map(amountReceived =>
+                TotalConsiderationSaleBondsPage(srn, index, disposalIndex) -> Money(amountReceived)
               )
-              val optAmountReceived = bondDisposed.optAmountReceived.map(
-                amountReceived => TotalConsiderationSaleBondsPage(srn, index, disposalIndex) -> Money(amountReceived)
+              val optBondsPurchaserName = bondDisposed.optBondsPurchaserName.map(bondsPurchaserName =>
+                BuyerNamePage(srn, index, disposalIndex) -> bondsPurchaserName
               )
-              val optBondsPurchaserName = bondDisposed.optBondsPurchaserName.map(
-                bondsPurchaserName => BuyerNamePage(srn, index, disposalIndex) -> bondsPurchaserName
-              )
-              val optConnectedParty = bondDisposed.optConnectedPartyStatus.map(
-                status => IsBuyerConnectedPartyPage(srn, index, disposalIndex) -> status
+              val optConnectedParty = bondDisposed.optConnectedPartyStatus.map(status =>
+                IsBuyerConnectedPartyPage(srn, index, disposalIndex) -> status
               )
 
               for {
@@ -335,7 +325,7 @@ class BondsTransformer @Inject() extends Transformer {
               } yield disposalUA7
           }
         } yield resultDisposalUA
-      })
+      }
       .getOrElse(initialUserAnswersOfDisposal)
   }
 }

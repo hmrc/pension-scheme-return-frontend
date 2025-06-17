@@ -17,16 +17,15 @@
 package pages
 
 import pages.nonsipp.memberdetails._
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import models.NameDOB
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.Max300
-import controllers.TestValues
 
 class MemberDetailsPageSpec extends PageBehaviours with TestValues {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
+  private val memberIndex = 1
 
   beRetrievable[NameDOB](MemberDetailsPage(srn, memberIndex))
   beSettable[NameDOB](MemberDetailsPage(srn, memberIndex))

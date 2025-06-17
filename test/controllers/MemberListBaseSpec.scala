@@ -18,7 +18,7 @@ package controllers
 
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.{Security => _}
-import org.scalatest.matchers.must.Matchers.{convertToAnyMustWrapper, include}
+import org.scalatest.matchers.must.Matchers._
 import org.scalatest.Assertion
 
 trait MemberListBaseSpec {

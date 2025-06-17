@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType.PensionSchemeType
 import config.RefinedTypes.{Max300, Max5}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -43,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class ReceivingSchemeTypeController @Inject()(
+class ReceivingSchemeTypeController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -57,13 +58,13 @@ class ReceivingSchemeTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(ReceivingSchemeTypePage(srn, index, secondaryIndex))
-    val builtForm = maybeAnswer.fold(ReceivingSchemeTypeController.form(formProvider))(
-      answer => ReceivingSchemeTypeController.form(formProvider, Some(answer.name))
+    val builtForm = maybeAnswer.fold(ReceivingSchemeTypeController.form(formProvider))(answer =>
+      ReceivingSchemeTypeController.form(formProvider, Some(answer.name))
     )
     val schemeName = request.userAnswers.get(ReceivingSchemeNamePage(srn, index, secondaryIndex)).get
     val filledForm = maybeAnswer.fold(builtForm)(builtForm.fill)
@@ -78,8 +79,8 @@ class ReceivingSchemeTypeController @Inject()(
 
   def onSubmit(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName

@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class AssetCompanyBuyerCrnController @Inject()(
+class AssetCompanyBuyerCrnController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -52,7 +53,7 @@ class AssetCompanyBuyerCrnController @Inject()(
     with I18nSupport {
   val form: Form[Either[String, Crn]] = AssetCompanyBuyerCrnController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex)).sync { companyName =>
         val preparedForm =
@@ -66,7 +67,7 @@ class AssetCompanyBuyerCrnController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

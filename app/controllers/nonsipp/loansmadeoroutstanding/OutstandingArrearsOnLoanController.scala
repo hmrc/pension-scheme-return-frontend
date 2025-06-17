@@ -23,6 +23,7 @@ import play.api.mvc._
 import forms.mappings.Mappings
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -47,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OutstandingArrearsOnLoanController @Inject()(
+class OutstandingArrearsOnLoanController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -60,7 +61,7 @@ class OutstandingArrearsOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
         val storedYesNoAnswer = request.userAnswers.get(ArrearsPrevYears(srn, index))
@@ -76,7 +77,7 @@ class OutstandingArrearsOnLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       usingSchemeDate(srn) { period =>
         val form = OutstandingArrearsOnLoanController.form(formProvider, period)

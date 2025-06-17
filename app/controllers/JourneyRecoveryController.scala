@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 
-class JourneyRecoveryController @Inject()(
+class JourneyRecoveryController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
   identify: IdentifierAction,
@@ -53,10 +53,12 @@ class JourneyRecoveryController @Inject()(
       }
 
       safeUrl
-        .map(url => Ok(continueView(url, config.reportAProblemUrl, answersSavedDisplayVersion))) //if there is a URL passed in, continue button goes to that URL
+        .map(url =>
+          Ok(continueView(url, config.reportAProblemUrl, answersSavedDisplayVersion))
+        ) // if there is a URL passed in, continue button goes to that URL
         .getOrElse(
           Ok(
-            startAgainView( //if we have SRN in the session, continue button goes to tasklist, otherwise to MPS overview
+            startAgainView( // if we have SRN in the session, continue button goes to tasklist, otherwise to MPS overview
               url = Srn(request.session.get(SRN).getOrElse(""))
                 .fold(config.urls.managePensionsSchemes.overview) { srn =>
                   controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url

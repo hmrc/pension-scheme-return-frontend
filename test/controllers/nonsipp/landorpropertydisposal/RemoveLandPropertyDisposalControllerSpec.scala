@@ -18,30 +18,29 @@ package controllers.nonsipp.landorpropertydisposal
 
 import services.PsrSubmissionService
 import controllers.nonsipp.landorpropertydisposal.RemoveLandPropertyDisposalController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.{
   HowWasPropertyDisposedOfPage,
   LandOrPropertyDisposalProgress,
   LandPropertyDisposalCompletedPage
 }
-import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{HowDisposed, NormalMode}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{when, _}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 
 import scala.concurrent.Future
 
-class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
+class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
   private val testAddress = addressGen.sample.value
   private val methodOfDisposal = HowDisposed.Other(otherDetails)
 
@@ -91,13 +90,13 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
-        .before({
+        .before {
           when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(())))
-        })
-        .after({
+        }
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

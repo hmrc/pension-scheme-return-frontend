@@ -17,9 +17,10 @@
 package controllers.nonsipp.receivetransfer
 
 import services.SchemeDateService
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DatePageView
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
-import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.DatePageFormProvider
 import models.{DateRange, NormalMode, UserAnswers}
@@ -28,15 +29,13 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 
-class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
+class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val index = 1
+  private val secondaryIndex = 1
   private lazy val onPageLoad =
     routes.WhenWasTransferReceivedController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasTransferReceivedController.onSubmit(srn, index, secondaryIndex, NormalMode)

@@ -28,6 +28,7 @@ import models.SchemeId.Srn
 import models.requests.psr.PsrSubmission
 import config.Constants.{PSA, PSP}
 import play.api.Logger
+import play.api.libs.ws.JsonBodyWritables.given
 import play.api.libs.json._
 import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse, PsrVersionsResponse}
 import play.api.http.Status._
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
+class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
   protected val logger: Logger = Logger(classOf[PSRConnector])
@@ -56,8 +57,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     userName: String,
     schemeName: String,
     srn: Srn
-  )(
-    implicit request: DataRequest[_],
+  )(implicit
+    request: DataRequest[_],
     headerCarrier: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Either[String, Unit]] =
@@ -80,8 +81,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     userName: String,
     schemeName: String,
     srn: Srn
-  )(
-    implicit request: DataRequest[_],
+  )(implicit
+    request: DataRequest[_],
     headerCarrier: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Either[String, Unit]] =
@@ -108,8 +109,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     userName: String,
     schemeName: String,
     srn: Srn
-  )(
-    implicit request: DataRequest[_],
+  )(implicit
+    request: DataRequest[_],
     headerCarrier: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[PsrSubmission]] = {
@@ -149,8 +150,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
   }
 
-  def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn, fallBackCall: Call)(
-    implicit request: AllowedAccessRequest[_],
+  def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn, fallBackCall: Call)(implicit
+    request: AllowedAccessRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
@@ -195,8 +196,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         }
       }
 
-  def getVersions(pstr: String, startDate: String, srn: Srn, fallBackCall: Call)(
-    implicit request: DataRequest[_],
+  def getVersions(pstr: String, startDate: String, srn: Srn, fallBackCall: Call)(implicit
+    request: DataRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
@@ -240,8 +241,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         }
       }
 
-  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn, fallBackCall: Call)(
-    implicit request: AllowedAccessRequest[_],
+  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn, fallBackCall: Call)(implicit
+    request: AllowedAccessRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] = {

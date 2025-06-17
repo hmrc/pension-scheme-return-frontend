@@ -11,7 +11,7 @@ import pages.QuestionPage
 $if(!index.empty)$
 import config.RefinedTypes._
 import utils.RefinedUtils._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 $endif$
 
 $! Generic (change QuestionPage type) !$

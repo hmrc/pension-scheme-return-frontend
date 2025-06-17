@@ -18,6 +18,8 @@ package controllers.nonsipp.memberdetails.upload
 
 import play.api.test.FakeRequest
 import play.api.inject.bind
+import utils.IntUtils.given
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models._
@@ -31,14 +33,12 @@ import pages.nonsipp.memberdetails._
 import org.mockito.Mockito.{reset, verify, when}
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import config.RefinedTypes.OneTo300
-import controllers.ControllerBaseSpec
+import config.RefinedTypes.Max300
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxOptionId
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransfersInSectionCompleted}
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import eu.timepit.refined.{refineMV, refineV}
 import models.UploadStatus.UploadStatus
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutSectionCompleted}
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
@@ -47,7 +47,7 @@ import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import scala.concurrent.Future
 import scala.util.Try
 
-class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
+class FileUploadSuccessControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.FileUploadSuccessController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.FileUploadSuccessController.onSubmit(srn, NormalMode)
@@ -65,7 +65,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
   def addMemberDetails(userAnswers: UserAnswers, srn: Srn, total: Int): UserAnswers = {
     def addMemberDetails(userAnswers: UserAnswers, index: Int): Try[UserAnswers] = {
       val memberDetails = wrappedMemberDetailsGen.sample.value
-      val refinedIndex = refineV[OneTo300](index).toOption.value
+      val refinedIndex: Max300 = index
 
       UserAnswers.compose(
         UserAnswers.set(MemberDetailsPage(srn, refinedIndex), memberDetails.nameDob),
@@ -156,33 +156,33 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
         val userAnswers = captor.getValue
 
-        userAnswers.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(NameDOB("A", "A", localDate))
-        userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
-        userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(Nino("AB123456A"))
-        userAnswers.get(MemberDetailsManualProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
+        userAnswers.get(MemberDetailsPage(srn, 1)) mustBe Some(NameDOB("A", "A", localDate))
+        userAnswers.get(DoesMemberHaveNinoPage(srn, 1)) mustBe Some(true)
+        userAnswers.get(MemberDetailsNinoPage(srn, 1)) mustBe Some(Nino("AB123456A"))
+        userAnswers.get(MemberDetailsManualProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
 
-        userAnswers.get(MemberDetailsPage(srn, refineMV(2))) mustBe None
-        userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(2))) mustBe None
-        userAnswers.get(NoNINOPage(srn, refineMV(2))) mustBe None
-        userAnswers.get(MemberDetailsNinoPage(srn, refineMV(2))) mustBe None
-        userAnswers.get(MemberDetailsManualProgress(srn, refineMV(2))) mustBe None
+        userAnswers.get(MemberDetailsPage(srn, 2)) mustBe None
+        userAnswers.get(DoesMemberHaveNinoPage(srn, 2)) mustBe None
+        userAnswers.get(NoNINOPage(srn, 2)) mustBe None
+        userAnswers.get(MemberDetailsNinoPage(srn, 2)) mustBe None
+        userAnswers.get(MemberDetailsManualProgress(srn, 2)) mustBe None
       }
     }
 
     "onSubmit should remove all member payments" in {
 
       val userAnswers = addMemberDetails(emptyUserAnswers, srn, 5)
-        .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+        .unsafeSet(EmployerNamePage(srn, 1, 1), employerName)
         .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
-        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), money)
-        .unsafeSet(TransferringSchemeNamePage(srn, refineMV(1), refineMV(1)), schemeName)
-        .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1)), schemeName)
-        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
-        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
-        .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
-        .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-        .unsafeSet(TransfersInSectionCompleted(srn, refineMV(1), refineMV(1)), SectionCompleted)
-        .unsafeSet(TransfersOutSectionCompleted(srn, refineMV(1), refineMV(1)), SectionCompleted)
+        .unsafeSet(TotalMemberContributionPage(srn, 1), money)
+        .unsafeSet(TransferringSchemeNamePage(srn, 1, 1), schemeName)
+        .unsafeSet(ReceivingSchemeNamePage(srn, 1, 1), schemeName)
+        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, 1), pensionCommencementLumpSumGen.sample.value)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, 1), money)
+        .unsafeSet(SurrenderedBenefitsAmountPage(srn, 1), money)
+        .unsafeSet(EmployerContributionsProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+        .unsafeSet(TransfersInSectionCompleted(srn, 1, 1), SectionCompleted)
+        .unsafeSet(TransfersOutSectionCompleted(srn, 1, 1), SectionCompleted)
 
       val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -201,14 +201,14 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
         val userAnswers = captor.getValue
 
-        userAnswers.get(EmployerNamePage(srn, refineMV(1), refineMV(1))) mustBe None
+        userAnswers.get(EmployerNamePage(srn, 1, 1)) mustBe None
         userAnswers.get(UnallocatedEmployerAmountPage(srn)) mustBe None
-        userAnswers.get(TotalMemberContributionPage(srn, refineMV(1))) mustBe None
-        userAnswers.get(TransferringSchemeNamePage(srn, refineMV(1), refineMV(1))) mustBe None
-        userAnswers.get(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1))) mustBe None
-        userAnswers.get(PensionCommencementLumpSumAmountPage(srn, refineMV(1))) mustBe None
-        userAnswers.get(TotalAmountPensionPaymentsPage(srn, refineMV(1))) mustBe None
-        userAnswers.get(SurrenderedBenefitsAmountPage(srn, refineMV(1))) mustBe None
+        userAnswers.get(TotalMemberContributionPage(srn, 1)) mustBe None
+        userAnswers.get(TransferringSchemeNamePage(srn, 1, 1)) mustBe None
+        userAnswers.get(ReceivingSchemeNamePage(srn, 1, 1)) mustBe None
+        userAnswers.get(PensionCommencementLumpSumAmountPage(srn, 1)) mustBe None
+        userAnswers.get(TotalAmountPensionPaymentsPage(srn, 1)) mustBe None
+        userAnswers.get(SurrenderedBenefitsAmountPage(srn, 1)) mustBe None
       }
     }
 
@@ -225,29 +225,29 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit, emptyUserAnswers)
-          .before({
+          .before {
             when(mockSaveService.save(captor.capture())(any(), any())).thenReturn(Future.successful(()))
             mockGetUploadResult(Some(upload))
-          })
+          }
           .after {
             val userAnswers = captor.getValue
-            userAnswers.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(NameDOB("A", "A", localDate))
-            userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(Nino("AB123456A"))
-            userAnswers.get(NoNINOPage(srn, refineMV(1))) mustBe None
-            userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
-            userAnswers.get(MemberDetailsManualProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
+            userAnswers.get(MemberDetailsPage(srn, 1)) mustBe Some(NameDOB("A", "A", localDate))
+            userAnswers.get(MemberDetailsNinoPage(srn, 1)) mustBe Some(Nino("AB123456A"))
+            userAnswers.get(NoNINOPage(srn, 1)) mustBe None
+            userAnswers.get(DoesMemberHaveNinoPage(srn, 1)) mustBe Some(true)
+            userAnswers.get(MemberDetailsManualProgress(srn, 1)) mustBe Some(SectionJourneyStatus.Completed)
 
-            userAnswers.get(MemberDetailsPage(srn, refineMV(2))) mustBe Some(NameDOB("B", "B", localDate))
-            userAnswers.get(MemberDetailsNinoPage(srn, refineMV(2))) mustBe None
-            userAnswers.get(NoNINOPage(srn, refineMV(2))) mustBe Some("reason B")
-            userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(2))) mustBe Some(false)
-            userAnswers.get(MemberDetailsManualProgress(srn, refineMV(2))) mustBe Some(SectionJourneyStatus.Completed)
+            userAnswers.get(MemberDetailsPage(srn, 2)) mustBe Some(NameDOB("B", "B", localDate))
+            userAnswers.get(MemberDetailsNinoPage(srn, 2)) mustBe None
+            userAnswers.get(NoNINOPage(srn, 2)) mustBe Some("reason B")
+            userAnswers.get(DoesMemberHaveNinoPage(srn, 2)) mustBe Some(false)
+            userAnswers.get(MemberDetailsManualProgress(srn, 2)) mustBe Some(SectionJourneyStatus.Completed)
 
-            userAnswers.get(MemberDetailsPage(srn, refineMV(3))) mustBe Some(NameDOB("C", "C", localDate))
-            userAnswers.get(NoNINOPage(srn, refineMV(3))) mustBe Some("reason C")
-            userAnswers.get(MemberDetailsNinoPage(srn, refineMV(3))) mustBe None
-            userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(3))) mustBe Some(false)
-            userAnswers.get(MemberDetailsManualProgress(srn, refineMV(3))) mustBe Some(SectionJourneyStatus.Completed)
+            userAnswers.get(MemberDetailsPage(srn, 3)) mustBe Some(NameDOB("C", "C", localDate))
+            userAnswers.get(NoNINOPage(srn, 3)) mustBe Some("reason C")
+            userAnswers.get(MemberDetailsNinoPage(srn, 3)) mustBe None
+            userAnswers.get(DoesMemberHaveNinoPage(srn, 3)) mustBe Some(false)
+            userAnswers.get(MemberDetailsManualProgress(srn, 3)) mustBe Some(SectionJourneyStatus.Completed)
           }
       )
     }

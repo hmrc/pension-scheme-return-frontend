@@ -17,17 +17,16 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.IndividualNameOfSharesSellerPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextInputView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.shares.IndividualNameOfSharesSellerController._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
+class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     routes.IndividualNameOfSharesSellerController.onPageLoad(srn, index, NormalMode)

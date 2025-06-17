@@ -30,13 +30,13 @@ import scala.util.Try
 
 trait Transformer {
 
-  protected def keysToIndex[A: Validate[Int, *]](map: Map[String, _]): List[Refined[Int, A]] =
+  protected def keysToIndex[A](map: Map[String, _])(using Validate[Int, A]): List[Refined[Int, A]] =
     map.keys.toList.flatMap(refineIndex[A])
 
-  protected def refineIndex[A: Validate[Int, *]](index: String): Option[Refined[Int, A]] =
+  protected def refineIndex[A](index: String)(using Validate[Int, A]): Option[Refined[Int, A]] =
     index.toIntOption.flatMap(i => refineV[A](i + 1).toOption)
 
-  protected def refineIndex[A: Validate[Int, *]](index: Int): Option[Refined[Int, A]] =
+  protected def refineIndex[A](index: Int)(using Validate[Int, A]): Option[Refined[Int, A]] =
     refineV[A](index + 1).toOption
 
   protected def buildIndexesForMax5000(num: Int): Try[List[Max5000]] =
@@ -64,7 +64,7 @@ object Transformer {
         )
         false
       case (Some(true), false) =>
-        //return pre-populated in the past, fbVersion less than 1, already checked, should default to zero
+        // return pre-populated in the past, fbVersion less than 1, already checked, should default to zero
         logger.info(
           s"index: $index, name: $nameToLog - entity with prePopulated field," +
             s" fbVersion less than 1, already checked - should default to zero if missing"

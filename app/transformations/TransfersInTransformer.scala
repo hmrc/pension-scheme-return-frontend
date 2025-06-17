@@ -60,22 +60,21 @@ class TransfersInTransformer @Inject() extends Transformer {
     index: Max300,
     transfersIn: List[TransfersIn]
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
-    transfersIn.zipWithIndex.flatMap {
-      case (transferIn, zippedIndex) =>
-        refineIndex[Max5.Refined](zippedIndex).fold(List.empty[UserAnswers.Compose]) { secondaryIndex =>
-          List[UserAnswers.Compose](
-            _.set(
-              TransfersInSectionCompleted(srn, index, secondaryIndex),
-              SectionCompleted
-            ),
-            _.set(TransferringSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),
-            _.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), transferIn.dateOfTransfer),
-            _.set(TotalValueTransferPage(srn, index, secondaryIndex), Money(transferIn.transferValue)),
-            _.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), transferIn.transferIncludedAsset),
-            _.set(TransferringSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType),
-            _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false),
-            _.set(ReceiveTransferProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
-          )
-        }
+    transfersIn.zipWithIndex.flatMap { case (transferIn, zippedIndex) =>
+      refineIndex[Max5.Refined](zippedIndex).fold(List.empty[UserAnswers.Compose]) { secondaryIndex =>
+        List[UserAnswers.Compose](
+          _.set(
+            TransfersInSectionCompleted(srn, index, secondaryIndex),
+            SectionCompleted
+          ),
+          _.set(TransferringSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),
+          _.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), transferIn.dateOfTransfer),
+          _.set(TotalValueTransferPage(srn, index, secondaryIndex), Money(transferIn.transferValue)),
+          _.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), transferIn.transferIncludedAsset),
+          _.set(TransferringSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType),
+          _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false),
+          _.set(ReceiveTransferProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
+        )
+      }
     }
 }

@@ -18,7 +18,7 @@ package controllers.nonsipp.memberdetails.upload
 
 import services.UploadService
 import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ContentPageView
 import play.api.inject
 import models.{NormalMode, Upload}
@@ -28,7 +28,7 @@ import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 
-class FileUploadTooManyErrorsControllerSpec extends ControllerBaseSpec {
+class FileUploadTooManyErrorsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.FileUploadTooManyErrorsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.FileUploadTooManyErrorsController.onSubmit(srn, NormalMode)

@@ -29,7 +29,7 @@ import play.api.libs.json.JsObject
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait SchemeDetailNavigationUtils { _: PSRController =>
+trait SchemeDetailNavigationUtils extends PSRController {
 
   protected val psrVersionsService: PsrVersionsService
   protected val psrRetrievalService: PsrRetrievalService
@@ -47,8 +47,8 @@ trait SchemeDetailNavigationUtils { _: PSRController =>
    * we use {{{.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty}}} to determine whether or
    * not a retrieved set of `UserAnswers` refers to a 'full' or 'skipped' return.
    */
-  def isJourneyBypassed(srn: Srn)(
-    implicit request: DataRequest[AnyContent],
+  def isJourneyBypassed(srn: Srn)(implicit
+    request: DataRequest[AnyContent],
     ec: ExecutionContext
   ): Future[Either[Result, Boolean]] = {
 

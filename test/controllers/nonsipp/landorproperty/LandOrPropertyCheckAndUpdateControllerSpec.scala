@@ -17,20 +17,20 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.ContentTablePageView
+import models.NormalMode
+import eu.timepit.refined.api.Refined
+import config.RefinedTypes.OneTo5000
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import utils.IntUtils.given
 import pages.nonsipp.landorproperty.{
   LandOrPropertyChosenAddressPage,
   LandOrPropertyTotalCostPage,
   WhyDoesSchemeHoldLandPropertyPage
 }
-import eu.timepit.refined.refineMV
-import models.NormalMode
-import eu.timepit.refined.api.Refined
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  private val index: Refined[Int, OneTo5000] = 1
 
   private def onPageLoad = routes.LandOrPropertyCheckAndUpdateController.onPageLoad(srn, index)
   private def onSubmit = routes.LandOrPropertyCheckAndUpdateController.onSubmit(srn, index)

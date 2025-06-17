@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import play.api.test.FakeRequest
 import services.{AuditService, SchemeDateService, UploadService}
 import play.api.mvc.Call
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.UploadView
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
 import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
@@ -33,7 +33,7 @@ import config.FrontendAppConfig
 
 import scala.concurrent.Future
 
-class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
+class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.UploadMemberDetailsController.onPageLoad(srn)
   private def onPageLoad(errorCode: String, errorMessage: String): Call =
@@ -107,15 +107,13 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
             "1MB"
           )
         )
-      }.before({
-          mockTaxYear(dateRange)
-          mockInitiateUpscan()
-        })
-        .after({
-          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-          reset(mockAuditService)
-        })
-        .updateName(_ + " with error EntityTooLarge")
+      }.before {
+        mockTaxYear(dateRange)
+        mockInitiateUpscan()
+      }.after {
+        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+        reset(mockAuditService)
+      }.updateName(_ + " with error EntityTooLarge")
     )
 
     act.like(
@@ -124,10 +122,10 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
           viewModel(postTarget, formFields, Some(FormError("file-input", "uploadMemberDetails.error.required")), "1MB")
         )
       }.updateName(_ + " with error InvalidArgument")
-        .before({
+        .before {
           mockTaxYear(dateRange)
           mockInitiateUpscan()
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

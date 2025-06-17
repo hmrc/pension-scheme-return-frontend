@@ -30,6 +30,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
+import utils.IntUtils.{toInt, toRefined5000}
 import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsLandPropertyLeasedController @Inject()(
+class IsLandPropertyLeasedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -51,7 +52,7 @@ class IsLandPropertyLeasedController @Inject()(
 
   private val form = IsLandPropertyLeasedController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(IsLandPropertyLeasedPage(srn, index), form)
@@ -59,7 +60,7 @@ class IsLandPropertyLeasedController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

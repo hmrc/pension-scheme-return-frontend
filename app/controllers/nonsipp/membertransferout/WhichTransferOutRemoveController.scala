@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits._
 import controllers.actions.IdentifyAndRequireData
 import forms.RadioListFormProvider
@@ -41,7 +42,7 @@ import play.api.data.Form
 
 import java.time.LocalDate
 
-class WhichTransferOutRemoveController @Inject()(
+class WhichTransferOutRemoveController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -51,11 +52,11 @@ class WhichTransferOutRemoveController @Inject()(
 
   val form: Form[Max5] = WhichTransferOutRemoveController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max5] = request.userAnswers
       .map(MemberTransferOutProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -82,7 +83,7 @@ class WhichTransferOutRemoveController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     form
       .bindFromRequest()
       .fold(
@@ -101,13 +102,13 @@ class WhichTransferOutRemoveController @Inject()(
       )
   }
 
-  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
-    implicit request: DataRequest[_]
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(implicit
+    request: DataRequest[_]
   ) =
     request.userAnswers
       .map(MemberTransferOutProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -133,14 +134,13 @@ object WhichTransferOutRemoveController {
     )
 
   private def buildRows(values: List[(Max5, String, LocalDate)]): List[ListRadiosRow] =
-    values.flatMap {
-      case (index, receivingSchemeName, value) =>
-        List(
-          ListRadiosRow(
-            index.value,
-            Message("transferOut.whichTransferOutRemove.radio.label", receivingSchemeName, value.show)
-          )
+    values.flatMap { case (index, receivingSchemeName, value) =>
+      List(
+        ListRadiosRow(
+          index.value,
+          Message("transferOut.whichTransferOutRemove.radio.label", receivingSchemeName, value.show)
         )
+      )
     }.toList
 
   def viewModel(

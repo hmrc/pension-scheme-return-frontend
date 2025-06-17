@@ -16,15 +16,14 @@
 
 package pages.nonsipp.memberreceivedpcls
 
-import config.RefinedTypes.OneTo300
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class RemovePclsPageSpec extends PageBehaviours {
 
   "RemovePclsPage" - {
 
-    val index = refineMV[OneTo300](1)
+    val index = 1
     val srnSample = srnGen.sample.value
 
     beRetrievable[Boolean](RemovePclsPage(srnSample, index))

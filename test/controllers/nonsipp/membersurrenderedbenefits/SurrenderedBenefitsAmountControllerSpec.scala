@@ -17,18 +17,17 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.MoneyFormProvider
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models.NormalMode
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController.{form, viewModel}
-import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
 
-class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
+class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private lazy val onPageLoad = routes.SurrenderedBenefitsAmountController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsAmountController.onSubmit(srn, index, NormalMode)
 

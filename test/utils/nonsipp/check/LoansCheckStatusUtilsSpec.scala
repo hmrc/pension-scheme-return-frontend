@@ -23,11 +23,11 @@ import org.scalatest.OptionValues
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import pages.nonsipp.loansmadeoroutstanding._
 import models.IdentitySubject.LoanRecipient
 
-class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
+class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with ControllerBehaviours with Matchers with OptionValues {
 
   private def addNonPrePopRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers

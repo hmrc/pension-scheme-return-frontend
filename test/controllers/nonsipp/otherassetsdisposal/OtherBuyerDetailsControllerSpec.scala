@@ -17,17 +17,16 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RecipientDetailsView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
+class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController

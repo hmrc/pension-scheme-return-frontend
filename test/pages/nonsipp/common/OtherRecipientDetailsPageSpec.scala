@@ -16,13 +16,12 @@
 
 package pages.nonsipp.common
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.{IdentitySubject, RecipientDetails}
 import pages.behaviours.PageBehaviours
 
 class OtherRecipientDetailsPageSpec extends PageBehaviours {
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private val srnSample = srnGen.sample.value
 
   "OtherRecipientDetailsPage" - {

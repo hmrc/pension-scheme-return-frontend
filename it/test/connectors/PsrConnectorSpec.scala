@@ -51,14 +51,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
   override implicit lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionSchemeReturn.port" -> wireMockPort)
 
-  private implicit val queryParamsToJava: Map[String, String] => java.util.Map[String, StringValuePattern] = _.map {
+  given queryParamsToJava: Conversion[Map[String, String], java.util.Map[String, StringValuePattern]] = _.map {
     case (k, v) => k -> equalTo(v)
   }.asJava
 
   def stubGet(url: String, queryParams: Map[String, String], response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer.stubFor(
       get(urlPathTemplate(url))
-        .withQueryParams(queryParams)
+        .withQueryParams(queryParamsToJava(queryParams))
         .willReturn(response)
     )
 

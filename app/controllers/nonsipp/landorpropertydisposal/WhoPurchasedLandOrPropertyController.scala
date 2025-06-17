@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType._
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyPage
 import controllers.actions._
 import navigation.Navigator
@@ -33,6 +32,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyController._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhoPurchasedLandOrPropertyController @Inject()(
+class WhoPurchasedLandOrPropertyController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,7 +55,7 @@ class WhoPurchasedLandOrPropertyController @Inject()(
 
   private val form = WhoPurchasedLandOrPropertyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
         address =>
@@ -67,7 +68,7 @@ class WhoPurchasedLandOrPropertyController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -85,7 +86,7 @@ class WhoPurchasedLandOrPropertyController @Inject()(
                     )
                   )
             },
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex), answer)
@@ -98,7 +99,6 @@ class WhoPurchasedLandOrPropertyController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

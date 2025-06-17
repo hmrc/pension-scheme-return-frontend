@@ -22,8 +22,8 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
-class DownloadPensionSchemeTemplateController @Inject()(cc: ControllerComponents)(
-  implicit ec: ExecutionContext
+class DownloadPensionSchemeTemplateController @Inject() (cc: ControllerComponents)(implicit
+  ec: ExecutionContext
 ) extends AbstractController(cc) {
 
   def downloadFile: Action[AnyContent] = Action {

@@ -21,6 +21,7 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer.ReceiveTransferProgress.TransfersInSectionCompletedUserAnswersOps
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
@@ -35,7 +36,6 @@ import cats.implicits.toShow
 import pages.nonsipp.receivetransfer._
 import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -49,7 +49,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class TransferReceivedMemberListController @Inject()(
+class TransferReceivedMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -75,8 +75,8 @@ class TransferReceivedMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -135,20 +135,18 @@ class TransferReceivedMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(
-    implicit request: DataRequest[_]
-  ): List[MemberWithReceiveTransfer] = indexes.map {
-    case (index, nameDOB) =>
-      MemberWithReceiveTransfer(
-        memberIndex = index,
-        transferFullName = nameDOB.fullName,
-        receive = request.userAnswers
-          .receiveTransferProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              ReceiveTransfer(secondaryIndex, status)
-          }
-      )
+  private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
+    request: DataRequest[_]
+  ): List[MemberWithReceiveTransfer] = indexes.map { case (index, nameDOB) =>
+    MemberWithReceiveTransfer(
+      memberIndex = index,
+      transferFullName = nameDOB.fullName,
+      receive = request.userAnswers
+        .receiveTransferProgress(srn, index)
+        .map { case (secondaryIndex, status) =>
+          ReceiveTransfer(secondaryIndex, status)
+        }
+    )
   }
 
 }
@@ -182,7 +180,7 @@ object TransferReceivedMemberListController {
                   case Some(ReceiveTransfer(_, InProgress(url))) => url
                   case _ =>
                     controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                      .onSubmit(srn, membersWithTransfers.memberIndex, refineMV(1), mode)
+                      .onSubmit(srn, membersWithTransfers.memberIndex, 1, mode)
                       .url
                 },
                 Message(

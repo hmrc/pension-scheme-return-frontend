@@ -53,8 +53,8 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     optLandOrPropertyHeld: Option[Boolean],
     initialUA: UserAnswers,
     isSubmitted: Boolean = false
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ): Option[LandOrProperty] =
     Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
       val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
@@ -76,8 +76,8 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
       )
     }
 
-  private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, optDisposeAnyLandOrProperty: Option[Boolean])(
-    implicit request: DataRequest[_]
+  private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, optDisposeAnyLandOrProperty: Option[Boolean])(implicit
+    request: DataRequest[_]
   ): List[LandOrPropertyTransactions] =
     request.userAnswers
       .map(LandPropertyInUKPages(srn))
@@ -129,9 +129,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                     optLandOrPropertyLeased = request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)),
                     optTotalIncomeOrReceipts = request.userAnswers
                       .get(LandOrPropertyTotalIncomePage(srn, index))
-                      .fold(None: Option[Double])(
-                        money => Some(money.value)
-                      )
+                      .fold(None: Option[Double])(money => Some(money.value))
                   ),
                   optDisposedPropertyTransaction = Option
                     .when(optDisposeAnyLandOrProperty.getOrElse(false))(
@@ -158,234 +156,219 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
     for {
       indexes <- buildIndexesForMax5000(landOrPropertyTransactions.size)
-      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
-        case (ua, index) =>
-          val transaction = landOrPropertyTransactions(index.value - 1)
-          val propertyDetails = transaction.propertyDetails
-          val heldPropertyTransaction = transaction.heldPropertyTransaction
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) { case (ua, index) =>
+        val transaction = landOrPropertyTransactions(index.value - 1)
+        val propertyDetails = transaction.propertyDetails
+        val heldPropertyTransaction = transaction.heldPropertyTransaction
 
-          val landOrPropertyInUK = LandPropertyInUKPage(srn, index) -> propertyDetails.landOrPropertyInUK
-          val addressDetails = LandOrPropertyChosenAddressPage(srn, index) -> propertyDetails.addressDetails
+        val landOrPropertyInUK = LandPropertyInUKPage(srn, index) -> propertyDetails.landOrPropertyInUK
+        val addressDetails = LandOrPropertyChosenAddressPage(srn, index) -> propertyDetails.addressDetails
 
-          val landRegistryTitleNumber = buildLandRegistryTitleNumberDetail(srn, index, propertyDetails)
-          val methodOfHolding = WhyDoesSchemeHoldLandPropertyPage(srn, index) -> heldPropertyTransaction.methodOfHolding
-          val totalCostOfLandOrProperty = LandOrPropertyTotalCostPage(srn, index) -> Money(
-            heldPropertyTransaction.totalCostOfLandOrProperty
-          )
-          val optIsLandOrPropertyResidential = heldPropertyTransaction.optIsLandOrPropertyResidential.map(
-            isResidential => IsLandOrPropertyResidentialPage(srn, index) -> isResidential
-          )
-          val optLandOrPropertyLeased = heldPropertyTransaction.optLandOrPropertyLeased.map(
-            isLandOrPropertyLeased => IsLandPropertyLeasedPage(srn, index) -> isLandOrPropertyLeased
-          )
-          val optTotalIncomeOrReceipts =
-            if (heldPropertyTransaction.optTotalIncomeOrReceipts.isEmpty &&
-              shouldDefaultToZeroIfMissing(
-                userAnswers = userAnswers,
-                srn = srn,
-                index = index,
-                transactionPrepopulated = transaction.prePopulated,
-                nameToLog = addressDetails._2.addressLine1
-              )) {
-              logger.info(
-                s"land or property index: $index, name: ${addressDetails._2.addressLine1} addressLine1 - defaulting to zero"
-              )
-              Some(LandOrPropertyTotalIncomePage(srn, index) -> Money(0))
-            } else {
-              logger.info(
-                s"land or property: $index, name: ${addressDetails._2.addressLine1} addressLine1 - NOT defaulting to zero"
-              )
-              heldPropertyTransaction.optTotalIncomeOrReceipts.map(
-                totalIncomeOrReceipts => LandOrPropertyTotalIncomePage(srn, index) -> Money(totalIncomeOrReceipts)
-              )
-            }
-
-          val optDateOfAcquisitionOrContribution = heldPropertyTransaction.dateOfAcquisitionOrContribution.map(
-            date => LandOrPropertyWhenDidSchemeAcquirePage(srn, index) -> date
-          )
-          val optIndepValuationSupport = heldPropertyTransaction.optIndepValuationSupport.map(
-            indepValuationSupport => LandPropertyIndependentValuationPage(srn, index) -> indepValuationSupport
-          )
-          val optSellerConnectedParty = heldPropertyTransaction.optConnectedPartyStatus.map(
-            status => LandOrPropertySellerConnectedPartyPage(srn, index) -> status
-          )
-          val optReceivedLandType = heldPropertyTransaction.optPropertyAcquiredFrom.map(
-            prop => {
-              IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) -> prop.identityType
-            }
-          )
-          val optIndividualTuple = heldPropertyTransaction.optPropertyAcquiredFrom
-            .filter(prop => prop.identityType == IdentityType.Individual)
-            .map(
-              prop => {
-                val name = LandPropertyIndividualSellersNamePage(srn, index) -> heldPropertyTransaction.optPropertyAcquiredFromName.get
-                val yesNoValue = prop.idNumber
-                  .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
-                  .getOrElse(
-                    ConditionalYesNo.no[String, Nino](
-                      prop.reasonNoIdNumber.get
-                    )
-                  )
-
-                (name, IndividualSellerNiPage(srn, index) -> yesNoValue)
-              }
+        val landRegistryTitleNumber = buildLandRegistryTitleNumberDetail(srn, index, propertyDetails)
+        val methodOfHolding = WhyDoesSchemeHoldLandPropertyPage(srn, index) -> heldPropertyTransaction.methodOfHolding
+        val totalCostOfLandOrProperty = LandOrPropertyTotalCostPage(srn, index) -> Money(
+          heldPropertyTransaction.totalCostOfLandOrProperty
+        )
+        val optIsLandOrPropertyResidential = heldPropertyTransaction.optIsLandOrPropertyResidential.map(isResidential =>
+          IsLandOrPropertyResidentialPage(srn, index) -> isResidential
+        )
+        val optLandOrPropertyLeased = heldPropertyTransaction.optLandOrPropertyLeased.map(isLandOrPropertyLeased =>
+          IsLandPropertyLeasedPage(srn, index) -> isLandOrPropertyLeased
+        )
+        val optTotalIncomeOrReceipts =
+          if (
+            heldPropertyTransaction.optTotalIncomeOrReceipts.isEmpty &&
+            shouldDefaultToZeroIfMissing(
+              userAnswers = userAnswers,
+              srn = srn,
+              index = index,
+              transactionPrepopulated = transaction.prePopulated,
+              nameToLog = addressDetails._2.addressLine1
             )
-
-          val optUKCompanyTuple = heldPropertyTransaction.optPropertyAcquiredFrom
-            .filter(prop => prop.identityType == IdentityType.UKCompany)
-            .map(
-              prop => {
-                val name = CompanySellerNamePage(srn, index) -> heldPropertyTransaction.optPropertyAcquiredFromName.get
-                val yesNoValue = prop.idNumber
-                  .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
-                  .getOrElse(
-                    ConditionalYesNo.no[String, Crn](
-                      prop.reasonNoIdNumber.get
-                    )
-                  )
-                (name, CompanyRecipientCrnPage(srn, index, LandOrPropertySeller) -> yesNoValue)
-              }
+          ) {
+            logger.info(
+              s"land or property index: $index, name: ${addressDetails._2.addressLine1} addressLine1 - defaulting to zero"
             )
-
-          val optUKPartnershipTuple = heldPropertyTransaction.optPropertyAcquiredFrom
-            .filter(prop => prop.identityType == IdentityType.UKPartnership)
-            .map(
-              prop => {
-                val name = PartnershipSellerNamePage(srn, index) -> heldPropertyTransaction.optPropertyAcquiredFromName.get
-                val yesNoValue = prop.idNumber
-                  .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
-                  .getOrElse(
-                    ConditionalYesNo.no[String, Utr](
-                      prop.reasonNoIdNumber.get
-                    )
-                  )
-
-                (name, PartnershipRecipientUtrPage(srn, index, LandOrPropertySeller) -> yesNoValue)
-              }
+            Some(LandOrPropertyTotalIncomePage(srn, index) -> Money(0))
+          } else {
+            logger.info(
+              s"land or property: $index, name: ${addressDetails._2.addressLine1} addressLine1 - NOT defaulting to zero"
             )
-
-          val optOther = heldPropertyTransaction.optPropertyAcquiredFrom
-            .filter(prop => prop.identityType == IdentityType.Other)
-            .map(
-              prop => {
-                OtherRecipientDetailsPage(srn, index, LandOrPropertySeller) -> RecipientDetails(
-                  heldPropertyTransaction.optPropertyAcquiredFromName.get,
-                  prop.otherDescription.get
-                )
-              }
-            )
-
-          val optLeaseTuple = heldPropertyTransaction.optLeaseDetails.map(
-            leaseDetails => {
-              val ldp = LandOrPropertyLeaseDetailsPage(srn, index) ->
-                leaseDetails.optLesseeName.map(lesseeName => {
-                  val optAnnualLeaseAmount = leaseDetails.optAnnualLeaseAmount
-
-                  val annualLeaseAmount =
-                    if (optAnnualLeaseAmount.isEmpty &&
-                      shouldDefaultToZeroIfMissing(
-                        userAnswers = userAnswers,
-                        srn = srn,
-                        index = index,
-                        transactionPrepopulated = transaction.prePopulated,
-                        nameToLog = addressDetails._2.addressLine1
-                      )) {
-                      logger.info(
-                        s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - defaulting to zero"
-                      )
-                      Money(0)
-                    } else {
-                      logger.info(
-                        s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - NOT defaulting to zero"
-                      )
-                      Money(optAnnualLeaseAmount.get)
-                    }
-
-                  (
-                    lesseeName,
-                    annualLeaseAmount, // assume it is present when name is present
-                    leaseDetails.optLeaseGrantDate.get
-                  )
-                })
-
-              val leaseConnectedParty = IsLesseeConnectedPartyPage(srn, index) ->
-                leaseDetails.optConnectedPartyStatus
-
-              (ldp, leaseConnectedParty)
-            }
-          )
-
-          val landOrPropertyCompleted = LandOrPropertyCompleted(srn, index) -> SectionCompleted
-
-          val progress = indexes.map(
-            index => LandOrPropertyProgress(srn, index) -> SectionJourneyStatus.Completed
-          )
-
-          val landOrPropertyPrePopulated = indexes
-            .filter(
-              index => {
-                landOrPropertyTransactions(index.value - 1).prePopulated.nonEmpty
-              }
-            )
-            .map(
-              index =>
-                LandOrPropertyPrePopulated(srn, index) -> landOrPropertyTransactions(index.value - 1).prePopulated.get
-            )
-
-          val triedUA = for {
-            ua0 <- ua
-            ua1 <- ua0.set(landOrPropertyInUK._1, landOrPropertyInUK._2)
-            ua2 <- ua1.set(addressDetails._1, addressDetails._2)
-            ua3 <- ua2.set(landRegistryTitleNumber._1, landRegistryTitleNumber._2)
-            ua4 <- ua3.set(methodOfHolding._1, methodOfHolding._2)
-            ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
-            ua6 <- optIsLandOrPropertyResidential.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
-            ua7 <- optLandOrPropertyLeased.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
-            ua8 <- optTotalIncomeOrReceipts.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))
-            ua9 <- optDateOfAcquisitionOrContribution.map(t => ua8.set(t._1, t._2)).getOrElse(Try(ua8))
-            ua10 <- optIndepValuationSupport.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
-            ua11 <- optReceivedLandType.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))
-
-            ua12 <- optIndividualTuple.map(t => ua11.set(t._1._1, t._1._2)).getOrElse(Try(ua11))
-            ua13 <- optIndividualTuple.map(t => ua12.set(t._2._1, t._2._2)).getOrElse(Try(ua12))
-            ua14 <- optUKCompanyTuple.map(t => ua13.set(t._1._1, t._1._2)).getOrElse(Try(ua13))
-            ua15 <- optUKCompanyTuple.map(t => ua14.set(t._2._1, t._2._2)).getOrElse(Try(ua14))
-            ua16 <- optUKPartnershipTuple.map(t => ua15.set(t._1._1, t._1._2)).getOrElse(Try(ua15))
-            ua17 <- optUKPartnershipTuple.map(t => ua16.set(t._2._1, t._2._2)).getOrElse(Try(ua16))
-            ua18 <- optOther.map(t => ua17.set(t._1, t._2)).getOrElse(Try(ua17))
-
-            ua19 <- optLeaseTuple
-              .map(
-                optLeaseDetails =>
-                  optLeaseDetails._1._2.map(values => ua18.set(optLeaseDetails._1._1, values)).getOrElse(Try(ua18))
-              )
-              .getOrElse(Try(ua18))
-
-            ua20 <- optLeaseTuple
-              .map(
-                optLesseeConnectedParty =>
-                  optLesseeConnectedParty._2._2
-                    .map(b => ua19.set(optLesseeConnectedParty._2._1, b))
-                    .getOrElse(Try(ua19))
-              )
-              .getOrElse(Try(ua18))
-
-            ua21 <- optSellerConnectedParty.map(t => ua20.set(t._1, t._2)).getOrElse(Try(ua20))
-            ua22 <- ua21.set(landOrPropertyCompleted._1, landOrPropertyCompleted._2)
-            ua23 <- landOrPropertyPrePopulated.foldLeft(Try(ua22)) {
-              case (ua, (page, value)) => ua.flatMap(_.set(page, value))
-            }
-            ua24 <- progress.foldLeft(Try(ua23)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-          } yield {
-            buildOptDisposedTransactionUA(
-              index,
-              srn,
-              ua24,
-              transaction.optDisposedPropertyTransaction,
-              landOrProperty.optDisposeAnyLandOrProperty
+            heldPropertyTransaction.optTotalIncomeOrReceipts.map(totalIncomeOrReceipts =>
+              LandOrPropertyTotalIncomePage(srn, index) -> Money(totalIncomeOrReceipts)
             )
           }
-          triedUA.flatten
+
+        val optDateOfAcquisitionOrContribution = heldPropertyTransaction.dateOfAcquisitionOrContribution.map(date =>
+          LandOrPropertyWhenDidSchemeAcquirePage(srn, index) -> date
+        )
+        val optIndepValuationSupport = heldPropertyTransaction.optIndepValuationSupport.map(indepValuationSupport =>
+          LandPropertyIndependentValuationPage(srn, index) -> indepValuationSupport
+        )
+        val optSellerConnectedParty = heldPropertyTransaction.optConnectedPartyStatus.map(status =>
+          LandOrPropertySellerConnectedPartyPage(srn, index) -> status
+        )
+        val optReceivedLandType = heldPropertyTransaction.optPropertyAcquiredFrom.map { prop =>
+          IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) -> prop.identityType
+        }
+        val optIndividualTuple = heldPropertyTransaction.optPropertyAcquiredFrom
+          .filter(prop => prop.identityType == IdentityType.Individual)
+          .map { prop =>
+            val name = LandPropertyIndividualSellersNamePage(
+              srn,
+              index
+            ) -> heldPropertyTransaction.optPropertyAcquiredFromName.get
+            val yesNoValue = prop.idNumber
+              .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
+              .getOrElse(
+                ConditionalYesNo.no[String, Nino](
+                  prop.reasonNoIdNumber.get
+                )
+              )
+
+            (name, IndividualSellerNiPage(srn, index) -> yesNoValue)
+          }
+
+        val optUKCompanyTuple = heldPropertyTransaction.optPropertyAcquiredFrom
+          .filter(prop => prop.identityType == IdentityType.UKCompany)
+          .map { prop =>
+            val name = CompanySellerNamePage(srn, index) -> heldPropertyTransaction.optPropertyAcquiredFromName.get
+            val yesNoValue = prop.idNumber
+              .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
+              .getOrElse(
+                ConditionalYesNo.no[String, Crn](
+                  prop.reasonNoIdNumber.get
+                )
+              )
+            (name, CompanyRecipientCrnPage(srn, index, LandOrPropertySeller) -> yesNoValue)
+          }
+
+        val optUKPartnershipTuple = heldPropertyTransaction.optPropertyAcquiredFrom
+          .filter(prop => prop.identityType == IdentityType.UKPartnership)
+          .map { prop =>
+            val name = PartnershipSellerNamePage(srn, index) -> heldPropertyTransaction.optPropertyAcquiredFromName.get
+            val yesNoValue = prop.idNumber
+              .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
+              .getOrElse(
+                ConditionalYesNo.no[String, Utr](
+                  prop.reasonNoIdNumber.get
+                )
+              )
+
+            (name, PartnershipRecipientUtrPage(srn, index, LandOrPropertySeller) -> yesNoValue)
+          }
+
+        val optOther = heldPropertyTransaction.optPropertyAcquiredFrom
+          .filter(prop => prop.identityType == IdentityType.Other)
+          .map { prop =>
+            OtherRecipientDetailsPage(srn, index, LandOrPropertySeller) -> RecipientDetails(
+              heldPropertyTransaction.optPropertyAcquiredFromName.get,
+              prop.otherDescription.get
+            )
+          }
+
+        val optLeaseTuple = heldPropertyTransaction.optLeaseDetails.map { leaseDetails =>
+          val ldp = LandOrPropertyLeaseDetailsPage(srn, index) ->
+            leaseDetails.optLesseeName.map { lesseeName =>
+              val optAnnualLeaseAmount = leaseDetails.optAnnualLeaseAmount
+
+              val annualLeaseAmount =
+                if (
+                  optAnnualLeaseAmount.isEmpty &&
+                  shouldDefaultToZeroIfMissing(
+                    userAnswers = userAnswers,
+                    srn = srn,
+                    index = index,
+                    transactionPrepopulated = transaction.prePopulated,
+                    nameToLog = addressDetails._2.addressLine1
+                  )
+                ) {
+                  logger.info(
+                    s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - defaulting to zero"
+                  )
+                  Money(0)
+                } else {
+                  logger.info(
+                    s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - NOT defaulting to zero"
+                  )
+                  Money(optAnnualLeaseAmount.get)
+                }
+
+              (
+                lesseeName,
+                annualLeaseAmount, // assume it is present when name is present
+                leaseDetails.optLeaseGrantDate.get
+              )
+            }
+
+          val leaseConnectedParty = IsLesseeConnectedPartyPage(srn, index) ->
+            leaseDetails.optConnectedPartyStatus
+
+          (ldp, leaseConnectedParty)
+        }
+
+        val landOrPropertyCompleted = LandOrPropertyCompleted(srn, index) -> SectionCompleted
+
+        val progress = indexes.map(index => LandOrPropertyProgress(srn, index) -> SectionJourneyStatus.Completed)
+
+        val landOrPropertyPrePopulated = indexes
+          .filter { index =>
+            landOrPropertyTransactions(index.value - 1).prePopulated.nonEmpty
+          }
+          .map(index =>
+            LandOrPropertyPrePopulated(srn, index) -> landOrPropertyTransactions(index.value - 1).prePopulated.get
+          )
+
+        val triedUA = for {
+          ua0 <- ua
+          ua1 <- ua0.set(landOrPropertyInUK._1, landOrPropertyInUK._2)
+          ua2 <- ua1.set(addressDetails._1, addressDetails._2)
+          ua3 <- ua2.set(landRegistryTitleNumber._1, landRegistryTitleNumber._2)
+          ua4 <- ua3.set(methodOfHolding._1, methodOfHolding._2)
+          ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
+          ua6 <- optIsLandOrPropertyResidential.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
+          ua7 <- optLandOrPropertyLeased.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
+          ua8 <- optTotalIncomeOrReceipts.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))
+          ua9 <- optDateOfAcquisitionOrContribution.map(t => ua8.set(t._1, t._2)).getOrElse(Try(ua8))
+          ua10 <- optIndepValuationSupport.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
+          ua11 <- optReceivedLandType.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))
+
+          ua12 <- optIndividualTuple.map(t => ua11.set(t._1._1, t._1._2)).getOrElse(Try(ua11))
+          ua13 <- optIndividualTuple.map(t => ua12.set(t._2._1, t._2._2)).getOrElse(Try(ua12))
+          ua14 <- optUKCompanyTuple.map(t => ua13.set(t._1._1, t._1._2)).getOrElse(Try(ua13))
+          ua15 <- optUKCompanyTuple.map(t => ua14.set(t._2._1, t._2._2)).getOrElse(Try(ua14))
+          ua16 <- optUKPartnershipTuple.map(t => ua15.set(t._1._1, t._1._2)).getOrElse(Try(ua15))
+          ua17 <- optUKPartnershipTuple.map(t => ua16.set(t._2._1, t._2._2)).getOrElse(Try(ua16))
+          ua18 <- optOther.map(t => ua17.set(t._1, t._2)).getOrElse(Try(ua17))
+
+          ua19 <- optLeaseTuple
+            .map(optLeaseDetails =>
+              optLeaseDetails._1._2.map(values => ua18.set(optLeaseDetails._1._1, values)).getOrElse(Try(ua18))
+            )
+            .getOrElse(Try(ua18))
+
+          ua20 <- optLeaseTuple
+            .map(optLesseeConnectedParty =>
+              optLesseeConnectedParty._2._2
+                .map(b => ua19.set(optLesseeConnectedParty._2._1, b))
+                .getOrElse(Try(ua19))
+            )
+            .getOrElse(Try(ua18))
+
+          ua21 <- optSellerConnectedParty.map(t => ua20.set(t._1, t._2)).getOrElse(Try(ua20))
+          ua22 <- ua21.set(landOrPropertyCompleted._1, landOrPropertyCompleted._2)
+          ua23 <- landOrPropertyPrePopulated.foldLeft(Try(ua22)) { case (ua, (page, value)) =>
+            ua.flatMap(_.set(page, value))
+          }
+          ua24 <- progress.foldLeft(Try(ua23)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+        } yield buildOptDisposedTransactionUA(
+          index,
+          srn,
+          ua24,
+          transaction.optDisposedPropertyTransaction,
+          landOrProperty.optDisposeAnyLandOrProperty
+        )
+        triedUA.flatten
       }
     } yield resultUA
   }
@@ -406,152 +389,153 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
       }
 
     optDisposedPropertyTransaction
-      .map(
-        disposedPropertyTransactions => {
-          for {
-            disposalIndexes <- buildIndexesForMax50(disposedPropertyTransactions.size)
-            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
-              case (disposalUA, disposalIndex) =>
-                val disposedPropertyTransaction = disposedPropertyTransactions(disposalIndex.value - 1)
-                val methodOfDisposal = disposedPropertyTransaction.methodOfDisposal match {
-                  case HowDisposed.Sold.name => HowDisposed.Sold
-                  case HowDisposed.Transferred.name => HowDisposed.Transferred
-                  case _ =>
-                    HowDisposed.Other(disposedPropertyTransaction.optOtherMethod.get)
+      .map(disposedPropertyTransactions => {
+        for {
+          disposalIndexes <- buildIndexesForMax50(disposedPropertyTransactions.size)
+          resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
+            case (disposalUA, disposalIndex) =>
+              val disposedPropertyTransaction = disposedPropertyTransactions(disposalIndex.value - 1)
+              val methodOfDisposal = disposedPropertyTransaction.methodOfDisposal match {
+                case HowDisposed.Sold.name => HowDisposed.Sold
+                case HowDisposed.Transferred.name => HowDisposed.Transferred
+                case _ =>
+                  HowDisposed.Other(disposedPropertyTransaction.optOtherMethod.get)
+              }
+
+              val howWasPropertyDisposed = HowWasPropertyDisposedOfPage(srn, index, disposalIndex) -> methodOfDisposal
+              val portionStillHeld =
+                LandOrPropertyStillHeldPage(srn, index, disposalIndex) -> disposedPropertyTransaction.portionStillHeld
+              val optWhenWasPropertySold = disposedPropertyTransaction.optDateOfSale.map(date =>
+                WhenWasPropertySoldPage(srn, index, disposalIndex) -> date
+              )
+              val optConnectedParty = disposedPropertyTransaction.optConnectedPartyStatus.map(status =>
+                LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) -> status
+              )
+              val optSaleProceeds = disposedPropertyTransaction.optSaleProceeds.map(saleProceeds =>
+                TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex) -> Money(saleProceeds)
+              )
+
+              val optIndepValuation = disposedPropertyTransaction.optIndepValuationSupport.map(indepValuation =>
+                DisposalIndependentValuationPage(srn, index, disposalIndex) -> indepValuation
+              )
+
+              val optLandOrPropertyDisposedType = disposedPropertyTransaction.optPropertyAcquiredFrom.map { prop =>
+                WhoPurchasedLandOrPropertyPage(srn, index, disposalIndex) -> prop.identityType
+              }
+              val optIndividualTuple = disposedPropertyTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.Individual)
+                .map { prop =>
+                  val name = LandOrPropertyIndividualBuyerNamePage(
+                    srn,
+                    index,
+                    disposalIndex
+                  ) -> disposedPropertyTransaction.optNameOfPurchaser.get
+                  val yesNoValue = prop.idNumber
+                    .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
+                    .getOrElse(
+                      ConditionalYesNo.no[String, Nino](
+                        prop.reasonNoIdNumber.get
+                      )
+                    )
+
+                  (name, IndividualBuyerNinoNumberPage(srn, index, disposalIndex) -> yesNoValue)
                 }
 
-                val howWasPropertyDisposed = HowWasPropertyDisposedOfPage(srn, index, disposalIndex) -> methodOfDisposal
-                val portionStillHeld = LandOrPropertyStillHeldPage(srn, index, disposalIndex) -> disposedPropertyTransaction.portionStillHeld
-                val optWhenWasPropertySold = disposedPropertyTransaction.optDateOfSale.map(
-                  date => WhenWasPropertySoldPage(srn, index, disposalIndex) -> date
-                )
-                val optConnectedParty = disposedPropertyTransaction.optConnectedPartyStatus.map(
-                  status => LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) -> status
-                )
-                val optSaleProceeds = disposedPropertyTransaction.optSaleProceeds.map(
-                  saleProceeds => TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex) -> Money(saleProceeds)
-                )
-
-                val optIndepValuation = disposedPropertyTransaction.optIndepValuationSupport.map(
-                  indepValuation => DisposalIndependentValuationPage(srn, index, disposalIndex) -> indepValuation
-                )
-
-                val optLandOrPropertyDisposedType = disposedPropertyTransaction.optPropertyAcquiredFrom.map(
-                  prop => {
-                    WhoPurchasedLandOrPropertyPage(srn, index, disposalIndex) -> prop.identityType
-                  }
-                )
-                val optIndividualTuple = disposedPropertyTransaction.optPropertyAcquiredFrom
-                  .filter(prop => prop.identityType == IdentityType.Individual)
-                  .map(
-                    prop => {
-                      val name = LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex) -> disposedPropertyTransaction.optNameOfPurchaser.get
-                      val yesNoValue = prop.idNumber
-                        .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
-                        .getOrElse(
-                          ConditionalYesNo.no[String, Nino](
-                            prop.reasonNoIdNumber.get
-                          )
-                        )
-
-                      (name, IndividualBuyerNinoNumberPage(srn, index, disposalIndex) -> yesNoValue)
-                    }
-                  )
-
-                val optUKCompanyTuple = disposedPropertyTransaction.optPropertyAcquiredFrom
-                  .filter(prop => prop.identityType == IdentityType.UKCompany)
-                  .map(
-                    prop => {
-                      val name = CompanyBuyerNamePage(srn, index, disposalIndex) -> disposedPropertyTransaction.optNameOfPurchaser.get
-                      val yesNoValue = prop.idNumber
-                        .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
-                        .getOrElse(
-                          ConditionalYesNo.no[String, Crn](
-                            prop.reasonNoIdNumber.get
-                          )
-                        )
-                      (name, CompanyBuyerCrnPage(srn, index, disposalIndex) -> yesNoValue)
-                    }
-                  )
-
-                val optUKPartnershipTuple = disposedPropertyTransaction.optPropertyAcquiredFrom
-                  .filter(prop => prop.identityType == IdentityType.UKPartnership)
-                  .map(
-                    prop => {
-                      val name = PartnershipBuyerNamePage(srn, index, disposalIndex) -> disposedPropertyTransaction.optNameOfPurchaser.get
-                      val yesNoValue = prop.idNumber
-                        .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
-                        .getOrElse(
-                          ConditionalYesNo.no[String, Utr](
-                            prop.reasonNoIdNumber.get
-                          )
-                        )
-
-                      (name, PartnershipBuyerUtrPage(srn, index, disposalIndex) -> yesNoValue)
-                    }
-                  )
-
-                val optOther = disposedPropertyTransaction.optPropertyAcquiredFrom
-                  .filter(prop => prop.identityType == IdentityType.Other)
-                  .map(
-                    prop => {
-                      OtherBuyerDetailsPage(srn, index, disposalIndex) -> RecipientDetails(
-                        disposedPropertyTransaction.optNameOfPurchaser.get,
-                        prop.otherDescription.get
+              val optUKCompanyTuple = disposedPropertyTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.UKCompany)
+                .map { prop =>
+                  val name = CompanyBuyerNamePage(
+                    srn,
+                    index,
+                    disposalIndex
+                  ) -> disposedPropertyTransaction.optNameOfPurchaser.get
+                  val yesNoValue = prop.idNumber
+                    .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
+                    .getOrElse(
+                      ConditionalYesNo.no[String, Crn](
+                        prop.reasonNoIdNumber.get
                       )
-                    }
+                    )
+                  (name, CompanyBuyerCrnPage(srn, index, disposalIndex) -> yesNoValue)
+                }
+
+              val optUKPartnershipTuple = disposedPropertyTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.UKPartnership)
+                .map { prop =>
+                  val name = PartnershipBuyerNamePage(
+                    srn,
+                    index,
+                    disposalIndex
+                  ) -> disposedPropertyTransaction.optNameOfPurchaser.get
+                  val yesNoValue = prop.idNumber
+                    .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
+                    .getOrElse(
+                      ConditionalYesNo.no[String, Utr](
+                        prop.reasonNoIdNumber.get
+                      )
+                    )
+
+                  (name, PartnershipBuyerUtrPage(srn, index, disposalIndex) -> yesNoValue)
+                }
+
+              val optOther = disposedPropertyTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.Other)
+                .map { prop =>
+                  OtherBuyerDetailsPage(srn, index, disposalIndex) -> RecipientDetails(
+                    disposedPropertyTransaction.optNameOfPurchaser.get,
+                    prop.otherDescription.get
                   )
-                for {
-                  disposalUA0 <- disposalUA
-                  disposalUA1 <- disposalUA0
-                    .set(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
-                  disposalUA2 <- disposalUA1.set(howWasPropertyDisposed._1, howWasPropertyDisposed._2)
-                  disposalUA3 <- disposalUA2.set(portionStillHeld._1, portionStillHeld._2)
-                  disposalUA4 <- optWhenWasPropertySold
-                    .map(t => disposalUA3.set(t._1, t._2))
-                    .getOrElse(Try(disposalUA3))
-                  disposalUA5 <- optSaleProceeds
-                    .map(t => disposalUA4.set(t._1, t._2))
-                    .getOrElse(Try(disposalUA4))
+                }
+              for {
+                disposalUA0 <- disposalUA
+                disposalUA1 <- disposalUA0
+                  .set(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
+                disposalUA2 <- disposalUA1.set(howWasPropertyDisposed._1, howWasPropertyDisposed._2)
+                disposalUA3 <- disposalUA2.set(portionStillHeld._1, portionStillHeld._2)
+                disposalUA4 <- optWhenWasPropertySold
+                  .map(t => disposalUA3.set(t._1, t._2))
+                  .getOrElse(Try(disposalUA3))
+                disposalUA5 <- optSaleProceeds
+                  .map(t => disposalUA4.set(t._1, t._2))
+                  .getOrElse(Try(disposalUA4))
 
-                  disposalUA6 <- optIndepValuation
-                    .map(t => disposalUA5.set(t._1, t._2))
-                    .getOrElse(Try(disposalUA5))
-                  disposalUA7 <- optLandOrPropertyDisposedType
-                    .map(t => disposalUA6.set(t._1, t._2))
-                    .getOrElse(Try(disposalUA6))
+                disposalUA6 <- optIndepValuation
+                  .map(t => disposalUA5.set(t._1, t._2))
+                  .getOrElse(Try(disposalUA5))
+                disposalUA7 <- optLandOrPropertyDisposedType
+                  .map(t => disposalUA6.set(t._1, t._2))
+                  .getOrElse(Try(disposalUA6))
 
-                  disposalUA8 <- optIndividualTuple
-                    .map(t => disposalUA7.set(t._1._1, t._1._2))
-                    .getOrElse(Try(disposalUA7))
-                  disposalUA9 <- optIndividualTuple
-                    .map(t => disposalUA8.set(t._2._1, t._2._2))
-                    .getOrElse(Try(disposalUA8))
+                disposalUA8 <- optIndividualTuple
+                  .map(t => disposalUA7.set(t._1._1, t._1._2))
+                  .getOrElse(Try(disposalUA7))
+                disposalUA9 <- optIndividualTuple
+                  .map(t => disposalUA8.set(t._2._1, t._2._2))
+                  .getOrElse(Try(disposalUA8))
 
-                  disposalUA10 <- optUKCompanyTuple
-                    .map(t => disposalUA9.set(t._1._1, t._1._2))
-                    .getOrElse(Try(disposalUA9))
-                  disposalUA11 <- optUKCompanyTuple
-                    .map(t => disposalUA10.set(t._2._1, t._2._2))
-                    .getOrElse(Try(disposalUA10))
+                disposalUA10 <- optUKCompanyTuple
+                  .map(t => disposalUA9.set(t._1._1, t._1._2))
+                  .getOrElse(Try(disposalUA9))
+                disposalUA11 <- optUKCompanyTuple
+                  .map(t => disposalUA10.set(t._2._1, t._2._2))
+                  .getOrElse(Try(disposalUA10))
 
-                  disposalUA12 <- optUKPartnershipTuple
-                    .map(t => disposalUA11.set(t._1._1, t._1._2))
-                    .getOrElse(Try(disposalUA11))
-                  disposalUA13 <- optUKPartnershipTuple
-                    .map(t => disposalUA12.set(t._2._1, t._2._2))
-                    .getOrElse(Try(disposalUA12))
-                  disposalUA14 <- optConnectedParty
-                    .map(t => disposalUA13.set(t._1, t._2))
-                    .getOrElse(Try(disposalUA13))
-                  disposalUA15 <- optOther.map(t => disposalUA14.set(t._1, t._2)).getOrElse(Try(disposalUA14))
-                  disposalUA16 <- disposalUA15
-                    .set(LandOrPropertyDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
-                } yield disposalUA16
-            }
-          } yield resultDisposalUA
-        }
-      )
+                disposalUA12 <- optUKPartnershipTuple
+                  .map(t => disposalUA11.set(t._1._1, t._1._2))
+                  .getOrElse(Try(disposalUA11))
+                disposalUA13 <- optUKPartnershipTuple
+                  .map(t => disposalUA12.set(t._2._1, t._2._2))
+                  .getOrElse(Try(disposalUA12))
+                disposalUA14 <- optConnectedParty
+                  .map(t => disposalUA13.set(t._1, t._2))
+                  .getOrElse(Try(disposalUA13))
+                disposalUA15 <- optOther.map(t => disposalUA14.set(t._1, t._2)).getOrElse(Try(disposalUA14))
+                disposalUA16 <- disposalUA15
+                  .set(LandOrPropertyDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+              } yield disposalUA16
+          }
+        } yield resultDisposalUA
+      })
       .getOrElse(initialUserAnswersOfDisposal)
   }
 
@@ -690,18 +674,17 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           case IdentityType.Other =>
             request.userAnswers
               .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .map(
-                other =>
-                  (
-                    other.name,
-                    sellerConnectedParty,
-                    PropertyAcquiredFrom(
-                      identityType = receivedLandType,
-                      idNumber = None,
-                      reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
-                    )
+              .map(other =>
+                (
+                  other.name,
+                  sellerConnectedParty,
+                  PropertyAcquiredFrom(
+                    identityType = receivedLandType,
+                    idNumber = None,
+                    reasonNoIdNumber = None,
+                    otherDescription = Some(other.description)
                   )
+                )
               )
 
         }
@@ -728,8 +711,8 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
   private def buildOptDisposedPropertyTransactions(
     srn: Srn,
     landOrPropertyIndex: Refined[Int, OneTo5000]
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ): Seq[DisposedPropertyTransaction] =
     request.userAnswers
       .map(
@@ -897,17 +880,16 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           case IdentityType.Other =>
             request.userAnswers
               .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
-              .map(
-                other =>
-                  (
-                    other.name,
-                    PropertyAcquiredFrom(
-                      identityType = landOrPropertyDisposedType,
-                      idNumber = None,
-                      reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
-                    )
+              .map(other =>
+                (
+                  other.name,
+                  PropertyAcquiredFrom(
+                    identityType = landOrPropertyDisposedType,
+                    idNumber = None,
+                    reasonNoIdNumber = None,
+                    otherDescription = Some(other.description)
                   )
+                )
               )
         }
       }

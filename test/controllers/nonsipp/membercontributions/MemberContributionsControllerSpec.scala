@@ -17,7 +17,7 @@
 package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import play.api.libs.json.JsPath
@@ -29,7 +29,7 @@ import org.mockito.Mockito._
 import pages.nonsipp.membercontributions.MemberContributionsPage
 import controllers.nonsipp.membercontributions.MemberContributionsController._
 
-class MemberContributionsControllerSpec extends ControllerBaseSpec {
+class MemberContributionsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad =
     controllers.nonsipp.membercontributions.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
@@ -54,19 +54,19 @@ class MemberContributionsControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

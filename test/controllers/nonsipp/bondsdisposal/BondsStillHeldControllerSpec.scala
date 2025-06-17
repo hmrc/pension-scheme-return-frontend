@@ -17,18 +17,17 @@
 package controllers.nonsipp.bondsdisposal
 
 import controllers.nonsipp.bondsdisposal.BondsStillHeldController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.IntView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.IntFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.BondsStillHeldPage
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class BondsStillHeldControllerSpec extends ControllerBaseSpec {
+class BondsStillHeldControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val bondIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val bondIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.BondsStillHeldController.onPageLoad(srn, bondIndex, disposalIndex, NormalMode)

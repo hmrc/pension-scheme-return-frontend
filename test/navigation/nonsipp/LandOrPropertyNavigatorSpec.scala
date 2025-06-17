@@ -18,13 +18,13 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
-import config.RefinedTypes.{Max5000, OneTo5000}
-import pages.nonsipp.landorproperty._
-import eu.timepit.refined.refineMV
+import config.RefinedTypes.Max5000
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty._
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -32,7 +32,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[OneTo5000](1)
+  private val index: Max5000 = 1
   private val subject = IdentitySubject.LandOrPropertySeller
 
   "LandOrPropertyNavigator" - {
@@ -74,7 +74,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LandPropertyInUKPage,
           Gen.const(false),
-          (srn, index: Max5000, mode) =>
+          (srn, index: Int, mode) =>
             controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
               .onPageLoad(srn, index, isUkAddress = false, mode)
         )
@@ -122,9 +122,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             LandOrPropertyTotalCostPage,
             Gen.const(money),
-            (srn, index: Max5000, _) =>
-              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, NormalMode),
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad,
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
           )
           .withName(
@@ -154,7 +152,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldLandPropertyPage(srn, index),
               SchemeHoldLandProperty.Contribution
-            ) //Needed to mock the user input from 2 pages "ago"
+            ) // Needed to mock the user input from 2 pages "ago"
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
@@ -480,7 +478,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          srn => RemovePropertyPage(srn, refineMV(1)),
+          srn => RemovePropertyPage(srn, 1),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad
         )
         .withName("go from remove page to LandOrPropertyHeldPage page")
@@ -493,9 +491,11 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(2), mode),
-            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+            (
+              srn,
+              mode
+            ) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 2, mode),
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, 1), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 1")
       )
@@ -506,9 +506,11 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), mode),
-            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
+            (
+              srn,
+              mode
+            ) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode),
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, 2), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 2")
       )
@@ -519,8 +521,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), mode)
+            (srn, mode) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode)
           )
           .withName("Add Land or property with no records")
       )
@@ -718,7 +719,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldLandPropertyPage(srn, index),
               SchemeHoldLandProperty.Contribution
-            ) //Needed to mock the user input from 2 pages "ago"
+            ) // Needed to mock the user input from 2 pages "ago"
         )
         .withName("go from land or property when did scheme acquire page to Land or property CYA page")
     )

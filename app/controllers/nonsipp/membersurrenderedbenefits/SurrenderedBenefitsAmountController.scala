@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, toRefined300}
 import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -43,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class SurrenderedBenefitsAmountController @Inject()(
+class SurrenderedBenefitsAmountController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -56,7 +57,7 @@ class SurrenderedBenefitsAmountController @Inject()(
 
   private val form = SurrenderedBenefitsAmountController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
         val preparedForm = request.userAnswers.fillForm(SurrenderedBenefitsAmountPage(srn, memberIndex), form)
@@ -65,13 +66,13 @@ class SurrenderedBenefitsAmountController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => {
+            formWithErrors =>
               Future.successful(
                 BadRequest(
                   view(
@@ -79,8 +80,7 @@ class SurrenderedBenefitsAmountController @Inject()(
                     viewModel(srn, memberName.fullName, memberIndex, form, mode)
                   )
                 )
-              )
-            },
+              ),
             value =>
               for {
                 updatedAnswers <- request.userAnswers

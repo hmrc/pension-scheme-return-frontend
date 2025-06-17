@@ -19,17 +19,18 @@ package navigation.nonsipp
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max50
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
 import cats.implicits.toTraverseOps
 import pages.nonsipp.landorpropertydisposal._
 import navigation.JourneyNavigator
 import models._
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
 
 object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case page @ LandOrPropertyDisposalPage(srn) => //41
+    case page @ LandOrPropertyDisposalPage(srn) => // 41
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorpropertydisposal.routes.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn)
       } else {
@@ -40,7 +41,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController
         .onPageLoad(srn, page = 1)
 
-    case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, _) => //41c
+    case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, _) => // 41c
       userAnswers.get(page) match {
         case None => controllers.routes.UnauthorisedController.onPageLoad()
         case Some(HowDisposed.Sold) =>
@@ -51,7 +52,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
       }
 
-    case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
+    case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => // 41d
       controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
@@ -129,9 +130,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) =>
-      if (userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex)).isEmpty ||
+      if (
+        userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex)).isEmpty ||
         userAnswers.get(DisposalIndependentValuationPage(srn, index, disposalIndex)).isEmpty ||
-        userAnswers.get(LandOrPropertyStillHeldPage(srn, index, disposalIndex)).isEmpty) {
+        userAnswers.get(LandOrPropertyStillHeldPage(srn, index, disposalIndex)).isEmpty
+      ) {
         controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
           .onPageLoad(srn, index, disposalIndex, NormalMode)
       } else {
@@ -166,7 +169,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     _ =>
       userAnswers => {
 
-        case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged) => //41c
+        case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged) => // 41c
           userAnswers.get(page) match {
             case None => controllers.routes.UnauthorisedController.onPageLoad()
             case _ if hasAnswerChanged =>
@@ -184,7 +187,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
 
-        case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
+        case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => // 41d
           controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
 

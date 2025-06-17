@@ -46,7 +46,7 @@ import scala.util.{Success, Try}
 import javax.inject.Inject
 
 @Singleton()
-class MemberPaymentsTransformer @Inject()(
+class MemberPaymentsTransformer @Inject() (
   transfersInTransformer: TransfersInTransformer,
   transfersOutTransformer: TransfersOutTransformer,
   pensionSurrenderTransformer: PensionSurrenderTransformer,
@@ -70,8 +70,8 @@ class MemberPaymentsTransformer @Inject()(
       maybePreviousMemberDetails <- previousVersionUA.traverse(buildMemberDetails(srn, _))
     } yield {
 
-      val softDeletedMembers: List[MemberDetails] = userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map {
-        softDeletedMember =>
+      val softDeletedMembers: List[MemberDetails] =
+        userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map { softDeletedMember =>
           MemberDetails(
             prePopulated = None,
             state = MemberState.Deleted,
@@ -87,15 +87,16 @@ class MemberPaymentsTransformer @Inject()(
             benefitsSurrendered = softDeletedMember.pensionSurrendered,
             pensionAmountReceived = softDeletedMember.totalAmountPensionPaymentsPage.map(_.value)
           )
-      }
+        }
 
       val psrState: Option[PSRStatus] = userAnswers.get(FbStatus(srn))
 
       /**
-       * if member state is CHANGED, check if the status was set in this session by comparing to initial UserAnswers (ETMP GET snapshot)
-       * if it was, check if there is a previous version of the member. If previous member state exists:
-       * - stay CHANGED
-       * - else change to NEW as the member has not been part of a declaration yet
+       * if member state is CHANGED, check if the status was set in this session by comparing to initial UserAnswers
+       * (ETMP GET snapshot) if it was, check if there is a previous version of the member. If previous member state
+       * exists:
+       *   - stay CHANGED
+       *   - else change to NEW as the member has not been part of a declaration yet
        */
       val memberDetailsWithCorrectState: Map[Max300, MemberDetails] = currentMemberDetails.map {
         _ -> psrState -> maybePreviousMemberDetails match {
@@ -138,7 +139,7 @@ class MemberPaymentsTransformer @Inject()(
         }
       }
 
-      val normalise: MemberDetails => MemberDetails = (memberDetails: MemberDetails) => {
+      val normalise: MemberDetails => MemberDetails = (memberDetails: MemberDetails) =>
         memberDetails.copy(
           memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.isZero)) {
             None
@@ -152,33 +153,31 @@ class MemberPaymentsTransformer @Inject()(
             if (memberDetails.totalContributions.contains(0.0)) None
             else memberDetails.totalContributions
         )
-      }
 
       // Omit memberPSRVersion if member has changed
       // Check for empty member payment sections before comparing members
       // (this is because we send empty records in certain sections for members)
       val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.toSeq
         .sortBy(_._1.value)(Ordering[Int])
-        .map {
-          case (index, currentMemberDetail) =>
-            initialMemberDetails.get(index) match {
-              case None =>
-                currentMemberDetail.copy(memberPSRVersion = None)
-              case Some(initialMemberDetail) =>
-                val normalisedInitialMember = normalise(initialMemberDetail)
-                val normalisedCurrentMember = normalise(currentMemberDetail)
-                val same = normalisedInitialMember == normalisedCurrentMember
-                if (!same) {
-                  logger.info(s"member $index has changed, removing memberPSRVersion")
+        .map { case (index, currentMemberDetail) =>
+          initialMemberDetails.get(index) match {
+            case None =>
+              currentMemberDetail.copy(memberPSRVersion = None)
+            case Some(initialMemberDetail) =>
+              val normalisedInitialMember = normalise(initialMemberDetail)
+              val normalisedCurrentMember = normalise(currentMemberDetail)
+              val same = normalisedInitialMember == normalisedCurrentMember
+              if (!same) {
+                logger.info(s"member $index has changed, removing memberPSRVersion")
 //                // we can still use this on localhost if needed:
 //                if (logger.isDebugEnabled) {
 //                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
 //                }
-                }
-                currentMemberDetail.copy(
-                  memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
-                )
-            }
+              }
+              currentMemberDetail.copy(
+                memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
+              )
+          }
         }
         .toList
 
@@ -222,40 +221,36 @@ class MemberPaymentsTransformer @Inject()(
       .membersDetails(srn)
       .flatMap { case (index, value) => refineIndex[Refined](index).map(_ -> value) }
 
-    val completedJourneyMembers = refinedMemberDetails.toList.filter {
-      case (index, _) =>
-        userAnswers
-          .get(pages.nonsipp.memberdetails.MemberDetailsManualProgress(srn, index))
-          .contains(SectionJourneyStatus.Completed) && userAnswers.get(MemberStatus(srn, index)).nonEmpty
+    val completedJourneyMembers = refinedMemberDetails.toList.filter { case (index, _) =>
+      userAnswers
+        .get(pages.nonsipp.memberdetails.MemberDetailsManualProgress(srn, index))
+        .contains(SectionJourneyStatus.Completed) && userAnswers.get(MemberStatus(srn, index)).nonEmpty
     }
 
     completedJourneyMembers
-      .traverse {
-        case (index, memberDetails) =>
-          val employerContributions = buildEmployerContributions(srn, index, userAnswers).getOrElse(Nil)
-          val benefitsSurrendered = pensionSurrenderTransformer.transformToEtmp(srn, index, userAnswers)
-          val transfersIn = transfersInTransformer.transformToEtmp(srn, index, userAnswers).getOrElse(Nil)
-          val transfersOut = transfersOutTransformer.transformToEtmp(srn, index, userAnswers).getOrElse(Nil)
-          for {
-            // This should not happen because it's filtered out above
-            memberState <- userAnswers
-              .get(MemberStatus(srn, index))
-              .toRight(s"MemberStatus not found for member $index")
-          } yield {
-            index -> MemberDetails(
-              prePopulated = None,
-              state = memberState,
-              memberPSRVersion = userAnswers.get(MemberPsrVersionPage(srn, index)),
-              personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
-              employerContributions = employerContributions,
-              transfersIn = transfersIn,
-              totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
-              memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
-              transfersOut = transfersOut,
-              benefitsSurrendered = benefitsSurrendered,
-              pensionAmountReceived = userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
-            )
-          }
+      .traverse { case (index, memberDetails) =>
+        val employerContributions = buildEmployerContributions(srn, index, userAnswers).getOrElse(Nil)
+        val benefitsSurrendered = pensionSurrenderTransformer.transformToEtmp(srn, index, userAnswers)
+        val transfersIn = transfersInTransformer.transformToEtmp(srn, index, userAnswers).getOrElse(Nil)
+        val transfersOut = transfersOutTransformer.transformToEtmp(srn, index, userAnswers).getOrElse(Nil)
+        for {
+          // This should not happen because it's filtered out above
+          memberState <- userAnswers
+            .get(MemberStatus(srn, index))
+            .toRight(s"MemberStatus not found for member $index")
+        } yield index -> MemberDetails(
+          prePopulated = None,
+          state = memberState,
+          memberPSRVersion = userAnswers.get(MemberPsrVersionPage(srn, index)),
+          personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
+          employerContributions = employerContributions,
+          transfersIn = transfersIn,
+          totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
+          memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
+          transfersOut = transfersOut,
+          benefitsSurrendered = benefitsSurrendered,
+          pensionAmountReceived = userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
+        )
       }
       .map(_.toMap)
   }
@@ -273,12 +268,11 @@ class MemberPaymentsTransformer @Inject()(
       )
       // Only set UnallocatedEmployerContributionsPage when unallocatedContribsMade exists
       // If empty, this infers that the section hasn't been started yet
-      ua1 <- memberPayments.unallocatedContribsMade.fold(Try(ua0))(
-        unallocatedContribsMade =>
-          ua0.set(
-            UnallocatedEmployerContributionsPage(srn),
-            unallocatedContribsMade
-          )
+      ua1 <- memberPayments.unallocatedContribsMade.fold(Try(ua0))(unallocatedContribsMade =>
+        ua0.set(
+          UnallocatedEmployerContributionsPage(srn),
+          unallocatedContribsMade
+        )
       )
       ua2 <- memberPayments.unallocatedContribAmount match {
         case Some(value) => ua1.set(UnallocatedEmployerAmountPage(srn), Money(value))
@@ -287,17 +281,15 @@ class MemberPaymentsTransformer @Inject()(
       ua3 <- memberPayments.memberDetails
         .filter(_.state.active)
         .zipWithIndex
-        .traverse { case (memberDetails, index) => refineIndex[Max300.Refined](index).map(memberDetails -> _) }
-        .getOrElse(Nil)
-        .foldLeft(Try(ua2)) {
-          case (ua, (memberDetails, index)) =>
-            val pages: List[UserAnswers.Compose] =
-              memberPersonalDetailsPages(srn, index, memberDetails.personalDetails) ++
-                employerContributionsPages(
-                  srn,
-                  index,
-                  memberDetails.employerContributions
-                ) ++ transfersInTransformer.transformFromEtmp(
+        .flatMap { case (memberDetails, index) => refineIndex[Max300.Refined](index).map(memberDetails -> _).toList }
+        .foldLeft(Try(ua2)) { case (ua, (memberDetails, index)) =>
+          val pages: List[UserAnswers.Compose] =
+            memberPersonalDetailsPages(srn, index, memberDetails.personalDetails) ++
+              employerContributionsPages(
+                srn,
+                index,
+                memberDetails.employerContributions
+              ) ++ transfersInTransformer.transformFromEtmp(
                 srn,
                 index,
                 memberDetails.transfersIn
@@ -313,18 +305,16 @@ class MemberPaymentsTransformer @Inject()(
                 pensionSurrenderTransformer.transformFromEtmp(srn, index, _)
               ) ++ memberDetails.pensionAmountReceived.fold(noUpdate)(
                 pensionAmountReceivedTransformer.transformFromEtmp(srn, index, _)
-              ) :+ (
-                (triedUA: Try[UserAnswers]) =>
-                  memberDetails.memberPSRVersion.fold(triedUA)(triedUA.set(MemberPsrVersionPage(srn, index), _))
-                ) :+ (
-                triedUA =>
-                  triedUA.set(
-                    MemberStatus(srn, index),
-                    memberDetails.state
-                  )
+              ) :+ ((triedUA: Try[UserAnswers]) =>
+                memberDetails.memberPSRVersion.fold(triedUA)(triedUA.set(MemberPsrVersionPage(srn, index), _))
+              ) :+ (triedUA =>
+                triedUA.set(
+                  MemberStatus(srn, index),
+                  memberDetails.state
                 )
+              )
 
-            pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
+          pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
 
       // Section wide user answers (this includes initial pages that doesn't require an index)
@@ -336,63 +326,68 @@ class MemberPaymentsTransformer @Inject()(
       ua3_6 <- memberPayments.checked.fold(Try(ua3_5))(ua3_5.set(MembersDetailsChecked(srn), _))
 
       // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
-      newMembers <- if (!fetchingPreviousVersion) {
-        identifyNewMembers(srn, ua3_6, previousVersionUA)
-      } else {
-        Success(Nil)
-      }
+      newMembers <-
+        if (!fetchingPreviousVersion) {
+          identifyNewMembers(srn, ua3_6, previousVersionUA)
+        } else {
+          Success(Nil)
+        }
 
-      ua4 <- newMembers.foldLeft(Try(ua3_6)) {
-        case (ua, index) =>
-          logger.info(s"New member identified at index $index")
-          ua.set(SafeToHardDelete(srn, index))
+      ua4 <- newMembers.foldLeft(Try(ua3_6)) { case (ua, index) =>
+        logger.info(s"New member identified at index $index")
+        ua.set(SafeToHardDelete(srn, index))
       }
 
       ua5 <- ua4.set(
         SoftDeletedMembers(srn),
         memberPayments.memberDetails
           .filter(_.state == MemberState.Deleted)
-          .map(
-            memberDetails =>
-              SoftDeletedMember(
-                memberPSRVersion = memberDetails.memberPSRVersion,
-                memberDetails = memberDetails.personalDetails,
-                employerContributions = memberDetails.employerContributions,
-                transfersIn = memberDetails.transfersIn,
-                transfersOut = memberDetails.transfersOut,
-                pensionSurrendered = memberDetails.benefitsSurrendered,
-                memberLumpSumReceived = memberDetails.memberLumpSumReceived,
-                totalMemberContribution = memberDetails.totalContributions.map(Money(_)),
-                totalAmountPensionPaymentsPage = memberDetails.pensionAmountReceived.map(Money(_))
-              )
+          .map(memberDetails =>
+            SoftDeletedMember(
+              memberPSRVersion = memberDetails.memberPSRVersion,
+              memberDetails = memberDetails.personalDetails,
+              employerContributions = memberDetails.employerContributions,
+              transfersIn = memberDetails.transfersIn,
+              transfersOut = memberDetails.transfersOut,
+              pensionSurrendered = memberDetails.benefitsSurrendered,
+              memberLumpSumReceived = memberDetails.memberLumpSumReceived,
+              totalMemberContribution = memberDetails.totalContributions.map(Money(_)),
+              totalAmountPensionPaymentsPage = memberDetails.pensionAmountReceived.map(Money(_))
+            )
           )
       )
     } yield ua5
 
   /**
-   * Checks UserAnswers to see if any members are newly added (have never been through a declaration or have been newly added in this version prior to a declaration)
-   * - if member has no version, this is before the first submission and they are all new.
-   * - if member has a version, check previous user answers:
-   *   - if no previous user answers, check if the member psr version is the same as the fb version:
-   *     - if the same, its been added in the latest version so it's new.
-   *     - if they are different, they are not new members.
-   *   - if there are previous user answers, compare members:
-   *    - if they are the same, they are not new members.
-   *    - if they are different, check if they were added in the latest version of the return (memberStatus is NEW, psrStatus is Compiled and return’s fbVersion == memberPSRVersion)
-   *      - if so, they are changed members.
-   *      - if not, do the same check but check psrStatus is Submitted (memberStatus is NEW, psrStatus is Submitted and return’s fbVersion == memberPSRVersion)
-   *        - if so, this means the member is changed
-   *          (this is because psrStatus is only Submitted directly after a PSR declaration submission and the user has logged out / in before making another POST to ETMP)
-   *        - if not, they are new members.
+   * Checks UserAnswers to see if any members are newly added (have never been through a declaration or have been newly
+   * added in this version prior to a declaration)
+   *   - if member has no version, this is before the first submission and they are all new.
+   *   - if member has a version, check previous user answers:
+   *     - if no previous user answers, check if the member psr version is the same as the fb version:
+   *       - if the same, its been added in the latest version so it's new.
+   *       - if they are different, they are not new members.
+   *     - if there are previous user answers, compare members:
+   *       - if they are the same, they are not new members.
+   *       - if they are different, check if they were added in the latest version of the return (memberStatus is NEW,
+   *         psrStatus is Compiled and return’s fbVersion == memberPSRVersion)
+   *         - if so, they are changed members.
+   *         - if not, do the same check but check psrStatus is Submitted (memberStatus is NEW, psrStatus is Submitted
+   *           and return’s fbVersion == memberPSRVersion)
+   *           - if so, this means the member is changed (this is because psrStatus is only Submitted directly after a
+   *             PSR declaration submission and the user has logged out / in before making another POST to ETMP)
+   *           - if not, they are new members.
    *
-   * fetchingPreviousVersion - used to indicate that the PSR retrieval service is calling this method when fetching the previous version
-   *                         - this is required as when this happens, there won't be a previousVersionUA yet
-   *                         - we can't rely on the absence of previousVersionUA to determine this as the PSR connector can return None if not found and in some cases it is required to be there
+   * fetchingPreviousVersion - used to indicate that the PSR retrieval service is calling this method when fetching the
+   * previous version
+   *   - this is required as when this happens, there won't be a previousVersionUA yet
+   *   - we can't rely on the absence of previousVersionUA to determine this as the PSR connector can return None if not
+   *     found and in some cases it is required to be there
    *
-   * Bug: We check members against the previous version by index, this is an issue because we keep members in index whether we delete them or not
-   *      but when we POST members to ETMP, we group non-deleted members first and then append the deleted members to the end, changing the order
-   *      we only do this because we need to save the indexes in our cache for active members as we use Refined types to constrain the number of members
-   *      we have a ticket on the backlog to fix this (remove Refined type and just have an int)
+   * Bug: We check members against the previous version by index, this is an issue because we keep members in index
+   * whether we delete them or not but when we POST members to ETMP, we group non-deleted members first and then append
+   * the deleted members to the end, changing the order we only do this because we need to save the indexes in our cache
+   * for active members as we use Refined types to constrain the number of members we have a ticket on the backlog to
+   * fix this (remove Refined type and just have an int)
    */
   private def identifyNewMembers(
     srn: Srn,
@@ -404,7 +399,7 @@ class MemberPaymentsTransformer @Inject()(
       val psrVersion = ua.get(FbVersionPage(srn))
       logger.info(
         s"""[identifyNewMembers] identifying members that are safe to hard delete with PSR version $psrVersion, psrStatus $psrStatus and previous version useranswers are ${previousVersionUA
-          .fold("empty")(_ => "non-empty")}"""
+            .fold("empty")(_ => "non-empty")}"""
       )
 
       previousVersionUA match {
@@ -455,8 +450,8 @@ class MemberPaymentsTransformer @Inject()(
               case _ => throw new NoSuchElementException("Unexpected memberDetails structure encountered")
             }
 
-          val versionedMembersWithETMPStatus = membersWithVersions.map {
-            case (index, memberVersion) => (index, memberVersion, ua.get(MemberStatus(srn, index)))
+          val versionedMembersWithETMPStatus = membersWithVersions.map { case (index, memberVersion) =>
+            (index, memberVersion, ua.get(MemberStatus(srn, index)))
           }
 
           Success(
@@ -535,18 +530,17 @@ class MemberPaymentsTransformer @Inject()(
     val secondaryIndexes =
       keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompleted.all(srn, index)))
 
-    secondaryIndexes.traverse(
-      secondaryIndex =>
-        for {
-          employerName <- userAnswers.get(EmployerNamePage(srn, index, secondaryIndex))
-          identityType <- userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
-          employerType <- toEmployerType(srn, identityType, index, secondaryIndex, userAnswers)
-          total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
-        } yield EmployerContributions(
-          employerName,
-          employerType,
-          totalTransferValue = total.value
-        )
+    secondaryIndexes.traverse(secondaryIndex =>
+      for {
+        employerName <- userAnswers.get(EmployerNamePage(srn, index, secondaryIndex))
+        identityType <- userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
+        employerType <- toEmployerType(srn, identityType, index, secondaryIndex, userAnswers)
+        total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
+      } yield EmployerContributions(
+        employerName,
+        employerType,
+        totalTransferValue = total.value
+      )
     )
   }
 
@@ -568,37 +562,33 @@ class MemberPaymentsTransformer @Inject()(
     employerContributionsList: List[EmployerContributions]
   ): List[Try[UserAnswers] => Try[UserAnswers]] = {
     val secondaryIndexes: List[(Max50, EmployerContributions)] = employerContributionsList.zipWithIndex
-      .traverse {
-        case (employerContributions, index) =>
-          refineIndex[Max50.Refined](index).map(_ -> employerContributions)
+      .flatMap { case (employerContributions, index) =>
+        refineIndex[Max50.Refined](index).map(_ -> employerContributions).toList
       }
-      .toList
-      .flatten
 
-    secondaryIndexes.flatMap {
-      case (secondaryIndex, employerContributions) =>
-        List[UserAnswers.Compose](
-          _.set(EmployerNamePage(srn, index, secondaryIndex), employerContributions.employerName),
-          _.set(
-            TotalEmployerContributionPage(srn, index, secondaryIndex),
-            Money(employerContributions.totalTransferValue)
-          ),
-          _.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
-        ) ++ List[UserAnswers.Compose](
-          employerContributions.employerType match {
-            case EmployerType.UKCompany(idOrReason) =>
-              _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
-                .set(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo(idOrReason.map(Crn(_))))
-            case EmployerType.UKPartnership(idOrReason) =>
-              _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKPartnership)
-                .set(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo(idOrReason.map(Utr(_))))
-            case EmployerType.Other(description) =>
-              _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
-                .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), description)
-          }
-        ) ++ List[UserAnswers.Compose](
-          _.set(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
-        )
+    secondaryIndexes.flatMap { case (secondaryIndex, employerContributions) =>
+      List[UserAnswers.Compose](
+        _.set(EmployerNamePage(srn, index, secondaryIndex), employerContributions.employerName),
+        _.set(
+          TotalEmployerContributionPage(srn, index, secondaryIndex),
+          Money(employerContributions.totalTransferValue)
+        ),
+        _.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+      ) ++ List[UserAnswers.Compose](
+        employerContributions.employerType match {
+          case EmployerType.UKCompany(idOrReason) =>
+            _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
+              .set(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo(idOrReason.map(Crn(_))))
+          case EmployerType.UKPartnership(idOrReason) =>
+            _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKPartnership)
+              .set(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo(idOrReason.map(Utr(_))))
+          case EmployerType.Other(description) =>
+            _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
+              .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), description)
+        }
+      ) ++ List[UserAnswers.Compose](
+        _.set(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
+      )
     }
   }
 
@@ -625,12 +615,12 @@ class MemberPaymentsTransformer @Inject()(
     List(
       ua =>
         memberLumpSumReceived
-          .map(t => {
+          .map { t =>
             ua.set(
               PensionCommencementLumpSumAmountPage(srn, index),
               PensionCommencementLumpSum(Money(t.lumpSumAmount), Money(t.designatedPensionAmount))
             )
-          })
+          }
           .getOrElse(ua),
       _.set(PensionCommencementLumpSumPage(srn), lumpSumReceived)
     )

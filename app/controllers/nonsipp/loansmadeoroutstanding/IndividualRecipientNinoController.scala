@@ -20,6 +20,7 @@ import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}
@@ -42,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IndividualRecipientNinoController @Inject()(
+class IndividualRecipientNinoController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -56,7 +57,7 @@ class IndividualRecipientNinoController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualRecipientNinoController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
         val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index), form)
@@ -64,7 +65,7 @@ class IndividualRecipientNinoController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

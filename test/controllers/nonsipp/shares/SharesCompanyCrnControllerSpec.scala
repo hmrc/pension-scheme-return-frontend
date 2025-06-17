@@ -18,16 +18,15 @@ package controllers.nonsipp.shares
 
 import controllers.nonsipp.shares.SharesCompanyCrnController._
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models._
-import config.RefinedTypes.Max5000
-import controllers.ControllerBaseSpec
 
-class SharesCompanyCrnControllerSpec extends ControllerBaseSpec {
+class SharesCompanyCrnControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = 1
 
   private lazy val onPageLoad =
     routes.SharesCompanyCrnController

@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import navigation.Navigator
 import models._
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveMemberDetailsController @Inject()(
+class RemoveMemberDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,43 +55,41 @@ class RemoveMemberDetailsController @Inject()(
     extends PSRController
     with SoftDelete {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      withMemberDetails(srn, index)(
-        nameDOB => Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
+      withMemberDetails(srn, index)(nameDOB =>
+        Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
       )
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form(formProvider, request.userAnswers.get(MemberDetailsPage(srn, index)).get)
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              withMemberDetails(srn, index)(
-                nameDOB => BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
+              withMemberDetails(srn, index)(nameDOB =>
+                BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
               )
             ),
-          removeMemberDetails => {
+          removeMemberDetails =>
             if (removeMemberDetails) {
               for {
                 updatedAnswers <- softDeleteMember(srn, index).mapK[Future]
                 _ <- saveService.save(updatedAnswers)
                 result <- submissionService
                   .submitPsrDetailsWithUA(srn, updatedAnswers, routes.PensionSchemeMembersController.onPageLoad(srn))
-              } yield result.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
-                  )
+              } yield result.getOrRecoverJourney(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
+                )
               )
             } else {
               Future
                 .successful(Redirect(navigator.nextPage(RemoveMemberDetailsPage(srn), mode, request.userAnswers)))
             }
-          }
         )
     }
 
@@ -100,9 +99,7 @@ class RemoveMemberDetailsController @Inject()(
     (
       for {
         nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
-      } yield {
-        f(nameDOB)
-      }
+      } yield f(nameDOB)
     ).merge
 }
 object RemoveMemberDetailsController {

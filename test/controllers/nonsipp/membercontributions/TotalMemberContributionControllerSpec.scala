@@ -19,20 +19,19 @@ package controllers.nonsipp.membercontributions
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import controllers.nonsipp.membercontributions.TotalMemberContributionController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MoneyView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.MoneyFormProvider
 import models.NormalMode
 import viewmodels.models.SectionCompleted
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 
-class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
+class TotalMemberContributionControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
   private lazy val onPageLoad =
     routes.TotalMemberContributionController.onPageLoad(srn, index, NormalMode)

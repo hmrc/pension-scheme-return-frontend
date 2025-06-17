@@ -18,7 +18,7 @@ package controllers.nonsipp
 
 import models.ConditionalYesNo._
 import pages.nonsipp.otherassetsheld._
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import models.SchemeHoldShare._
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
@@ -65,7 +65,7 @@ import viewmodels.models._
 
 import scala.concurrent.Future
 
-class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
+class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviours with CommonTestValues {
 
   // Set up services
   private val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
@@ -1536,9 +1536,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
         }
       )
     } else {
-      val section: List[TaskListItemViewModel] = sections(sectionIndex).items.fold(_ => List(), list => {
-        list.toList
-      })
+      val section: List[TaskListItemViewModel] = sections(sectionIndex).items.fold(_ => List(), list => list.toList)
       section.map(_.link.content.key) must not contain expectedLinkContentKey
     }
   }

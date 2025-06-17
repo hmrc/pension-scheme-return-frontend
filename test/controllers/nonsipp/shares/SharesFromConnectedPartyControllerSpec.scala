@@ -18,18 +18,17 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares._
 import controllers.nonsipp.shares.SharesFromConnectedPartyController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import viewmodels.models.SectionCompleted
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
+class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"

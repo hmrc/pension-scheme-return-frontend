@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.OtherAssetsDisposalData
 import navigation.Navigator
@@ -41,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveAssetDisposalController @Inject()(
+class RemoveAssetDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -55,7 +56,7 @@ class RemoveAssetDisposalController @Inject()(
 
   private val form = RemoveAssetDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -65,13 +66,11 @@ class RemoveAssetDisposalController @Inject()(
           methodOfDisposal <- request.userAnswers
             .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)))
-        }
+        } yield Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)))
       ).merge
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -111,8 +110,8 @@ class RemoveAssetDisposalController @Inject()(
                     controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                       .onPageLoad(srn, 1)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ => Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))
               )
             } else {
               Future.successful(

@@ -19,6 +19,7 @@ package controllers.nonsipp.moneyborrowed
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.IntUtils.toInt
 import cats.implicits._
 import config.Constants.maxBorrows
 import forms.YesNoPageFormProvider
@@ -48,7 +49,7 @@ import scala.concurrent.Future
 
 import javax.inject.Named
 
-class BorrowInstancesListController @Inject()(
+class BorrowInstancesListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -100,8 +101,8 @@ class BorrowInstancesListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     borrowDetails(srn).map { instances =>
       val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
@@ -241,34 +242,33 @@ object BorrowInstancesListController {
       case (Nil, mode) if !mode.isViewOnlyMode =>
         List()
       case (list, _) =>
-        list.collect {
-          case BorrowedMoneyDetails(index, lenderName, Some(amount)) =>
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
-                List(
-                  ListRow.view(
-                    lenderName,
-                    controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                      .onPageLoadViewOnly(srn, index, year, current, previous)
-                      .url,
-                    Message("borrowList.row.view.hidden", amount.displayAs, lenderName)
-                  )
+        list.collect { case BorrowedMoneyDetails(index, lenderName, Some(amount)) =>
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+              List(
+                ListRow.view(
+                  lenderName,
+                  controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+                    .onPageLoadViewOnly(srn, index, year, current, previous)
+                    .url,
+                  Message("borrowList.row.view.hidden", amount.displayAs, lenderName)
                 )
-              case _ =>
-                List(
-                  ListRow(
-                    Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
-                    changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                      .onPageLoad(srn, index, CheckMode)
-                      .url,
-                    changeHiddenText = Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
-                    controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
-                      .onPageLoad(srn, index, mode)
-                      .url,
-                    Message("borrowList.row.remove.hidden", amount.displayAs, lenderName)
-                  )
+              )
+            case _ =>
+              List(
+                ListRow(
+                  Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
+                  changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                    .url,
+                  changeHiddenText = Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
+                  controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
+                    .onPageLoad(srn, index, mode)
+                    .url,
+                  Message("borrowList.row.remove.hidden", amount.displayAs, lenderName)
                 )
-            }
+              )
+          }
         }.flatten
     }
 

@@ -17,8 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
-import controllers.nonsipp.receivetransfer.routes
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
@@ -32,7 +31,7 @@ import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 
-class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec {
+class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private lazy val onPageLoad = routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.DidSchemeReceiveTransferController.onSubmit(srn, NormalMode)

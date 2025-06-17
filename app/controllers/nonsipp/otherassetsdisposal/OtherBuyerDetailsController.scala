@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RecipientDetailsFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OtherBuyerDetailsController @Inject()(
+class OtherBuyerDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -52,7 +53,7 @@ class OtherBuyerDetailsController @Inject()(
 
   private def form: Form[RecipientDetails] = OtherBuyerDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val form = OtherBuyerDetailsController.form(formProvider)
       Ok(
@@ -68,7 +69,7 @@ class OtherBuyerDetailsController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

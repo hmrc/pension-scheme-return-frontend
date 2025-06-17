@@ -29,7 +29,7 @@ import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PrePopulationService @Inject()(
+class PrePopulationService @Inject() (
   landOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor,
   memberPrePopulationProcessor: MemberPrePopulationProcessor,
   sharesPrePopulationProcessor: SharesPrePopulationProcessor,
@@ -43,7 +43,7 @@ class PrePopulationService @Inject()(
 
   /**
    * this logic assumes gap years are allowed in pre-population
-   * */
+   */
   def findLastSubmittedPsrFbInPreviousYears(
     versionsForYears: Seq[PsrVersionsForYearsResponse],
     yearFrom: LocalDate

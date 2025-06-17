@@ -16,8 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class CompanySellerNamePageSpec extends PageBehaviours {
@@ -26,7 +25,7 @@ class CompanySellerNamePageSpec extends PageBehaviours {
 
   "CompanySellerNamePage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[String](CompanySellerNamePage(srn, index))
 

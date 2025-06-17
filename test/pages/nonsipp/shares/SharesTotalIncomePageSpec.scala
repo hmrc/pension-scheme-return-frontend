@@ -16,8 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.Money
 import pages.behaviours.PageBehaviours
 
@@ -26,7 +25,7 @@ class SharesTotalIncomePageSpec extends PageBehaviours {
   "SharesTotalIncomePage" - {
 
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[Money](SharesTotalIncomePage(srn, index))
 

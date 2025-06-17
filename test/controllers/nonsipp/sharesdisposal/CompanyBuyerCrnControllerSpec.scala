@@ -16,19 +16,18 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.given
 import controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import forms.YesNoPageFormProvider
 import models._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
+class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val index = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.CompanyBuyerCrnController

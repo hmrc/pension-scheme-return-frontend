@@ -16,15 +16,13 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.OneTo5000
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class LandPropertyIndividualSellersNamePageSpec extends PageBehaviours {
   "LandPropertyIndividualSellersNamePage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[String](LandPropertyIndividualSellersNamePage(srn, index))
     beSettable[String](LandPropertyIndividualSellersNamePage(srn, index))

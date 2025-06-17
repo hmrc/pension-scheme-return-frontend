@@ -31,15 +31,15 @@ import scala.util.Try
 import javax.inject.Inject
 
 @Singleton()
-class AssetsTransformer @Inject()(
+class AssetsTransformer @Inject() (
   landOrPropertyTransformer: LandOrPropertyTransformer,
   borrowingTransformer: BorrowingTransformer,
   bondsTransformer: BondsTransformer,
   otherAssetsTransformer: OtherAssetsTransformer
 ) extends Transformer {
 
-  def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(
-    implicit request: DataRequest[_]
+  def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(implicit
+    request: DataRequest[_]
   ): Option[Assets] = {
     val optLandOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn))
     val optLandOrPropertyHeldOrList = Option.when(
@@ -75,51 +75,46 @@ class AssetsTransformer @Inject()(
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, assets: Assets): Try[UserAnswers] =
     for {
       transformedLandOrPropertyUa <- assets.optLandOrProperty
-        .map(
-          landOrProperty => {
-            landOrPropertyTransformer
-              .transformFromEtmp(
-                userAnswers,
-                srn,
-                landOrProperty
-              )
-          }
-        )
+        .map { landOrProperty =>
+          landOrPropertyTransformer
+            .transformFromEtmp(
+              userAnswers,
+              srn,
+              landOrProperty
+            )
+        }
         .getOrElse(Try(userAnswers))
 
       transformedMoneyBorrowingUa <- assets.optBorrowing
-        .map(
-          borrowing =>
-            borrowingTransformer
-              .transformFromEtmp(
-                transformedLandOrPropertyUa,
-                srn,
-                borrowing
-              )
+        .map(borrowing =>
+          borrowingTransformer
+            .transformFromEtmp(
+              transformedLandOrPropertyUa,
+              srn,
+              borrowing
+            )
         )
         .getOrElse(Try(transformedLandOrPropertyUa))
 
       transformedBondsUa <- assets.optBonds
-        .map(
-          bonds =>
-            bondsTransformer
-              .transformFromEtmp(
-                transformedMoneyBorrowingUa,
-                srn,
-                bonds
-              )
+        .map(bonds =>
+          bondsTransformer
+            .transformFromEtmp(
+              transformedMoneyBorrowingUa,
+              srn,
+              bonds
+            )
         )
         .getOrElse(Try(transformedMoneyBorrowingUa))
 
       transformedOtherAssetsUa <- assets.optOtherAssets
-        .map(
-          otherAssets =>
-            otherAssetsTransformer
-              .transformFromEtmp(
-                transformedBondsUa,
-                srn,
-                otherAssets
-              )
+        .map(otherAssets =>
+          otherAssetsTransformer
+            .transformFromEtmp(
+              transformedBondsUa,
+              srn,
+              otherAssets
+            )
         )
         .getOrElse(Try(transformedBondsUa))
 

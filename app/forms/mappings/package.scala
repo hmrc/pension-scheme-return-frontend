@@ -25,12 +25,11 @@ package object mappings {
   object implicits {
     implicit class ConstraintOps[A](constraint: Constraint[A]) {
       def or(other: Constraint[A]): Constraint[A] =
-        Constraint[A](
-          (value: A) =>
-            constraint(value) match {
-              case Valid => Valid
-              case Invalid(_) => other(value)
-            }
+        Constraint[A]((value: A) =>
+          constraint(value) match {
+            case Valid => Valid
+            case Invalid(_) => other(value)
+          }
         )
     }
   }

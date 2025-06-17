@@ -18,17 +18,16 @@ package controllers.nonsipp.otherassetsheld
 
 import controllers.nonsipp.otherassetsheld.OtherAssetSellerConnectedPartyController._
 import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetSellerConnectedPartyPage}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.YesNoPageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.IdentityTypePage
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
-class OtherAssetSellerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class OtherAssetSellerConnectedPartyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
   private lazy val onPageLoad = routes.OtherAssetSellerConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.OtherAssetSellerConnectedPartyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"

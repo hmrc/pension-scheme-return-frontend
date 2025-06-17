@@ -16,8 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.RefinedTypes.OneTo5000
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.TypeOfShares
 import pages.behaviours.PageBehaviours
 
@@ -26,7 +25,7 @@ class TypeOfSharesHeldPageSpec extends PageBehaviours {
   "DidSchemeHoldAnySharesPage" - {
 
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val index = 1
 
     beRetrievable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
 

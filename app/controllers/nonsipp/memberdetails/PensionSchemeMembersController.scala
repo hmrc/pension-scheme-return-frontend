@@ -55,7 +55,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class PensionSchemeMembersController @Inject()(
+class PensionSchemeMembersController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -84,12 +84,11 @@ class PensionSchemeMembersController @Inject()(
       .fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName)))),
-        answer => {
+        answer =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionSchemeMembersPage(srn), answer))
             _ <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(PensionSchemeMembersPage(srn), NormalMode, updatedAnswers))
-        }
       )
   }
 }

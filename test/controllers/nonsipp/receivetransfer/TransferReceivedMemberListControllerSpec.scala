@@ -18,17 +18,20 @@ package controllers.nonsipp.receivetransfer
 
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import controllers.{ControllerBaseSpec, MemberListBaseSpec}
+import controllers.{ControllerBaseSpec, ControllerBehaviours, MemberListBaseSpec}
 import views.html.TwoColumnsTripleAction
+import utils.IntUtils.given
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, ReceiveTransferProgress}
+import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
-import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
-import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
-class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
+class TransferReceivedMemberListControllerSpec
+    extends ControllerBaseSpec
+    with ControllerBehaviours
+    with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.TransferReceivedMemberListController.onPageLoad(srn, page, NormalMode)
   private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, page, NormalMode)
@@ -56,21 +59,21 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec with M
   private val page = 1
 
   val userAnswers: UserAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
     .unsafeSet(
-      ReceiveTransferProgress(srn, refineMV(1), refineMV(1)),
+      ReceiveTransferProgress(srn, 1, 1),
       SectionJourneyStatus.Completed
     )
 
   val testMemberList: List[MemberWithReceiveTransfer] = List(
     MemberWithReceiveTransfer(
-      memberIndex = refineMV(1),
+      memberIndex = 1,
       transferFullName = memberDetails.fullName,
       receive = List(
         ReceiveTransfer(
-          receiveIndex = refineMV(1),
+          receiveIndex = 1,
           status = SectionJourneyStatus.Completed
         )
       )
@@ -114,11 +117,11 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec with M
     "viewModel should show '2 Transfers in' when there are 2 transfers" in {
       val memberList: List[MemberWithReceiveTransfer] = List.fill(2)(
         MemberWithReceiveTransfer(
-          memberIndex = refineMV(1),
+          memberIndex = 1,
           transferFullName = "Test Member",
           receive = List(
             ReceiveTransfer(
-              receiveIndex = refineMV(1),
+              receiveIndex = 1,
               status = SectionJourneyStatus.Completed
             )
           )
@@ -216,7 +219,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec with M
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -240,8 +243,8 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec with M
     )
 
     val noUserAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
       .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)

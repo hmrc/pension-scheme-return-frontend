@@ -18,26 +18,25 @@ package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.shares._
+import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal._
 import models._
 import viewmodels.models.SectionJourneyStatus
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
-import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
-import org.mockito.ArgumentCaptor
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
-class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
+class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
   private implicit val mockSaveService: SaveService = mock[SaveService]
@@ -75,8 +74,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     submissionNumberOne
   )
 
-  private val shareIndex = refineMV[OneTo5000](1)
-  private val disposalIndex = refineMV[OneTo50](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   // Shares parameters
   private val nameOfCompany = Some(companyName)
@@ -99,7 +98,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
   private val sharesStillHeld = totalShares - 1
 
   private val soldUserAnswers = defaultUserAnswers
-  // Shares pages
+    // Shares pages
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.SponsoringEmployer)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Acquisition)
@@ -122,7 +121,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val redeemedUserAnswers = defaultUserAnswers
-  // Shares pages
+    // Shares pages
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.Unquoted)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Contribution)
@@ -136,7 +135,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val transferredUserAnswers = defaultUserAnswers
-  // Shares pages
+    // Shares pages
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.ConnectedParty)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Transfer)
@@ -146,7 +145,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val otherUserAnswers = defaultUserAnswers
-  // Shares pages
+    // Shares pages
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.SponsoringEmployer)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Acquisition)
@@ -193,11 +192,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-        }.after({
-            verify(mockSaveService, times(1)).save(any())(any(), any())
-            reset(mockPsrSubmissionService)
-          })
-          .withName(s"render correct $mode view for Sold journey")
+        }.after {
+          verify(mockSaveService, times(1)).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        }.withName(s"render correct $mode view for Sold journey")
       )
 
       // Redeemed
@@ -234,11 +232,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-        }.after({
-            verify(mockSaveService, times(1)).save(any())(any(), any())
-            reset(mockPsrSubmissionService)
-          })
-          .withName(s"render correct $mode view for Redeemed journey")
+        }.after {
+          verify(mockSaveService, times(1)).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        }.withName(s"render correct $mode view for Redeemed journey")
       )
 
       // Transferred
@@ -275,11 +272,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-        }.after({
-            verify(mockSaveService, times(1)).save(any())(any(), any())
-            reset(mockPsrSubmissionService)
-          })
-          .withName(s"render correct $mode view for Transferred journey")
+        }.after {
+          verify(mockSaveService, times(1)).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        }.withName(s"render correct $mode view for Transferred journey")
       )
 
       // Other
@@ -321,10 +317,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -391,13 +387,12 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
             isMaximumReached = false
           )
         )
-      }.after({
-          verify(mockSaveService).save(captor.capture())(any(), any())
-          val userAnswers = captor.getValue
-          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
-          reset(mockPsrSubmissionService)
-        })
-        .withName(s"onPageLoad should clear out point of entry when completed")
+      }.after {
+        verify(mockSaveService).save(captor.capture())(any(), any())
+        val userAnswers = captor.getValue
+        userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
+        reset(mockPsrSubmissionService)
+      }.withName(s"onPageLoad should clear out point of entry when completed")
     )
 
     act.like(
@@ -409,10 +404,9 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
           .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry),
         previousUserAnswers = emptyUserAnswers
       ).after {
-          verify(mockSaveService, never).save(any())(any(), any())
-          reset(mockPsrSubmissionService)
-        }
-        .withName(s"onPageLoad should not clear out point of entry when in progress")
+        verify(mockSaveService, never).save(any())(any(), any())
+        reset(mockPsrSubmissionService)
+      }.withName(s"onPageLoad should not clear out point of entry when in progress")
     )
   }
 
@@ -483,11 +477,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-      }.after({
-          verify(mockSaveService, never()).save(any())(any(), any())
-          reset(mockPsrSubmissionService)
-        })
-        .withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.after {
+        verify(mockSaveService, never()).save(any())(any(), any())
+        reset(mockPsrSubmissionService)
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
     act.like(
       redirectToPage(
@@ -495,9 +488,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only ReportedSharesDisposalListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only ReportedSharesDisposalListController page")
     )
   }
 

@@ -59,10 +59,9 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       .map(HowWasPropertyDisposedOfPages(srn, index))
       .keys
       .toList
-      .flatMap(
-        key =>
-          refineV[OneTo50](key.toInt + 1)
-            .fold(_ => Nil, ind => List(HowWasPropertyDisposedOfPage(srn, index, ind)))
+      .flatMap(key =>
+        refineV[OneTo50](key.toInt + 1)
+          .fold(_ => Nil, ind => List(HowWasPropertyDisposedOfPage(srn, index, ind)))
       )
 
   private def pages(srn: Srn, isLastRecord: Boolean, dependentPages: List[Removable[_]]): List[Removable[_]] = {

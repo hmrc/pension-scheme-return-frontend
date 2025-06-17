@@ -20,6 +20,7 @@ import services.SaveService
 import controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsBuyerConnectedPartyController @Inject()(
+class IsBuyerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -51,7 +52,7 @@ class IsBuyerConnectedPartyController @Inject()(
 
   private val form = IsBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).fold(form)(form.fill)
@@ -60,17 +61,16 @@ class IsBuyerConnectedPartyController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             request.userAnswers.get(BuyerNamePage(srn, index, disposalIndex)).getOrRecoverJourney { buyerName =>
               Future
                 .successful(BadRequest(view(formWithErrors, viewModel(srn, index, disposalIndex, buyerName, mode))))
-            }
-          },
+            },
           value =>
             for {
               updatedAnswers <- Future

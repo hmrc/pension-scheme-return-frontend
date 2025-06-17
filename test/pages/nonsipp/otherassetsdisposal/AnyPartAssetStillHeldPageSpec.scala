@@ -16,16 +16,15 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.RefinedTypes.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.behaviours.PageBehaviours
 
 class AnyPartAssetStillHeldPageSpec extends PageBehaviours {
 
   "AnyPartAssetStillHeldPage" - {
 
-    val assetIndex = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
+    val assetIndex = 1
+    val disposalIndex = 1
 
     beRetrievable[Boolean](AnyPartAssetStillHeldPage(srnGen.sample.value, assetIndex, disposalIndex))
 

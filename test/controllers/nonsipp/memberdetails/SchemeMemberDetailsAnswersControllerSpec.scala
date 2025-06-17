@@ -18,26 +18,25 @@ package controllers.nonsipp.memberdetails
 
 import services.PsrSubmissionService
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.given
 import cats.implicits.catsSyntaxOptionId
-import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
-import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{MemberState, SectionCompleted}
 
 import scala.concurrent.Future
 
-class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
+class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[Max300.Refined](1)
+  private val index = 1
   private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -86,7 +85,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
   private val userAnswersWithoutNino = defaultUserAnswers
     .unsafeSet(FbVersionPage(srn), "001")
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), false)
     .unsafeSet(NoNINOPage(srn, index), noNinoReason)
 
@@ -94,40 +93,38 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(mode), userAnswersWithNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(
-                  index,
-                  srn,
-                  mode,
-                  memberDetails,
-                  hasNINO = true,
-                  Some(nino),
-                  None,
-                  viewOnlyUpdated = true
-                )
+        renderView(onPageLoad(mode), userAnswersWithNino)(implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                index,
+                srn,
+                mode,
+                memberDetails,
+                hasNINO = true,
+                Some(nino),
+                None,
+                viewOnlyUpdated = true
               )
+            )
         ).withName(s"render correct $mode view when nino provided")
       )
 
       act.like(
-        renderView(onPageLoad(mode), userAnswersWithoutNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(
-                  index,
-                  srn,
-                  mode,
-                  memberDetails,
-                  hasNINO = false,
-                  None,
-                  Some(noNinoReason),
-                  viewOnlyUpdated = true
-                )
+        renderView(onPageLoad(mode), userAnswersWithoutNino)(implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                index,
+                srn,
+                mode,
+                memberDetails,
+                hasNINO = false,
+                None,
+                Some(noNinoReason),
+                viewOnlyUpdated = true
               )
+            )
         ).withName(s"render the correct $mode view when no nino provided")
       )
 
@@ -183,15 +180,15 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           saveAndContinue(
             onSubmit(NormalMode),
             userAnswersWithNino,
-            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, refineMV(1))).exists(_._new))
+            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, 1)).exists(_._new))
           ).withName(s"Set Member status to New when Status is Check and its a new member (no previous member state)")
         )
 
         act.like(
           saveAndContinue(
             onSubmit(NormalMode),
-            userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
-            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, refineMV(1))).exists(_.changed))
+            userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.Changed),
+            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, 1)).exists(_.changed))
           ).withName(s"DO NOT Set Member status to New when Status is Check and member already has a state of Changed")
         )
       }
@@ -201,12 +198,12 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         act.like(
           saveAndContinue(
             call = onSubmit(CheckMode),
-            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New),
-            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New).some,
             expectations = (ua: UserAnswers) =>
               List(
-                ua.get(MemberStatus(srn, refineMV(1))).exists(_._new),
-                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+                ua.get(MemberStatus(srn, 1)).exists(_._new),
+                ua.get(SafeToHardDelete(srn, 1)).isEmpty
               )
           ).withName(s"DO NOT Set Member status to Changed when member details have not changed")
         )
@@ -214,12 +211,12 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         act.like(
           saveAndContinue(
             call = onSubmit(CheckMode),
-            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New),
-            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New).some,
             expectations = (ua: UserAnswers) =>
               List(
-                ua.get(MemberStatus(srn, refineMV(1))).exists(_._new),
-                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+                ua.get(MemberStatus(srn, 1)).exists(_._new),
+                ua.get(SafeToHardDelete(srn, 1)).isEmpty
               )
           ).withName(s"DO NOT Set Member status to Changed when member PSR version is not present for member")
         )
@@ -227,12 +224,12 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         act.like(
           saveAndContinue(
             call = onSubmit(NormalMode),
-            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
-            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.Changed),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New).some,
             expectations = (ua: UserAnswers) =>
               List(
-                ua.get(MemberStatus(srn, refineMV(1))).exists(_.changed),
-                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+                ua.get(MemberStatus(srn, 1)).exists(_.changed),
+                ua.get(SafeToHardDelete(srn, 1)).isEmpty
               )
           ).withName(s"Set Member status to Changed when a member detail has changed")
         )
@@ -240,12 +237,12 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         act.like(
           saveAndContinue(
             call = onSubmit(CheckMode),
-            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
-            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.Changed),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New).some,
             expectations = (ua: UserAnswers) =>
               List(
-                ua.get(MemberStatus(srn, refineMV(1))).exists(_._new),
-                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+                ua.get(MemberStatus(srn, 1)).exists(_._new),
+                ua.get(SafeToHardDelete(srn, 1)).isEmpty
               )
           ).withName(s"Set Member status to New when a member detail has changed")
         )
@@ -253,9 +250,9 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         act.like(
           saveAndContinue(
             onSubmit(CheckMode),
-            userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New),
-            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
-            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, refineMV(1))).exists(_._new))
+            userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, 1), MemberState.New).some,
+            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, 1)).exists(_._new))
           ).withName(
             s"Keep Member status as New when member state is New and member details have not changed"
           )
@@ -373,9 +370,8 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
             .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
         ).after(
-            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          )
-          .withName("Submit redirects to view only tasklist")
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        ).withName("Submit redirects to view only tasklist")
       )
   }
 }

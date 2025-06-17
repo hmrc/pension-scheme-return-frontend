@@ -23,8 +23,10 @@ import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import cats.implicits.toShow
 import _root_.config.Constants
+import controllers.actions._
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
@@ -34,8 +36,6 @@ import _root_.config.RefinedTypes.{Max300, Max50}
 import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -49,7 +49,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class EmployerContributionsMemberListController @Inject()(
+class EmployerContributionsMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,8 +76,8 @@ class EmployerContributionsMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean = true)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean = true)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -140,20 +140,18 @@ class EmployerContributionsMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(
-    implicit request: DataRequest[_]
-  ): List[MemberWithEmployerContributions] = indexes.map {
-    case (index, nameDOB) =>
-      MemberWithEmployerContributions(
-        memberIndex = index,
-        employerFullName = nameDOB.fullName,
-        contributions = request.userAnswers
-          .employerContributionsProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              EmployerContributions(secondaryIndex, status)
-          }
-      )
+  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
+    request: DataRequest[_]
+  ): List[MemberWithEmployerContributions] = indexes.map { case (index, nameDOB) =>
+    MemberWithEmployerContributions(
+      memberIndex = index,
+      employerFullName = nameDOB.fullName,
+      contributions = request.userAnswers
+        .employerContributionsProgress(srn, index)
+        .map { case (secondaryIndex, status) =>
+          EmployerContributions(secondaryIndex, status)
+        }
+    )
   }
 }
 
@@ -185,7 +183,7 @@ object EmployerContributionsMemberListController {
                 case Some(EmployerContributions(_, InProgress(url))) => url
                 case _ =>
                   controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, refineMV(1), mode)
+                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, 1, mode)
                     .url
               },
               Message(

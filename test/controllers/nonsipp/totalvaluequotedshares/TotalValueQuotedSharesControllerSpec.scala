@@ -17,7 +17,7 @@
 package controllers.nonsipp.totalvaluequotedshares
 
 import services.SchemeDateService
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.MoneyView
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.viewModel
@@ -28,7 +28,7 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import org.mockito.Mockito.{reset, when}
 
-class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
+class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]

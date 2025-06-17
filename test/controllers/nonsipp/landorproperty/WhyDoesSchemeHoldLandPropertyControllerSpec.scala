@@ -17,18 +17,17 @@
 package controllers.nonsipp.landorproperty
 
 import play.api.mvc.Call
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.RadioListView
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
-import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldLandProperty}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
+import utils.IntUtils.given
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 
-class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
+class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = 1
 
   lazy val onPageLoad: Call = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit: Call = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)

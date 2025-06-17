@@ -20,7 +20,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import controllers.actions._
@@ -32,6 +31,8 @@ import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, g
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator
@@ -49,7 +50,7 @@ import scala.concurrent.Future
 
 import javax.inject.Named
 
-class LandOrPropertyListController @Inject()(
+class LandOrPropertyListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -58,7 +59,7 @@ class LandOrPropertyListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  private implicit val logger: Logger = Logger(getClass)
+  given logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = LandOrPropertyListController.form(formProvider)
 
@@ -101,8 +102,8 @@ class LandOrPropertyListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     val (status, incompleteLandOrPropertyUrl) =
       getLandOrPropertyTaskListStatusAndLink(request.userAnswers, srn, isPrePopulation)
@@ -112,83 +113,79 @@ class LandOrPropertyListController @Inject()(
     } else if (status == TaskListStatus.InProgress) {
       Redirect(incompleteLandOrPropertyUrl)
     } else {
-      addresses(srn).getOrRecoverJourney.map {
-        case (addressesToCheck, addresses) =>
-          Ok(
-            view(
-              form,
-              viewModel(
-                srn,
-                page,
-                mode,
-                addresses = addresses,
-                addressesToCheck = addressesToCheck,
-                request.schemeDetails.schemeName,
-                viewOnlyViewModel,
-                showBackLink = showBackLink,
-                isPrePopulation
-              )
+      addresses(srn).getOrRecoverJourney.map { case (addressesToCheck, addresses) =>
+        Ok(
+          view(
+            form,
+            viewModel(
+              srn,
+              page,
+              mode,
+              addresses = addresses,
+              addressesToCheck = addressesToCheck,
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel,
+              showBackLink = showBackLink,
+              isPrePopulation
             )
           )
+        )
       }.merge
     }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    {
 
-      val inProgressAnswers = request.userAnswers.map(LandOrPropertyProgress.all(srn))
-      val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
-      addresses(srn).getOrRecoverJourney.map {
-        case (addressesToCheck, addresses) =>
-          if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
-            Redirect(
-              navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
-            )
-          } else {
-            form
-              .bindFromRequest()
-              .fold(
-                errors =>
-                  BadRequest(
-                    view(
-                      errors,
-                      viewModel(
-                        srn,
-                        page,
+    val inProgressAnswers = request.userAnswers.map(LandOrPropertyProgress.all(srn))
+    val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+    addresses(srn).getOrRecoverJourney.map { case (addressesToCheck, addresses) =>
+      if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
+        Redirect(
+          navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
+        )
+      } else {
+        form
+          .bindFromRequest()
+          .fold(
+            errors =>
+              BadRequest(
+                view(
+                  errors,
+                  viewModel(
+                    srn,
+                    page,
+                    mode,
+                    addresses = addresses,
+                    addressesToCheck = addressesToCheck,
+                    request.schemeDetails.schemeName,
+                    None,
+                    showBackLink = true,
+                    isPrePopulation
+                  )
+                )
+              ),
+            answer =>
+              if (answer) {
+                inProgressUrl match {
+                  case Some(url) => Redirect(url)
+                  case _ =>
+                    Redirect(
+                      navigator.nextPage(
+                        LandOrPropertyListPage(srn, addLandOrProperty = answer),
                         mode,
-                        addresses = addresses,
-                        addressesToCheck = addressesToCheck,
-                        request.schemeDetails.schemeName,
-                        None,
-                        showBackLink = true,
-                        isPrePopulation
+                        request.userAnswers
                       )
                     )
-                  ),
-                answer =>
-                  if (answer) {
-                    inProgressUrl match {
-                      case Some(url) => Redirect(url)
-                      case _ =>
-                        Redirect(
-                          navigator.nextPage(
-                            LandOrPropertyListPage(srn, addLandOrProperty = answer),
-                            mode,
-                            request.userAnswers
-                          )
-                        )
-                    }
-                  } else {
-                    Redirect(
-                      navigator
-                        .nextPage(LandOrPropertyListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
-                    )
-                  }
-              )
-          }
-      }.merge
-    }
+                }
+              } else {
+                Redirect(
+                  navigator
+                    .nextPage(LandOrPropertyListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
+                )
+              }
+          )
+      }
+    }.merge
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -233,12 +230,11 @@ class LandOrPropertyListController @Inject()(
         .map(LandOrPropertyAddressLookupPages(srn))
         .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
         .refine[Max5000.Refined]
-        .map(_.map {
-          case (index, address) =>
-            (index, address.copy(canRemove = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index)).isEmpty))
+        .map(_.map { case (index, address) =>
+          (index, address.copy(canRemove = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index)).isEmpty))
         })
-        .map(_.partition {
-          case (index, _) => LandOrPropertyCheckStatusUtils.checkLandOrPropertyRecord(request.userAnswers, srn, index)
+        .map(_.partition { case (index, _) =>
+          LandOrPropertyCheckStatusUtils.checkLandOrPropertyRecord(request.userAnswers, srn, index)
         })
     } else {
       val noAddressesToCheck = Map.empty[Max5000, Address]
@@ -276,46 +272,45 @@ object LandOrPropertyListController {
       List()
     } else {
       addresses
-        .flatMap {
-          case (index, address) =>
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
-                List(
-                  index -> ListRow.view(
-                    address.addressLine1,
-                    routes.LandOrPropertyCYAController
-                      .onPageLoadViewOnly(srn, index, year, current, previous)
-                      .url,
-                    Message("landOrPropertyList.row.view.hiddenText", address.addressLine1)
-                  )
+        .flatMap { case (index, address) =>
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+              List(
+                index -> ListRow.view(
+                  address.addressLine1,
+                  routes.LandOrPropertyCYAController
+                    .onPageLoadViewOnly(srn, index, year, current, previous)
+                    .url,
+                  Message("landOrPropertyList.row.view.hiddenText", address.addressLine1)
                 )
-              case _ if check =>
-                List(
-                  index -> ListRow.check(
-                    address.addressLine1,
-                    routes.LandOrPropertyCheckAndUpdateController.onPageLoad(srn, index).url,
-                    Message("landOrPropertyList.row.check.hiddenText", address.addressLine1)
-                  )
+              )
+            case _ if check =>
+              List(
+                index -> ListRow.check(
+                  address.addressLine1,
+                  routes.LandOrPropertyCheckAndUpdateController.onPageLoad(srn, index).url,
+                  Message("landOrPropertyList.row.check.hiddenText", address.addressLine1)
                 )
-              case _ if address.canRemove =>
-                List(
-                  index -> ListRow(
-                    address.addressLine1,
-                    changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
-                    changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
-                    removeUrl = routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
-                    removeHiddenText = Message("landOrPropertyList.row.remove.hiddenText", address.addressLine1)
-                  )
+              )
+            case _ if address.canRemove =>
+              List(
+                index -> ListRow(
+                  address.addressLine1,
+                  changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
+                  removeUrl = routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
+                  removeHiddenText = Message("landOrPropertyList.row.remove.hiddenText", address.addressLine1)
                 )
-              case _ =>
-                List(
-                  index -> ListRow(
-                    address.addressLine1,
-                    changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
-                    changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1)
-                  )
+              )
+            case _ =>
+              List(
+                index -> ListRow(
+                  address.addressLine1,
+                  changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1)
                 )
-            }
+              )
+          }
         }
         .toList
         .sortBy { case (index, _) => index.value }
@@ -386,7 +381,7 @@ object LandOrPropertyListController {
       }
     )
 
-    val sections = {
+    val sections =
       if (isPrePop) {
         Option
           .when(addressesToCheck.nonEmpty)(
@@ -409,7 +404,6 @@ object LandOrPropertyListController {
           ListSection(rows(srn, mode, addresses, viewOnlyViewModel, schemeName))
         )
       }
-    }
 
     FormPageViewModel(
       mode = mode,

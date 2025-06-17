@@ -18,21 +18,20 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SchemeDateService
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.DatePageView
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.WhenWereSharesRedeemedPage
 import play.api.inject
 import forms.DatePageFormProvider
 import models.NormalMode
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 
-class WhenWereSharesRedeemedControllerSpec extends ControllerBaseSpec {
+class WhenWereSharesRedeemedControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val shareIndex = refineMV[Max5000.Refined](1)
-  private val disposalIndex = refineMV[Max50.Refined](1)
+  private val shareIndex = 1
+  private val disposalIndex = 1
 
   private lazy val onPageLoad =
     routes.WhenWereSharesRedeemedController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)

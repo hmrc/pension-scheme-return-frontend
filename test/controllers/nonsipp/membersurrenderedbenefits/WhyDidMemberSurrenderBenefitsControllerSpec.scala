@@ -17,18 +17,17 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.TextAreaView
+import utils.IntUtils.given
+import controllers.nonsipp.membersurrenderedbenefits.WhyDidMemberSurrenderBenefitsController._
 import forms.TextFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
 import models.{NormalMode, UserAnswers}
-import config.RefinedTypes.OneTo300
-import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import controllers.nonsipp.membersurrenderedbenefits.WhyDidMemberSurrenderBenefitsController._
 
-class WhyDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
+class WhyDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val index = refineMV[OneTo300](1)
+  private val index = 1
 
   private lazy val onPageLoad = routes.WhyDidMemberSurrenderBenefitsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhyDidMemberSurrenderBenefitsController.onSubmit(srn, index, NormalMode)

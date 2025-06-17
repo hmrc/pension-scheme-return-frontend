@@ -18,10 +18,14 @@ package forms.mappings.errors
 
 /**
  * Form errors for Money
- * @param requiredKey requiredKey
- * @param nonNumericKey nonNumericKey
- * @param max max
- * @param min If not specified, nonNumericKey error is shown when value less than min
+ * @param requiredKey
+ *   requiredKey
+ * @param nonNumericKey
+ *   nonNumericKey
+ * @param max
+ *   max
+ * @param min
+ *   If not specified, nonNumericKey error is shown when value less than min
  */
 case class MoneyFormErrors(
   requiredKey: String,

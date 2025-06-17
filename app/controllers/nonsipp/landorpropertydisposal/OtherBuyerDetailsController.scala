@@ -20,7 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import controllers.actions.IdentifyAndRequireData
@@ -33,6 +32,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 
@@ -40,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OtherBuyerDetailsController @Inject()(
+class OtherBuyerDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -54,8 +55,8 @@ class OtherBuyerDetailsController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
+    landOrPropertyIndex: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -70,7 +71,7 @@ class OtherBuyerDetailsController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val address: String =
         request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).get.addressLine1
@@ -82,7 +83,7 @@ class OtherBuyerDetailsController @Inject()(
             Future.successful(
               BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address)))
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future
                 .fromTry(
@@ -93,7 +94,6 @@ class OtherBuyerDetailsController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

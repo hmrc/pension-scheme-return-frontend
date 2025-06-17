@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
 
-class FileUploadErrorController @Inject()(
+class FileUploadErrorController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   uploadService: UploadService,
@@ -63,8 +63,8 @@ class FileUploadErrorController @Inject()(
     }
   }
 
-  private def navToNextPage(srn: Srn, mode: Mode, error: UploadError)(
-    implicit request: DataRequest[_]
+  private def navToNextPage(srn: Srn, mode: Mode, error: UploadError)(implicit
+    request: DataRequest[_]
   ): Result =
     Redirect(navigator.nextPage(FileUploadErrorPage(srn, error), mode, request.userAnswers))
 }

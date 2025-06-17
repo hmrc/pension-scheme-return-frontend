@@ -17,8 +17,7 @@
 package pages.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.EmployerContributionsCompleted.EmployerContributionsUserAnswersOps
-import config.RefinedTypes._
-import eu.timepit.refined.refineMV
+import utils.IntUtils.given
 import models.{SchemeId, UserAnswers}
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
@@ -29,8 +28,8 @@ class EmployerContributionsCompletedSpec extends PageBehaviours {
 
   "EmployerContributionsCYAPage" - {
 
-    val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val index = 1
+    val secondaryIndex = 1
 
     beRetrievable[SectionCompleted.type](EmployerContributionsCompleted(srnSample, index, secondaryIndex))
 
@@ -41,8 +40,8 @@ class EmployerContributionsCompletedSpec extends PageBehaviours {
 
   "EmployerContributionsUserAnswersOps" - {
 
-    val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val index = 1
+    val secondaryIndex = 1
 
     val userAnswers = UserAnswers(id = "test-id")
       .set(EmployerContributionsCompleted(srnSample, index, secondaryIndex), SectionCompleted)

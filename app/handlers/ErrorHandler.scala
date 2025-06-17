@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class ErrorHandler @Inject()(
+class ErrorHandler @Inject() (
   val messagesApi: MessagesApi,
   view: ErrorTemplate
 )(implicit override protected val ec: ExecutionContext)
@@ -39,8 +39,8 @@ class ErrorHandler @Inject()(
 
   private val logger = Logger(getClass)
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
-    implicit rh: RequestHeader
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+    rh: RequestHeader
   ): Future[Html] =
     Future.successful(view(pageTitle, heading, message))
 
@@ -49,10 +49,14 @@ class ErrorHandler @Inject()(
       """
         |
         |! %sInternal PSR server error, for (%s) [%s] ->
-        | """.stripMargin.format(ex match {
-        case p: PlayException => "@" + p.id + " - "
-        case _ => ""
-      }, request.method, request.uri),
+        | """.stripMargin.format(
+        ex match {
+          case p: PlayException => "@" + p.id + " - "
+          case _ => ""
+        },
+        request.method,
+        request.uri
+      ),
       ex
     )
 

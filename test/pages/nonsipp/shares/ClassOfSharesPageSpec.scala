@@ -16,22 +16,21 @@
 
 package pages.nonsipp.shares
 
-import eu.timepit.refined.refineMV
+import controllers.TestValues
+import utils.IntUtils.given
 import pages.nonsipp.sharesdisposal.HowWereSharesDisposedPage
 import utils.UserAnswersUtils.UserAnswersOps
 import models.HowSharesDisposed
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.TestValues
 
 class ClassOfSharesPageSpec extends PageBehaviours with TestValues {
 
   "ClassOfSharesPage" - {
     val srn = srnGen.sample.value
-    val indexOne = refineMV[OneTo5000](1)
-    val indexTwo = refineMV[OneTo5000](2)
-    val disposalIndexOne = refineMV[OneTo50](1)
-    val disposalIndexTwo = refineMV[OneTo50](2)
+    val indexOne = 1
+    val indexTwo = 2
+    val disposalIndexOne = 1
+    val disposalIndexTwo = 2
 
     beRetrievable[String](ClassOfSharesPage(srn, indexOne))
 

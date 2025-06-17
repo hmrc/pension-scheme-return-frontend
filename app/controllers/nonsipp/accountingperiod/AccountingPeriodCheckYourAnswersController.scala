@@ -19,6 +19,7 @@ package controllers.nonsipp.accountingperiod
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
 import config.RefinedTypes.Max3
+import utils.IntUtils.{toInt, toRefined3}
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
@@ -34,7 +35,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Named
 
-class AccountingPeriodCheckYourAnswersController @Inject()(
+class AccountingPeriodCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
@@ -46,7 +47,7 @@ class AccountingPeriodCheckYourAnswersController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       request.userAnswers.get(AccountingPeriodPage(srn, index, mode)) match {
         case None =>
