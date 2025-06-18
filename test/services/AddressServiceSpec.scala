@@ -156,6 +156,29 @@ class AddressServiceSpec extends BaseSpec with TestValues {
       addresses(7) mustEqual ("11a", Some("Street"), Some("Street"), Some(11), None, None)
       addresses(8) mustEqual ("12 Street", Some("Some district"), Some("Street"), Some(12), None, None)
     }
+    "should omit address without any lines" in {
+      when(mockConnector.lookup(any(), any())(any()))
+        .thenReturn(
+          Future.successful(
+            List(
+              alfAddressResponse.copy(address = alfAddressResponse.address.copy(lines = Seq("11 Street"))),
+              alfAddressResponse.copy(address = alfAddressResponse.address.copy(lines = Seq.empty)),
+              alfAddressResponse.copy(address = alfAddressResponse.address.copy(lines = Seq("11-12 Street"))),
+              alfAddressResponse.copy(address = alfAddressResponse.address.copy(lines = Seq("Street")))
+            )
+          )
+        )
+
+      val addresses = service
+        .postcodeLookup("any", None)
+        .futureValue
+        .map(s => (s.addressLine1, s.addressLine2, s.street, s.houseNumber, s.flatNumber, s.flat))
+
+      addresses.length mustBe 3
+      addresses(0) mustEqual ("11 Street", None, Some("Street"), Some(11), None, None)
+      addresses(1) mustEqual ("11-12 Street", None, Some("Street"), Some(11), None, None)
+      addresses(2) mustEqual ("Street", None, Some("Street"), None, None, None)
+    }
 
   }
 }
