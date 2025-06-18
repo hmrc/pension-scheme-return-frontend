@@ -12,8 +12,6 @@ ThisBuild / scalaVersion := "3.7.1"
 
 lazy val appName: String = "pension-scheme-return-frontend"
 
-//addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.13.3").cross(CrossVersion.full))
-
 lazy val root = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
@@ -52,8 +50,7 @@ lazy val root = Project(appName, file("."))
       "-feature",
       "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
       "-Xmax-inlines", "100",
-      "-language:implicitConversions",
-      "-Wunused:all"
+      "-language:implicitConversions"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
