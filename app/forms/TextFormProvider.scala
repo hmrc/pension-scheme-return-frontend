@@ -48,7 +48,7 @@ class TextFormProvider @Inject() {
       List((textAreaRegex, invalidCharactersKey)),
       maxTextAreaLength,
       tooLongKey,
-      args: _*
+      args*
     )
   )
 
@@ -63,7 +63,7 @@ class TextFormProvider @Inject() {
       List((textAreaRegex, invalidCharactersKey)),
       maxInputLength,
       tooLongKey,
-      args: _*
+      args*
     )
   )
 
@@ -75,7 +75,7 @@ class TextFormProvider @Inject() {
     args: Any*
   ): Form[Nino] =
     Form(
-      formKey -> Mappings.ninoNoDuplicates(requiredKey, invalidKey, duplicates, duplicateKey, args: _*)
+      formKey -> Mappings.ninoNoDuplicates(requiredKey, invalidKey, duplicates, duplicateKey, args*)
     )
 
   def name(
@@ -89,7 +89,7 @@ class TextFormProvider @Inject() {
       List((nameRegex, invalidCharactersKey)),
       maxTextAreaLength,
       tooLongKey,
-      args: _*
+      args*
     )
   )
 
@@ -104,7 +104,7 @@ class TextFormProvider @Inject() {
       List((textAreaRegex, invalidCharactersKey)),
       maxTextAreaLength,
       tooLongKey,
-      args: _*
+      args*
     )
   )
 
@@ -123,7 +123,7 @@ class TextFormProvider @Inject() {
       tooLongKey,
       authorisingPSAID: Option[String],
       invalidNoMatchKey: String,
-      args: _*
+      args*
     )
   )
 }

@@ -59,7 +59,7 @@ class CheckingMemberDetailsFileController @Inject() (
     }
   }
 
-  private def redirectNextPage(srn: Srn, uploadSuccessful: Boolean, mode: Mode)(implicit req: DataRequest[_]): Result =
+  private def redirectNextPage(srn: Srn, uploadSuccessful: Boolean, mode: Mode)(implicit req: DataRequest[?]): Result =
     Redirect(navigator.nextPage(CheckingMemberDetailsFilePage(srn, uploadSuccessful), mode, req.userAnswers))
 }
 

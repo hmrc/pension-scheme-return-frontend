@@ -56,7 +56,7 @@ class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec w
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )
@@ -65,7 +65,8 @@ class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec w
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )

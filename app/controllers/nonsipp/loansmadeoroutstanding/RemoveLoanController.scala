@@ -64,7 +64,7 @@ class RemoveLoanController @Inject() (
   }
 
   private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ) =
     (
       for {
@@ -125,7 +125,7 @@ class RemoveLoanController @Inject() (
                     updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, 1, mode)
-                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  )(using implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) => Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))

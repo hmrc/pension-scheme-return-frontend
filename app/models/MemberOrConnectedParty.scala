@@ -31,7 +31,7 @@ object MemberOrConnectedParty extends Enumerable.Implicits {
 
   val values: List[MemberOrConnectedParty] = List(Member, ConnectedParty, Neither)
 
-  implicit val enumerable: Enumerable[MemberOrConnectedParty] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[MemberOrConnectedParty] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[MemberOrConnectedParty] = (value: MemberOrConnectedParty) => value.name
 }

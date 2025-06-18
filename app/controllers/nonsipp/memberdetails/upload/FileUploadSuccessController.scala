@@ -127,7 +127,7 @@ class FileUploadSuccessController @Inject() (
       }
     }.flatten
 
-    UserAnswers.compose(insertions: _*)(userAnswers)
+    UserAnswers.compose(insertions*)(userAnswers)
   }
 }
 

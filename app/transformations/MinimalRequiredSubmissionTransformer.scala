@@ -47,7 +47,7 @@ class MinimalRequiredSubmissionTransformer @Inject() (schemeDateService: SchemeD
   }
 
   def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Option[MinimalRequiredSubmission] = {
 
     val currentUA = request.userAnswers

@@ -128,7 +128,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
           .after {
-            verify(mockSaveService, times(1)).save(any())(any(), any())
+            verify(mockSaveService, times(1)).save(any())(using any(), any())
             reset(mockPsrSubmissionService)
           }
           .withName(s"render correct ${mode.toString} view")
@@ -137,12 +137,13 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
       act.like(
         redirectNextPage(onSubmit(mode))
           .before {
-            when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+            when(mockSaveService.save(any())(using any(), any())).thenReturn(Future.successful(()))
             MockPsrSubmissionService.submitPsrDetailsWithUA()
           }
           .after {
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-            verify(mockSaveService, times(2)).save(any())(any(), any())
+            verify(mockPsrSubmissionService, times(1))
+              .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
+            verify(mockSaveService, times(2)).save(any())(using any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
           }
@@ -156,7 +157,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
           userAnswers = incompleteUserAnswers,
           previousUserAnswers = emptyUserAnswers
         ).after {
-          verify(mockSaveService, never()).save(any())(any(), any())
+          verify(mockSaveService, never()).save(any())(using any(), any())
           reset(mockPsrSubmissionService)
           reset(mockSaveService)
         }.withName(s"redirect to list page when in $mode mode and incomplete data")
@@ -227,7 +228,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
             )
           )
       }.after {
-        verify(mockSaveService, never()).save(any())(any(), any())
+        verify(mockSaveService, never()).save(any())(using any(), any())
         reset(mockPsrSubmissionService)
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
@@ -237,7 +238,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to other assets list page")
     )
   }

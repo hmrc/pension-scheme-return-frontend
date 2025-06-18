@@ -149,7 +149,7 @@ class SurrenderedBenefitsMemberListController @Inject() (
   private def buildSurrenderedBenefits(
     srn: Srn,
     indexes: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])]
-  )(implicit request: DataRequest[_]): List[MemberSurrenderedBenefits] =
+  )(implicit request: DataRequest[?]): List[MemberSurrenderedBenefits] =
     indexes.map { case (index, nameDOB, surrenderedAccountOpt) =>
       val status = request.userAnswers.memberSurrenderedBenefitsProgress(srn, index)
       MemberSurrenderedBenefits(

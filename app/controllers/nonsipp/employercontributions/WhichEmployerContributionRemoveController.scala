@@ -104,7 +104,7 @@ class WhichEmployerContributionRemoveController @Inject() (
   }
 
   private def getJourneyValues(srn: Srn, memberIndex: Max300)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, List[(Max50, Money, String)]] =
     request.userAnswers
       .map(EmployerContributionsProgress.all(srn, memberIndex))

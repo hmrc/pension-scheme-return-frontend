@@ -77,7 +77,7 @@ trait Navigator {
   def defaultNormalMode: Call
   def defaultCheckMode: Call
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit req: DataRequest[_]): Call = mode match {
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit req: DataRequest[?]): Call = mode match {
 
     case NormalMode =>
       journeys

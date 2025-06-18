@@ -219,7 +219,7 @@ class OtherAssetsListController @Inject() (
   }
 
   private def otherAssetsToTraverse(srn: Srn, completedIndexes: List[String])(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     logger: Logger
   ): Either[Result, (List[OtherAssetsData], List[OtherAssetsData])] = {
     // if return has been pre-populated, partition shares by those that need to be checked

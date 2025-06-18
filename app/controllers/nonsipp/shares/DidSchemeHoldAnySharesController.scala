@@ -87,7 +87,7 @@ class DidSchemeHoldAnySharesController @Inject() (
                       updatedAnswers,
                       fallbackCall =
                         controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController.onPageLoad(srn, mode)
-                    )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                    )(using implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                     .map {
                       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                       case Some(_) =>

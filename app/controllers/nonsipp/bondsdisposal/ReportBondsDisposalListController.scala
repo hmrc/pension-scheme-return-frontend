@@ -266,7 +266,7 @@ class ReportBondsDisposalListController @Inject() (
 
   private def getCompletedDisposals(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
+  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] =
     Right(
       request.userAnswers
         .map(BondsCompleted.all(srn))
@@ -285,7 +285,7 @@ class ReportBondsDisposalListController @Inject() (
     )
 
   private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
     disposals
       .map { case indexes @ (index, _) =>

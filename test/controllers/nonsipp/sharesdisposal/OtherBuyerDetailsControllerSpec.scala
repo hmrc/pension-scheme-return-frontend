@@ -86,8 +86,8 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec with Controller
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, updatedUserAnswers, validForm: _*))
-    act.like(invalidForm(onSubmit, updatedUserAnswers, invalidForm: _*))
+    act.like(saveAndContinue(onSubmit, updatedUserAnswers, validForm*))
+    act.like(invalidForm(onSubmit, updatedUserAnswers, invalidForm*))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

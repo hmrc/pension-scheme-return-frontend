@@ -60,7 +60,7 @@ class WhenDidSchemeAcquireBondsController @Inject() (
 
   private val form =
     (date: LocalDate, request: DataRequest[AnyContent]) =>
-      WhenDidSchemeAcquireBondsController.form(formProvider)(date, request.messages(messagesApi))
+      WhenDidSchemeAcquireBondsController.form(formProvider)(date, request.messages(using messagesApi))
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>

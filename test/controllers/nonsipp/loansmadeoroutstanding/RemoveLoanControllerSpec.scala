@@ -73,7 +73,8 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec with ControllerBehavio
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
           defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
         }
@@ -83,7 +84,7 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec with ControllerBehavio
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
           filledUserAnswers.get(LoansProgress(srn, index)) mustBe Some(SectionJourneyStatus.Completed)
         }
@@ -97,7 +98,8 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec with ControllerBehavio
       saveAndContinue(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
           defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
         }

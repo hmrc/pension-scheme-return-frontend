@@ -58,7 +58,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
     "viewModel" - {
 
-      val viewModel = AccountingPeriodCheckYourAnswersController.viewModel _
+      val viewModel = AccountingPeriodCheckYourAnswersController.viewModel
 
       "have the correct message key for title" in {
 

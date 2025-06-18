@@ -222,7 +222,7 @@ class LandOrPropertyListController @Inject() (
 
   private def addresses(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] = {
+  )(implicit request: DataRequest[?]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] = {
     val completedIndexes = request.userAnswers.map(LandOrPropertyProgress.all(srn)).filter(_._2.completed).keys.toList
     // if return has been pre-populated, partition addresses by those that need to be checked
     if (isPrePopulation) {

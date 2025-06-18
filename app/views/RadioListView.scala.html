@@ -29,7 +29,7 @@
     govukInput: GovukInput
 )
 
-@(form: Form[_], viewmodel: FormPageViewModel[RadioListViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], viewmodel: FormPageViewModel[RadioListViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 

@@ -83,8 +83,8 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec with Controller
   override def beforeEach(): Unit = {
     reset(mockUploadService)
     reset(mockSaveService)
-    when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockSaveService.save(any())(using any(), any())).thenReturn(Future.successful(()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -152,7 +152,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec with Controller
       running(_ => applicationBuilder(userAnswers = Some(userAnswers))) { implicit app =>
         route(app, FakeRequest(onSubmit)).value.futureValue
 
-        verify(mockSaveService).save(captor.capture())(any(), any())
+        verify(mockSaveService).save(captor.capture())(using any(), any())
 
         val userAnswers = captor.getValue
 
@@ -197,7 +197,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec with Controller
       running(_ => applicationBuilder(userAnswers = Some(userAnswers))) { implicit app =>
         route(app, FakeRequest(onSubmit)).value.futureValue
 
-        verify(mockSaveService).save(captor.capture())(any(), any())
+        verify(mockSaveService).save(captor.capture())(using any(), any())
 
         val userAnswers = captor.getValue
 
@@ -226,7 +226,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         redirectNextPage(onSubmit, emptyUserAnswers)
           .before {
-            when(mockSaveService.save(captor.capture())(any(), any())).thenReturn(Future.successful(()))
+            when(mockSaveService.save(captor.capture())(using any(), any())).thenReturn(Future.successful(()))
             mockGetUploadResult(Some(upload))
           }
           .after {

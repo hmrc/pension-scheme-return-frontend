@@ -95,7 +95,7 @@ class RemoveMemberDetailsController @Inject() (
 
   private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Result
-  )(implicit request: DataRequest[_]): Result =
+  )(implicit request: DataRequest[?]): Result =
     (
       for {
         nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)

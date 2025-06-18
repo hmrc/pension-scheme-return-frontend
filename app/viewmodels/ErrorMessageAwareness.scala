@@ -39,7 +39,7 @@ trait ErrorMessageAwareness {
               err.args.map {
                 case s: String => messages(s)
                 case any => any
-              }: _*
+              }*
             )
           )
         )

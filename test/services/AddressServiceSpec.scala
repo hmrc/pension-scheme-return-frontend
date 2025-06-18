@@ -53,7 +53,7 @@ class AddressServiceSpec extends BaseSpec with TestValues {
   "AddressService" - {
     "should return sorted addresses when real address details are used" in {
       val json = readJsonFromFile("/addressLookupResponse_B203LE.json")
-      when(mockConnector.lookup(any(), any())(any()))
+      when(mockConnector.lookup(any(), any())(using any()))
         .thenReturn(
           Future.successful(
             json.as[List[ALFAddressResponse]]
@@ -99,7 +99,7 @@ class AddressServiceSpec extends BaseSpec with TestValues {
     }
 
     "should return expected address list with line1 only" in {
-      when(mockConnector.lookup(any(), any())(any()))
+      when(mockConnector.lookup(any(), any())(using any()))
         .thenReturn(
           Future.successful(
             List(
@@ -122,7 +122,7 @@ class AddressServiceSpec extends BaseSpec with TestValues {
       addresses(3) mustEqual ("Street", None, Some("Street"), None, None, None)
     }
     "should return address with line2" in {
-      when(mockConnector.lookup(any(), any())(any()))
+      when(mockConnector.lookup(any(), any())(using any()))
         .thenReturn(
           Future.successful(
             List(
@@ -157,7 +157,7 @@ class AddressServiceSpec extends BaseSpec with TestValues {
       addresses(8) mustEqual ("12 Street", Some("Some district"), Some("Street"), Some(12), None, None)
     }
     "should omit address without any lines" in {
-      when(mockConnector.lookup(any(), any())(any()))
+      when(mockConnector.lookup(any(), any())(using any()))
         .thenReturn(
           Future.successful(
             List(

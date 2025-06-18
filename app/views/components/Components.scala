@@ -112,7 +112,7 @@ object Components {
       case LinkMessage(content, url, attrs, Some(hiddenText)) =>
         anchorWithHiddenText(renderMessage(content), url, attrs, renderMessage(hiddenText))
       case DownloadLinkMessage(content, url) => anchorDownload(renderMessage(content), url)
-      case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine(_, _)))
+      case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(using combine(_, _)))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))
       case TableMessage(content, heading) =>

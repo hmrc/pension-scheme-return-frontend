@@ -83,7 +83,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
 
       val result =
-        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(
+        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(using
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe Some(
@@ -108,7 +108,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
       result mustBe Some(
         LandOrProperty(
           recordVersion = Some("001"),
@@ -125,7 +125,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
       result mustBe Some(
         LandOrProperty(
           recordVersion = None,
@@ -142,7 +142,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       val request = DataRequest(allowedAccessRequest, modifiedUserAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(using request)
 
       result mustBe Some(
         LandOrProperty(
@@ -183,7 +183,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       val modifiedUserAnswers = userAnswers.remove(IsLandPropertyLeasedPage(srn, index1of5000)).get
       val request = DataRequest(allowedAccessRequest, modifiedUserAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(using request)
 
       result mustBe Some(
         LandOrProperty(
@@ -233,7 +233,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(using request)
 
       result mustBe Some(LandOrProperty(None, Some(true), Some(false), List()))
     }
@@ -249,7 +249,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(using request)
 
       result.get.landOrPropertyTransactions.head.optDisposedPropertyTransaction mustBe None
     }
@@ -279,7 +279,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(using request)
 
       result.get.landOrPropertyTransactions.head.optDisposedPropertyTransaction.map(_.size) mustBe Some(1)
     }

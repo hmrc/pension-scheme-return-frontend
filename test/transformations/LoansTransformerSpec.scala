@@ -65,7 +65,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
         .unsafeSet(LoansRecordVersionPage(srn), "001")
 
-      val result = transformer.transformToEtmp(srn, initialUA)(DataRequest(allowedAccessRequest, userAnswers))
+      val result = transformer.transformToEtmp(srn, initialUA)(using DataRequest(allowedAccessRequest, userAnswers))
       result mustBe Some(Loans(recordVersion = None, optSchemeHadLoans = Some(false), loanTransactions = Seq.empty))
     }
 
@@ -82,7 +82,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(recordVersion = Some("001"), optSchemeHadLoans = Some(true), loanTransactions = Seq.empty)
         )
@@ -108,7 +108,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -161,7 +161,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -218,7 +218,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -273,7 +273,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -329,7 +329,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -385,7 +385,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -441,7 +441,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
@@ -492,7 +492,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),

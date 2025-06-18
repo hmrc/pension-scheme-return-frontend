@@ -47,9 +47,9 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
     reset(mockSaveService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
-    when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+    when(mockSaveService.save(any())(using any(), any())).thenReturn(Future.successful(()))
   }
 
   private def onPageLoad(mode: Mode) =
@@ -193,7 +193,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
             )
           )
         }.after {
-          verify(mockSaveService, times(1)).save(any())(any(), any())
+          verify(mockSaveService, times(1)).save(any())(using any(), any())
           reset(mockPsrSubmissionService)
         }.withName(s"render correct $mode view for Sold journey")
       )
@@ -233,7 +233,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
             )
           )
         }.after {
-          verify(mockSaveService, times(1)).save(any())(any(), any())
+          verify(mockSaveService, times(1)).save(any())(using any(), any())
           reset(mockPsrSubmissionService)
         }.withName(s"render correct $mode view for Redeemed journey")
       )
@@ -273,7 +273,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
             )
           )
         }.after {
-          verify(mockSaveService, times(1)).save(any())(any(), any())
+          verify(mockSaveService, times(1)).save(any())(using any(), any())
           reset(mockPsrSubmissionService)
         }.withName(s"render correct $mode view for Transferred journey")
       )
@@ -318,7 +318,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         redirectNextPage(onSubmit(mode))
           .after {
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1))
+              .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
             reset(mockPsrSubmissionService)
           }
           .withName(s"redirect to next page when in $mode mode")
@@ -388,7 +389,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
           )
         )
       }.after {
-        verify(mockSaveService).save(captor.capture())(any(), any())
+        verify(mockSaveService).save(captor.capture())(using any(), any())
         val userAnswers = captor.getValue
         userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
         reset(mockPsrSubmissionService)
@@ -404,7 +405,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
           .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry),
         previousUserAnswers = emptyUserAnswers
       ).after {
-        verify(mockSaveService, never).save(any())(any(), any())
+        verify(mockSaveService, never).save(any())(using any(), any())
         reset(mockPsrSubmissionService)
       }.withName(s"onPageLoad should not clear out point of entry when in progress")
     )
@@ -478,7 +479,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
             )
           )
       }.after {
-        verify(mockSaveService, never()).save(any())(any(), any())
+        verify(mockSaveService, never()).save(any())(using any(), any())
         reset(mockPsrSubmissionService)
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
@@ -488,7 +489,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
         controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only ReportedSharesDisposalListController page")
     )
   }

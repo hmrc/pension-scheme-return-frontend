@@ -38,6 +38,6 @@ case class PensionPaymentsReceivedPage(srn: Srn) extends QuestionPage[Boolean] {
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(TotalAmountPensionPaymentsPage.all(srn))
 }

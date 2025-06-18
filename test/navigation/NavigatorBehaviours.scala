@@ -63,7 +63,7 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
     ): BehaviourTest =
       s"go from page to nextPage".hasBehaviour {
         forAll(srnGen) { srn =>
-          navigator.nextPage(page(srn), mode, userAnswers(srn))(
+          navigator.nextPage(page(srn), mode, userAnswers(srn))(using
             DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, oldUserAnswers(srn))
           ) mustBe nextPage(srn, mode)
         }

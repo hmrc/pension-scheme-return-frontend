@@ -23,7 +23,7 @@ import models.requests.DataRequest
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit req: DataRequest[_]): Call =
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit req: DataRequest[?]): Call =
     desiredRoute
 
   override def journeys: List[JourneyNavigator] = ???

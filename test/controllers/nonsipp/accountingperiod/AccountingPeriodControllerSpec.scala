@@ -73,7 +73,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerB
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
+    act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData)*))
 
     act.like(invalidForm(onSubmit, userAnswers))
 
@@ -85,7 +85,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerB
           onSubmit,
           userAnswers,
           Some(Paths.accountingPeriodDetails \ "accountingPeriods"),
-          formData(form, dateRangeData): _*
+          formData(form, dateRangeData)*
         )
       )
     }
@@ -100,7 +100,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerB
           .set(AccountingPeriodPage(srn, 2, NormalMode), dateRangeData)
           .get
 
-      act.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData): _*))
+      act.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData)*))
     }
   }
 }

@@ -63,7 +63,7 @@ class IsBuyerConnectedPartyController @Inject() (
     }
 
   private def getBuyerName(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, String] =
     for {
       buyerType <- request.userAnswers

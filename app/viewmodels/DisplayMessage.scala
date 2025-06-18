@@ -32,7 +32,7 @@ object DisplayMessage {
   case class Message(key: String, args: List[Message]) extends InlineMessage {
 
     def toMessage(implicit messages: Messages): String =
-      messages(key, args.map(_.toMessage): _*)
+      messages(key, args.map(_.toMessage)*)
   }
 
   object Message {

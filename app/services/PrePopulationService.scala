@@ -52,12 +52,12 @@ class PrePopulationService @Inject() (
       .when(config.prePopulationEnabled)(
         versionsForYears
           .filter(x => LocalDate.parse(x.startDate) < yearFrom)
-          .sortBy(x => LocalDate.parse(x.startDate))(Ordering[LocalDate].reverse)
+          .sortBy(x => LocalDate.parse(x.startDate))(using Ordering[LocalDate].reverse)
           .find(response => response.data.exists(isSubmitted))
           .flatMap { response =>
             response.data
               .filter(isSubmitted)
-              .sortBy(_.reportVersion)(Ordering[Int].reverse)
+              .sortBy(_.reportVersion)(using Ordering[Int].reverse)
               .headOption
               .map(_.reportFormBundleNumber)
           }

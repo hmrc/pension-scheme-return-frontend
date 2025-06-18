@@ -94,7 +94,7 @@ class UploadMemberDetailsController @Inject() (
     } yield Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers))
   }
 
-  private def collectErrors(srn: Srn, startTime: Long)(implicit request: DataRequest[_]): Option[FormError] =
+  private def collectErrors(srn: Srn, startTime: Long)(implicit request: DataRequest[?]): Option[FormError] =
     request.flash
       .get("error")
       .map { errorKey =>
@@ -115,7 +115,7 @@ class UploadMemberDetailsController @Inject() (
       }
 
   private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
@@ -128,7 +128,7 @@ class UploadMemberDetailsController @Inject() (
     duration
   )
 
-  private def audit(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(implicit request: DataRequest[_]): Unit = {
+  private def audit(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(implicit request: DataRequest[?]): Unit = {
     val endTime = System.currentTimeMillis
     val duration = endTime - startTime
     for {

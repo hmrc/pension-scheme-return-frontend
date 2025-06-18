@@ -114,7 +114,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
       (12, 3),
       (49, 10)
     ).foreach { case (navigatingFromIndex, expectedPage) =>
-      val userAnswers = userAnswersWithEmployerNames(50) _
+      val userAnswers = userAnswersWithEmployerNames(50)
       val secondaryIndex: Max50 = navigatingFromIndex
       act.like(
         checkmode

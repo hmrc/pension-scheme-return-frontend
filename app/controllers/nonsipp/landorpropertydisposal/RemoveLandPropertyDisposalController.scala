@@ -135,7 +135,7 @@ class RemoveLandPropertyDisposalController @Inject() (
                     fallbackCall =
                       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
                         .onPageLoad(srn, 1)
-                  )(
+                  )(using
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

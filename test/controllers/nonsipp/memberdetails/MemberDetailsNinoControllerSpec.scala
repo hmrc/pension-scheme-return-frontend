@@ -62,7 +62,7 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec with Controller
         .withName("onSubmit should redirect to journey recovery page when no member details exist")
     )
 
-    act.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*))
+    act.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino)*))
 
     act.like(invalidForm(onSubmit, populatedUserAnswers))
 
@@ -70,7 +70,7 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec with Controller
 
     "allow nino to be updated" - {
       val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, 1), validNino).get
-      act.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
+      act.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino)*))
     }
 
     "return a 400 if nino has already been entered" - {
@@ -79,7 +79,7 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec with Controller
           .unsafeSet(MemberDetailsNinoPage(srn, 1), otherValidNino)
           .unsafeSet(MemberDetailsNinoPage(srn, 2), validNino)
 
-      act.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
+      act.like(invalidForm(onSubmit, userAnswers, formData(form, validNino)*))
     }
   }
 }

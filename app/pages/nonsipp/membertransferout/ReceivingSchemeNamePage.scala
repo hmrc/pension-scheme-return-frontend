@@ -41,7 +41,7 @@ case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5)
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(
       ReceivingSchemeTypePage(srn, index, transferIndex),
       WhenWasTransferMadePage(srn, index, transferIndex),

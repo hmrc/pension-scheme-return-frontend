@@ -98,7 +98,7 @@ class LandOrPropertyPostcodeLookupController @Inject() (
     value: PostcodeLookup,
     addresses: List[Address]
   )(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ): Either[Result, Unit] =
     Option
       .when(addresses.isEmpty) {

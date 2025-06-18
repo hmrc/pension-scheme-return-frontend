@@ -156,7 +156,7 @@ class CheckMemberDetailsFileController @Inject() (
       .getUploadStatus(uploadKey)
 
   private def buildUploadAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(
-    implicit req: DataRequest[_]
+    implicit req: DataRequest[?]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
@@ -170,7 +170,7 @@ class CheckMemberDetailsFileController @Inject() (
   )
 
   private def auditUpload(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Unit = {
     val endTime = System.currentTimeMillis
     val duration = endTime - startTime
@@ -185,7 +185,7 @@ class CheckMemberDetailsFileController @Inject() (
   }
 
   private def buildDownloadAuditEvent(taxYear: DateRange, responseStatus: Int, duration: Long, userName: String)(
-    implicit req: DataRequest[_]
+    implicit req: DataRequest[?]
   ) = PSRUpscanFileDownloadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
@@ -202,7 +202,7 @@ class CheckMemberDetailsFileController @Inject() (
   )
 
   private def auditDownload(srn: Srn, responseStatus: Int, duration: Long)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Unit =
     schemeDateService
       .taxYearOrAccountingPeriods(srn)
@@ -215,7 +215,7 @@ class CheckMemberDetailsFileController @Inject() (
       )
 
   private def auditValidation(srn: Srn, outcome: (Upload, Int, Long))(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Unit =
     schemeDateService
       .taxYearOrAccountingPeriods(srn)
@@ -227,7 +227,7 @@ class CheckMemberDetailsFileController @Inject() (
       )
 
   private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int, Long), userName: String)(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ) = PSRFileValidationAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),

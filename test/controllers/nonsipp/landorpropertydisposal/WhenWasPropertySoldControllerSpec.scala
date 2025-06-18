@@ -64,7 +64,7 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec with Controll
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[DatePageView]
         .apply(
-          form(injected[DatePageFormProvider])(date, beforeDate, createMessages(app)),
+          form(injected[DatePageFormProvider])(date, beforeDate, createMessages(using app)),
           viewModel(srn, index, disposalIndex, address.addressLine1, NormalMode)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
@@ -74,7 +74,7 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec with Controll
         implicit app => implicit request =>
           injected[DatePageView]
             .apply(
-              form(injected[DatePageFormProvider])(date, beforeDate, createMessages(app))
+              form(injected[DatePageFormProvider])(date, beforeDate, createMessages(using app))
                 .fill(date),
               viewModel(srn, index, disposalIndex, address.addressLine1, NormalMode)
             )

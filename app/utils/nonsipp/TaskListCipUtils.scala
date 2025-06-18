@@ -40,7 +40,7 @@ object TaskListCipUtils {
         TaskListCipViewModel(
           messagesApi(
             getCipLabel(level1.title.key)
-          )(Lang.defaultLang),
+          )(using Lang.defaultLang),
           level1.items.fold(
             fa =>
               if (fa.isInstanceOf[LinkMessage]) {
@@ -49,7 +49,7 @@ object TaskListCipUtils {
                     TaskListLevel2(
                       messagesApi(
                         getCipLabel(fa.asInstanceOf[LinkMessage].content.key)
-                      )(Lang.defaultLang()),
+                      )(using Lang.defaultLang()),
                       "Enabled"
                     )
                   )
@@ -60,7 +60,7 @@ object TaskListCipUtils {
                     TaskListLevel2(
                       messagesApi(
                         getCipLabel(fa.asInstanceOf[Message].key)
-                      )(Lang.defaultLang()),
+                      )(using Lang.defaultLang()),
                       "Disabled"
                     )
                   )
@@ -75,14 +75,14 @@ object TaskListCipUtils {
                     val argsTranslated = messagesApi
                       .translate(
                         item.status.description.key,
-                        item.status.description.args.map(a => messagesApi(a.key)(Lang.defaultLang))
-                      )(Lang.defaultLang())
+                        item.status.description.args.map(a => messagesApi(a.key)(using Lang.defaultLang))
+                      )(using Lang.defaultLang())
                       .getOrElse(item.status.description.key)
 
                     TaskListLevel2(
                       messagesApi(
                         getCipLabel(item.link.content.key)
-                      )(Lang.defaultLang),
+                      )(using Lang.defaultLang),
                       argsTranslated
                     )
                   }

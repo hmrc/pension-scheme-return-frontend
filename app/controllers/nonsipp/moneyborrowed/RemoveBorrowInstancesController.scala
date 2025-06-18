@@ -104,7 +104,7 @@ class RemoveBorrowInstancesController @Inject() (
                     updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, mode)
-                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  )(using implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) =>

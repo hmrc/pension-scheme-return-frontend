@@ -111,7 +111,7 @@ class CheckReturnDatesController @Inject() (
 
   private def getWhichTaxYear(
     srn: Srn
-  )(f: DateRange => Future[Result])(implicit request: DataRequest[_]): Future[Result] =
+  )(f: DateRange => Future[Result])(implicit request: DataRequest[?]): Future[Result] =
     request.userAnswers.get(WhichTaxYearPage(srn)) match {
       case Some(taxYear) => f(taxYear)
       case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))

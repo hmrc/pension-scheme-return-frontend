@@ -28,7 +28,7 @@
   govukSelect: GovukSelect
 )
 
-@(form: Form[_], viewModel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], viewModel: FormPageViewModel[MultipleQuestionsViewModel[?]])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewModel.title.toMessage)) {
 

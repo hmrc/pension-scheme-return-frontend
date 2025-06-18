@@ -228,7 +228,7 @@ class BondsListController @Inject() (
   }
 
   private def bondsData(srn: Srn)(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     logger: Logger
   ): Either[Result, (List[BondsData], List[BondsData])] = {
     // if return has been pre-populated, partition bonds by those that need to be checked

@@ -55,7 +55,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   def schemeDateCommonTest[A](
     name: String,
-    action: DataRequest[_] => A,
+    action: DataRequest[?] => A,
     expected: NonEmptyList[DateRange] => A
   ): List[BehaviourTest] =
     List(
@@ -88,7 +88,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     )
   def schemeDateRangeTest[A](
     name: String,
-    action: DataRequest[_] => A,
+    action: DataRequest[?] => A,
     expected: NonEmptyList[DateRange] => A
   ): Behaviours =
     MultipleBehaviourTests(
@@ -113,7 +113,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
         )
     )
 
-  def schemeDateTest[A](name: String, action: DataRequest[_] => A, expected: NonEmptyList[DateRange] => A): Behaviours =
+  def schemeDateTest[A](name: String, action: DataRequest[?] => A, expected: NonEmptyList[DateRange] => A): Behaviours =
     MultipleBehaviourTests(
       s"SchemeDateService.$name",
       schemeDateCommonTest(name, action, expected) ++
@@ -137,8 +137,8 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
           }
         )
     )
-  act.like(schemeDateTest("schemeDate", service.schemeDate(srn)(_), _.head))
-  act.like(schemeDateTest("schemeStartDate", service.schemeStartDate(srn)(_), _.head.from))
-  act.like(schemeDateTest("schemeEndDate", service.schemeEndDate(srn)(_), _.head.to))
-  act.like(schemeDateRangeTest("returnPeriods", service.returnPeriods(srn)(_), identity))
+  act.like(schemeDateTest("schemeDate", service.schemeDate(srn)(using _), _.head))
+  act.like(schemeDateTest("schemeStartDate", service.schemeStartDate(srn)(using _), _.head.from))
+  act.like(schemeDateTest("schemeEndDate", service.schemeEndDate(srn)(using _), _.head.to))
+  act.like(schemeDateRangeTest("returnPeriods", service.returnPeriods(srn)(using _), identity))
 }

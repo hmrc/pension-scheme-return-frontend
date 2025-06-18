@@ -370,6 +370,6 @@ object OverviewController {
 
     val taxYearRanges = taxYears.map(DateRange.from).map(r => (r.toString, r))
 
-    Enumerable(taxYearRanges: _*).toList
+    Enumerable(taxYearRanges*).toList
   }
 }

@@ -24,7 +24,7 @@
         govukInsetText: GovukInsetText,
         govukPagination: GovukPagination
 )
-@(form: Form[Boolean], viewmodel: FormPageViewModel[ListViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], viewmodel: FormPageViewModel[ListViewModel])(implicit request: Request[?], messages: Messages)
 
     @layout(pageTitle = paginatedTitle(viewmodel.page.paginatedViewModel, form, if(viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = viewmodel.showBackLink) {
 

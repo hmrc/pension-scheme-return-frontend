@@ -37,7 +37,7 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ControllerBeha
       mockSessionRepository,
       mockPsrRetrievalService,
       mockPrePopulationService
-    )(ExecutionContext.global)
+    )(using ExecutionContext.global)
 
   lazy val mockSessionRepository: SessionRepository = mock[SessionRepository]
   lazy val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
@@ -69,7 +69,7 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ControllerBeha
 
       result mustBe defaultDataRequest
       verify(mockSessionRepository, never).set(any())
-      verify(mockPsrRetrievalService, never).getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(
+      verify(mockPsrRetrievalService, never).getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using
         any(),
         any(),
         any()
@@ -81,6 +81,7 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ControllerBeha
       when(
         mockPsrRetrievalService
           .getAndTransformStandardPsrDetails(optFbNumber = ArgumentMatchers.eq(Some("1")), any(), any(), any(), any())(
+            using
             any(),
             any(),
             any()
@@ -97,6 +98,7 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ControllerBeha
       result.userAnswers mustBe defaultUserAnswers
       verify(mockSessionRepository, times(1)).set(any())
       verify(mockPsrRetrievalService, times(1)).getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(
+        using
         any(),
         any(),
         any()

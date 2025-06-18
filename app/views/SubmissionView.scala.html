@@ -20,7 +20,7 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(viewModel: SubmissionViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: SubmissionViewModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewModel.title.toMessage), showBackLink = false) {
 

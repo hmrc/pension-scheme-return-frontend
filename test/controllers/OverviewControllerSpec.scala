@@ -79,10 +79,10 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
 
     "onPageLoads returns OK and the correct view - when empty responses returned" in runningApplication {
       implicit app =>
-        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(Some(Seq()))
         )
-        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(Seq())
         )
 
@@ -92,24 +92,24 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         val seqOfPreviousReturns: Seq[OverviewSummary] = Seq()
 
         val result = route(app, request).value
-        val expectedView = view(seqOfOutstandingReturns, seqOfPreviousReturns, defaultSchemeDetails.schemeName)(
+        val expectedView = view(seqOfOutstandingReturns, seqOfPreviousReturns, defaultSchemeDetails.schemeName)(using
           request,
-          createMessages(app)
+          createMessages(using app)
         )
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual expectedView.toString
-        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any(), any())
-        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any(), any())
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(using any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(using any(), any(), any())
         verify(mockPrePopulationService, never).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
     "onPageLoads returns OK and expected content - when submitted responses returned" in runningApplication {
       implicit app =>
-        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
         )
-        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsForYearsResponse)
         )
         when(mockPrePopulationService.findLastSubmittedPsrFbInPreviousYears(any(), any())).thenReturn(
@@ -130,17 +130,17 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         (content must not).include(
           "<caption class=\"govuk-table__caption govuk-table__caption--m\" id=\"table-caption-2\">Submitted with changes in progress</caption>"
         )
-        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any(), any())
-        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any(), any())
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(using any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(using any(), any(), any())
         verify(mockPrePopulationService, times(1)).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
     "onPageLoads returns OK and expected content - when in progress responses returned" in runningApplication {
       implicit app =>
-        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
         )
-        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsForYearsInProgressResponse)
         )
         when(mockPrePopulationService.findLastSubmittedPsrFbInPreviousYears(any(), any())).thenReturn(
@@ -161,8 +161,8 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         content must include(
           "<caption class=\"govuk-table__caption govuk-table__caption--m\" id=\"table-caption-2\">Submitted with changes in progress</caption>"
         )
-        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any(), any())
-        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any(), any())
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(using any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(using any(), any(), any())
         verify(mockPrePopulationService, times(1)).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
@@ -199,7 +199,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     }
 
     "onSelectContinue redirects to the BasicDetailsCYA page when members over threshold" in {
-      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
         Future.successful(Seq())
       )
       val currentUA = emptyUserAnswers
@@ -269,7 +269,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     }
 
     "onSelectViewAndChange redirects to the BasicDetailsCYA page when members over threshold and no previous userAnswers and no previous psr return at all" in {
-      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
         Future.successful(Seq())
       )
       val currentUA = emptyUserAnswers
@@ -290,12 +290,12 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
 
     "onSelectViewAndChange redirects to the BasicDetailsCYA page " +
       "when members over threshold and no previous userAnswers and no previous psr return with memberDetails" in {
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsResponse)
         )
         when(
           mockPsrRetrievalService
-            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
         ).thenReturn(Future.successful(emptyUserAnswers))
         val currentUA = emptyUserAnswers
           .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
@@ -318,12 +318,12 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         val currentUA = emptyUserAnswers
           .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
           .unsafeSet(WhichTaxYearPage(srn), dateRange)
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsResponse)
         )
         when(
           mockPsrRetrievalService
-            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
         ).thenReturn(Future.successful(currentUA))
         running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
           val request = FakeRequest(GET, onSelectViewAndChange)

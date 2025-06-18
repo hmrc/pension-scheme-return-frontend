@@ -97,7 +97,7 @@ class DoesSchemeMemberHaveNINOController @Inject() (
 
   private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Future[Result]
-  )(implicit request: DataRequest[_]): Future[Result] =
+  )(implicit request: DataRequest[?]): Future[Result] =
     request.userAnswers.get(MemberDetailsPage(srn, index)) match {
       case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       case Some(memberDetails) => f(memberDetails)

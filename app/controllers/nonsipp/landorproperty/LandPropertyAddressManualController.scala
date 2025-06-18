@@ -97,7 +97,7 @@ class LandPropertyAddressManualController @Inject() (
     }
 
   private def onSubmitUKAddress(srn: Srn, index: Max5000, mode: Mode)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Future[Result] =
     ukAddressForm
       .bindFromRequest()
@@ -125,7 +125,7 @@ class LandPropertyAddressManualController @Inject() (
       )
 
   private def onSubmitInternationalAddress(srn: Srn, index: Max5000, mode: Mode)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Future[Result] =
     internationalAddressFormWithCountries
       .bindFromRequest()

@@ -42,7 +42,7 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(
       EmployerTypeOfBusinessPage(srn, memberIndex, index),
       TotalEmployerContributionPage(srn, memberIndex, index),

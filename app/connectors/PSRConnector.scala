@@ -58,7 +58,7 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
     schemeName: String,
     srn: Srn
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     headerCarrier: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Either[String, Unit]] =
@@ -82,7 +82,7 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
     schemeName: String,
     srn: Srn
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     headerCarrier: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Either[String, Unit]] =
@@ -110,7 +110,7 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
     schemeName: String,
     srn: Srn
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     headerCarrier: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[PsrSubmission]] = {
@@ -151,7 +151,7 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
   }
 
   def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn, fallBackCall: Call)(implicit
-    request: AllowedAccessRequest[_],
+    request: AllowedAccessRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
@@ -197,7 +197,7 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
       }
 
   def getVersions(pstr: String, startDate: String, srn: Srn, fallBackCall: Call)(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
@@ -242,7 +242,7 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
       }
 
   def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn, fallBackCall: Call)(implicit
-    request: AllowedAccessRequest[_],
+    request: AllowedAccessRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] = {

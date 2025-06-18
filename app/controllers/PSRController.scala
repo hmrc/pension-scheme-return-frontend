@@ -60,9 +60,9 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
 
   private val logger = Logger("PSRController")
 
-  implicit def requestToUserAnswers(implicit req: DataRequest[_]): UserAnswers = req.userAnswers
+  implicit def requestToUserAnswers(implicit req: DataRequest[?]): UserAnswers = req.userAnswers
 
-  def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[_]): Either[Result, A] =
+  def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[?]): Either[Result, A] =
     request.userAnswers.get(page) match {
       case Some(value) => Right(value)
       case None =>
@@ -87,7 +87,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
   ): Either[Result, Unit] =
     if (bool) Left(Redirect(call)) else Right(())
 
-  def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
+  def loggedInUserNameOrRedirect(implicit request: DataRequest[?]): Either[Result, String] =
     request.minimalDetails.individualDetails match {
       case Some(individual) => Right(individual.fullName)
       case None =>
@@ -123,7 +123,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     )
   }
 
-  def loggedInUserNameOrBlank(implicit request: DataRequest[_]): String =
+  def loggedInUserNameOrBlank(implicit request: DataRequest[?]): String =
     request.minimalDetails.individualDetails match {
       case Some(individual) => individual.fullName
       case None =>
@@ -191,7 +191,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
   }
 
   implicit class UserAnswersOps(userAnswers: UserAnswers) {
-    def exists[A: Reads](page: Gettable[A])(f: A => Boolean)(implicit request: DataRequest[_]): Boolean =
+    def exists[A: Reads](page: Gettable[A])(f: A => Boolean)(implicit request: DataRequest[?]): Boolean =
       request.userAnswers.get(page).fold(true)(f)
 
     def buildMemberDetails(srn: Srn, index: Max300): Option[MemberPersonalDetails] =
@@ -318,7 +318,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
         surrenderReason = surrenderReason
       )
 
-    def changed[A](f: UserAnswers => Option[A])(implicit request: DataRequest[_]): Boolean =
+    def changed[A](f: UserAnswers => Option[A])(implicit request: DataRequest[?]): Boolean =
       request.pureUserAnswers match {
         case Some(pure) =>
           (for {
@@ -328,7 +328,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
         case None => false
       }
 
-    def changedList[A](f: UserAnswers => Option[List[A]])(implicit request: DataRequest[_]): Boolean =
+    def changedList[A](f: UserAnswers => Option[List[A]])(implicit request: DataRequest[?]): Boolean =
       request.pureUserAnswers match {
         case Some(pure) =>
           (for {
@@ -347,16 +347,16 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))
     def remove[A](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removeOnlyMultiplePages(List(page)))
 
-    def remove(pages: List[Removable[_]]): Try[UserAnswers] = userAnswers.flatMap(_.removeOnlyMultiplePages(pages))
+    def remove(pages: List[Removable[?]]): Try[UserAnswers] = userAnswers.flatMap(_.removeOnlyMultiplePages(pages))
 
-    def softRemove[A: Reads: Writes](page: Gettable[A] with Settable[A] with Removable[A]): Try[UserAnswers] =
+    def softRemove[A: Reads: Writes](page: Gettable[A] & Settable[A] & Removable[A]): Try[UserAnswers] =
       userAnswers.flatMap(_.softRemove(page))
 
-    def removeWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
-      userAnswers.flatMap(_.removeOnlyWhen(bool)(page: _*))
+    def removeWhen(bool: Boolean)(page: Removable[?]*): Try[UserAnswers] =
+      userAnswers.flatMap(_.removeOnlyWhen(bool)(page*))
 
-    def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
-      userAnswers.flatMap(ua => ua.removeOnlyWhen(bool(ua))(page: _*))
+    def removeWhen(bool: UserAnswers => Boolean)(page: Removable[?]*): Try[UserAnswers] =
+      userAnswers.flatMap(ua => ua.removeOnlyWhen(bool(ua))(page*))
 
     def when(
       get: UserAnswers => Option[Boolean]

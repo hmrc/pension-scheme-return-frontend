@@ -99,7 +99,7 @@ class QuotedSharesManagedFundsHeldController @Inject() (
                       updatedAnswers,
                       fallbackCall =
                         controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, mode)
-                    )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                    )(using implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                     .map {
                       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                       case Some(_) =>
@@ -113,7 +113,7 @@ class QuotedSharesManagedFundsHeldController @Inject() (
 
   private def usingSchemeDate[F[_]: Monad](
     srn: Srn
-  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+  )(body: DateRange => F[Result])(implicit request: DataRequest[?]): F[Result] =
     schemeDateService.schemeDate(srn) match {
       case Some(period) => body(period)
       case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))

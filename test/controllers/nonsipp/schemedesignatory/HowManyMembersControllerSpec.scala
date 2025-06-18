@@ -43,7 +43,7 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec with ControllerBeh
     List(bind[SchemeDateService].toInstance(mockSchemeDateService))
 
   def setEndDate(date: Option[LocalDate]): Unit =
-    when(mockSchemeDateService.schemeEndDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeEndDate(any())(using any())).thenReturn(date)
 
   override def beforeAll(): Unit = setEndDate(Some(submissionEndDate))
 

@@ -91,7 +91,7 @@ class RemoveAccountingPeriodController @Inject() (
 
   private def withAccountingPeriodAtIndex(srn: Srn, index: Max3, mode: Mode)(
     f: DateRange => Result
-  )(implicit request: DataRequest[_]): Result =
+  )(implicit request: DataRequest[?]): Result =
     (
       for {
         bankAccount <- request.userAnswers.get(AccountingPeriodPage(srn, index, mode)).getOrRedirectToTaskList(srn)

@@ -74,7 +74,7 @@ trait PageBehaviours
 
     def list(
       getter: Gen[Gettable[List[A]]],
-      setter: Gen[Settable[A] with Removable[A]]
+      setter: Gen[Settable[A] & Removable[A]]
     )(implicit ev1: Arbitrary[A], ev2: Format[A]): Unit =
       "when being retrieved from UserAnswers" - {
 

@@ -60,7 +60,7 @@ case class HowWereSharesDisposedPage(
             shareIndex,
             disposalIndex,
             removeExtraPages = true,
-            isLastRecord = completedPages.flatten(_._2).size == 1
+            isLastRecord = completedPages.flatten(using _._2).size == 1
           )
         )
       case _ => Try(userAnswers)
@@ -72,7 +72,7 @@ case class HowWereSharesDisposedPage(
     disposalIndex: Max50,
     removeExtraPages: Boolean,
     isLastRecord: Boolean
-  ): List[Removable[_]] = {
+  ): List[Removable[?]] = {
     val list = List(
       WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex),
       HowManySharesRedeemedPage(srn, shareIndex, disposalIndex),

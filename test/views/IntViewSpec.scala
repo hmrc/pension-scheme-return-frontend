@@ -40,9 +40,9 @@ class IntViewSpec extends ViewSpec with ViewBehaviours with Mappings {
 
     val invalidForm = intForm.bind(Map("value" -> ""))
 
-    val singleIntViewModel = formPageViewModelGen(singleQuestionGen(intForm))
-    val invalidViewModel = formPageViewModelGen(singleQuestionGen(invalidForm))
-    val tripleIntViewModel = formPageViewModelGen(tripleQuestionGen(tripleIntForm))
+    val singleIntViewModel = formPageViewModelGen(using singleQuestionGen(intForm))
+    val invalidViewModel = formPageViewModelGen(using singleQuestionGen(invalidForm))
+    val tripleIntViewModel = formPageViewModelGen(using tripleQuestionGen(tripleIntForm))
     val viewModelGen = Gen.oneOf(singleIntViewModel, tripleIntViewModel, invalidViewModel)
 
     "IntView" - {

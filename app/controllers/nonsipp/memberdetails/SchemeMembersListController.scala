@@ -99,7 +99,7 @@ class SchemeMembersListController @Inject() (
     }
 
   def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Result = {
     val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
     val membersDetails = request.userAnswers.membersDetails(srn)

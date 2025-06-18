@@ -32,7 +32,7 @@ import javax.inject.Inject
 @Singleton()
 class DeclarationTransformer @Inject() {
 
-  def transformToEtmp(implicit request: DataRequest[_]): PsrDeclaration =
+  def transformToEtmp(implicit request: DataRequest[?]): PsrDeclaration =
     PsrDeclaration(
       submittedBy = if (request.pensionSchemeId.isPSP) PSP else PSA,
       submitterId = request.pensionSchemeId.value,

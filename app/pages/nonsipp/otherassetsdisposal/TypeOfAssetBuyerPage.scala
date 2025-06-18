@@ -35,7 +35,7 @@ case class TypeOfAssetBuyerPage(srn: Srn, assetIndex: Max5000, disposalIndex: Ma
 
   override def toString: String = "purchaserType"
 
-  private def pages(srn: Srn): List[Removable[_]] = List(
+  private def pages(srn: Srn): List[Removable[?]] = List(
     IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
     AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex),
     CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),

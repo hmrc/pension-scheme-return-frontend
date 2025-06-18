@@ -21,7 +21,7 @@
     govukButton: GovukButton
 )
 
-@(viewmodel: FormPageViewModel[ContentPageViewModel])(implicit request: Request[_], messages: Messages)
+@(viewmodel: FormPageViewModel[ContentPageViewModel])(implicit request: Request[?], messages: Messages)
 
 @if(viewmodel.page.isStartButton) {
 

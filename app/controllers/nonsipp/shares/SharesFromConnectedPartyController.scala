@@ -162,7 +162,7 @@ class SharesFromConnectedPartyController @Inject() (
 
   }
 
-  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[_]): Option[String] =
+  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[?]): Option[String] =
     request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)).flatMap {
       case IdentityType.Individual => request.userAnswers.get(IndividualNameOfSharesSellerPage(srn, index))
       case IdentityType.UKCompany => request.userAnswers.get(CompanyNameOfSharesSellerPage(srn, index))

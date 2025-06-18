@@ -232,7 +232,7 @@ class LandPropertyDisposalCYAController @Inject() (
             updatedUserAnswers,
             fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
               .onPageLoad(srn, index, disposalIndex, mode)
-          )(implicitly, implicitly, request = DataRequest(request.request, updatedUserAnswers))
+          )(using implicitly, implicitly, request = DataRequest(request.request, updatedUserAnswers))
           .map {
             case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             case Some(_) =>

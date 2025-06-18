@@ -76,7 +76,7 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehav
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       injected[DatePageView]
         .apply(
-          WhenBorrowedController.form(injected[DatePageFormProvider])(date, createMessages(app)),
+          WhenBorrowedController.form(injected[DatePageFormProvider])(date, createMessages(using app)),
           viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
@@ -87,7 +87,7 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehav
           injected[DatePageView]
             .apply(
               WhenBorrowedController
-                .form(injected[DatePageFormProvider])(date, createMessages(app))
+                .form(injected[DatePageFormProvider])(date, createMessages(using app))
                 .fill(date),
               viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
             )
@@ -121,7 +121,7 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehav
     )
 
     act.like(
-      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm: _*)
+      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm*)
         .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
   }

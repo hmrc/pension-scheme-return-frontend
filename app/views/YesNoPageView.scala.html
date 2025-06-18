@@ -26,7 +26,7 @@
   govukButton: GovukButton,
 )
 
-@(form: Form[Boolean], viewModel: FormPageViewModel[YesNoPageViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], viewModel: FormPageViewModel[YesNoPageViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewModel.title.toMessage), refresh = viewModel.refresh) {
 

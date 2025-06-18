@@ -145,7 +145,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId, isPrePopulation)) {
-      auditAndRedirect(srn)(implicitly)
+      auditAndRedirect(srn)(using implicitly)
     } else {
       psrSubmissionService
         .submitPsrDetails(srn, fallbackCall = controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
@@ -153,7 +153,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
           case None =>
             Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           case Some(_) =>
-            auditAndRedirect(srn)(implicitly)
+            auditAndRedirect(srn)(using implicitly)
         }
         .flatten
     }
@@ -200,7 +200,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
   }
 
   private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ) = PSRStartAuditEvent(
     schemeName = req.schemeDetails.schemeName,
     req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),

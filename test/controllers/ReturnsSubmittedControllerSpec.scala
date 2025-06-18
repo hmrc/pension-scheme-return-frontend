@@ -126,10 +126,10 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         injected[ReturnsSubmittedView]
           .apply(viewModel(srn, page, data(srn), fromYearUi, toYearUi, schemeName))
       }.before(
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsResponse)
         )
-      ).after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any()))
+      ).after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any()))
         .withName("onPageLoad renders ok")
     )
 
@@ -138,10 +138,10 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         injected[ReturnsSubmittedView]
           .apply(viewModel(srn, page, dataInProgress(srn), fromYearUi, toYearUi, schemeName))
       }.before(
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsResponseInProgress)
         )
-      ).after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any()))
+      ).after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any()))
         .withName("onPageLoad inProgress renders ok")
     )
 
@@ -163,9 +163,9 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
             submissionNumberOne
           )
       ).after {
-        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, never)
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.withName("onSelectToView redirects ok ViewOnlyTaskListController when members empty")
     )
 
@@ -181,9 +181,9 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
           ),
         emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
       ).after {
-        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, never)
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.withName(
         "onSelectToView redirects ok ViewOnlyTaskListController when members under threshold"
       )
@@ -202,9 +202,9 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         userAnswers = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold),
         previousUserAnswers = emptyUserAnswers.unsafeSet(DoesMemberHaveNinoPage(srn, 1), true)
       ).after {
-        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, never)
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.withName(
         "onSelectToView redirects ok ViewOnlyTaskListController when members over threshold and previous userAnswers has some memberDetails"
       )
@@ -216,9 +216,9 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         controllers.routes.JourneyRecoveryController.onPageLoad(),
         userAnswers = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
       ).after {
-        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, never)
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.withName(
         "onSelectToView redirects ok ViewOnlyTaskListController when members over threshold and previous userAnswers empty and no TaxYear data"
       )
@@ -238,11 +238,11 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         ),
         userAnswers = overThresholdUA
       ).after {
-        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, never)
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.before(
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(Seq())
         )
       ).withName(
@@ -261,16 +261,16 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         ),
         userAnswers = overThresholdUA
       ).after {
-        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, times(1))
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.before {
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsResponse)
         )
         when(
           mockPsrRetrievalService
-            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
         ).thenReturn(Future.successful(emptyUserAnswers))
       }.withName(
         "onSelectToView redirects ok the BasicDetailsCYA page when members over threshold and no " +
@@ -289,17 +289,17 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with ControllerB
         ),
         userAnswers = overThresholdUA
       ).before {
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
           Future.successful(versionsResponse)
         )
         when(
           mockPsrRetrievalService
-            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
         ).thenReturn(Future.successful(overThresholdUA))
       }.after {
-        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
         verify(mockPsrRetrievalService, times(1))
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
       }.withName(
         "onSelectToView redirects ok the BasicDetailsCYA page when members over threshold and no " +
           "previous userAnswers and previous psr return with memberDetails"

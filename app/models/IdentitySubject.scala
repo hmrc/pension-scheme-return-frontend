@@ -46,7 +46,7 @@ object IdentitySubject extends Enumerable.Implicits {
   def withNameWithDefault(name: String): IdentitySubject =
     values.find(_.toString.toLowerCase() == name.toLowerCase()).getOrElse(Unknown)
 
-  implicit val enumerable: Enumerable[IdentitySubject] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[IdentitySubject] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[IdentitySubject] = (value: IdentitySubject) => value.name
 }

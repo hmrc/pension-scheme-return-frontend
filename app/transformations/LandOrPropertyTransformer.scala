@@ -54,7 +54,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     initialUA: UserAnswers,
     isSubmitted: Boolean = false
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Option[LandOrProperty] =
     Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
       val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
@@ -77,7 +77,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     }
 
   private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, optDisposeAnyLandOrProperty: Option[Boolean])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): List[LandOrPropertyTransactions] =
     request.userAnswers
       .map(LandPropertyInUKPages(srn))
@@ -558,7 +558,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     methodOfHolding: SchemeHoldLandProperty,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(Boolean, LocalDate)] = Option.when(methodOfHolding != Transfer) {
+  )(implicit request: DataRequest[?]): Option[(Boolean, LocalDate)] = Option.when(methodOfHolding != Transfer) {
     val landPropertyIndependentValuation =
       request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
     val landOrPropertyAcquire =
@@ -573,7 +573,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     methodOfHolding: SchemeHoldLandProperty,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(String, Boolean, PropertyAcquiredFrom)] =
+  )(implicit request: DataRequest[?]): Option[(String, Boolean, PropertyAcquiredFrom)] =
     Option
       .when(methodOfHolding == Acquisition) {
         val receivedLandType =
@@ -695,7 +695,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     landOrPropertyLeased: Boolean,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[LeaseDetails] =
+  )(implicit request: DataRequest[?]): Option[LeaseDetails] =
     Option.when(landOrPropertyLeased) {
       val leaseDetails =
         request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index))
@@ -712,7 +712,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     srn: Srn,
     landOrPropertyIndex: Refined[Int, OneTo5000]
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Seq[DisposedPropertyTransaction] =
     request.userAnswers
       .map(
@@ -785,7 +785,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     srn: Srn,
     landOrPropertyIndex: Refined[Int, OneTo5000],
     disposalIndex: Refined[Int, OneTo50]
-  )(implicit request: DataRequest[_]): Option[(String, PropertyAcquiredFrom)] =
+  )(implicit request: DataRequest[?]): Option[(String, PropertyAcquiredFrom)] =
     Option
       .when(howWasPropertyDisposed == Sold) {
         val landOrPropertyDisposedType =

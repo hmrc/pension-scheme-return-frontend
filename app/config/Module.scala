@@ -27,7 +27,7 @@ import java.time.{Clock, ZoneOffset}
 
 class Module extends play.api.inject.Module {
 
-  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] =
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[?]] =
     Seq(
       bind[DataRetrievalAction].to(classOf[DataRetrievalActionImpl]).eagerly(),
       bind[DataRequiredAction].to(classOf[DataRequiredActionImpl]).eagerly(),

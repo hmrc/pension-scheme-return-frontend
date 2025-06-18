@@ -83,7 +83,7 @@ class MemberDetailsUploadValidator @Inject() (
     }
 
   def validateCSV(
-    source: Source[ByteString, _],
+    source: Source[ByteString, ?],
     validDateThreshold: Option[LocalDate]
   )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int, Long)] = {
     val startTime = System.currentTimeMillis
@@ -349,7 +349,7 @@ class MemberDetailsUploadValidator @Inject() (
         (form.errors: @unchecked) match {
           case head :: rest =>
             NonEmptyList
-              .of[FormError](head, rest: _*)
+              .of[FormError](head, rest*)
               .map(err =>
                 cellMapping(err).map(cell => ValidationError.fromCell(cell, row, errorTypeMapping(err), err.message))
               )

@@ -22,7 +22,7 @@
   govukButton: GovukButton,
 )
 
-@(form: Form[DateRange], viewmodel: FormPageViewModel[DateRangeViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[DateRange], viewmodel: FormPageViewModel[DateRangeViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 

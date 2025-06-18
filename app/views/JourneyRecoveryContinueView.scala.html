@@ -22,7 +22,7 @@
     govukButton: GovukButton
 )
 
-@(continueUrl: String, reportAProblemUrl: String, answersSavedDisplayVersion: Int = 0)(implicit request: Request[_], messages: Messages)
+@(continueUrl: String, reportAProblemUrl: String, answersSavedDisplayVersion: Int = 0)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.title"))) {
 

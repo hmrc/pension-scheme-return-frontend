@@ -58,9 +58,10 @@ class LandOrPropertyPostcodeLookupControllerSpec extends ControllerBaseSpec with
     act.like(
       saveAndContinue(onSubmit, "postcode" -> "ZZ1 1ZZ", "filter" -> "")
         .before(
-          when(mockAddressService.postcodeLookup(any(), any())(any())).thenReturn(Future.successful(List(address)))
+          when(mockAddressService.postcodeLookup(any(), any())(using any()))
+            .thenReturn(Future.successful(List(address)))
         )
-        .after(verify(mockAddressService, times(1)).postcodeLookup(any(), any())(any()))
+        .after(verify(mockAddressService, times(1)).postcodeLookup(any(), any())(using any()))
     )
 
     act.like(invalidForm(onSubmit))

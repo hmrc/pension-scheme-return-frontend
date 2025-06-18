@@ -43,7 +43,7 @@ class SessionRepository @Inject() (
     extends PlayMongoRepository[UserAnswers](
       collectionName = "user-answers",
       mongoComponent = mongoComponent,
-      domainFormat = UserAnswers.format(crypto.getCrypto),
+      domainFormat = UserAnswers.format(using crypto.getCrypto),
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),
@@ -61,7 +61,7 @@ class SessionRepository @Inject() (
 
   private def bySessionIds(id: String): Bson = {
     val filters = List(id, UNCHANGED_SESSION_PREFIX + id, PREVIOUS_SUBMITTED_PREFIX + id).map(byId)
-    Filters.or(filters: _*)
+    Filters.or(filters*)
   }
 
   def keepAlive(id: String): Future[Unit] =

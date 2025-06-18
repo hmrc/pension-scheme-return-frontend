@@ -105,7 +105,7 @@ class OtherAssetsTransformerSpec
         .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
 
       val result =
-        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(
+        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(using
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe Some(
@@ -161,7 +161,7 @@ class OtherAssetsTransformerSpec
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result shouldMatchTo Some(
           OtherAssets(
             recordVersion = Some("001"),
@@ -286,7 +286,7 @@ class OtherAssetsTransformerSpec
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result shouldMatchTo Some(
           OtherAssets(
             recordVersion = Some("001"),
@@ -412,7 +412,7 @@ class OtherAssetsTransformerSpec
 
         val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(using request)
 
         result mustBe Some(OtherAssets(None, Some(true), Some(false), List()))
       }
@@ -424,7 +424,7 @@ class OtherAssetsTransformerSpec
 
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
       result mustBe Some(
         OtherAssets(
           recordVersion = None,

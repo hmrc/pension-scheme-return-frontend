@@ -151,7 +151,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         .unsafeSet(SharesRecordVersionPage(srn), "001")
 
       val result =
-        transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
+        transformer.transformToEtmp(srn = srn, initialUserAnswer)(using DataRequest(allowedAccessRequest, userAnswers))
       result mustBe Some(Shares(None, Some(false), None, None))
     }
 
@@ -164,7 +164,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
 
       val result =
-        transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
+        transformer.transformToEtmp(srn = srn, initialUserAnswer)(using DataRequest(allowedAccessRequest, userAnswers))
       result mustBe Some(Shares(None, Some(false), None, None))
     }
 
@@ -177,7 +177,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
 
       val result =
-        transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
+        transformer.transformToEtmp(srn = srn, initialUserAnswer)(using DataRequest(allowedAccessRequest, userAnswers))
       result mustBe Some(Shares(None, Some(true), None, None))
     }
 
@@ -189,7 +189,8 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(TotalValueQuotedSharesPage(srn), money)
           .unsafeSet(SharesRecordVersionPage(srn), "001")
 
-        val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
+        val result =
+          transformer.transformToEtmp(srn = srn, userAnswers)(using DataRequest(allowedAccessRequest, userAnswers))
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
@@ -225,7 +226,8 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(SharesProgress(srn, 1), SectionJourneyStatus.Completed)
           .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
 
-        val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
+        val result =
+          transformer.transformToEtmp(srn = srn, userAnswers)(using DataRequest(allowedAccessRequest, userAnswers))
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
@@ -305,7 +307,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(SharePrePopulated(srn, 2), false)
           .unsafeSet(SharesProgress(srn, 2), SectionJourneyStatus.Completed)
 
-        val result = transformer.transformToEtmp(srn = srn, userAnswers)(
+        val result = transformer.transformToEtmp(srn = srn, userAnswers)(using
           DataRequest(allowedAccessRequestPrePopulation, userAnswers)
         )
         result mustBe Some(
@@ -382,7 +384,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
-      val result = transformer.transformToEtmp(srn, incompleteUserAnswers)(request)
+      val result = transformer.transformToEtmp(srn, incompleteUserAnswers)(using request)
 
       result mustBe Some(Shares(Some("001"), Some(true), None, Some(123456.0)))
     }

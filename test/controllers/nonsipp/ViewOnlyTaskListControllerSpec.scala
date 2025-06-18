@@ -76,7 +76,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with ControllerB
     )
 
   override def beforeEach(): Unit =
-    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+    when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Seq()))
 
   // Build userAnswers for current version

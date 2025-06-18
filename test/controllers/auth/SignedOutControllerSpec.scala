@@ -36,7 +36,7 @@ class SignedOutControllerSpec extends ControllerBaseSpec with ControllerBehaviou
         val view = application.injector.instanceOf[SignedOutView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, createMessages(application)).toString
+        contentAsString(result) mustEqual view()(using request, createMessages(using application)).toString
       }
     }
   }

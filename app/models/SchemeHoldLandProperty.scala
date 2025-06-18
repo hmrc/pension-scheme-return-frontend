@@ -33,7 +33,7 @@ object SchemeHoldLandProperty extends Enumerable.Implicits {
 
   val values: List[SchemeHoldLandProperty] = List(Acquisition, Contribution, Transfer)
 
-  implicit val enumerable: Enumerable[SchemeHoldLandProperty] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[SchemeHoldLandProperty] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[SchemeHoldLandProperty] = (value: SchemeHoldLandProperty) => value.name
 }

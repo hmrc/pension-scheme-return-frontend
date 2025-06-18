@@ -80,7 +80,7 @@ class MemberContributionsController @Inject() (
                     updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.membercontributions.routes.MemberContributionsController.onPageLoad(srn, mode)
-                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  )(using implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) => Redirect(navigator.nextPage(MemberContributionsPage(srn), mode, updatedAnswers))

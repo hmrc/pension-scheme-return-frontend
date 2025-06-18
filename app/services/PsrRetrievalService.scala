@@ -47,7 +47,7 @@ class PsrRetrievalService @Inject() (
     fallBackCall: Call,
     fetchingPreviousVersion: Boolean = false
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[UserAnswers] = {
@@ -73,7 +73,7 @@ class PsrRetrievalService @Inject() (
     optPsrVersion: Option[String] = None,
     fallBackCall: Call
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[PsrSubmission]] =
@@ -93,7 +93,7 @@ class PsrRetrievalService @Inject() (
     psrDetails: PsrSubmission,
     fetchingPreviousVersion: Boolean = false
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Future[UserAnswers] =
     Future.fromTry {
       val srn = request.srn

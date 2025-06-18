@@ -100,7 +100,7 @@ class StartReportingAssetsDisposalController @Inject() (
   }
 
   private def assetsData(srn: Srn, indexes: List[Max5000])(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ): Either[Result, List[AssetData]] =
     indexes.traverse { index =>
       for {

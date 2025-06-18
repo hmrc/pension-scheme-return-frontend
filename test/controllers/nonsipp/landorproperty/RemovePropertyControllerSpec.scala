@@ -73,7 +73,8 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec with ControllerBeh
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )
@@ -81,7 +82,7 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec with ControllerBeh
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )
@@ -94,7 +95,8 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec with ControllerBeh
       saveAndContinue(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )

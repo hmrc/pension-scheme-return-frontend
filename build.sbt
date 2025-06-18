@@ -48,7 +48,15 @@ lazy val root = Project(appName, file("."))
     PlayKeys.playDefaultPort := 10701,
     scalacOptions ++= Seq(
       "-feature",
-      "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
+      "-Wconf:msg=Flag.*repeatedly:s",
+      "-Wconf:msg=unused import&src=.*views/.*:s",
+      "-Wconf:msg=unused import&src=<empty>:s",
+      "-Wconf:msg=unused&src=.*RoutesPrefix\\.scala:s",
+      "-Wconf:msg=unused&src=.*Routes\\.scala:s",
+      "-Wconf:msg=unused&src=.*ReverseRoutes\\.scala:s",
+      "-Wconf:msg=unused&src=.*JavaScriptReverseRoutes\\.scala:s",
+      "-Wconf:msg=Implicit parameters should be provided with a \\`using\\` clause&src=.*views/.*:s",
+      "-Wconf:msg=match may not be exhaustive.&src=.*routes:s",
       "-Xmax-inlines", "100",
       "-language:implicitConversions"
     ),

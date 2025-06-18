@@ -44,7 +44,7 @@ class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec with Contr
   }
 
   def setSchemeDate(date: Option[DateRange]): Unit =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(date)
 
   "TotalValueQuotedSharesController" - {
 
@@ -73,7 +73,7 @@ class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec with Contr
         .before(setSchemeDate(None))
     )
 
-    act.like(saveAndContinue(onSubmit, formData(form, validMoney): _*))
+    act.like(saveAndContinue(onSubmit, formData(form, validMoney)*))
 
     act.like(invalidForm(onSubmit))
 

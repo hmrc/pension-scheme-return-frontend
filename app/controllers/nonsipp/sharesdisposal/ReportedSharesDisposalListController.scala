@@ -232,7 +232,7 @@ class ReportedSharesDisposalListController @Inject() (
   }
 
   private def getSharesDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
     disposals
       .map { case indexes @ (index, _) =>
@@ -282,7 +282,7 @@ class ReportedSharesDisposalListController @Inject() (
 
   private def getCompletedDisposals(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] = {
+  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] = {
     val all = request.userAnswers
       .map(SharesCompleted.all(srn))
     Right(

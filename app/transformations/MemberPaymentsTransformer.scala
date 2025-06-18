@@ -158,7 +158,7 @@ class MemberPaymentsTransformer @Inject() (
       // Check for empty member payment sections before comparing members
       // (this is because we send empty records in certain sections for members)
       val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.toSeq
-        .sortBy(_._1.value)(Ordering[Int])
+        .sortBy(_._1.value)(using Ordering[Int])
         .map { case (index, currentMemberDetail) =>
           initialMemberDetails.get(index) match {
             case None =>
@@ -184,7 +184,7 @@ class MemberPaymentsTransformer @Inject() (
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
         case (Nil, Nil) => None
         case _ =>
-          val sameMemberPayments: Boolean = userAnswers.sameAs(initialUA, membersPayments, Omitted.membersPayments: _*)
+          val sameMemberPayments: Boolean = userAnswers.sameAs(initialUA, membersPayments, Omitted.membersPayments*)
           if (!sameMemberPayments) {
             logger.info(s"member payments has changed, removing recordVersion")
           }

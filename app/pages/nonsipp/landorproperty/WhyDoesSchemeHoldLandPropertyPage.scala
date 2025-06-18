@@ -49,7 +49,7 @@ case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max5000) extends Q
     }
   }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(
       LandOrPropertyWhenDidSchemeAcquirePage(srn, index),
       LandPropertyIndependentValuationPage(srn, index),

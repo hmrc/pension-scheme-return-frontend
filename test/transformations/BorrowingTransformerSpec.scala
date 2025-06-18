@@ -64,7 +64,7 @@ class BorrowingTransformerSpec
         .unsafeSet(BorrowingRecordVersionPage(srn), "001")
 
       val result =
-        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(
+        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(using
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe Some(Borrowing(recordVersion = None, moneyWasBorrowed = false, moneyBorrowed = Seq.empty))
@@ -76,7 +76,7 @@ class BorrowingTransformerSpec
         .unsafeSet(LenderNamePage(srn, 1), "borrowingFromName")
 
       val result =
-        transformer.transformToEtmp(srn = srn, Some(true), userAnswers)(
+        transformer.transformToEtmp(srn = srn, Some(true), userAnswers)(using
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe None
@@ -88,7 +88,7 @@ class BorrowingTransformerSpec
         .unsafeSet(BorrowingRecordVersionPage(srn), "001")
 
       val result =
-        transformer.transformToEtmp(srn = srn, Some(false), userAnswers)(
+        transformer.transformToEtmp(srn = srn, Some(false), userAnswers)(using
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe Some(Borrowing(recordVersion = Some("001"), moneyWasBorrowed = false, moneyBorrowed = Seq.empty))
@@ -107,7 +107,7 @@ class BorrowingTransformerSpec
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result mustBe Some(Borrowing(recordVersion = Some("001"), moneyWasBorrowed = true, moneyBorrowed = Seq.empty))
       }
 
@@ -125,7 +125,7 @@ class BorrowingTransformerSpec
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result mustBe Some(
           Borrowing(
             recordVersion = Some("001"),
@@ -171,7 +171,7 @@ class BorrowingTransformerSpec
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result mustBe Some(
           Borrowing(
             recordVersion = Some("001"),

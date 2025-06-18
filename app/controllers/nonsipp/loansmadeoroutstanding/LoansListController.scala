@@ -228,7 +228,7 @@ class LoansListController @Inject() (
     }
 
   private def loansToTraverse(srn: Srn)(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     logger: Logger
   ): Either[Result, (List[LoansData], List[LoansData])] = {
 

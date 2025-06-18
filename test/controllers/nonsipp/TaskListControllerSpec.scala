@@ -61,7 +61,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+    when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Seq()))
   }
 
@@ -103,7 +103,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         view(defaultViewModel, schemeName)
       }.withName("task list renders OK when version response without any submitted")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
             .thenReturn(
               Future.successful(
                 Seq(
@@ -147,7 +147,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         )
       }.withName("task list renders OK when version response with any submitted")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
             .thenReturn(
               Future.successful(versionsResponse)
             )
@@ -176,7 +176,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           )
       }.withName("task list renders OK when version response with any submitted but max version compiled")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
             .thenReturn(
               Future.successful(versionsResponseInProgress)
             )
@@ -199,7 +199,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         populatedUserAnswers,
         populatedUserAnswers
       ).before(
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
           .thenReturn(
             Future.successful(versionsResponseInProgress)
           )
@@ -230,7 +230,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           )
       }.withName("task list renders OK when a historical submission with compiled status is in user answers")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
             .thenReturn(
               Future.successful(Seq(compiledVersionsResponse))
             )
@@ -259,7 +259,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           )
       }.withName("task list renders OK when version a data was just changed and version remains the same")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
             .thenReturn(
               Future.successful(versionsResponseInProgress)
             )

@@ -24,7 +24,7 @@
   govukInput: GovukInput
 )
 
-@(form: Form[Money], viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
+@(form: Form[Money], viewmodel: FormPageViewModel[MultipleQuestionsViewModel[?]])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 

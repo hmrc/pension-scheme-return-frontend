@@ -25,7 +25,7 @@
     govukPagination: GovukPagination,
     govukTable: GovukTable
 )
-@(viewmodel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[_], messages: Messages)
+@(viewmodel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

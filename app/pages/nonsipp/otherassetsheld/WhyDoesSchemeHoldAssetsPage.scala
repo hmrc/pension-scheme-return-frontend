@@ -56,13 +56,13 @@ case class WhyDoesSchemeHoldAssetsPage(srn: Srn, index: Max5000) extends Questio
       case _ => Try(userAnswers)
     }
 
-  private def acquisitionOnlyPages(srn: Srn): List[Removable[_]] =
+  private def acquisitionOnlyPages(srn: Srn): List[Removable[?]] =
     List(
       IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller),
       OtherAssetSellerConnectedPartyPage(srn, index)
     )
 
-  private def acquisitionAndContributionPages(srn: Srn): List[Removable[_]] =
+  private def acquisitionAndContributionPages(srn: Srn): List[Removable[?]] =
     List(
       WhenDidSchemeAcquireAssetsPage(srn, index),
       IndependentValuationPage(srn, index)

@@ -23,7 +23,7 @@ import scala.util.Try
 
 object PageUtils {
 
-  def removePages(userAnswers: UserAnswers, pages: List[Removable[_]]): Try[UserAnswers] =
+  def removePages(userAnswers: UserAnswers, pages: List[Removable[?]]): Try[UserAnswers] =
     pages.foldLeft(Try(userAnswers))((a, b) => a.flatMap(_.remove(b)))
 
 }

@@ -37,7 +37,7 @@ trait WireMockHelper extends BeforeAndAfterAll with BeforeAndAfterEach {
         "auditing.enabled" -> false,
         "metrics.enabled" -> false
       )
-      .overrides(bindings: _*)
+      .overrides(bindings*)
       .build()
 
   protected def bindings: Seq[GuiceableModule] = Seq.empty[GuiceableModule]

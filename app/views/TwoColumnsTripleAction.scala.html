@@ -25,7 +25,7 @@
     govukTable: GovukTable,
     govukSummaryList: GovukSummaryList
 )
-@(viewModel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[_], messages: Messages)
+@(viewModel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = paginatedTitleNoForm(viewModel.page.paginatedViewModel, if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.title.toMessage else viewModel.title.toMessage), showBackLink = viewModel.showBackLink) {
 

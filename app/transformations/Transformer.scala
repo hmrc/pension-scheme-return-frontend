@@ -30,7 +30,7 @@ import scala.util.Try
 
 trait Transformer {
 
-  protected def keysToIndex[A](map: Map[String, _])(using Validate[Int, A]): List[Refined[Int, A]] =
+  protected def keysToIndex[A](map: Map[String, ?])(using Validate[Int, A]): List[Refined[Int, A]] =
     map.keys.toList.flatMap(refineIndex[A])
 
   protected def refineIndex[A](index: String)(using Validate[Int, A]): Option[Refined[Int, A]] =

@@ -19,7 +19,7 @@
     govukButton: GovukButton
 )
 
-@(url: String, reportAProblemUrl: String)(implicit request: Request[_], messages: Messages)
+@(url: String, reportAProblemUrl: String)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.title"))) {
 

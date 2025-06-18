@@ -33,7 +33,7 @@ object SchemeHoldShare extends Enumerable.Implicits {
 
   val values: List[SchemeHoldShare] = List(Acquisition, Contribution, Transfer)
 
-  implicit val enumerable: Enumerable[SchemeHoldShare] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[SchemeHoldShare] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[SchemeHoldShare] = (value: SchemeHoldShare) => value.name
 }
