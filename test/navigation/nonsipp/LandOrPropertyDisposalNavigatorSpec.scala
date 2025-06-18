@@ -178,7 +178,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
-          WhoPurchasedLandOrPropertyPage,
+          WhoPurchasedLandOrPropertyPage.apply,
           Gen.const(IdentityType.Individual),
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController

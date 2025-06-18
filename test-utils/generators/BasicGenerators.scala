@@ -103,9 +103,7 @@ trait BasicGenerators extends EitherValues {
   val uniqueStringGen: Gen[String] = Gen.uuid.map(_.toString)
 
   def nonEmptyListOf[A](gen: Gen[A]): Gen[NonEmptyList[A]] =
-    Gen.nonEmptyListOf(gen).map { case head :: tail =>
-      NonEmptyList(head, tail)
-    }
+    Gen.nonEmptyListOf(gen).map(list => NonEmptyList(list.head, list.tail))
 
   def stringLengthBetween(minLength: Int, maxLength: Int, charGen: Gen[Char]): Gen[String] =
     for {

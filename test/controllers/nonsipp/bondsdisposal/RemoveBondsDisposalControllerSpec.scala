@@ -47,9 +47,6 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec with Controll
     .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex), methodOfDisposal)
 
-  private val userAnswersNameOfBond = defaultUserAnswers
-    .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
-
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )

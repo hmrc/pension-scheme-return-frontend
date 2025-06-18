@@ -115,7 +115,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          RecipientSponsoringEmployerConnectedPartyPage.apply ,
+          RecipientSponsoringEmployerConnectedPartyPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.DatePeriodLoanController.onPageLoad
         )
         .withName("go from sponsoring employer or connected party page to date period loan page")

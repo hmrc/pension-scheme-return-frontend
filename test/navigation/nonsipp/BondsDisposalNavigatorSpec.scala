@@ -235,7 +235,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage.apply,
-                (srn, bondIndex: Int, disposalIndex: Int, _) =>
+                (srn, _: Int, _: Int, _) =>
                   controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode)
               )
               .withName("go from RemoveBondsDisposal to BondsDisposal")
@@ -256,7 +256,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage.apply,
-                (srn, bondIndex: Int, disposalIndex: Int, _) =>
+                (srn, _: Int, _: Int, _) =>
                   controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
@@ -278,7 +278,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage.apply,
-                (srn, bondIndex: Int, disposalIndex: Int, _) =>
+                (srn, _: Int, _: Int, _) =>
                   controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )

@@ -201,7 +201,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TransfersInSectionCompleted.apply,
-          (srn, index: Int, secondaryIndex: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (_, _: Int, _: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from TransfersInCYACompletedPage to ??? page")
     )

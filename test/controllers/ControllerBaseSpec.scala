@@ -43,7 +43,7 @@ import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import org.scalatest.OptionValues
 import play.api.Application
 import uk.gov.hmrc.domain.Nino
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{Json, Writes}
 
 import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
@@ -115,7 +115,7 @@ trait ControllerBaseSpec
     def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).get
     def unsafeSet(page: Settable[Flag]): UserAnswers = ua.set(page, Flag).get
 
-    def unsafeRemove[A: Reads](page: Removable[A]): UserAnswers = ua.remove(page).get
+    def unsafeRemove[A](page: Removable[A]): UserAnswers = ua.remove(page).get
   }
 }
 

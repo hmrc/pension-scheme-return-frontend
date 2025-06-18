@@ -174,7 +174,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           ReceivingSchemeNamePage.apply,
-          (srn, index: Int, secondaryIndex: Int, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
               .onPageLoad(srn, index, NormalMode)
         )

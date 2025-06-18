@@ -308,25 +308,6 @@ class MemberPaymentsTransformerSpec
     pensionAmountReceived = None
   )
 
-  private val activeMemberNoSectionsIndex2 = MemberDetails(
-    prePopulated = None,
-    state = MemberState.New,
-    memberPSRVersion = Some("001"),
-    personalDetails = MemberPersonalDetails(
-      firstName = memberDetails.firstName,
-      lastName = memberDetails.lastName,
-      nino = Some(nino.value),
-      reasonNoNINO = None,
-      dateOfBirth = memberDetails.dob
-    ),
-    employerContributions = List.empty,
-    transfersIn = List.empty,
-    totalContributions = None,
-    memberLumpSumReceived = None,
-    transfersOut = List.empty,
-    benefitsSurrendered = None,
-    pensionAmountReceived = None
-  )
   private val deletedMemberNoSections = activeMemberNoSections.copy(state = MemberState.Deleted)
 
   private val memberPaymentsNoSections = MemberPayments(

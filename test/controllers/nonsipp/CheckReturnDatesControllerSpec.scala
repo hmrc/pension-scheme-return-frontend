@@ -22,7 +22,6 @@ import utils.DateTimeUtils
 import viewmodels.implicits._
 import play.api.mvc.Call
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
-import pages.nonsipp.WhichTaxYearPage
 import models.NormalMode
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 
@@ -35,8 +34,6 @@ class CheckReturnDatesControllerSpec
 
   override protected def beforeEach(): Unit =
     MockSaveService.save()
-
-  private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
   def onwardRoute: Call = Call("GET", "/foo")
 

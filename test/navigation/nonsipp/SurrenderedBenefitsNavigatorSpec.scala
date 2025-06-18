@@ -137,7 +137,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
             .navigateToWithIndex(
               memberIndex,
               SurrenderedBenefitsCYAPage.apply,
-              (srn, memberIndex: Int, _) =>
+              (srn, _: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                   .onPageLoad(srn, page = 1, NormalMode)
             )

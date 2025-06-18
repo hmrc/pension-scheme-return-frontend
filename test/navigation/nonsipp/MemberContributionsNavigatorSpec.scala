@@ -98,7 +98,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
     act.like(
       normalmode
         .navigateTo(
-          MemberContributionsCYAPage,
+          MemberContributionsCYAPage.apply,
           (srn, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionListController
               .onPageLoad(srn, page = 1, NormalMode)

@@ -89,7 +89,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             .navigateToWithIndex(
               assetIndexOne,
               OtherAssetsDisposalListPage.apply,
-              (srn, index: Int, _) =>
+              (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
                   .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
@@ -185,7 +185,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               disposalIndex,
               TypeOfAssetBuyerPage.apply,
               Gen.const(IdentityType.Individual),
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
                   .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
@@ -199,7 +199,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               disposalIndex,
               TypeOfAssetBuyerPage.apply,
               Gen.const(IdentityType.UKCompany),
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
                   .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
@@ -213,7 +213,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               disposalIndex,
               TypeOfAssetBuyerPage.apply,
               Gen.const(IdentityType.UKPartnership),
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
                   .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
@@ -227,7 +227,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               disposalIndex,
               TypeOfAssetBuyerPage.apply,
               Gen.const(IdentityType.Other),
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
                   .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
@@ -256,7 +256,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             .navigateToWithDoubleIndex(
               assetIndexOne,
               disposalIndex,
-              AssetIndividualBuyerNiNumberPage,
+              AssetIndividualBuyerNiNumberPage.apply,
               (srn, assetIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
@@ -485,7 +485,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           checkmode
             .navigateTo(
-              OtherAssetsDisposalCYAPage,
+              OtherAssetsDisposalCYAPage.apply,
               (srn, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                   .onPageLoad(srn, page = 1)
@@ -507,7 +507,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Sold),
-            (srn, shareIndex: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
@@ -521,7 +521,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Transferred),
-            (srn, shareIndex: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
@@ -535,7 +535,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Other("test details")),
-            (srn, shareIndex: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
@@ -612,7 +612,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage.apply,
             Gen.const(IdentityType.Individual),
-            (srn, index: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
@@ -626,7 +626,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage.apply,
             Gen.const(IdentityType.UKCompany),
-            (srn, index: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
@@ -640,7 +640,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage.apply,
             Gen.const(IdentityType.UKPartnership),
-            (srn, index: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
@@ -654,7 +654,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage.apply,
             Gen.const(IdentityType.Other),
-            (srn, index: Int, disposalIndex: Int, _) =>
+            (srn, _: Int, disposalIndex: Int, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
                 .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )

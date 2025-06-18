@@ -534,12 +534,6 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
   }
 
   "nino" - {
-    val fieldErrors: InputFormErrors =
-      InputFormErrors.input(
-        "error.required",
-        "invalid",
-        "max"
-      )
 
     val testForm: Form[Nino] =
       Form("value" -> nino("error.required", "error.invalid"))
@@ -572,12 +566,6 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
   }
 
   "nino with duplicates" - {
-    val fieldErrors: InputFormErrors =
-      InputFormErrors.input(
-        "error.required",
-        "invalid",
-        "max"
-      )
 
     val duplicates = List(Nino("AB123456C"), Nino("AB123456D"))
     val testForm: Form[Nino] =

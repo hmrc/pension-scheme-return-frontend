@@ -29,7 +29,6 @@ import controllers.{ControllerBaseSpec, ControllerBehaviours}
 class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with ControllerBehaviours with Matchers with OptionValues {
 
   private val didSchemeHoldAnySharesTrue = defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-  private val didSchemeHoldAnySharesFalse = defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
 
   private def addSharesBaseAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers

@@ -39,7 +39,7 @@ class TaskListViewSpec extends ViewSpec with ViewBehaviours with TestValues {
       "render task list section headers" in {
         forAll(viewModelGen) { viewmodel =>
           val expected =
-            viewmodel.page.sections.zipWithIndex.map { case (section, index) =>
+            viewmodel.page.sections.zipWithIndex.map { case (section, _) =>
               s"${renderMessage(section.title)}"
             }.toList
 

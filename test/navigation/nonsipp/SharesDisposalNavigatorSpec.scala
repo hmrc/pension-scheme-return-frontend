@@ -483,7 +483,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               IndependentValuationPage.apply,
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
@@ -498,7 +498,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               HowManyDisposalSharesPage.apply,
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
@@ -1226,7 +1226,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               IndependentValuationPage.apply,
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
@@ -1338,7 +1338,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               HowManyDisposalSharesPage.apply,
-              (srn, index: Int, disposalIndex: Int, _) =>
+              (srn, _: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )

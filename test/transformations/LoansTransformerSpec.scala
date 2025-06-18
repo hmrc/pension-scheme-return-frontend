@@ -880,7 +880,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
     def loansBlankTotalIncome(prePopulated: Option[Boolean], recordVersion: Option[String]): Loans =
       Loans(
-        recordVersion = Some("001"),
+        recordVersion = recordVersion,
         optSchemeHadLoans = Some(true),
         Seq(
           LoanTransactions(
