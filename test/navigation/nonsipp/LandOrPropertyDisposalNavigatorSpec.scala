@@ -37,7 +37,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          LandOrPropertyDisposalPage,
+          LandOrPropertyDisposalPage.apply,
           Gen.const(true),
           (srn, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.WhatYouWillNeedLandPropertyDisposalController
@@ -49,7 +49,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          LandOrPropertyDisposalPage,
+          LandOrPropertyDisposalPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -63,7 +63,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          LandOrPropertyStillHeldPage,
+          LandOrPropertyStillHeldPage.apply,
           (srn, index: Int, disposalIndex: Int, mode) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
               .onPageLoad(srn, index, disposalIndex, mode)
@@ -78,7 +78,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          WhenWasPropertySoldPage,
+          WhenWasPropertySoldPage.apply,
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -93,7 +93,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          TotalProceedsSaleLandPropertyPage,
+          TotalProceedsSaleLandPropertyPage.apply,
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -108,7 +108,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          IndividualBuyerNinoNumberPage,
+          IndividualBuyerNinoNumberPage.apply,
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad
         )
         .withName("go from individual buyer nino page to land or property disposal buyer connected party page")
@@ -121,7 +121,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          LandOrPropertyIndividualBuyerNamePage,
+          LandOrPropertyIndividualBuyerNamePage.apply,
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -136,7 +136,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          PartnershipBuyerNamePage,
+          PartnershipBuyerNamePage.apply,
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController.onPageLoad
         )
         .withName("go from partnership buyer name page to partnership buyer UTR page")
@@ -149,7 +149,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          PartnershipBuyerUtrPage,
+          PartnershipBuyerUtrPage.apply,
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad
         )
         .withName("go from partnership buyer UTR page to land or property disposal buyer connected party page")
@@ -162,7 +162,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          OtherBuyerDetailsPage,
+          OtherBuyerDetailsPage.apply,
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -192,7 +192,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
-          WhoPurchasedLandOrPropertyPage,
+          WhoPurchasedLandOrPropertyPage.apply,
           Gen.const(IdentityType.UKCompany),
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
@@ -206,7 +206,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
-          WhoPurchasedLandOrPropertyPage,
+          WhoPurchasedLandOrPropertyPage.apply,
           Gen.const(IdentityType.UKPartnership),
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
@@ -220,7 +220,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
-          WhoPurchasedLandOrPropertyPage,
+          WhoPurchasedLandOrPropertyPage.apply,
           Gen.const(IdentityType.Other),
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
@@ -237,7 +237,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          LandOrPropertyDisposalBuyerConnectedPartyPage,
+          LandOrPropertyDisposalBuyerConnectedPartyPage.apply,
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -255,7 +255,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          DisposalIndependentValuationPage,
+          DisposalIndependentValuationPage.apply,
           (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
               .onPageLoad(srn, index, disposalIndex, NormalMode)

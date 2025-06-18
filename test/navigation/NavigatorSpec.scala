@@ -38,7 +38,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            WhatYouWillNeedPage,
+            WhatYouWillNeedPage.apply,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             _ => emptyUserAnswers
           )
@@ -48,7 +48,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            WhatYouWillNeedPage,
+            WhatYouWillNeedPage.apply,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             _ => defaultUserAnswers
           )
@@ -60,7 +60,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            WhatYouWillNeedPage,
+            WhatYouWillNeedPage.apply,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             srn => defaultUserAnswers.set(CheckReturnDatesPage(srn), true).get
           )
@@ -72,7 +72,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            CheckUpdateInformationPage,
+            CheckUpdateInformationPage.apply,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             _ => emptyUserAnswers
           )
@@ -82,7 +82,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            CheckUpdateInformationPage,
+            CheckUpdateInformationPage.apply,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             _ => defaultUserAnswers
           )
@@ -94,7 +94,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            CheckUpdateInformationPage,
+            CheckUpdateInformationPage.apply,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             srn => defaultUserAnswers.set(CheckReturnDatesPage(srn), true).get
           )

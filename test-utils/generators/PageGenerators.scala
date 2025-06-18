@@ -31,7 +31,7 @@ trait PageGenerators {
     Arbitrary(LandPropertyIndividualSellersNamePage)
 
   implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage] =
-    Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))
+    Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage.apply))
 
   implicit lazy val arbitraryAccountingPeriodPage: Arbitrary[AccountingPeriodPage] =
     Arbitrary(ModelGenerators.srnGen.map(AccountingPeriodPage(_, 1, NormalMode)))

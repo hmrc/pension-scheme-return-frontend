@@ -37,7 +37,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
     act.like(
       normalmode
         .navigateToWithData(
-          UnregulatedOrConnectedBondsHeldPage,
+          UnregulatedOrConnectedBondsHeldPage.apply,
           Gen.const(true),
           (srn, _) => controllers.nonsipp.bonds.routes.WhatYouWillNeedBondsController.onPageLoad(srn)
         )
@@ -47,7 +47,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
     act.like(
       normalmode
         .navigateToWithData(
-          UnregulatedOrConnectedBondsHeldPage,
+          UnregulatedOrConnectedBondsHeldPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -58,7 +58,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
       act.like(
         normalmode
           .navigateTo(
-            WhatYouWillNeedBondsPage,
+            WhatYouWillNeedBondsPage.apply,
             (srn, _) =>
               controllers.nonsipp.bonds.routes.NameOfBondsController
                 .onPageLoad(srn, index, NormalMode)
@@ -74,7 +74,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            NameOfBondsPage,
+            NameOfBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.WhyDoesSchemeHoldBondsController
                 .onPageLoad(srn, index, NormalMode)
@@ -90,7 +90,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            WhyDoesSchemeHoldBondsPage,
+            WhyDoesSchemeHoldBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                 .onPageLoad(srn, index, NormalMode),
@@ -109,7 +109,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            WhyDoesSchemeHoldBondsPage,
+            WhyDoesSchemeHoldBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                 .onPageLoad(srn, index, NormalMode),
@@ -128,7 +128,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            WhyDoesSchemeHoldBondsPage,
+            WhyDoesSchemeHoldBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.CostOfBondsController
                 .onPageLoad(srn, index, NormalMode),
@@ -149,7 +149,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            WhenDidSchemeAcquireBondsPage,
+            WhenDidSchemeAcquireBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.CostOfBondsController
                 .onPageLoad(srn, index, NormalMode)
@@ -165,7 +165,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            CostOfBondsPage,
+            CostOfBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController
                 .onPageLoad(srn, index, NormalMode),
@@ -184,7 +184,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            CostOfBondsPage,
+            CostOfBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.AreBondsUnregulatedController
                 .onPageLoad(srn, index, NormalMode),
@@ -203,7 +203,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            CostOfBondsPage,
+            CostOfBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.AreBondsUnregulatedController
                 .onPageLoad(srn, index, NormalMode),
@@ -224,7 +224,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            BondsFromConnectedPartyPage,
+            BondsFromConnectedPartyPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.AreBondsUnregulatedController
                 .onPageLoad(srn, index, NormalMode)
@@ -240,7 +240,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            AreBondsUnregulatedPage,
+            AreBondsUnregulatedPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.IncomeFromBondsController
                 .onPageLoad(srn, index, NormalMode)
@@ -256,7 +256,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            IncomeFromBondsPage,
+            IncomeFromBondsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                 .onPageLoad(srn, index, NormalMode)
@@ -273,7 +273,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           normalmode
             .navigateToWithIndex(
               index,
-              RemoveBondsPage,
+              RemoveBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
                   .onPageLoad(srn, NormalMode)
@@ -292,7 +292,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           normalmode
             .navigateToWithIndex(
               index,
-              RemoveBondsPage,
+              RemoveBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.BondsListController
                   .onPageLoad(srn, 1, NormalMode),
@@ -310,7 +310,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              NameOfBondsPage,
+              NameOfBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
@@ -326,7 +326,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldBondsPage,
+              WhyDoesSchemeHoldBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                   .onPageLoad(srn, index, CheckMode),
@@ -345,7 +345,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldBondsPage,
+              WhyDoesSchemeHoldBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                   .onPageLoad(srn, index, CheckMode),
@@ -364,7 +364,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldBondsPage,
+              WhyDoesSchemeHoldBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode),
@@ -385,7 +385,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireBondsPage,
+              WhenDidSchemeAcquireBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -404,7 +404,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireBondsPage,
+              WhenDidSchemeAcquireBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode),
@@ -423,7 +423,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireBondsPage,
+              WhenDidSchemeAcquireBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode),
@@ -444,7 +444,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              CostOfBondsPage,
+              CostOfBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
@@ -460,7 +460,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              BondsFromConnectedPartyPage,
+              BondsFromConnectedPartyPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
@@ -476,7 +476,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              AreBondsUnregulatedPage,
+              AreBondsUnregulatedPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
@@ -492,7 +492,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              IncomeFromBondsPage,
+              IncomeFromBondsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)

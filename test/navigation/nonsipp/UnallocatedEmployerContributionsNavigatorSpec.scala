@@ -32,7 +32,7 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
     act.like(
       normalmode
         .navigateToWithData(
-          UnallocatedEmployerContributionsPage,
+          UnallocatedEmployerContributionsPage.apply,
           Gen.const(true),
           controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController.onPageLoad
         )
@@ -42,7 +42,7 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
     act.like(
       normalmode
         .navigateToWithData(
-          UnallocatedEmployerContributionsPage,
+          UnallocatedEmployerContributionsPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -54,7 +54,7 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
     act.like(
       normalmode
         .navigateToWithData(
-          UnallocatedEmployerAmountPage,
+          UnallocatedEmployerAmountPage.apply,
           Gen.const(money),
           (srn, _) =>
             controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
@@ -79,7 +79,7 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
     act.like(
       normalmode
         .navigateToWithData(
-          RemoveUnallocatedAmountPage,
+          RemoveUnallocatedAmountPage.apply,
           Gen.const(false),
           (srn, _) =>
             controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController

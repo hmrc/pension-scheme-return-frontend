@@ -42,7 +42,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          LoansMadeOrOutstandingPage,
+          LoansMadeOrOutstandingPage.apply,
           Gen.const(true),
           (srn, _) => controllers.nonsipp.loansmadeoroutstanding.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
         )
@@ -52,7 +52,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          LoansMadeOrOutstandingPage,
+          LoansMadeOrOutstandingPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -65,7 +65,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          IndividualRecipientNamePage,
+          IndividualRecipientNamePage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad
         )
         .withName("go from Individual recipient name page to individual nino page")
@@ -75,7 +75,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          IndividualRecipientNinoPage,
+          IndividualRecipientNinoPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.IsIndividualRecipientConnectedPartyController.onPageLoad
         )
         .withName("go from individual recipient nino page to is individual recipient connected party page")
@@ -86,7 +86,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            WhatYouWillNeedLoansPage,
+            WhatYouWillNeedLoansPage.apply,
             controllers.nonsipp.common.routes.IdentityTypeController
               .onPageLoad(_, index, _, IdentitySubject.LoanRecipient)
           )
@@ -102,7 +102,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            WhatYouWillNeedLoansPage,
+            WhatYouWillNeedLoansPage.apply,
             (srn, mode) =>
               controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, 1, mode),
             completedLoanUserAnswers
@@ -115,7 +115,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          RecipientSponsoringEmployerConnectedPartyPage,
+          RecipientSponsoringEmployerConnectedPartyPage.apply ,
           controllers.nonsipp.loansmadeoroutstanding.routes.DatePeriodLoanController.onPageLoad
         )
         .withName("go from sponsoring employer or connected party page to date period loan page")
@@ -125,7 +125,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          DatePeriodLoanPage,
+          DatePeriodLoanPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.AmountOfTheLoanController.onPageLoad
         )
         .withName("go from date period loan page to amount of loan page")
@@ -139,7 +139,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataIndexAndSubjectBoth(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.Other),
             controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
           )
@@ -151,7 +151,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.Individual),
             controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad
           )
@@ -163,7 +163,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.UKCompany),
             controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
           )
@@ -175,7 +175,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.UKPartnership),
             controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad
           )
@@ -192,7 +192,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataIndexAndSubjects(
             index,
             subject,
-            CompanyRecipientNamePage,
+            CompanyRecipientNamePage.apply,
             Gen.const(""),
             controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
           )
@@ -204,7 +204,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithIndexAndSubject(
             index,
             subject,
-            CompanyRecipientCrnPage,
+            CompanyRecipientCrnPage.apply,
             controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
           )
           .withName("go from company recipient CRN page to sponsoring employer or connected party page")
@@ -218,7 +218,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDataIndexAndSubjects(
           index,
           subject,
-          PartnershipRecipientNamePage,
+          PartnershipRecipientNamePage.apply,
           Gen.const(""),
           controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad
         )
@@ -232,7 +232,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithIndexAndSubject(
           index,
           subject,
-          PartnershipRecipientUtrPage,
+          PartnershipRecipientUtrPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )
         .withName("go from partnership recipient Utr page to sponsoring employer or connected party page")
@@ -244,7 +244,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          AmountOfTheLoanPage,
+          AmountOfTheLoanPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController.onPageLoad
         )
         .withName("go from amount of the loan page to are repayments instalments page")
@@ -256,7 +256,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          AreRepaymentsInstalmentsPage,
+          AreRepaymentsInstalmentsPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController.onPageLoad
         )
         .withName("go from are repayments instalments page to interest on loan page")
@@ -268,7 +268,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          InterestOnLoanPage,
+          InterestOnLoanPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController.onPageLoad
         )
         .withName("go from interest on loan page to security given for loan page")
@@ -280,7 +280,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          SecurityGivenForLoanPage,
+          SecurityGivenForLoanPage.apply,
           controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController.onPageLoad
         )
         .withName("go from interest on loan page to outstanding arrears on loan page")
@@ -380,7 +380,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithDataIndexAndSubject(
           index,
           subject,
-          OtherRecipientDetailsPage,
+          OtherRecipientDetailsPage.apply,
           Gen.const(recipientDetails),
           controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )

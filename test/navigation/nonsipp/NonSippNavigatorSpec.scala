@@ -44,7 +44,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            WhichTaxYearPage,
+            WhichTaxYearPage.apply,
             routes.CheckReturnDatesController.onPageLoad
           )
           .withName("go from which tax year page to check return dates page")
@@ -53,7 +53,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            CheckReturnDatesPage,
+            CheckReturnDatesPage.apply,
             Gen.const(true),
             schemedesignatory.routes.ActiveBankAccountController.onPageLoad
           )
@@ -63,7 +63,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            CheckReturnDatesPage,
+            CheckReturnDatesPage.apply,
             Gen.const(false),
             accountingperiod.routes.AccountingPeriodController.onPageLoad(_, 1, _)
           )
@@ -91,7 +91,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            FinancialDetailsCheckYourAnswersPage,
+            FinancialDetailsCheckYourAnswersPage.apply,
             (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           )
           .withName("go from financial details check your answers page to task list page")
@@ -129,7 +129,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         checkmode
           .navigateToWithData(
-            CheckReturnDatesPage,
+            CheckReturnDatesPage.apply,
             Gen.const(true),
             nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad
           )
@@ -139,7 +139,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         checkmode
           .navigateToWithData(
-            CheckReturnDatesPage,
+            CheckReturnDatesPage.apply,
             Gen.const(false),
             nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad,
             srn =>
@@ -154,7 +154,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         checkmode
           .navigateToWithData(
-            CheckReturnDatesPage,
+            CheckReturnDatesPage.apply,
             Gen.const(false),
             (srn, mode) => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, 1, mode)
           )

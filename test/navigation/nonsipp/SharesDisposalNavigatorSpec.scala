@@ -43,7 +43,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateToWithData(
-              SharesDisposalPage,
+              SharesDisposalPage.apply,
               Gen.const(true),
               (srn, _) =>
                 controllers.nonsipp.sharesdisposal.routes.WhatYouWillNeedSharesDisposalController.onPageLoad(srn)
@@ -54,7 +54,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateToWithData(
-              SharesDisposalPage,
+              SharesDisposalPage.apply,
               Gen.const(false),
               (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
             )
@@ -67,7 +67,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateTo(
-              WhatYouWillNeedSharesDisposalPage,
+              WhatYouWillNeedSharesDisposalPage.apply,
               (srn, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
                   .onPageLoad(srn, 1)
@@ -82,7 +82,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               shareIndex,
-              SharesDisposalListPage,
+              SharesDisposalListPage.apply,
               (srn, shareIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -97,7 +97,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           act.like(
             normalmode
               .navigateTo(
-                RemoveShareDisposalPage,
+                RemoveShareDisposalPage.apply,
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad
               )
               .withName("go from RemoveShareDisposalPage to Shares Disposal page")
@@ -108,7 +108,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           act.like(
             normalmode
               .navigateTo(
-                RemoveShareDisposalPage,
+                RemoveShareDisposalPage.apply,
                 (srn, _) =>
                   controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                     .onPageLoad(srn, page = 1),
@@ -124,7 +124,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           act.like(
             normalmode
               .navigateTo(
-                RemoveShareDisposalPage,
+                RemoveShareDisposalPage.apply,
                 (srn, _) =>
                   controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                     .onPageLoad(srn, page = 1),
@@ -206,7 +206,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              WhenWereSharesSoldPage,
+              WhenWereSharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -222,7 +222,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesSoldPage,
+              HowManySharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -238,7 +238,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              TotalConsiderationSharesSoldPage,
+              TotalConsiderationSharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.WhoWereTheSharesSoldToController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -254,7 +254,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              WhenWereSharesRedeemedPage,
+              WhenWereSharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesRedeemedController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -270,7 +270,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesRedeemedPage,
+              HowManySharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -286,7 +286,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              TotalConsiderationSharesRedeemedPage,
+              TotalConsiderationSharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -302,7 +302,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.Individual),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController
@@ -316,7 +316,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.UKCompany),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController
@@ -330,7 +330,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.UKPartnership),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
@@ -344,7 +344,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.Other),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
@@ -360,7 +360,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              SharesIndividualBuyerNamePage,
+              SharesIndividualBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -375,7 +375,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IndividualBuyerNinoNumberPage,
+              IndividualBuyerNinoNumberPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -390,7 +390,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerNamePage,
+              CompanyBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -405,7 +405,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerCrnPage,
+              CompanyBuyerCrnPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -421,7 +421,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerNamePage,
+              PartnershipBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -437,7 +437,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerUtrPage,
+              PartnershipBuyerUtrPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -452,7 +452,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              OtherBuyerDetailsPage,
+              OtherBuyerDetailsPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -467,7 +467,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IsBuyerConnectedPartyPage,
+              IsBuyerConnectedPartyPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IndependentValuationController
                   .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -482,7 +482,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IndependentValuationPage,
+              IndependentValuationPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -497,7 +497,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManyDisposalSharesPage,
+              HowManyDisposalSharesPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -511,7 +511,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateTo(
-              SharesDisposalCYAPage,
+              SharesDisposalCYAPage.apply,
               (srn, _) =>
                 controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                   .onPageLoad(srn, page = 1)
@@ -591,7 +591,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              WhenWereSharesSoldPage,
+              WhenWereSharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
@@ -609,7 +609,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              WhenWereSharesSoldPage,
+              WhenWereSharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
                   .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
@@ -630,7 +630,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesSoldPage,
+              HowManySharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
@@ -648,7 +648,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesSoldPage,
+              HowManySharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
                   .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
@@ -669,7 +669,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              TotalConsiderationSharesSoldPage,
+              TotalConsiderationSharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
@@ -687,7 +687,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              TotalConsiderationSharesSoldPage,
+              TotalConsiderationSharesSoldPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.WhoWereTheSharesSoldToController
                   .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
@@ -710,7 +710,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.Individual),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController
@@ -724,7 +724,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.UKCompany),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController
@@ -738,7 +738,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.UKPartnership),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
@@ -752,7 +752,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
-              WhoWereTheSharesSoldToPage,
+              WhoWereTheSharesSoldToPage.apply,
               Gen.const(IdentityType.Other),
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
@@ -769,7 +769,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              SharesIndividualBuyerNamePage,
+              SharesIndividualBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -787,7 +787,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              SharesIndividualBuyerNamePage,
+              SharesIndividualBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -805,7 +805,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              SharesIndividualBuyerNamePage,
+              SharesIndividualBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -826,7 +826,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IndividualBuyerNinoNumberPage,
+              IndividualBuyerNinoNumberPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -844,7 +844,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IndividualBuyerNinoNumberPage,
+              IndividualBuyerNinoNumberPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -862,7 +862,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IndividualBuyerNinoNumberPage,
+              IndividualBuyerNinoNumberPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -883,7 +883,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerNamePage,
+              CompanyBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -901,7 +901,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerNamePage,
+              CompanyBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -919,7 +919,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerNamePage,
+              CompanyBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -940,7 +940,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerCrnPage,
+              CompanyBuyerCrnPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -958,7 +958,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerCrnPage,
+              CompanyBuyerCrnPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -976,7 +976,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              CompanyBuyerCrnPage,
+              CompanyBuyerCrnPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -997,7 +997,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerNamePage,
+              PartnershipBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1015,7 +1015,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerNamePage,
+              PartnershipBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -1033,7 +1033,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerNamePage,
+              PartnershipBuyerNamePage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -1054,7 +1054,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerUtrPage,
+              PartnershipBuyerUtrPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1072,7 +1072,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerUtrPage,
+              PartnershipBuyerUtrPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -1090,7 +1090,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              PartnershipBuyerUtrPage,
+              PartnershipBuyerUtrPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1110,7 +1110,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              OtherBuyerDetailsPage,
+              OtherBuyerDetailsPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1128,7 +1128,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              OtherBuyerDetailsPage,
+              OtherBuyerDetailsPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -1146,7 +1146,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              OtherBuyerDetailsPage,
+              OtherBuyerDetailsPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1167,7 +1167,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IsBuyerConnectedPartyPage,
+              IsBuyerConnectedPartyPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1185,7 +1185,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IsBuyerConnectedPartyPage,
+              IsBuyerConnectedPartyPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.IndependentValuationController
                   .onPageLoad(srn, index, disposalIndex, CheckMode),
@@ -1203,7 +1203,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IsBuyerConnectedPartyPage,
+              IsBuyerConnectedPartyPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, index, disposalIndex, NormalMode),
@@ -1225,7 +1225,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              IndependentValuationPage,
+              IndependentValuationPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -1241,7 +1241,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              WhenWereSharesRedeemedPage,
+              WhenWereSharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
@@ -1259,7 +1259,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              WhenWereSharesRedeemedPage,
+              WhenWereSharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesRedeemedController
                   .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
@@ -1280,7 +1280,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesRedeemedPage,
+              HowManySharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
@@ -1298,7 +1298,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesRedeemedPage,
+              HowManySharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController
                   .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
@@ -1320,7 +1320,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              TotalConsiderationSharesRedeemedPage,
+              TotalConsiderationSharesRedeemedPage.apply,
               (srn, shareIndex: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -1337,7 +1337,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManyDisposalSharesPage,
+              HowManyDisposalSharesPage.apply,
               (srn, index: Int, disposalIndex: Int, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -1351,7 +1351,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           checkmode
             .navigateTo(
-              SharesDisposalCYAPage,
+              SharesDisposalCYAPage.apply,
               (srn, _) =>
                 controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                   .onPageLoad(srn, page = 1)

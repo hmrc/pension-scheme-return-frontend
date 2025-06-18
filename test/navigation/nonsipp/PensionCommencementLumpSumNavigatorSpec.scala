@@ -34,7 +34,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
     act.like(
       normalmode
         .navigateToWithData(
-          PensionCommencementLumpSumPage,
+          PensionCommencementLumpSumPage.apply,
           Gen.const(true),
           (s, _) =>
             controllers.nonsipp.memberreceivedpcls.routes.WhatYouWillNeedPensionCommencementLumpSumController
@@ -48,7 +48,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
     act.like(
       normalmode
         .navigateToWithData(
-          PensionCommencementLumpSumPage,
+          PensionCommencementLumpSumPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -58,7 +58,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
     act.like(
       normalmode
         .navigateTo(
-          WhatYouWillNeedPensionCommencementLumpSumPage,
+          WhatYouWillNeedPensionCommencementLumpSumPage.apply,
           (srn, _) =>
             controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
               .onPageLoad(srn, 1, NormalMode)

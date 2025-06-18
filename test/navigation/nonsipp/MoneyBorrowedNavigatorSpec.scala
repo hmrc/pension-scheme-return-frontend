@@ -36,7 +36,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          MoneyBorrowedPage,
+          MoneyBorrowedPage.apply,
           Gen.const(true),
           (srn, _) => controllers.nonsipp.moneyborrowed.routes.WhatYouWillNeedMoneyBorrowedController.onPageLoad(srn)
         )
@@ -46,7 +46,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          MoneyBorrowedPage,
+          MoneyBorrowedPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -71,7 +71,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          LenderNamePage,
+          LenderNamePage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.moneyborrowed.routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)
         )
@@ -84,7 +84,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          BorrowedAmountAndRatePage,
+          BorrowedAmountAndRatePage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onPageLoad(srn, index, NormalMode)
         )
@@ -97,7 +97,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          WhenBorrowedPage,
+          WhenBorrowedPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.moneyborrowed.routes.ValueOfSchemeAssetsWhenMoneyBorrowedController
               .onPageLoad(srn, index, NormalMode)
@@ -111,7 +111,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          ValueOfSchemeAssetsWhenMoneyBorrowedPage,
+          ValueOfSchemeAssetsWhenMoneyBorrowedPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
         )
@@ -124,7 +124,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          WhySchemeBorrowedMoneyPage,
+          WhySchemeBorrowedMoneyPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
               .onPageLoad(srn, index, NormalMode)

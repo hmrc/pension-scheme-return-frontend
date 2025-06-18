@@ -35,7 +35,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
     act.like(
       normalmode
         .navigateToWithData(
-          PensionPaymentsReceivedPage,
+          PensionPaymentsReceivedPage.apply,
           Gen.const(true),
           (srn, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
@@ -47,7 +47,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
     act.like(
       normalmode
         .navigateToWithData(
-          PensionPaymentsReceivedPage,
+          PensionPaymentsReceivedPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -59,7 +59,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
     act.like(
       normalmode
         .navigateTo(
-          MemberPensionPaymentsListPage,
+          MemberPensionPaymentsListPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from  member pension payments list page to task list page")
@@ -99,7 +99,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
       normalmode
         .navigateToWithIndex(
           index,
-          RemovePensionPaymentsPage,
+          RemovePensionPaymentsPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
               .onPageLoad(srn, 1, NormalMode)

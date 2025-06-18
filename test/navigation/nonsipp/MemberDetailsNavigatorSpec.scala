@@ -118,7 +118,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            SchemeMemberDetailsAnswersPage,
+            SchemeMemberDetailsAnswersPage.apply,
             (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
           )
           .withName("go from scheme member details answers page to scheme members list Page")
@@ -128,7 +128,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateFromListPage(
             SchemeMembersListPage(_, addMember = true, Manual),
-            MemberDetailsPage,
+            MemberDetailsPage.apply,
             nameDobGen,
             IndexGen[OneTo300](min = 1, max = 300),
             (srn, _, _) => routes.PensionSchemeMembersController.onPageLoad(srn),
@@ -143,7 +143,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateFromListPage(
             SchemeMembersListPage(_, addMember = true, Upload),
-            MemberDetailsPage,
+            MemberDetailsPage.apply,
             nameDobGen,
             IndexGen[OneTo300](min = 1, max = 300),
             (srn, _, _) => routes.PensionSchemeMembersController.onPageLoad(srn),
@@ -179,7 +179,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            RemoveMemberDetailsPage,
+            RemoveMemberDetailsPage.apply,
             (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
           )
           .withName("go from remove page to list page")
@@ -188,7 +188,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            HowToUploadPage,
+            HowToUploadPage.apply,
             (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
           )
           .withName("go from how to upload page  to upload member details page")
@@ -197,7 +197,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            UploadMemberDetailsPage,
+            UploadMemberDetailsPage.apply,
             routes.CheckMemberDetailsFileController.onPageLoad
           )
           .withName("go from upload member details page to check member details file page")
@@ -206,7 +206,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            CheckMemberDetailsFilePage,
+            CheckMemberDetailsFilePage.apply,
             Gen.const(true),
             controllers.nonsipp.memberdetails.upload.routes.CheckingMemberDetailsFileController.onPageLoad
           )
@@ -234,7 +234,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            FileUploadSuccessPage,
+            FileUploadSuccessPage.apply,
             (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
           )
           .withName("go from file upload success page to scheme members list page")
@@ -271,7 +271,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            FileUploadErrorSummaryPage,
+            FileUploadErrorSummaryPage.apply,
             (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
           )
           .withName("go from file upload error summary page to upload a file page")
@@ -280,7 +280,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            FileUploadTooManyErrorsPage,
+            FileUploadTooManyErrorsPage.apply,
             (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
           )
           .withName("go from too many file upload errors page to upload a file page")
@@ -368,7 +368,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           checkmode
             .navigateTo(
-              UploadMemberDetailsPage,
+              UploadMemberDetailsPage.apply,
               routes.CheckMemberDetailsFileController.onPageLoad
             )
             .withName("go from upload member details page to check member details file page")

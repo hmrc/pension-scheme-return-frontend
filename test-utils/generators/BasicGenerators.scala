@@ -240,7 +240,7 @@ trait BasicGenerators extends EitherValues {
   implicit val max99: Gen[Max300] = chooseNum(1, 99).map(refineV[OneTo300](_).value)
 
   val jsStringGen: Gen[JsString] =
-    Gen.alphaStr.map(JsString)
+    Gen.alphaStr.map(JsString.apply)
 
   val jsBooleanGen: Gen[JsBoolean] =
     Gen.oneOf(true, false).map(JsBoolean)
