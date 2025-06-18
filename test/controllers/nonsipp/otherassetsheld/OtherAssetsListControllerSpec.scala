@@ -404,7 +404,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec with ControllerBe
         onSubmitViewOnly,
         onPageLoadViewOnlyTaskListController
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only tasklist")
     )
 

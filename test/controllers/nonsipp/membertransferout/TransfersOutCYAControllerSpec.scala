@@ -73,7 +73,7 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec with ControllerBe
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -140,7 +140,7 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec with ControllerBe
         controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to TransferOutMemberListController page")
     )
   }

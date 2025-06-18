@@ -81,8 +81,8 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec with Contro
 
         act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-        act.like(saveAndContinue(onSubmit, validForm: _*))
-        act.like(invalidForm(onSubmit, defaultUserAnswers, invalidForm: _*))
+        act.like(saveAndContinue(onSubmit, validForm*))
+        act.like(invalidForm(onSubmit, defaultUserAnswers, invalidForm*))
         act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
       }
     }

@@ -33,7 +33,7 @@ object SchemeHoldBond extends Enumerable.Implicits {
 
   val values: List[SchemeHoldBond] = List(Acquisition, Contribution, Transfer)
 
-  implicit val enumerable: Enumerable[SchemeHoldBond] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[SchemeHoldBond] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[SchemeHoldBond] = (value: SchemeHoldBond) => value.name
 }

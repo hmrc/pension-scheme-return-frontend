@@ -34,7 +34,7 @@ package object shares {
 
   }
 
-  def sharesPages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[QuestionPage[_]] = {
+  def sharesPages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[QuestionPage[?]] = {
     val list = List(
       ClassOfSharesPage(srn, index),
       CompanyNameOfSharesSellerPage(srn, index),

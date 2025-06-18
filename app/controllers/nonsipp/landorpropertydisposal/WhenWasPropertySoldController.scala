@@ -60,7 +60,7 @@ class WhenWasPropertySoldController @Inject() (
 
   private val form =
     (date: LocalDate, beforeDate: LocalDate, request: DataRequest[AnyContent]) =>
-      WhenWasPropertySoldController.form(formProvider)(date, beforeDate, request.messages(messagesApi))
+      WhenWasPropertySoldController.form(formProvider)(date, beforeDate, request.messages(using messagesApi))
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>

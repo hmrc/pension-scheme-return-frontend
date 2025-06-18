@@ -99,7 +99,7 @@ class SharesDisposalListController @Inject() (
   }
 
   private def sharesDisposalData(srn: Srn, indexes: List[Max5000])(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ): Either[Result, List[SharesDisposalData]] =
     indexes.map { index =>
       for {

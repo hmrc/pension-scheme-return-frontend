@@ -40,7 +40,7 @@ case class SurrenderedBenefitsAmountPage(srn: Srn, memberIndex: Max300) extends 
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(
       WhenDidMemberSurrenderBenefitsPage(srn, memberIndex),
       WhyDidMemberSurrenderBenefitsPage(srn, memberIndex),

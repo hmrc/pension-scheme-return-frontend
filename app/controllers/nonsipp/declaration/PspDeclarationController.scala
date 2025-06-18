@@ -178,7 +178,7 @@ class PspDeclarationController @Inject() (
     submittedDate: LocalDateTime,
     reportVersion: String
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     hc: HeaderCarrier
   ): Future[EmailStatus] = {
     val requestId = hc.requestId.map(_.value).getOrElse(request.headers.get("X-Session-ID").getOrElse(""))

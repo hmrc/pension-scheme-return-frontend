@@ -96,7 +96,7 @@ class MemberDetailsNinoController @Inject() (
       }
   }
 
-  private def duplicateNinos(srn: Srn, index: Max300)(implicit request: DataRequest[_]): List[Nino] =
+  private def duplicateNinos(srn: Srn, index: Max300)(implicit request: DataRequest[?]): List[Nino] =
     request.userAnswers.map(MemberDetailsNinoPages(srn)).removed(index.arrayIndex.toString).values.toList
 }
 

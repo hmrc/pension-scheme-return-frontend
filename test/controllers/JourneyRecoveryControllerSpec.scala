@@ -48,9 +48,9 @@ class JourneyRecoveryControllerSpec extends ControllerBaseSpec with ControllerBe
           val continueView = application.injector.instanceOf[JourneyRecoveryContinueView]
 
           status(result) mustEqual OK
-          val expectedView = continueView(continueUrl.unsafeValue, expectedReportAProblemUrl)(
+          val expectedView = continueView(continueUrl.unsafeValue, expectedReportAProblemUrl)(using
             request,
-            createMessages(application)
+            createMessages(using application)
           ).toString
           val actualView = contentAsString(result)
           actualView mustEqual expectedView
@@ -75,9 +75,9 @@ class JourneyRecoveryControllerSpec extends ControllerBaseSpec with ControllerBe
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView(expectedRedirectUrl, expectedReportAProblemUrl)(
+          contentAsString(result) mustEqual startAgainView(expectedRedirectUrl, expectedReportAProblemUrl)(using
             request,
-            createMessages(application)
+            createMessages(using application)
           ).toString
         }
       }
@@ -102,9 +102,9 @@ class JourneyRecoveryControllerSpec extends ControllerBaseSpec with ControllerBe
             val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual startAgainView(expectedRedirectUrl, expectedReportAProblemUrl)(
+            contentAsString(result) mustEqual startAgainView(expectedRedirectUrl, expectedReportAProblemUrl)(using
               request,
-              createMessages(application)
+              createMessages(using application)
             ).toString
           }
         }
@@ -125,9 +125,9 @@ class JourneyRecoveryControllerSpec extends ControllerBaseSpec with ControllerBe
             val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual startAgainView(expectedRedirectUrl, expectedReportAProblemUrl)(
+            contentAsString(result) mustEqual startAgainView(expectedRedirectUrl, expectedReportAProblemUrl)(using
               request,
-              createMessages(application)
+              createMessages(using application)
             ).toString
           }
         }

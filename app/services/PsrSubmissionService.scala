@@ -62,8 +62,8 @@ class PsrSubmissionService @Inject() (
     srn: Srn,
     userAnswers: UserAnswers,
     fallbackCall: Call
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    submitPsrDetails(srn, fallbackCall = fallbackCall)(
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[?]): Future[Option[Unit]] =
+    submitPsrDetails(srn, fallbackCall = fallbackCall)(using
       implicitly,
       implicitly,
       DataRequest(request.request, userAnswers, previousUserAnswers = request.previousUserAnswers)
@@ -73,7 +73,7 @@ class PsrSubmissionService @Inject() (
     srn: Srn,
     isSubmitted: Boolean = false,
     fallbackCall: Call
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[?]): Future[Option[Unit]] = {
     val currentUA = request.userAnswers
     sessionRepository
       .get(UNCHANGED_SESSION_PREFIX + currentUA.id)
@@ -116,7 +116,7 @@ class PsrSubmissionService @Inject() (
     srn: Srn,
     submissionRequest: PsrSubmission,
     isSubmitted: Boolean
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Either[String, Unit]] =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[?]): Future[Either[String, Unit]] =
     if (isPrePopulation && !isSubmitted) {
       logger.info("Submit pre-populated PSR is called")
       psrConnector
@@ -140,7 +140,7 @@ class PsrSubmissionService @Inject() (
   def submitPsrDetailsBypassed(
     srn: Srn,
     fallbackCall: Call
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[?]): Future[Option[Unit]] =
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn, request.userAnswers, isSubmitted = true),
       request.userAnswers.get(CheckReturnDatesPage(srn)),
@@ -182,7 +182,7 @@ class PsrSubmissionService @Inject() (
     }.sequence
 
   private def buildAuditEvent(taxYear: DateRange, isSubmitted: Boolean, submissionRequest: PsrSubmission)(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ): ExtendedAuditEvent = {
     val affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual"
     val credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA

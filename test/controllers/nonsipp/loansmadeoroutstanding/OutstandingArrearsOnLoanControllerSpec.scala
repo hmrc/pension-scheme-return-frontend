@@ -62,7 +62,7 @@ class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec with Con
   }
 
   def setSchemeDate(date: Option[DateRange]): Unit =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(date)
 
   "OutstandingArrearsOnLoanController" - {
 

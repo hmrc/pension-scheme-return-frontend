@@ -36,7 +36,7 @@ class ListRadiosViewSpec extends ViewSpec with ViewBehaviours {
     def viewModelGen(
       rows: Option[Int] = None
     ): Gen[FormPageViewModel[ListRadiosViewModel]] =
-      formPageViewModelGen(listRadiosViewModelGen(rows = rows))
+      formPageViewModelGen(using listRadiosViewModelGen(rows = rows))
 
     "SummaryView" - {
       act.like(renderTitle(viewModelGen())(view(form, _), _.title.key))

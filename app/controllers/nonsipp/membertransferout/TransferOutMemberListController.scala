@@ -142,7 +142,7 @@ class TransferOutMemberListController @Inject() (
     }
 
   private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): List[MemberWithTransferOut] = memberTransferOutList.map { case (index, nameDOB) =>
     MemberWithTransferOut(
       memberIndex = index,

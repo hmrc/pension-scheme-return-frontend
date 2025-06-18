@@ -60,14 +60,14 @@ class MemberDetailsController @Inject() (
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(using request))
 
       Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(using request))
       form
         .bindFromRequest()
         .fold(

@@ -59,7 +59,7 @@ case class UploadKey(userId: String, srn: Srn) {
 }
 
 object UploadKey {
-  def fromRequest(srn: Srn)(implicit req: DataRequest[_]): UploadKey =
+  def fromRequest(srn: Srn)(implicit req: DataRequest[?]): UploadKey =
     UploadKey(req.getUserId, srn)
 
   val separator = "&&"

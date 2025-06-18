@@ -103,7 +103,7 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec with ControllerBeh
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     act.like(
-      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm: _*)
+      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm*)
         .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
   }

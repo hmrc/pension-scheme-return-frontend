@@ -75,7 +75,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -153,7 +153,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
         controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to TransferReceivedMemberListController page")
     )
   }

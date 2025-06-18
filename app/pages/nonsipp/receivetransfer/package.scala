@@ -29,7 +29,7 @@ package object receivetransfer {
     val memberTransfersIn: JsPath = memberDetails \ "memberTransfersIn"
   }
 
-  def transferInPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[_]] = List(
+  def transferInPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[?]] = List(
     DidTransferIncludeAssetPage(srn, index, secondaryIndex),
     ReportAnotherTransferInPage(srn, index, secondaryIndex),
     TotalValueTransferPage(srn, index, secondaryIndex),

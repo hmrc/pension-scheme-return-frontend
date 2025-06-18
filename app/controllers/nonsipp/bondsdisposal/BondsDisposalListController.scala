@@ -100,7 +100,7 @@ class BondsDisposalListController @Inject() (
   }
 
   private def bondsData(srn: Srn, indexes: List[Max5000])(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ): Either[Result, List[BondsData]] =
     indexes.map { index =>
       for {

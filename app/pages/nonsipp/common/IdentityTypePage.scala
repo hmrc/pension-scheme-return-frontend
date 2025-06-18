@@ -50,13 +50,13 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
 
   override def toString: String = "identityTypes"
 
-  private def allPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+  private def allPages(srn: Srn, userAnswers: UserAnswers): List[Removable[?]] =
     pagesDependentOnIdentitySubject(srn) ++ pagesNotDependentOnIdentitySubject(
       srn,
       userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size == 1
     )
 
-  private def pagesNotDependentOnIdentitySubject(srn: Srn, isLastRecord: Boolean): List[Removable[_]] =
+  private def pagesNotDependentOnIdentitySubject(srn: Srn, isLastRecord: Boolean): List[Removable[?]] =
     this.identitySubject match {
       // only for loans for now, as this is the first question in the journey
       case IdentitySubject.LoanRecipient =>
@@ -76,13 +76,13 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       case _ =>
         List().empty
     }
-  private def genericPagesDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
+  private def genericPagesDependentOnIdentitySubject(srn: Srn): List[Removable[?]] =
     List(
       CompanyRecipientCrnPage(srn, index, this.identitySubject),
       PartnershipRecipientUtrPage(srn, index, this.identitySubject),
       OtherRecipientDetailsPage(srn, index, this.identitySubject)
     )
-  private def pagesNotUsingIdentitySubject(srn: Srn): List[Removable[_]] =
+  private def pagesNotUsingIdentitySubject(srn: Srn): List[Removable[?]] =
     this.identitySubject match {
       case IdentitySubject.LoanRecipient =>
         List(
@@ -120,7 +120,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       case _ =>
         List().empty
     }
-  private def pagesDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
+  private def pagesDependentOnIdentitySubject(srn: Srn): List[Removable[?]] =
     genericPagesDependentOnIdentitySubject(srn) ++ pagesNotUsingIdentitySubject(srn)
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =

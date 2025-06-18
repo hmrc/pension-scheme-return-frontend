@@ -52,7 +52,7 @@ class PrePopulationDataAction @Inject() (
           baseReturnUA <- psrRetrievalService.getAndTransformStandardPsrDetails(
             optFbNumber = Some(lastSubmittedPsrFbInPreviousYears),
             fallBackCall = controllers.routes.OverviewController.onPageLoad(srn)
-          )(
+          )(using
             hc = implicitly,
             ec = implicitly,
             request = DataRequest[A](allowedAccessRequest, emptyUserAnswers(allowedAccessRequest))
@@ -69,7 +69,7 @@ class PrePopulationDataAction @Inject() (
   override protected def executionContext: ExecutionContext = ec
 
   // value of UserAnswers in DataRequest is not referenced in the psrRetrievalService
-  private def emptyUserAnswers(request: AllowedAccessRequest[_]): UserAnswers =
+  private def emptyUserAnswers(request: AllowedAccessRequest[?]): UserAnswers =
     UserAnswers(request.getUserId + request.srn)
 }
 

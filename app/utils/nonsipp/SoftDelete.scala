@@ -45,7 +45,7 @@ import scala.util.{Failure, Success, Try}
 
 trait SoftDelete extends PSRController {
 
-  protected def softDeleteMember(srn: Srn, index: Max300)(implicit req: DataRequest[_]): Try[UserAnswers] =
+  protected def softDeleteMember(srn: Srn, index: Max300)(implicit req: DataRequest[?]): Try[UserAnswers] =
     softDeleteMember(srn, index, req.userAnswers)
 
   /**
@@ -83,7 +83,7 @@ trait SoftDelete extends PSRController {
         Success(MemberPersonalDetails(nameDob.firstName, nameDob.lastName, nino, noNino, nameDob.dob))
     }
 
-    val memberDetailsPages: List[Removable[_]] = List(
+    val memberDetailsPages: List[Removable[?]] = List(
       MemberDetailsPage(srn, index),
       DoesMemberHaveNinoPage(srn, index),
       NoNINOPage(srn, index),
@@ -91,7 +91,7 @@ trait SoftDelete extends PSRController {
       MemberDetailsCompletedPage(srn, index)
     )
 
-    val employerContributionsPages: Max50 => List[Removable[_]] = secondaryIndex =>
+    val employerContributionsPages: Max50 => List[Removable[?]] = secondaryIndex =>
       List(
         EmployerContributionsProgress(srn, index, secondaryIndex),
         EmployerNamePage(srn, index, secondaryIndex),
@@ -103,7 +103,7 @@ trait SoftDelete extends PSRController {
         EmployerContributionsCompleted(srn, index, secondaryIndex)
       )
 
-    val transfersInPages: Max5 => List[Removable[_]] = secondaryIndex =>
+    val transfersInPages: Max5 => List[Removable[?]] = secondaryIndex =>
       List(
         TransfersInSectionCompleted(srn, index, secondaryIndex),
         TransferringSchemeNamePage(srn, index, secondaryIndex),
@@ -115,7 +115,7 @@ trait SoftDelete extends PSRController {
         ReceiveTransferProgress(srn, index, secondaryIndex)
       )
 
-    val transfersOutPages: Max5 => List[Removable[_]] = secondaryIndex =>
+    val transfersOutPages: Max5 => List[Removable[?]] = secondaryIndex =>
       List(
         TransfersOutSectionCompleted(srn, index, secondaryIndex),
         ReceivingSchemeNamePage(srn, index, secondaryIndex),
@@ -125,7 +125,7 @@ trait SoftDelete extends PSRController {
         MemberTransferOutProgress(srn, index, secondaryIndex)
       )
 
-    val surrenderedBenefitsPages: List[Removable[_]] = List(
+    val surrenderedBenefitsPages: List[Removable[?]] = List(
       SurrenderedBenefitsCompletedPage(srn, index),
       SurrenderedBenefitsAmountPage(srn, index),
       WhenDidMemberSurrenderBenefitsPage(srn, index),
@@ -133,15 +133,15 @@ trait SoftDelete extends PSRController {
       MemberSurrenderedBenefitsProgress(srn, index)
     )
 
-    val memberContributionsPages: List[Removable[_]] = List(
+    val memberContributionsPages: List[Removable[?]] = List(
       TotalMemberContributionPage(srn, index)
     )
 
-    val memberPensionPaymentsPages: List[Removable[_]] = List(
+    val memberPensionPaymentsPages: List[Removable[?]] = List(
       TotalAmountPensionPaymentsPage(srn, index)
     )
 
-    val memberCommencementLumpSumPages: List[Removable[_]] = List(
+    val memberCommencementLumpSumPages: List[Removable[?]] = List(
       PensionCommencementLumpSumAmountPage(srn, index)
     )
 

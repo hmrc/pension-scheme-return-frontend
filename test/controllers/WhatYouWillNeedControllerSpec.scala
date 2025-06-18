@@ -56,8 +56,9 @@ class WhatYouWillNeedControllerSpec extends ControllerBaseSpec with ControllerBe
       val request = FakeRequest(GET, onPageLoad)
       val result = route(app, request).value
       val expectedView = view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", "", schemeName, dashboardUrlPsa))(
+        using
         request,
-        createMessages(app)
+        createMessages(using app)
       )
 
       status(result) mustEqual OK
@@ -73,9 +74,9 @@ class WhatYouWillNeedControllerSpec extends ControllerBaseSpec with ControllerBe
         val request = FakeRequest(GET, onPageLoad)
         val result = route(application, request).value
         val expectedView =
-          view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", "", schemeName, dashboardUrlPsp))(
+          view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", "", schemeName, dashboardUrlPsp))(using
             request,
-            createMessages(application)
+            createMessages(using application)
           )
 
         status(result) mustEqual OK

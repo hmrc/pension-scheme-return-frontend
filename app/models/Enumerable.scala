@@ -49,7 +49,7 @@ object Enumerable {
             index => index
           )
         )
-        .map(index => index.value.toString -> index): _*
+        .map(index => index.value.toString -> index)*
     )
 
   trait Implicits {

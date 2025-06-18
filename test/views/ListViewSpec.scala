@@ -31,7 +31,7 @@ class ListViewSpec extends ViewSpec with ViewBehaviours {
     val form = formProvider("summaryView.required")
 
     def viewModelGen(showRadios: Boolean = true, rows: Option[Int] = None) =
-      formPageViewModelGen(summaryViewModelGen(showRadios = showRadios, rows = rows))
+      formPageViewModelGen(using summaryViewModelGen(showRadios = showRadios, rows = rows))
 
     "SummaryView" - {
       act.like(renderTitle(viewModelGen())(view(form, _), _.title.key))

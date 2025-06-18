@@ -45,7 +45,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec with ControllerBehavi
   }
 
   def setSchemeDate(date: Option[DateRange]): Unit =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(date)
 
   "HowMuchCashController" - {
 
@@ -82,7 +82,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec with ControllerBehavi
       saveAndContinue(
         onSubmit,
         Some(JsPath \ "schemeDesignatory" \ "totalCash"),
-        formData(form, moneyInPeriodData.from[(Money, Money)]): _*
+        formData(form, moneyInPeriodData.from[(Money, Money)])*
       )
     )
 

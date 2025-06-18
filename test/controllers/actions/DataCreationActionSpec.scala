@@ -32,7 +32,7 @@ class DataCreationActionSpec extends BaseSpec {
 
   class Harness(request: AllowedAccessRequest[AnyContentAsEmpty.type], sessionRepository: SessionRepository)(implicit
     ec: ExecutionContext
-  ) extends DataCreationActionImpl(sessionRepository)(ec) {
+  ) extends DataCreationActionImpl(sessionRepository)(using ec) {
     def callTransform(): Future[DataRequest[AnyContentAsEmpty.type]] =
       transform(request)
   }

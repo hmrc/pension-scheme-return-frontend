@@ -77,7 +77,8 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec with Controll
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )

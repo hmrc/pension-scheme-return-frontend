@@ -36,7 +36,7 @@ import javax.inject.Inject
 class BorrowingTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, optMoneyWasBorrowed: Option[Boolean], initialUA: UserAnswers)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Option[Borrowing] =
     if (
       optMoneyWasBorrowed.isEmpty ||
@@ -60,7 +60,7 @@ class BorrowingTransformer @Inject() extends Transformer {
       )
     }
 
-  private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
+  private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[?]): List[MoneyBorrowed] =
     request.userAnswers
       .get(MoneyBorrowedProgress.all(srn))
       .map { value =>

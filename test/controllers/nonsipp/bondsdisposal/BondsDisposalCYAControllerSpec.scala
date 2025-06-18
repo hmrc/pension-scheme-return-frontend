@@ -46,9 +46,9 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
     reset(mockSaveService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
-    when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+    when(mockSaveService.save(any())(using any(), any())).thenReturn(Future.successful(()))
   }
 
   private def onPageLoad(mode: Mode) =
@@ -123,7 +123,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
             )
           )
         }.after {
-          verify(mockSaveService, times(1)).save(any())(any(), any())
+          verify(mockSaveService, times(1)).save(any())(using any(), any())
           reset(mockPsrSubmissionService)
         }.withName(s"render correct $mode view for Sold journey")
       )
@@ -131,7 +131,8 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         redirectNextPage(onSubmit(mode))
           .after {
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1))
+              .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
             reset(mockPsrSubmissionService)
           }
           .withName(s"redirect to next page when in $mode mode")
@@ -193,7 +194,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
           )
         )
       }.after {
-        verify(mockSaveService).save(captor.capture())(any(), any())
+        verify(mockSaveService).save(captor.capture())(using any(), any())
         val userAnswers = captor.getValue
         userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
         reset(mockPsrSubmissionService)
@@ -209,7 +210,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
           .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), HowWereBondsDisposedPointOfEntry),
         previousUserAnswers = emptyUserAnswers
       ).after {
-        verify(mockSaveService, never).save(any())(any(), any())
+        verify(mockSaveService, never).save(any())(using any(), any())
         reset(mockPsrSubmissionService)
       }.withName(s"onPageLoad should not clear out point of entry when in progress")
     )
@@ -264,7 +265,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
             )
           )
       }.after {
-        verify(mockSaveService, never()).save(any())(any(), any())
+        verify(mockSaveService, never()).save(any())(using any(), any())
         reset(mockPsrSubmissionService)
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
@@ -274,7 +275,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only RemoveBondsDisposalController page")
     )
   }

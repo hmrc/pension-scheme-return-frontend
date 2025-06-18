@@ -40,7 +40,7 @@ object AnswersSavedDisplayVersion extends Enumerable.Implicits {
   def withNameWithDefault(name: String): AnswersSavedDisplayVersion =
     values.find(_.toString.toLowerCase() == name.toLowerCase()).getOrElse(NoDisplay)
 
-  implicit val enumerable: Enumerable[AnswersSavedDisplayVersion] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[AnswersSavedDisplayVersion] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[AnswersSavedDisplayVersion] = (value: AnswersSavedDisplayVersion) =>
     value.name

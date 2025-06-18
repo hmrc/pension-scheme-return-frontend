@@ -64,7 +64,7 @@ class FileUploadErrorController @Inject() (
   }
 
   private def navToNextPage(srn: Srn, mode: Mode, error: UploadError)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Result =
     Redirect(navigator.nextPage(FileUploadErrorPage(srn, error), mode, request.userAnswers))
 }

@@ -42,7 +42,7 @@ class DataRetrievalETMPAction(
   private val logger = Logger(getClass)
 
   // value of UserAnswers in DataRequest is not referenced in the psrRetrievalService
-  private def emptyUserAnswers(request: AllowedAccessRequest[_]): UserAnswers =
+  private def emptyUserAnswers(request: AllowedAccessRequest[?]): UserAnswers =
     UserAnswers(request.getUserId + request.srn)
 
   def versionForYear(year: String, current: Int): ActionTransformer[AllowedAccessRequest, OptionalDataRequest] =
@@ -63,7 +63,7 @@ class DataRetrievalETMPAction(
             Some(year),
             Some("%03d".format(current)),
             controllers.routes.OverviewController.onPageLoad(request.srn)
-          )(hc = implicitly, ec = implicitly, request = dataRequest)
+          )(using hc = implicitly, ec = implicitly, request = dataRequest)
         } yield OptionalDataRequest(
           request,
           userAnswers = Some(currentReturn),
@@ -96,7 +96,7 @@ class DataRetrievalETMPAction(
             optPsrVersion = Some("%03d".format(previous)),
             fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn),
             fetchingPreviousVersion = true
-          )(hc = implicitly, ec = implicitly, request = dataRequest)
+          )(using hc = implicitly, ec = implicitly, request = dataRequest)
           previousUa =
             if (previousReturn.data == emptyUserAnswers(request).data) {
               logger.info("[Compare] Fetching previous return was empty, setting previousUserAnswers to None")
@@ -110,7 +110,7 @@ class DataRetrievalETMPAction(
             optPeriodStartDate = Some(year),
             optPsrVersion = Some("%03d".format(current)),
             fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
-          )(hc = implicitly, ec = implicitly, request = dataRequest.copy(previousUserAnswers = previousUa))
+          )(using hc = implicitly, ec = implicitly, request = dataRequest.copy(previousUserAnswers = previousUa))
         } yield OptionalDataRequest(
           request,
           Some(currentReturn),
@@ -142,7 +142,7 @@ class DataRetrievalETMPAction(
           maybePsrDetails <- psrRetrievalService.getStandardPsrDetails(
             optFbNumber = Some(fbNumber),
             fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
-          )(hc = implicitly, ec = implicitly, request = dataRequest)
+          )(using hc = implicitly, ec = implicitly, request = dataRequest)
           maybeReportDetails = maybePsrDetails.map(_.minimalRequiredSubmission.reportDetails)
           maybePreviousReturn <- maybeReportDetails
             .traverseCollect { case ReportDetails(Some(fbVersion), _, _, periodStart, _, _) =>
@@ -157,14 +157,14 @@ class DataRetrievalETMPAction(
                       optPsrVersion = Some("%03d".format(fbVersionAsInt - 1)),
                       fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn),
                       fetchingPreviousVersion = true
-                    )(hc = implicitly, ec = implicitly, request = dataRequest)
+                    )(using hc = implicitly, ec = implicitly, request = dataRequest)
               }
             }
             .map(_.flatten)
           currentReturn <- maybePsrDetails match {
             case Some(psrDetails) =>
               logger.info(s"[FBNumber] Transforming current PSR version with fbNumber $fbNumber")
-              psrRetrievalService.transformPsrDetails(psrDetails)(
+              psrRetrievalService.transformPsrDetails(psrDetails)(using
                 request = dataRequest.copy(previousUserAnswers = maybePreviousReturn)
               )
             case None =>

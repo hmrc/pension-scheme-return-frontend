@@ -24,7 +24,7 @@
     govukInsetText: GovukInsetText,
     govukPagination: GovukPagination
 )
-@(form: Form[_], viewmodel: FormPageViewModel[ListRadiosViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], viewmodel: FormPageViewModel[ListRadiosViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 

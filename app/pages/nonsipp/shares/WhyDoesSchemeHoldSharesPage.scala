@@ -59,7 +59,7 @@ case class WhyDoesSchemeHoldSharesPage(srn: Srn, index: Max5000) extends Questio
       case _ => Try(userAnswers)
     }
 
-  private def dependantPages(srn: Srn): List[Removable[_]] =
+  private def dependantPages(srn: Srn): List[Removable[?]] =
     List(
       WhenDidSchemeAcquireSharesPage(srn, index),
       common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller),

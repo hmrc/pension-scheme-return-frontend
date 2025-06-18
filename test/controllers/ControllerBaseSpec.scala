@@ -99,7 +99,7 @@ trait ControllerBaseSpec
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
           bind[PrePopulationDataActionProvider].toInstance(new FakePrePopulationDataActionProvider)
         ) ++ saveService.fold[List[GuiceableModule]](Nil)(service => List(bind[SaveService].toInstance(service)))
-          ++ additionalBindings: _*
+          ++ additionalBindings*
       )
       .configure("play.filters.csp.nonce.enabled" -> false)
   }

@@ -37,7 +37,7 @@ class UnauthorisedControllerSpec extends ControllerBaseSpec with ControllerBehav
           UnauthorisedController.viewModel(
             "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
           )
-        )(request, createMessages(application)).toString
+        )(using request, createMessages(using application)).toString
 
       }
 

@@ -24,7 +24,7 @@
 
 
 
-@(seqOfOutstandingReturns:Seq[OverviewSummary], seqOfPreviousReturns:Seq[OverviewSummary], schemeName: String)(implicit request: Request[_], messages: Messages)
+@(seqOfOutstandingReturns:Seq[OverviewSummary], seqOfPreviousReturns:Seq[OverviewSummary], schemeName: String)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("overview.title"))) {
 

@@ -112,7 +112,7 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec with C
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     act.like(
-      invalidForm(onSubmit, userAnswersWithAddress, dateTooEarlyForm: _*)
+      invalidForm(onSubmit, userAnswersWithAddress, dateTooEarlyForm*)
         .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
   }

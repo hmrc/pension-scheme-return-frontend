@@ -23,6 +23,6 @@ object PrePopulationUtils extends PrePopulationUtils
 
 trait PrePopulationUtils {
 
-  def isPrePopulation(implicit request: DataRequest[_]): Boolean =
+  def isPrePopulation(implicit request: DataRequest[?]): Boolean =
     request.session.get(PREPOPULATION_FLAG).fold(false)(_.toBoolean)
 }

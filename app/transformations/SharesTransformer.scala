@@ -52,7 +52,7 @@ class SharesTransformer @Inject() extends Transformer {
   def transformToEtmp(
     srn: Srn,
     initialUA: UserAnswers
-  )(implicit request: DataRequest[_]): Option[Shares] = {
+  )(implicit request: DataRequest[?]): Option[Shares] = {
     val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
     if (optDidSchemeHoldAnyShares.nonEmpty || isPrePopulation) {
       val sharesDisposal = request.userAnswers.get(SharesDisposalPage(srn)).getOrElse(false)
@@ -73,7 +73,7 @@ class SharesTransformer @Inject() extends Transformer {
     }
   }
 
-  private def buildOptQuotedShares(srn: Srn)(implicit request: DataRequest[_]): Option[Double] = {
+  private def buildOptQuotedShares(srn: Srn)(implicit request: DataRequest[?]): Option[Double] = {
     val totalValueQuotedSharesPage = request.userAnswers.get(TotalValueQuotedSharesPage(srn))
     totalValueQuotedSharesPage.map(money => money.value)
   }
@@ -81,7 +81,7 @@ class SharesTransformer @Inject() extends Transformer {
   private def buildOptShareTransactions(
     srn: Srn,
     sharesDisposal: Boolean
-  )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] = {
+  )(implicit request: DataRequest[?]): Option[List[ShareTransaction]] = {
     val optSchemeHadShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
     val anyCompleted = request.userAnswers.map(SharesProgress.all(srn)).toList.exists(_._2.completed)
     if (optSchemeHadShares.nonEmpty && !optSchemeHadShares.get) {
@@ -170,7 +170,7 @@ class SharesTransformer @Inject() extends Transformer {
     schemeHoldShare: SchemeHoldShare,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(String, PropertyAcquiredFrom)] =
+  )(implicit request: DataRequest[?]): Option[(String, PropertyAcquiredFrom)] =
     Option
       .when(schemeHoldShare == Acquisition) {
         val identityType =
@@ -283,7 +283,7 @@ class SharesTransformer @Inject() extends Transformer {
     srn: Srn,
     shareIndex: Refined[Int, OneTo5000]
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Seq[DisposedSharesTransaction] =
     request.userAnswers
       .map(
@@ -322,7 +322,7 @@ class SharesTransformer @Inject() extends Transformer {
     srn: Srn,
     shareIndex: Refined[Int, OneTo5000],
     disposalIndex: Refined[Int, OneTo50]
-  )(implicit request: DataRequest[_]): Option[RedemptionQuestions] =
+  )(implicit request: DataRequest[?]): Option[RedemptionQuestions] =
     Option
       .when(howWereSharesDisposedPage == Redeemed) {
         val dateOfRedemption = request.userAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex)).get
@@ -341,7 +341,7 @@ class SharesTransformer @Inject() extends Transformer {
     srn: Srn,
     shareIndex: Refined[Int, OneTo5000],
     disposalIndex: Refined[Int, OneTo50]
-  )(implicit request: DataRequest[_]): Option[SalesQuestions] =
+  )(implicit request: DataRequest[?]): Option[SalesQuestions] =
     Option
       .when(howWereSharesDisposedPage == Sold) {
         val dateOfSale = request.userAnswers.get(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex)).get

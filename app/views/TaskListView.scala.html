@@ -21,7 +21,7 @@
     taskListItems: TaskListItems
 )
 
-@(viewmodel: PageViewModel[TaskListViewModel], schemeName: String)(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[TaskListViewModel], schemeName: String)(implicit request: Request[?], messages: Messages)
 
 @item(content: Html) = {
     <li class="govuk-task-list__item govuk-task-list__item--with-link">

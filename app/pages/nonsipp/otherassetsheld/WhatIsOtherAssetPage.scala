@@ -47,7 +47,7 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[Removable[_]] = {
+  private def pages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[Removable[?]] = {
     val list = List(
       IsAssetTangibleMoveablePropertyPage(srn, index),
       WhyDoesSchemeHoldAssetsPage(srn, index), // This triggers cleanup of any other dependent pages in the journey
@@ -60,7 +60,7 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
     if (isLastRecord) list :+ OtherAssetsHeldPage(srn) :+ OtherAssetsListPage(srn) else list
   }
 
-  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[?]] =
     userAnswers
       .map(HowWasAssetDisposedOfPagesForEachAsset(srn, index))
       .keys

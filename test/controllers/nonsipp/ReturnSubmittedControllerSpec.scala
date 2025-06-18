@@ -82,9 +82,9 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec with ControllerBe
           .withSession((SUBMISSION_DATE, submissionDateTime.format(DateTimeFormatter.ISO_DATE_TIME)))
 
         val result = route(app, request).value
-        val expectedView = view(buildViewModel(returnPeriods, submissionDateTime))(
+        val expectedView = view(buildViewModel(returnPeriods, submissionDateTime))(using
           request,
-          createMessages(app)
+          createMessages(using app)
         )
 
         status(result) mustEqual OK

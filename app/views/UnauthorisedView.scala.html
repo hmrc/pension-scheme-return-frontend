@@ -20,7 +20,7 @@ layout: templates.Layout
 
 )
 
-    @(viewmodel: FormPageViewModel[UnauthorisedPageViewModel])(implicit request: Request[_], messages: Messages)
+    @(viewmodel: FormPageViewModel[UnauthorisedPageViewModel])(implicit request: Request[?], messages: Messages)
 
     @layout(
 

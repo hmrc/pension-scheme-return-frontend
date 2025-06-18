@@ -96,7 +96,7 @@ trait CharacterCountFluency {
       )
 
     def withError(maybeFormError: Option[FormError])(implicit messages: Messages): CharacterCount =
-      maybeFormError.fold(characterCount)(error => characterCount.withError(messages(error.message, error.args: _*)))
+      maybeFormError.fold(characterCount)(error => characterCount.withError(messages(error.message, error.args*)))
 
     def withThreshold(threshold: Int): CharacterCount =
       characterCount.copy(threshold = Some(threshold))

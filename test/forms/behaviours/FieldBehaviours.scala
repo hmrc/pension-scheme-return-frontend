@@ -27,7 +27,7 @@ import java.time.LocalDate
 
 trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Generators {
 
-  def fieldThatBindsValidData(form: Form[_], fieldName: String, validDataGenerator: Gen[String]): Unit =
+  def fieldThatBindsValidData(form: Form[?], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "bind valid data" in {
 
       forAll(validDataGenerator -> "validDataItem") { (dataItem: String) =>
@@ -37,7 +37,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       }
     }
 
-  def mandatoryField(form: Form[_], fieldName: String, requiredError: FormError): Unit = {
+  def mandatoryField(form: Form[?], fieldName: String, requiredError: FormError): Unit = {
 
     "not bind when key is not present at all" in {
 
@@ -52,17 +52,17 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     }
   }
 
-  def mandatoryField(form: Form[_], fieldName: String, message: String): Unit =
+  def mandatoryField(form: Form[?], fieldName: String, message: String): Unit =
     mandatoryField(form, fieldName, FormError(fieldName, message))
 
-  def optionalField(form: Form[_], fieldName: String): Unit =
+  def optionalField(form: Form[?], fieldName: String): Unit =
     "bind blank values" in {
 
       val result = form.bind(Map(fieldName -> "")).apply(fieldName)
       result.errors mustBe empty
     }
 
-  def invalidNumericField(form: Form[_], fieldName: String, errorMessage: String, args: Any*): Unit =
+  def invalidNumericField(form: Form[?], fieldName: String, errorMessage: String, args: Any*): Unit =
     errorField(
       "numeric value is invalid",
       form,
@@ -71,7 +71,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       alphaStr.filter(_.nonEmpty)
     )
 
-  def invalidAlphaField(form: Form[_], fieldName: String, errorMessage: String, args: List[Any] = Nil): Unit =
+  def invalidAlphaField(form: Form[?], fieldName: String, errorMessage: String, args: List[Any] = Nil): Unit =
     errorField(
       "alpha value is invalid",
       form,
@@ -81,7 +81,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     )
 
   def fieldLengthError(
-    form: Form[_],
+    form: Form[?],
     fieldName: String,
     error: FormError,
     min: Int,
@@ -93,7 +93,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
   }
 
   def fieldRejectDuplicates(
-    form: Form[_],
+    form: Form[?],
     fieldName: String,
     errorMessage: String,
     duplicates: List[String],
@@ -107,10 +107,10 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       Gen.oneOf(duplicates)
     )
 
-  def invalidField(form: Form[_], fieldName: String, errorMessage: String, invalidData: Gen[String], args: Any*): Unit =
+  def invalidField(form: Form[?], fieldName: String, errorMessage: String, invalidData: Gen[String], args: Any*): Unit =
     errorField("invalid field", form, fieldName, FormError(fieldName, errorMessage, args.toList), invalidData)
 
-  def trimmedField(form: Form[_], fieldName: String, gen: Gen[String]): Unit =
+  def trimmedField(form: Form[?], fieldName: String, gen: Gen[String]): Unit =
     "trim field value when bound" in {
       forAll(gen -> "validDataItem") { (value: String) =>
         val result = form.bind(Map(fieldName -> value))
@@ -119,7 +119,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       }
     }
 
-  def textTooLongField(form: Form[_], fieldName: String, errorMessage: String, maxLength: Int, args: Any*): Unit =
+  def textTooLongField(form: Form[?], fieldName: String, errorMessage: String, maxLength: Int, args: Any*): Unit =
     errorField(
       "field value is too long",
       form,
@@ -128,7 +128,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       stringsWithMinLength(maxLength)
     )
 
-  def errorField(testName: String, form: Form[_], fieldName: String, error: FormError, gen: Gen[String]): Unit =
+  def errorField(testName: String, form: Form[?], fieldName: String, error: FormError, gen: Gen[String]): Unit =
     s"not bind when $testName" in {
       forAll(gen -> "validDataItem") { (value: String) =>
         val result = form.bind(Map(fieldName -> value))(fieldName)
@@ -136,7 +136,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       }
     }
 
-  def fieldThatBindsValidDate(form: Form[_], fieldName: String): Unit =
+  def fieldThatBindsValidDate(form: Form[?], fieldName: String): Unit =
     "bind valid date" in {
 
       forAll(date -> "valid date") { (localDate: LocalDate) =>
@@ -154,7 +154,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       }
     }
 
-  def fieldThatBindsTooEarlyDate(form: Form[_], fieldName: String, formError: FormError): Unit =
+  def fieldThatBindsTooEarlyDate(form: Form[?], fieldName: String, formError: FormError): Unit =
     "bind too early date" in {
 
       forAll(tooEarlyDateGen -> "invalid date") { (localDate: LocalDate) =>

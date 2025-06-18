@@ -43,9 +43,9 @@ class CheckUpdateInformationControllerSpec extends ControllerBaseSpec with Contr
       val view = injected[ContentPageView]
       val request = FakeRequest(GET, onPageLoad)
       val result = route(app, request).value
-      val expectedView = view(CheckUpdateInformationController.viewModel(srn, schemeName, dashboardUrlPsa))(
+      val expectedView = view(CheckUpdateInformationController.viewModel(srn, schemeName, dashboardUrlPsa))(using
         request,
-        createMessages(app)
+        createMessages(using app)
       )
 
       status(result) mustEqual OK
@@ -61,9 +61,9 @@ class CheckUpdateInformationControllerSpec extends ControllerBaseSpec with Contr
         val request = FakeRequest(GET, onPageLoad)
         val result = route(application, request).value
         val expectedView =
-          view(CheckUpdateInformationController.viewModel(srn, schemeName, dashboardUrlPsp))(
+          view(CheckUpdateInformationController.viewModel(srn, schemeName, dashboardUrlPsp))(using
             request,
-            createMessages(application)
+            createMessages(using application)
           )
 
         status(result) mustEqual OK

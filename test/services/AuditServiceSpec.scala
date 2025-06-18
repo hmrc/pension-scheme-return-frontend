@@ -56,7 +56,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
-      when(mockAuditConnector.sendEvent(captor.capture())(any(), any()))
+      when(mockAuditConnector.sendEvent(captor.capture())(using any(), any()))
         .thenReturn(Future.successful(AuditResult.Success))
 
       val auditEvent = PSRStartAuditEvent(
@@ -97,7 +97,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
-      when(mockAuditConnector.sendEvent(captor.capture())(any(), any()))
+      when(mockAuditConnector.sendEvent(captor.capture())(using any(), any()))
         .thenReturn(Future.successful(AuditResult.Success))
 
       val auditEvent = PSRStartAuditEvent(
@@ -138,7 +138,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val captor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      when(mockAuditConnector.sendExtendedEvent(captor.capture())(any(), any()))
+      when(mockAuditConnector.sendExtendedEvent(captor.capture())(using any(), any()))
         .thenReturn(Future.successful(AuditResult.Success))
 
       val auditEvent = PSRCompileAuditEvent(
@@ -175,7 +175,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val captor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      when(mockAuditConnector.sendExtendedEvent(captor.capture())(any(), any()))
+      when(mockAuditConnector.sendExtendedEvent(captor.capture())(using any(), any()))
         .thenReturn(Future.successful(AuditResult.Success))
 
       val auditEvent = PSRCompileAuditEvent(

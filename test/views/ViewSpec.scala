@@ -27,7 +27,7 @@ import viewmodels.DisplayMessage
 
 trait ViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper with DisplayMessageUtils {
 
-  implicit val request: FakeRequest[_] = FakeRequest("GET", "/test")
+  implicit val request: FakeRequest[?] = FakeRequest("GET", "/test")
 
   def renderedErrorMessage(key: String): String = s"Error: $key"
 

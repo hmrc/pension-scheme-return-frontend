@@ -101,7 +101,7 @@ class LandOrPropertySellerConnectedPartyController @Inject() (
         )
   }
 
-  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[_]): Option[String] =
+  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[?]): Option[String] =
     request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).flatMap {
       case IdentityType.Individual => request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index))
       case IdentityType.UKCompany => request.userAnswers.get(CompanySellerNamePage(srn, index))

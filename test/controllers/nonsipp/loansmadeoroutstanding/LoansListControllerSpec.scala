@@ -224,7 +224,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
           viewOnlyViewModel = None,
           showBackLink = true,
           isPrePop = false
-        )(mockReq)
+        )(using mockReq)
       )
     }.withName("Completed Journey"))
 
@@ -241,7 +241,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
           viewOnlyViewModel = None,
           showBackLink = true,
           isPrePop = true
-        )(mockReq)
+        )(using mockReq)
       )
     }.withName("PrePop Journey"))
 
@@ -289,7 +289,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               viewOnlyViewModel = Some(viewOnlyViewModel),
               showBackLink = true,
               isPrePop = false
-            )(mockReq)
+            )(using mockReq)
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
@@ -309,7 +309,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true,
               isPrePop = false
-            )(mockReq)
+            )(using mockReq)
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
     )
@@ -329,7 +329,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true,
               isPrePop = false
-            )(mockReq)
+            )(using mockReq)
           )
       }.withName("OnPageLoadViewOnly renders ok with no loans")
     )
@@ -339,7 +339,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
         onSubmitViewOnly,
         onPageLoadViewOnlyTaskListController
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only tasklist")
     )
 
@@ -367,7 +367,7 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               ),
               showBackLink = false,
               isPrePop = false
-            )(mockReq)
+            )(using mockReq)
           )
       }.withName("OnPreviousViewOnly renders the view correctly")
     )

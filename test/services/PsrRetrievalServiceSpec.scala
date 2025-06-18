@@ -86,10 +86,14 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
 
     "should not getPsrDetails return data when not found" in {
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(Future.successful(None))
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly
@@ -109,7 +113,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(
         Future.successful(
           Some(
@@ -126,7 +134,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly
@@ -149,7 +157,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockLoansTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(
         Future.successful(
           Some(
@@ -166,7 +178,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly
@@ -189,7 +201,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockAssetsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(
         Future.successful(
           Some(
@@ -206,7 +222,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly
@@ -230,7 +246,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
 
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(
         Future.successful(
           Some(
@@ -247,7 +267,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly
@@ -271,7 +291,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
 
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(
         Future.successful(
           Some(
@@ -288,7 +312,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly
@@ -311,7 +335,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockDeclarationTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(
-        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(using
+          any(),
+          any(),
+          any()
+        )
       ).thenReturn(
         Future.successful(
           Some(
@@ -328,7 +356,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(using
           mockReq,
           implicitly,
           implicitly

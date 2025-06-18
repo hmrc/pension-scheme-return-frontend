@@ -38,7 +38,7 @@ case class UnallocatedEmployerContributionsPage(srn: Srn) extends QuestionPage[B
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(UnallocatedEmployerAmountPage(srn))
 
 }

@@ -48,13 +48,13 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       case _ => Try(userAnswers)
     }
 
-  private def addressPages(srn: Srn): List[Removable[_]] =
+  private def addressPages(srn: Srn): List[Removable[?]] =
     List(
       LandOrPropertyPostcodeLookupPage(srn, index),
       LandOrPropertyChosenAddressPage(srn, index),
       AddressLookupResultsPage(srn, index)
     )
-  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[?]] =
     userAnswers
       .map(HowWasPropertyDisposedOfPages(srn, index))
       .keys
@@ -64,7 +64,7 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
           .fold(_ => Nil, ind => List(HowWasPropertyDisposedOfPage(srn, index, ind)))
       )
 
-  private def pages(srn: Srn, isLastRecord: Boolean, dependentPages: List[Removable[_]]): List[Removable[_]] = {
+  private def pages(srn: Srn, isLastRecord: Boolean, dependentPages: List[Removable[?]]): List[Removable[?]] = {
     val list = List(
       LandOrPropertyChosenAddressPage(srn, index),
       LandRegistryTitleNumberPage(srn, index),

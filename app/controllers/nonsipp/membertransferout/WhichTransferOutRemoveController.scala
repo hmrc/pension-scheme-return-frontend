@@ -103,7 +103,7 @@ class WhichTransferOutRemoveController @Inject() (
   }
 
   private def getJourneyValues(srn: Srn, memberIndex: Max300)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ) =
     request.userAnswers
       .map(MemberTransferOutProgress.all(srn, memberIndex))

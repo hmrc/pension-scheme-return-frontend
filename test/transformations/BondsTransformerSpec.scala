@@ -84,7 +84,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         .unsafeSet(BondsRecordVersionPage(srn), "001")
 
       val result =
-        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(
+        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(using
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe Some(
@@ -114,7 +114,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result mustBe Some(
           Bonds(
             recordVersion = Some("001"),
@@ -164,7 +164,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
-        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
         result mustBe Some(
           Bonds(
             recordVersion = Some("001"),
@@ -215,7 +215,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
       result mustBe Some(
         Bonds(
           recordVersion = None,
@@ -248,7 +248,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
       result mustBe Some(
         Bonds(
           recordVersion = Some("001"),

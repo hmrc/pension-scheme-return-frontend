@@ -58,7 +58,7 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
   "UploadService" - {
     "initiateUpscan should return what the connector returns" in {
       val expected = UpscanInitiateResponse(UpscanFileReference("test-ref"), "post-target", Map("test" -> "fields"))
-      when(mockUpscanConnector.initiate(any(), any(), any())(any())).thenReturn(Future.successful(expected))
+      when(mockUpscanConnector.initiate(any(), any(), any())(using any())).thenReturn(Future.successful(expected))
       val result = service.initiateUpscan("callback-url", "success-url", "failure-url")
 
       result.futureValue mustBe expected
@@ -92,7 +92,8 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
 
     "stream should return the upscan download http response body as a stream" in {
       val httpResponseBody = "test body"
-      when(mockUpscanConnector.download(any())(any())).thenReturn(Future.successful(HttpResponse(OK, httpResponseBody)))
+      when(mockUpscanConnector.download(any())(using any()))
+        .thenReturn(Future.successful(HttpResponse(OK, httpResponseBody)))
       val result = service.stream("/test-download-url")
       result.flatMap(_._2.runWith(Sink.seq).map(_.toList)).futureValue mustBe List(ByteString(httpResponseBody))
     }

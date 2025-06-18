@@ -54,7 +54,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     initialUA: UserAnswers,
     isSubmitted: Boolean = false
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Option[OtherAssets] =
     Option.when(optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty) {
       val optDisposeAnyOtherAsset = request.userAnswers.get(OtherAssetsDisposalPage(srn))
@@ -77,7 +77,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     }
 
   private def otherAssetTransactionsTransformToEtmp(srn: Srn, optDisposeAnyOtherAssets: Option[Boolean])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): List[OtherAssetTransaction] =
     request.userAnswers
       .map(OtherAssetsCompleted.all(srn))
@@ -127,7 +127,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     methodOfHolding: SchemeHoldAsset,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(String, Boolean, PropertyAcquiredFrom)] =
+  )(implicit request: DataRequest[?]): Option[(String, Boolean, PropertyAcquiredFrom)] =
     Option
       .when(methodOfHolding == Acquisition) {
         val sellerIdentityType =
@@ -249,7 +249,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     methodOfHolding: SchemeHoldAsset,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(Boolean, LocalDate)] = Option.when(methodOfHolding != Transfer) {
+  )(implicit request: DataRequest[?]): Option[(Boolean, LocalDate)] = Option.when(methodOfHolding != Transfer) {
 
     val indepValuationSupport = request.userAnswers.get(IndependentValuationPage(srn, index)).get
     val dateOfAcqOrContrib =
@@ -264,7 +264,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     srn: Srn,
     otherAssetIndex: Refined[Int, OneTo5000]
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Seq[OtherAssetDisposed] =
     request.userAnswers
       .map(
@@ -338,7 +338,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     srn: Srn,
     otherAssetIndex: Refined[Int, OneTo5000],
     disposalIndex: Refined[Int, OneTo50]
-  )(implicit request: DataRequest[_]): Option[(String, PropertyAcquiredFrom)] = {
+  )(implicit request: DataRequest[?]): Option[(String, PropertyAcquiredFrom)] = {
 
     Option
       .when(howWasAssetDisposed == Sold) {

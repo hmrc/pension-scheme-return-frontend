@@ -139,12 +139,13 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
       act.like(
         redirectNextPage(onSubmit(mode))
           .before {
-            when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+            when(mockSaveService.save(any())(using any(), any())).thenReturn(Future.successful(()))
             MockPsrSubmissionService.submitPsrDetailsWithUA()
           }
           .after {
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-            verify(mockSaveService, times(1)).save(any())(any(), any())
+            verify(mockPsrSubmissionService, times(1))
+              .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
+            verify(mockSaveService, times(1)).save(any())(using any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
           }
@@ -217,7 +218,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
         controllers.nonsipp.shares.routes.SharesListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only SharesListController page")
     )
   }

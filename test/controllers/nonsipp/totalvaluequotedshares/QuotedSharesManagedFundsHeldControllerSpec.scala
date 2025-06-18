@@ -47,7 +47,7 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec with
   }
 
   def setSchemeDate(date: Option[DateRange]): Unit =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(date)
 
   "QuotedSharesManagedFundsHeldController" - {
 
@@ -78,7 +78,7 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec with
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )
@@ -87,7 +87,8 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec with
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1))
+            .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           reset(mockPsrSubmissionService)
         }
     )

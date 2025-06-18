@@ -33,7 +33,7 @@ object TypeOfShares extends Enumerable.Implicits {
 
   val values: List[TypeOfShares] = List(SponsoringEmployer, Unquoted, ConnectedParty)
 
-  implicit val enumerable: Enumerable[TypeOfShares] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[TypeOfShares] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[TypeOfShares] = (value: TypeOfShares) => value.name
 }

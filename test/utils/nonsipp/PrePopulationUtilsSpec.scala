@@ -49,18 +49,18 @@ class PrePopulationUtilsSpec extends ControllerBaseSpec with ControllerBehaviour
     "must be false" - {
 
       "when no PREPOPULATION_FLAG flag present" in {
-        isPrePopulation(request) mustBe false
+        isPrePopulation(using request) mustBe false
       }
 
       "when no PREPOPULATION_FLAG flag is false" in {
-        isPrePopulation(requestWithFlagFalse) mustBe false
+        isPrePopulation(using requestWithFlagFalse) mustBe false
       }
     }
 
     "must be true" - {
 
       "when no PREPOPULATION_FLAG flag is false" in {
-        isPrePopulation(requestWithFlagTrue) mustBe true
+        isPrePopulation(using requestWithFlagTrue) mustBe true
       }
     }
   }

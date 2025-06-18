@@ -46,7 +46,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       appConfig,
       mockSchemeDetailsConnector,
       mockMinimalDetailsConnector
-    )(ExecutionContext.global)
+    )(using ExecutionContext.global)
 
   lazy val mockMinimalDetailsConnector: MinimalDetailsConnector = mock[MinimalDetailsConnector]
   lazy val mockSchemeDetailsConnector: SchemeDetailsConnector = mock[SchemeDetailsConnector]
@@ -64,15 +64,15 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
   def appConfig(implicit app: Application): FrontendAppConfig = injected[FrontendAppConfig]
 
   def setupSchemeDetails(psaId: PsaId, srn: Srn, result: Future[Option[SchemeDetails]]): Unit =
-    when(mockSchemeDetailsConnector.details(meq(psaId), meq(srn))(any(), any()))
+    when(mockSchemeDetailsConnector.details(meq(psaId), meq(srn))(using any(), any()))
       .thenReturn(result)
 
   def setupSchemeDetails(pspId: PspId, srn: Srn, result: Future[Option[SchemeDetails]]): Unit =
-    when(mockSchemeDetailsConnector.details(meq(pspId), meq(srn))(any(), any()))
+    when(mockSchemeDetailsConnector.details(meq(pspId), meq(srn))(using any(), any()))
       .thenReturn(result)
 
   def setupMinimalDetails(loggedInAsPsa: Boolean, result: Future[Either[MinimalDetailsError, MinimalDetails]]): Unit =
-    when(mockMinimalDetailsConnector.fetch(meq(loggedInAsPsa))(any(), any()))
+    when(mockMinimalDetailsConnector.fetch(meq(loggedInAsPsa))(using any(), any()))
       .thenReturn(result)
 
   override def beforeEach(): Unit = {

@@ -93,7 +93,7 @@ class HowManyMembersController @Inject() (
       )
   }
 
-  private def usingSubmissionEndDate(srn: Srn)(body: LocalDate => Result)(implicit request: DataRequest[_]) =
+  private def usingSubmissionEndDate(srn: Srn)(body: LocalDate => Result)(implicit request: DataRequest[?]) =
     dateService
       .schemeEndDate(srn)
       .fold(

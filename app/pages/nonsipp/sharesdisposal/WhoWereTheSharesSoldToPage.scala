@@ -35,7 +35,7 @@ case class WhoWereTheSharesSoldToPage(srn: Srn, index: Max5000, disposalIndex: M
 
   override def toString: String = "purchaserType"
 
-  private def pages(srn: Srn): List[Removable[_]] = List(
+  private def pages(srn: Srn): List[Removable[?]] = List(
     SharesIndividualBuyerNamePage(srn, index, disposalIndex),
     IndividualBuyerNinoNumberPage(srn, index, disposalIndex),
     CompanyBuyerNamePage(srn, index, disposalIndex),

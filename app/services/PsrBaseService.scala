@@ -20,7 +20,7 @@ import models.requests.DataRequest
 
 trait PsrBaseService {
 
-  private def loggedInUserNameOrBlank(implicit request: DataRequest[_]): String =
+  private def loggedInUserNameOrBlank(implicit request: DataRequest[?]): String =
     request.minimalDetails.individualDetails match {
       case Some(individual) => individual.fullName
       case None =>
@@ -30,6 +30,6 @@ trait PsrBaseService {
         }
     }
 
-  def schemeAdministratorOrPractitionerName(implicit req: DataRequest[_]): String =
+  def schemeAdministratorOrPractitionerName(implicit req: DataRequest[?]): String =
     req.schemeDetails.establishers.headOption.fold(loggedInUserNameOrBlank)(e => e.name)
 }

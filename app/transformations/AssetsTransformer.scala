@@ -39,7 +39,7 @@ class AssetsTransformer @Inject() (
 ) extends Transformer {
 
   def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Option[Assets] = {
     val optLandOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn))
     val optLandOrPropertyHeldOrList = Option.when(

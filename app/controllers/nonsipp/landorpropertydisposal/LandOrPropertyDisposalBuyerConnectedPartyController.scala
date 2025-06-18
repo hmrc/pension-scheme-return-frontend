@@ -94,7 +94,7 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject() (
     }
 
   private def getBuyersName(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, String] =
     for {
       buyerType <- request.userAnswers

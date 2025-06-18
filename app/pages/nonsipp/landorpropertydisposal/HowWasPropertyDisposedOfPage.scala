@@ -55,7 +55,7 @@ case class HowWasPropertyDisposedOfPage(
             srn,
             landOrPropertyIndex,
             disposalIndex,
-            completedPages.flatten(_._2).size == 1
+            completedPages.flatten(using _._2).size == 1
           )
         )
       case _ => Try(userAnswers)
@@ -66,7 +66,7 @@ case class HowWasPropertyDisposedOfPage(
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
     isLastRecord: Boolean
-  ): List[Removable[_]] = {
+  ): List[Removable[?]] = {
     val list = List(
       LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
       WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex),

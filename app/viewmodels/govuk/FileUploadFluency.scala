@@ -41,7 +41,7 @@ trait FileUploadFluency {
   implicit class FileUploadFluency(fileUpload: FileUpload) {
     def withError(msg: Option[FormError])(implicit messages: Messages): FileUpload = {
 
-      val errorMessage = msg.map(err => messages(err.message, err.args: _*))
+      val errorMessage = msg.map(err => messages(err.message, err.args*))
 
       fileUpload.copy(errorMessage = errorMessage.map(err => ErrorMessage(content = Text(err))))
     }

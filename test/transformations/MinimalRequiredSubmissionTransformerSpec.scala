@@ -64,10 +64,10 @@ class MinimalRequiredSubmissionTransformerSpec
   "Transform to ETMP" - {
     "should return None when userAnswer is empty" in {
 
-      when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
+      when(mockSchemeDateService.returnPeriods(any())(using any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
       val result = transformer.transformToEtmp(srn, emptyUserAnswers)
-      verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
+      verify(mockSchemeDateService, times(1)).returnPeriods(any())(using any())
       result mustBe None
     }
 
@@ -77,10 +77,10 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(None)
+      when(mockSchemeDateService.returnPeriods(any())(using any())).thenReturn(None)
 
-      val result = transformer.transformToEtmp(srn, emptyUserAnswers)(request)
-      verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
+      val result = transformer.transformToEtmp(srn, emptyUserAnswers)(using request)
+      verify(mockSchemeDateService, times(1)).returnPeriods(any())(using any())
       result mustBe None
     }
 
@@ -100,10 +100,10 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
+      when(mockSchemeDateService.returnPeriods(any())(using any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
-      val result = transformer.transformToEtmp(srn, emptyUserAnswers)(request)
-      verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
+      val result = transformer.transformToEtmp(srn, emptyUserAnswers)(using request)
+      verify(mockSchemeDateService, times(1)).returnPeriods(any())(using any())
       result mustBe Some(
         MinimalRequiredSubmission(
           ReportDetails(
@@ -151,10 +151,10 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
+      when(mockSchemeDateService.returnPeriods(any())(using any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
-      val result = transformer.transformToEtmp(srn, userAnswers)(request)
-      verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
+      val result = transformer.transformToEtmp(srn, userAnswers)(using request)
+      verify(mockSchemeDateService, times(1)).returnPeriods(any())(using any())
       result mustBe Some(
         MinimalRequiredSubmission(
           ReportDetails(

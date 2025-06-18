@@ -44,13 +44,17 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Cont
     )
 
   override def beforeAll(): Unit = {
-    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+    when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(versionsResponse))
       .thenReturn(Future.successful(versionsResponse))
       .thenReturn(Future.successful(Seq.empty[PsrVersionsResponse]))
       .thenReturn(Future.successful(Seq.empty[PsrVersionsResponse]))
     when(
-      mockPsrRetrievalService.getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+      mockPsrRetrievalService.getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using
+        any(),
+        any(),
+        any()
+      )
     ).thenReturn(Future.successful(userAnswers))
       .thenReturn(Future.successful(emptyUserAnswers))
       .thenReturn(Future.successful(userAnswers))

@@ -41,7 +41,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with Contr
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
   private val memberIndex = 1
@@ -97,7 +97,8 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with Contr
       act.like(
         redirectNextPage(onSubmit(mode))
           .after {
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1))
+              .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
             reset(mockPsrSubmissionService)
           }
           .withName(s"redirect to next page when in $mode mode")
@@ -155,7 +156,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with Contr
         controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only tasklist")
     )
   }

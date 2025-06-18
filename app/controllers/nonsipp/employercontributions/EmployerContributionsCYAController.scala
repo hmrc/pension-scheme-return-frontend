@@ -157,7 +157,7 @@ class EmployerContributionsCYAController @Inject() (
     }
 
   private def buildCompletedSecondaryIndexes(srn: Srn, index: Max300)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, List[Max50]] =
     request.userAnswers
       .map(EmployerContributionsProgress.all(srn, index))
@@ -169,7 +169,7 @@ class EmployerContributionsCYAController @Inject() (
       .getOrRecoverJourney
 
   private def buildCYA(srn: Srn, index: Max300, secondaryIndex: Max50)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, EmployerCYA] =
     for {
       employerName <- request.userAnswers

@@ -47,7 +47,7 @@ case class NameOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[String
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[Removable[_]] = {
+  private def pages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[Removable[?]] = {
     val list = List(
       WhyDoesSchemeHoldBondsPage(srn, index),
       WhenDidSchemeAcquireBondsPage(srn, index),
@@ -62,7 +62,7 @@ case class NameOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[String
     if (isLastRecord) list :+ UnregulatedOrConnectedBondsHeldPage(srn) else list
   }
 
-  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[?]] =
     userAnswers
       .map(HowWereBondsDisposedOfPagesForEachBond(srn, index))
       .keys

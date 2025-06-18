@@ -69,7 +69,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -131,7 +131,8 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
       act.like(
         redirectNextPage(onSubmit(mode))
           .after(
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1))
+              .submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
           )
           .withName(s"verify POST and redirect to next page when in $mode mode")
       )
@@ -370,7 +371,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
             .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
         ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
         ).withName("Submit redirects to view only tasklist")
       )
   }

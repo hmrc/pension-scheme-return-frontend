@@ -35,7 +35,7 @@ case class WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex: Max5000
 
   override def toString: String = "purchasedLandOrProperty"
 
-  private def pages(srn: Srn): List[Removable[_]] = List(
+  private def pages(srn: Srn): List[Removable[?]] = List(
     LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex),
     IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex),
     CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex),

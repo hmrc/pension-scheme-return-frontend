@@ -24,7 +24,7 @@
         hmrcCharacterCount: HmrcCharacterCount
 )
 
-@(form: Form[String], viewModel: FormPageViewModel[TextAreaViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[String], viewModel: FormPageViewModel[TextAreaViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewModel.title.toMessage)) {
 

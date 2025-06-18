@@ -45,7 +45,7 @@ case class ClassOfSharesPage(srn: Srn, index: Max5000) extends QuestionPage[Stri
       case _ => Try(userAnswers) // everything else
     }
 
-  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[?]] =
     userAnswers
       .map(HowWereSharesDisposedPagesForShare(srn, index))
       .keys

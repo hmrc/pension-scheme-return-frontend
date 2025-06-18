@@ -93,7 +93,7 @@ class RemovePropertyController @Inject() (
                     updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, 1, mode)
-                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  )(using implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) => Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, updatedAnswers))

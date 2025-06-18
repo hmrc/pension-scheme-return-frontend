@@ -49,7 +49,7 @@ class LoansTransformer @Inject() extends Transformer {
 
   private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Boolean, Option[String])]
 
-  def transformToEtmp(srn: Srn, initialUA: UserAnswers)(implicit request: DataRequest[_]): Option[Loans] = {
+  def transformToEtmp(srn: Srn, initialUA: UserAnswers)(implicit request: DataRequest[?]): Option[Loans] = {
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
     if (optSchemeHadLoans.nonEmpty || isPrePopulation) {
       Some(

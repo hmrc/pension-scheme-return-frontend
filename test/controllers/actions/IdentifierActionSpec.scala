@@ -44,7 +44,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
       mockAuthConnector,
       mockSessionDataCacheConnector,
       stubPlayBodyParsers
-    )(ExecutionContext.global)
+    )(using ExecutionContext.global)
 
   class Handler(appConfig: FrontendAppConfig) {
     def run: Action[AnyContent] = authAction(appConfig) { request =>
@@ -81,14 +81,14 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
     setAuthValue(Future.successful(value))
 
   def setAuthValue[A](value: Future[A]): Unit =
-    when(mockAuthConnector.authorise[A](any(), any())(any(), any()))
+    when(mockAuthConnector.authorise[A](any(), any())(using any(), any()))
       .thenReturn(value)
 
   def setSessionValue(value: Option[SessionData]): Unit =
     setSessionValue(Future.successful(value))
 
   def setSessionValue(value: Future[Option[SessionData]]): Unit =
-    when(mockSessionDataCacheConnector.fetch(any())(any(), any()))
+    when(mockSessionDataCacheConnector.fetch(any())(using any(), any()))
       .thenReturn(value)
 
   "IdentifierAction" - {

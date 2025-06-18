@@ -29,14 +29,14 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class PsrVersionsService @Inject() (psrConnector: PSRConnector) {
   def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn)(implicit
-    request: AllowedAccessRequest[_],
+    request: AllowedAccessRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
     psrConnector.getVersionsForYears(pstr, startDates, srn, controllers.routes.OverviewController.onPageLoad(srn))
 
   def getVersions(pstr: String, startDate: String, srn: Srn)(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =

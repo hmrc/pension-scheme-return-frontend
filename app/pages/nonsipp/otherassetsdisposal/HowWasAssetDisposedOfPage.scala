@@ -54,7 +54,7 @@ case class HowWasAssetDisposedOfPage(
             srn,
             assetIndex,
             disposalIndex,
-            isLastRecord = completedPages.flatten(_._2).size == 1
+            isLastRecord = completedPages.flatten(using _._2).size == 1
           )
         )
       case _ => Try(userAnswers)
@@ -65,7 +65,7 @@ case class HowWasAssetDisposedOfPage(
     assetIndex: Max5000,
     disposalIndex: Max50,
     isLastRecord: Boolean
-  ): List[Removable[_]] = {
+  ): List[Removable[?]] = {
     val list = List(
       AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
       TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex),

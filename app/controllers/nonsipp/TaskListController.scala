@@ -108,7 +108,7 @@ class TaskListController @Inject() (
 
   private def withCompletedBasicDetails(
     srn: Srn
-  )(f: DateRange => Future[Result])(implicit request: DataRequest[_]): Future[Result] = {
+  )(f: DateRange => Future[Result])(implicit request: DataRequest[?]): Future[Result] = {
     val basicDetails: Option[DateRange] = for {
       _ <- request.userAnswers.get(CheckReturnDatesPage(srn)).flatMap {
         case false => request.userAnswers.get(AccountingPeriods(srn))
@@ -203,7 +203,7 @@ object TaskListController {
       historyLink,
       submissionDateMessage,
       sectionList.head,
-      sectionList.tail: _*
+      sectionList.tail*
     )
 
     PageViewModel(

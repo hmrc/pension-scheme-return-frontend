@@ -37,8 +37,8 @@ trait ModelSerializers {
       case EstablisherKind.Partnership =>
         Json.obj("partnershipDetails" -> Json.obj("name" -> establisher.name))
       case EstablisherKind.Individual =>
-        val first :: rest = establisher.name.split(" ").toList
-        val last :: middles = rest.reverse
+        val first :: rest = establisher.name.split(" ").toList: @unchecked
+        val last :: middles = rest.reverse: @unchecked
         val middle = middles.iterator.reduceOption((a, b) => s"$a $b")
         Json.obj(
           "establisherDetails" -> Json
@@ -77,7 +77,7 @@ trait ModelSerializers {
         details.windUpDate.map(d => "windUpDate" -> formatDate(d))
       ).flatten
 
-    Json.obj(fields: _*)
+    Json.obj(fields*)
   }
 
   implicit val writeListMinimalSchemeDetails: Writes[ListMinimalSchemeDetails] = Json.writes[ListMinimalSchemeDetails]

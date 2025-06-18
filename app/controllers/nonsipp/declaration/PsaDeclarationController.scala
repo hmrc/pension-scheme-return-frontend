@@ -157,7 +157,7 @@ class PsaDeclarationController @Inject() (
     submittedDate: LocalDateTime,
     reportVersion: String
   )(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     hc: HeaderCarrier
   ): Future[EmailStatus] = {
 

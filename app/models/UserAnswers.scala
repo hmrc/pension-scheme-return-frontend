@@ -37,10 +37,10 @@ final case class UserAnswers(
 ) { self =>
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
-    Reads.optionNoError(Reads.at(page.path)).reads(data.decryptedValue).getOrElse(None)
+    Reads.optionNoError(using Reads.at(page.path)).reads(data.decryptedValue).getOrElse(None)
 
   def get(path: JsPath)(implicit rds: Reads[JsValue]): Option[JsValue] =
-    Reads.optionNoError(Reads.at(path)).reads(data.decryptedValue).getOrElse(None)
+    Reads.optionNoError(using Reads.at(path)).reads(data.decryptedValue).getOrElse(None)
 
   def list[A](page: Gettable[List[A]])(implicit rds: Reads[A]): List[A] =
     get(page).getOrElse(Nil)
@@ -99,7 +99,7 @@ final case class UserAnswers(
    *   Page to remove
    * @return
    */
-  def remove(page: Removable[_]): Try[UserAnswers] =
+  def remove(page: Removable[?]): Try[UserAnswers] =
     page
       .cleanup(None, self)
       .transform(
@@ -113,7 +113,7 @@ final case class UserAnswers(
    *   List of pages to remove
    * @return
    */
-  def removeOnlyMultiplePages(pages: List[Removable[_]]): Try[UserAnswers] =
+  def removeOnlyMultiplePages(pages: List[Removable[?]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.transform(_.removeOnly(page), _ => removeOnly(page)))
 
   /**
@@ -121,7 +121,7 @@ final case class UserAnswers(
    * @param pages
    * @return
    */
-  def removeOnly(pages: List[Removable[_]]): Try[UserAnswers] =
+  def removeOnly(pages: List[Removable[?]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.removeOnly(page)))
 
   /**
@@ -130,7 +130,7 @@ final case class UserAnswers(
    * @param pages
    * @return
    */
-  def remove(pages: List[Removable[_]]): Try[UserAnswers] =
+  def remove(pages: List[Removable[?]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
 
   def setWhen[A](bool: Boolean)(page: Settable[A], value: => A)(implicit writes: Writes[A]): Try[UserAnswers] =
@@ -144,7 +144,7 @@ final case class UserAnswers(
    *   page to remove
    * @return
    */
-  def removeOnlyWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
+  def removeOnlyWhen(bool: Boolean)(page: Removable[?]*): Try[UserAnswers] =
     if (bool) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
 
   /**
@@ -155,7 +155,7 @@ final case class UserAnswers(
    *   page to remove
    * @return
    */
-  def removeOnlyWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
+  def removeOnlyWhen(bool: UserAnswers => Boolean)(page: Removable[?]*): Try[UserAnswers] =
     if (bool(this)) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
 
   def when(
@@ -194,7 +194,7 @@ final case class UserAnswers(
    *   - When soft deleting pages, the cleanup function is not called to stop accidentally hard deleting associated
    *     pages as cleanup pages use remove rather than softRemove.
    */
-  def softRemove[A: Reads: Writes](page: Gettable[A] with Settable[A] with Removable[A]): Try[UserAnswers] =
+  def softRemove[A: Reads: Writes](page: Gettable[A] & Settable[A] & Removable[A]): Try[UserAnswers] =
     get(page).fold(Try(this)) { value =>
       for {
         updated <- set(SoftRemovable.path ++ page.path, Json.toJson(value))
@@ -230,10 +230,10 @@ object UserAnswers {
 
   case class SensitiveJsObject(override val decryptedValue: JsObject) extends Sensitive[JsObject]
 
-  implicit def sensitiveJsObjectFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveJsObject] =
+  implicit def sensitiveJsObjectFormat(implicit crypto: Encrypter & Decrypter): Format[SensitiveJsObject] =
     JsonEncryption.sensitiveEncrypterDecrypter(SensitiveJsObject.apply)
 
-  def reads(implicit crypto: Encrypter with Decrypter): Reads[UserAnswers] = {
+  def reads(implicit crypto: Encrypter & Decrypter): Reads[UserAnswers] = {
 
     import play.api.libs.functional.syntax._
 
@@ -242,11 +242,11 @@ object UserAnswers {
       .and((__ \ "data").read[SensitiveJsObject])
       .and(
         (__ \ "lastUpdated")
-          .read(MongoJavatimeFormats.instantFormat)
-      )(UserAnswers.apply _)
+          .read(using MongoJavatimeFormats.instantFormat)
+      )(UserAnswers.apply)
   }
 
-  def writes(implicit crypto: Encrypter with Decrypter): OWrites[UserAnswers] = {
+  def writes(implicit crypto: Encrypter & Decrypter): OWrites[UserAnswers] = {
 
     import play.api.libs.functional.syntax._
 
@@ -255,11 +255,11 @@ object UserAnswers {
       .and((__ \ "data").write[SensitiveJsObject])
       .and(
         (__ \ "lastUpdated")
-          .write(MongoJavatimeFormats.instantFormat)
+          .write(using MongoJavatimeFormats.instantFormat)
       )(unlift((x: UserAnswers) => Some((x.id, x.data, x.lastUpdated))))
   }
 
-  implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = OFormat(reads, writes)
+  implicit def format(implicit crypto: Encrypter & Decrypter): OFormat[UserAnswers] = OFormat(reads, writes)
 
   object implicits {
     implicit class UserAnswersTryOps(ua: Try[UserAnswers]) {
@@ -267,7 +267,7 @@ object UserAnswers {
 
       def set(page: Settable[Flag]): Try[UserAnswers] = ua.flatMap(_.set(page))
 
-      def remove(page: Removable[_]): Try[UserAnswers] = ua.flatMap(_.remove(page))
+      def remove(page: Removable[?]): Try[UserAnswers] = ua.flatMap(_.remove(page))
 
       def setWhen[A: Writes](bool: Boolean)(page: Settable[A], value: A): Try[UserAnswers] =
         ua.flatMap(_.setWhen(bool)(page, value))

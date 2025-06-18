@@ -51,7 +51,7 @@ class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec with Co
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -72,13 +72,19 @@ class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec with Co
 
     act.like(
       continueNoSave(onSubmit, userAnswers, "value" -> "false")
-        .after(verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+        .after(
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
+        )
     )
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .after(
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(using
+            any(),
+            any(),
+            any()
+          )
         )
     )
 

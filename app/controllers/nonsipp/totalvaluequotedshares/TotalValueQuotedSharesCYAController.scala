@@ -124,7 +124,7 @@ class TotalValueQuotedSharesCYAController @Inject() (
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ) =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>

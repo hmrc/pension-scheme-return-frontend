@@ -200,7 +200,7 @@ class BorrowInstancesListController @Inject() (
 
   private def borrowDetails(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[BorrowedMoneyDetails]] =
+  )(implicit request: DataRequest[?]): Either[Result, List[BorrowedMoneyDetails]] =
     request.userAnswers
       .map(MoneyBorrowedProgress.all(srn))
       .filter(_._2.completed)

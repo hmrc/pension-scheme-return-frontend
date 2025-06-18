@@ -49,7 +49,7 @@ class BondsTransformer @Inject() extends Transformer {
     initialUA: UserAnswers,
     isSubmitted: Boolean = false
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Option[Bonds] =
     if (optUnregulatedOrConnectedBondsHeld.nonEmpty || request.userAnswers.map(NameOfBondsPages(srn)).toList.nonEmpty) {
       val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
@@ -76,7 +76,7 @@ class BondsTransformer @Inject() extends Transformer {
       None
     }
   private def bondTransactionsTransformToEtmp(srn: Srn, bondsDisposal: Boolean)(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): List[BondTransactions] =
     request.userAnswers
       .map(BondsProgress.all(srn))
@@ -122,7 +122,7 @@ class BondsTransformer @Inject() extends Transformer {
     srn: Srn,
     bondIndex: Refined[Int, OneTo5000]
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Seq[BondDisposed] =
     request.userAnswers
       .map(

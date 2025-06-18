@@ -101,7 +101,7 @@ class LandOrPropertyDisposalAddressListController @Inject() (
   }
 
   private def landOrPropertyData(srn: Srn, indexes: List[Max5000])(implicit
-    req: DataRequest[_]
+    req: DataRequest[?]
   ): Either[Result, List[LandOrPropertyData]] =
     indexes.map { index =>
       for {

@@ -79,10 +79,10 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec with ControllerBeha
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, validForm: _*))
+    act.like(saveAndContinue(onSubmit, validForm*))
     act.like(invalidForm(onSubmit))
-    act.like(invalidForm(onSubmit, dobInFutureForm: _*))
-    act.like(invalidForm(onSubmit, dobTooEarlyForm: _*))
+    act.like(invalidForm(onSubmit, dobInFutureForm*))
+    act.like(invalidForm(onSubmit, dobTooEarlyForm*))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 

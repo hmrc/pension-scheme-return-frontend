@@ -144,7 +144,7 @@ class LandOrPropertyDisposalListController @Inject() (
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
   )(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Result = {
     val (status, _) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
     logger.info(s"Land or property disposal status is $status")
@@ -256,7 +256,7 @@ class LandOrPropertyDisposalListController @Inject() (
 
   private def getDisposals(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
+  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] =
     Right(
       request.userAnswers
         .map(LandOrPropertyProgress.all(srn))
@@ -276,7 +276,7 @@ class LandOrPropertyDisposalListController @Inject() (
     )
 
   private def getAddressesWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): Either[Result, List[((Max5000, List[Max50]), Address)]] =
     disposals
       .map { case indexes @ (landOrPropertyIndex, _) =>

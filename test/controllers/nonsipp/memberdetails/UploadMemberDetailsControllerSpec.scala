@@ -66,7 +66,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with Controll
 
   "onPageLoad should use the right upscan config URLs" in {
     running(_ => applicationBuilder(Some(defaultUserAnswers))) { implicit app =>
-      when(mockUploadService.initiateUpscan(any(), any(), any())(any()))
+      when(mockUploadService.initiateUpscan(any(), any(), any())(using any()))
         .thenReturn(Future.successful(upscanInitiateResponse))
 
       val appConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -81,7 +81,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with Controll
         callbackCaptor.capture(),
         successCaptor.capture(),
         failureCaptor.capture()
-      )(any())
+      )(using any())
 
       val actualCallbackUrl = callbackCaptor.getValue
       val actualSuccessUrl = successCaptor.getValue
@@ -111,7 +111,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with Controll
         mockTaxYear(dateRange)
         mockInitiateUpscan()
       }.after {
-        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+        verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
         reset(mockAuditService)
       }.updateName(_ + " with error EntityTooLarge")
     )
@@ -133,9 +133,9 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with Controll
   }
 
   private def mockInitiateUpscan(): Unit =
-    when(mockUploadService.initiateUpscan(any(), any(), any())(any()))
+    when(mockUploadService.initiateUpscan(any(), any(), any())(using any()))
       .thenReturn(Future.successful(upscanInitiateResponse))
 
   private def mockTaxYear(taxYear: DateRange) =
-    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(using any())).thenReturn(Some(Left(taxYear)))
 }

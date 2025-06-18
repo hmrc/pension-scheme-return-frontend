@@ -106,7 +106,7 @@ class RemoveBondsController @Inject() (
                     srn,
                     removedUserAnswers,
                     fallbackCall = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, 1, mode)
-                  )(
+                  )(using
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

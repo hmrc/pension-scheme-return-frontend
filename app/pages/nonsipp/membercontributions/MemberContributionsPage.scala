@@ -40,6 +40,6 @@ case class MemberContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
 
   private def pages(
     srn: Srn
-  ): List[Removable[_]] =
+  ): List[Removable[?]] =
     List(AllTotalMemberContributionPages(srn))
 }

@@ -45,7 +45,7 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec with ControllerBe
   }
 
   def setSchemeDate(date: Option[DateRange]): Unit =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(date)
 
   val partialUserAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), partialAmountOfTheLoan)

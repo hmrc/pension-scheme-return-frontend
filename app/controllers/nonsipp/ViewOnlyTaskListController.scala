@@ -123,7 +123,7 @@ object ViewOnlyTaskListController {
       Some(historyLink),
       submissionDateMessage,
       sectionListWithoutDeclaration.head,
-      sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
+      sectionListWithoutDeclaration.tail :+ declarationSectionViewModel*
     )
 
     PageViewModel(

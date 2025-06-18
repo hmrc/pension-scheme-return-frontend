@@ -51,7 +51,7 @@ class UploadRepository @Inject() (
     extends PlayMongoRepository[repositories.UploadRepository.MongoUpload](
       collectionName = "upload",
       mongoComponent = mongoComponent,
-      domainFormat = repositories.UploadRepository.MongoUpload.format(crypto.getCrypto),
+      domainFormat = repositories.UploadRepository.MongoUpload.format(using crypto.getCrypto),
       indexes = Seq(
         IndexModel(Indexes.ascending("id"), IndexOptions().unique(true)),
         IndexModel(Indexes.ascending("reference"), IndexOptions().unique(true)),
@@ -66,7 +66,7 @@ class UploadRepository @Inject() (
     ) {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-  implicit val cryptoEncDec: Encrypter with Decrypter = crypto.getCrypto
+  implicit val cryptoEncDec: Encrypter & Decrypter = crypto.getCrypto
 
   import UploadRepository._
 
@@ -137,10 +137,10 @@ object UploadRepository {
 
   case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
 
-  implicit def sensitiveUploadFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
+  implicit def sensitiveUploadFormat(implicit crypto: Encrypter & Decrypter): Format[SensitiveUpload] =
     JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
 
-  implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUploadStatus] =
+  implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter & Decrypter): Format[SensitiveUploadStatus] =
     JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUploadStatus.apply)
 
   case class MongoUpload(
@@ -153,25 +153,25 @@ object UploadRepository {
 
   object MongoUpload {
 
-    def reads(implicit crypto: Encrypter with Decrypter): Reads[MongoUpload] =
+    def reads(implicit crypto: Encrypter & Decrypter): Reads[MongoUpload] =
       (__ \ "id")
         .read[UploadKey]
         .and((__ \ "reference").read[Reference])
         .and((__ \ "status").read[SensitiveUploadStatus])
-        .and((__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat))
-        .and((__ \ "result").readNullable[SensitiveUpload])(MongoUpload.apply _)
+        .and((__ \ "lastUpdated").read(using MongoJavatimeFormats.instantFormat))
+        .and((__ \ "result").readNullable[SensitiveUpload])(MongoUpload.apply)
 
-    def writes(implicit crypto: Encrypter with Decrypter): OWrites[MongoUpload] =
+    def writes(implicit crypto: Encrypter & Decrypter): OWrites[MongoUpload] =
       (__ \ "id")
         .write[UploadKey]
         .and((__ \ "reference").write[Reference])
         .and((__ \ "status").write[SensitiveUploadStatus])
-        .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))
+        .and((__ \ "lastUpdated").write(using MongoJavatimeFormats.instantFormat))
         .and((__ \ "result").writeNullable[SensitiveUpload])(
           unlift((x: MongoUpload) => Some(x._1, x._2, x._3, x._4, x._5))
         )
 
-    implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[MongoUpload] = OFormat(reads, writes)
+    implicit def format(implicit crypto: Encrypter & Decrypter): OFormat[MongoUpload] = OFormat(reads, writes)
   }
 
   implicit val uploadKeyReads: Reads[UploadKey] = Reads.StringReads.flatMap(_.split(separator).toList match {

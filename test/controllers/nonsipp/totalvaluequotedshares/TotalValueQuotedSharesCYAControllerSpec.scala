@@ -94,7 +94,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           MockPsrSubmissionService.submitPsrDetails()
         )
         .after(
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
         )
     )
 
@@ -217,7 +217,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           controllers.nonsipp.routes.ViewOnlyTaskListController
             .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
         ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
         ).withName("Submit redirects to view only tasklist")
       )
 
@@ -255,5 +255,5 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
   private def mockTaxYear(
     taxYear: DateRange
   ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
-    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(using any())).thenReturn(Some(Left(taxYear)))
 }

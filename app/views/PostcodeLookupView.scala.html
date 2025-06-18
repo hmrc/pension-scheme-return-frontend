@@ -24,7 +24,7 @@
         govukInput: GovukInput
 )
 
-@(form: Form[_], viewmodel: FormPageViewModel[PostcodeLookupViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], viewmodel: FormPageViewModel[PostcodeLookupViewModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 

@@ -44,7 +44,7 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec with C
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -65,14 +65,18 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec with C
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .after {
-          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(using any(), any(), any())
         }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .after {
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(using
+            any(),
+            any(),
+            any()
+          )
         }
     )
 

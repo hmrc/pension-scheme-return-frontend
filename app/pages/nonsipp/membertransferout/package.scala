@@ -28,7 +28,7 @@ package object membertransferout {
     val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
   }
 
-  def transferOutPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[_]] = List(
+  def transferOutPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[?]] = List(
     ReceivingSchemeNamePage(srn, index, secondaryIndex),
     ReceivingSchemeTypePage(srn, index, secondaryIndex),
     ReportAnotherTransferOutPage(srn, index, secondaryIndex),

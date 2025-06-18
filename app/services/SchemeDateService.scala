@@ -37,7 +37,7 @@ class SchemeDateServiceImpl @Inject() extends SchemeDateService {
 
   def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("Europe/London"))
 
-  def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] = {
+  def schemeDate(srn: Srn)(implicit request: DataRequest[?]): Option[DateRange] = {
     val accountingPeriods = request.userAnswers.list(AccountingPeriods(srn))
     if (accountingPeriods.isEmpty) {
       whichTaxYear(srn)
@@ -51,7 +51,7 @@ class SchemeDateServiceImpl @Inject() extends SchemeDateService {
     }
   }
 
-  def returnPeriods(srn: Srn)(implicit request: DataRequest[_]): Option[NonEmptyList[DateRange]] = {
+  def returnPeriods(srn: Srn)(implicit request: DataRequest[?]): Option[NonEmptyList[DateRange]] = {
     val accountingPeriods = request.userAnswers.list(AccountingPeriods(srn))
 
     if (accountingPeriods.isEmpty) {
@@ -63,25 +63,25 @@ class SchemeDateServiceImpl @Inject() extends SchemeDateService {
 
   def taxYearOrAccountingPeriods(
     srn: Srn
-  )(implicit request: DataRequest[_]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]] =
+  )(implicit request: DataRequest[?]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]] =
     request.userAnswers.list(AccountingPeriods(srn)) match {
       case Nil => request.userAnswers.get(WhichTaxYearPage(srn)).map(Left(_))
       case head :: rest =>
         NonEmptyList
-          .of(head, rest: _*)
+          .of(head, rest*)
           .zipWithIndex
           .traverse { case (date, index) =>
             refineV[OneToThree](index + 1).toOption.map(refined => date -> refined)
           }
           .map(Right(_))
     }
-  def returnPeriodsAsJsonString(srn: Srn)(implicit request: DataRequest[_]): String =
+  def returnPeriodsAsJsonString(srn: Srn)(implicit request: DataRequest[?]): String =
     Json.prettyPrint(Json.toJson(returnPeriods(srn)))
 
   def submissionDateAsString(localDateTime: LocalDateTime): String =
     localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)
 
-  private def whichTaxYear(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
+  private def whichTaxYear(srn: Srn)(implicit request: DataRequest[?]): Option[DateRange] =
     request.userAnswers.get(WhichTaxYearPage(srn))
 
 }
@@ -91,21 +91,21 @@ trait SchemeDateService {
 
   def now(): LocalDateTime
 
-  def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
+  def schemeStartDate(srn: Srn)(implicit request: DataRequest[?]): Option[LocalDate] =
     schemeDate(srn).map(_.from)
 
-  def schemeEndDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
+  def schemeEndDate(srn: Srn)(implicit request: DataRequest[?]): Option[LocalDate] =
     schemeDate(srn).map(_.to)
 
-  def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange]
+  def schemeDate(srn: Srn)(implicit request: DataRequest[?]): Option[DateRange]
 
-  def returnPeriods(srn: Srn)(implicit request: DataRequest[_]): Option[NonEmptyList[DateRange]]
+  def returnPeriods(srn: Srn)(implicit request: DataRequest[?]): Option[NonEmptyList[DateRange]]
 
   def taxYearOrAccountingPeriods(
     srn: Srn
-  )(implicit request: DataRequest[_]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]
+  )(implicit request: DataRequest[?]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]
 
-  def returnPeriodsAsJsonString(srn: Srn)(implicit request: DataRequest[_]): String
+  def returnPeriodsAsJsonString(srn: Srn)(implicit request: DataRequest[?]): String
 
   def submissionDateAsString(localDateTime: LocalDateTime): String
 }

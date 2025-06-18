@@ -141,7 +141,7 @@ class EmployerContributionsMemberListController @Inject() (
     }
 
   private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): List[MemberWithEmployerContributions] = indexes.map { case (index, nameDOB) =>
     MemberWithEmployerContributions(
       memberIndex = index,

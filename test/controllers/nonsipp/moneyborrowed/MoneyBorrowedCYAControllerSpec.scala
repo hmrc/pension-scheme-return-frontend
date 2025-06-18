@@ -114,7 +114,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec with ControllerB
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetails())
           .after {
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
             reset(mockPsrSubmissionService)
           }
           .withName(s"redirect to next page when in ${mode.toString} mode")
@@ -185,7 +185,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec with ControllerB
         controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only BorrowInstancesListController page")
     )
   }

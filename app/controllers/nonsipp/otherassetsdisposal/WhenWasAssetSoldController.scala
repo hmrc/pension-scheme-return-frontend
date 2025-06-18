@@ -105,7 +105,7 @@ class WhenWasAssetSoldController @Inject() (
 
   private def usingSchemeDate[F[_]: Monad](
     srn: Srn
-  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+  )(body: DateRange => F[Result])(implicit request: DataRequest[?]): F[Result] =
     schemeDateService.schemeDate(srn) match {
       case Some(period) => body(period)
       case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))

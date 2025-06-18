@@ -112,7 +112,7 @@ object TaskListStatusUtils {
   def getEmployerContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereEmployerContributions = userAnswers.get(EmployerContributionsPage(srn))
     val numRecorded =
-      userAnswers.map(EmployerContributionsCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+      userAnswers.map(EmployerContributionsCompleted.all(srn)).flatten(using _._2).count(_._2 == SectionCompleted)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.employercontributions.routes.EmployerContributionsController
@@ -182,7 +182,7 @@ object TaskListStatusUtils {
   def getTransferInStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereTransfersIn = userAnswers.get(DidSchemeReceiveTransferPage(srn))
     val numRecorded =
-      userAnswers.map(TransfersInSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+      userAnswers.map(TransfersInSectionCompleted.all(srn)).flatten(using _._2).count(_._2 == SectionCompleted)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
@@ -205,7 +205,7 @@ object TaskListStatusUtils {
   def getTransferOutStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereTransfersOut = userAnswers.get(SchemeTransferOutPage(srn))
     val numRecorded =
-      userAnswers.map(TransfersOutSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+      userAnswers.map(TransfersOutSectionCompleted.all(srn)).flatten(using _._2).count(_._2 == SectionCompleted)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
@@ -404,7 +404,7 @@ object TaskListStatusUtils {
 
   def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val sharesDisposalsMade = userAnswers.get(SharesDisposalPage(srn))
-    val numRecorded = userAnswers.map(SharesDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
+    val numRecorded = userAnswers.map(SharesDisposalProgress.all(srn)).flatten(using _._2).count(_._2.completed)
 
     val firstQuestionPageUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
       .onPageLoad(srn, NormalMode)
@@ -533,7 +533,7 @@ object TaskListStatusUtils {
 
   def getBondsDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereBondsDisposals = userAnswers.get(BondsDisposalPage(srn))
-    val numRecorded = userAnswers.map(BondsDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
+    val numRecorded = userAnswers.map(BondsDisposalProgress.all(srn)).flatten(using _._2).count(_._2.completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.bondsdisposal.routes.BondsDisposalController
@@ -619,7 +619,7 @@ object TaskListStatusUtils {
 
   def getOtherAssetsDisposalTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereOtherAssetsDisposals = userAnswers.get(OtherAssetsDisposalPage(srn))
-    val numRecorded = userAnswers.map(OtherAssetsDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
+    val numRecorded = userAnswers.map(OtherAssetsDisposalProgress.all(srn)).flatten(using _._2).count(_._2.completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController

@@ -31,19 +31,19 @@ import java.time.LocalDate
 trait Mappings extends Formatters with Constraints {
 
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
-    of(stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
+    of(using stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
 
   def textWithKey(key: String, errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
-    FieldMapping[String](key = key)(stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
+    FieldMapping[String](key = key)(using stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
 
   def conditional[A](
     l: List[(Condition, Option[Mapping[A]])],
     prePopKey: Option[String]
   )(implicit ev: GenericFormMapper[String, A]): FieldMapping[Option[A]] =
-    of(conditionalFormatter[A](l, prePopKey))
+    of(using conditionalFormatter[A](l, prePopKey))
 
   def optionalText(): Mapping[String] =
-    of(optionalStringFormatter()).transform[String](_.trim, _.trim)
+    of(using optionalStringFormatter()).transform[String](_.trim, _.trim)
 
   def int(
     requiredKey: String = "error.required",
@@ -59,12 +59,12 @@ trait Mappings extends Formatters with Constraints {
     intFormErrors: IntFormErrors,
     args: Seq[String]
   ): FieldMapping[Int] =
-    of(intFormatter(intFormErrors, args))
+    of(using intFormatter(intFormErrors, args))
 
   def int(
     intFormErrors: IntFormErrors
   ): FieldMapping[Int] =
-    of(intFormatter(intFormErrors, Nil))
+    of(using intFormatter(intFormErrors, Nil))
 
   def double(
     requiredKey: String = "error.required",
@@ -73,24 +73,24 @@ trait Mappings extends Formatters with Constraints {
     min: (Double, String) = (0d, "error.tooSmall"),
     args: Seq[String] = Seq.empty
   ): FieldMapping[Double] =
-    of(doubleFormatter(requiredKey, nonNumericKey, max, min, args))
+    of(using doubleFormatter(requiredKey, nonNumericKey, max, min, args))
 
   def double(
     doubleFormErrors: DoubleFormErrors,
     args: Seq[String]
   ): FieldMapping[Double] =
-    of(doubleFormatter(doubleFormErrors, args))
+    of(using doubleFormatter(doubleFormErrors, args))
 
   def double(
     doubleFormErrors: DoubleFormErrors
   ): FieldMapping[Double] =
-    of(doubleFormatter(doubleFormErrors, Nil))
+    of(using doubleFormatter(doubleFormErrors, Nil))
 
   def money(
     moneyFormErrors: MoneyFormErrors,
     args: Seq[String] = Seq.empty
   ): FieldMapping[Money] =
-    of(moneyFormatter(moneyFormErrors, args))
+    of(using moneyFormatter(moneyFormErrors, args))
 
   def optionalMoney(
     moneyFormErrors: MoneyFormErrors,
@@ -105,34 +105,34 @@ trait Mappings extends Formatters with Constraints {
 
   def security(requiredKey: String, invalidKey: String, maxLengthErrorKey: String, args: Any*): Mapping[Security] =
     text(requiredKey, args.toList)
-      .verifying(verify[String](invalidKey, s => Security.isValid(s), args: _*))
-      .verifying(verify[String](maxLengthErrorKey, s => Security.maxLengthCheck(s), args: _*))
+      .verifying(verify[String](invalidKey, s => Security.isValid(s), args*))
+      .verifying(verify[String](maxLengthErrorKey, s => Security.maxLengthCheck(s), args*))
       .transform[Security](s => Security(s), _.security)
 
   def percentage(
     percentageFormErrors: PercentageFormErrors,
     args: Seq[String] = Seq.empty
   ): FieldMapping[Percentage] =
-    of(percentageFormatter(percentageFormErrors, args))
+    of(using percentageFormatter(percentageFormErrors, args))
 
   def boolean(
     requiredKey: String = "error.required",
     invalidKey: String = "error.boolean",
     args: Seq[String] = Seq.empty
   ): FieldMapping[Boolean] =
-    of(booleanFormatter(requiredKey, invalidKey, args))
+    of(using booleanFormatter(requiredKey, invalidKey, args))
 
-  val unit: FieldMapping[Unit] = of(unitFormatter)
+  val unit: FieldMapping[Unit] = of(using unitFormatter)
 
   def enumerable[A](
     requiredKey: String = "error.required",
     invalidKey: String = "error.invalid",
     args: Seq[String] = Seq.empty
   )(implicit ev: Enumerable[A]): FieldMapping[A] =
-    of(enumerableFormatter[A](requiredKey, invalidKey, args))
+    of(using enumerableFormatter[A](requiredKey, invalidKey, args))
 
   def localDate(dateFormErrors: DateFormErrors, args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
-    of(new LocalDateFormatter(dateFormErrors, args))
+    of(using new LocalDateFormatter(dateFormErrors, args))
 
   def dateRange(
     startDateErrors: DateFormErrors,
@@ -152,7 +152,7 @@ trait Mappings extends Formatters with Constraints {
     errorEndBefore: String,
     errorEndAfter: String
   ): FieldMapping[DateRange] =
-    of(
+    of(using
       new DateRangeFormatter(
         startDateErrors,
         endDateErrors,
@@ -176,7 +176,7 @@ trait Mappings extends Formatters with Constraints {
   def verify[A](errorKey: String, pred: A => Boolean, args: Any*): Constraint[A] =
     Constraint[A] { (a: A) =>
       if (pred(a)) Valid
-      else Invalid(errorKey, args: _*)
+      else Invalid(errorKey, args*)
     }
 
   def validatedText(
@@ -188,9 +188,9 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[String] =
     regexChecks
       .foldLeft(text(requiredKey, args.toList)) { case (mapping, (regex, key)) =>
-        mapping.verifying(verify[String](key, _.matches(regex), args: _*))
+        mapping.verifying(verify[String](key, _.matches(regex), args*))
       }
-      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args*))
 
   def validatedOptionalText(
     regexChecks: List[(Regex, String)],
@@ -200,9 +200,9 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[String] =
     regexChecks
       .foldLeft(optionalText()) { case (mapping, (regex, key)) =>
-        mapping.verifying(verify[String](key, s => s.trim.isEmpty || s.matches(regex), args: _*))
+        mapping.verifying(verify[String](key, s => s.trim.isEmpty || s.matches(regex), args*))
       }
-      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args*))
 
   def validatedText(
     fieldKey: String,
@@ -214,9 +214,9 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[String] =
     regexChecks
       .foldLeft(textWithKey(fieldKey, requiredKey, args.toList)) { case (mapping, (regex, key)) =>
-        mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).matches(regex), args: _*))
+        mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).matches(regex), args*))
       }
-      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args*))
 
   def validatedPsaId(
     requiredKey: String,
@@ -229,10 +229,10 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[String] =
     regexChecks
       .foldLeft(text(requiredKey, args.toList)) { case (mapping, (regex, key)) =>
-        mapping.verifying(verify[String](key, _.matches(regex), args: _*))
+        mapping.verifying(verify[String](key, _.matches(regex), args*))
       }
       .verifying(isEqual(authorisingPSAID, noMatchKey))
-      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args*))
 
   def input(formErrors: InputFormErrors): Mapping[String] =
     validatedText(
@@ -240,7 +240,7 @@ trait Mappings extends Formatters with Constraints {
       formErrors.regexChecks,
       formErrors.max._1,
       formErrors.max._2,
-      formErrors.args: _*
+      formErrors.args*
     )
 
   def input(key: String, formErrors: InputFormErrors): Mapping[String] =
@@ -250,7 +250,7 @@ trait Mappings extends Formatters with Constraints {
       formErrors.regexChecks,
       formErrors.max._1,
       formErrors.max._2,
-      formErrors.args: _*
+      formErrors.args*
     )
 
   def optionalInput(formErrors: InputFormErrors): Mapping[Option[String]] =
@@ -259,7 +259,7 @@ trait Mappings extends Formatters with Constraints {
         formErrors.regexChecks,
         formErrors.max._1,
         formErrors.max._2,
-        formErrors.args: _*
+        formErrors.args*
       )
     )
 
@@ -269,7 +269,7 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[Nino] =
     text(requiredKey, args.toList)
-      .verifying(verify[String](invalidKey, s => Nino.isValid(s.filterNot(_.isWhitespace).toUpperCase), args: _*))
+      .verifying(verify[String](invalidKey, s => Nino.isValid(s.filterNot(_.isWhitespace).toUpperCase), args*))
       .transform[Nino](s => Nino(s.filterNot(_.isWhitespace).toUpperCase), _.nino.filterNot(_.isWhitespace).toUpperCase)
 
   def utr(
@@ -278,13 +278,13 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[Utr] =
     text(requiredKey, args.toList)
-      .verifying(verify[String](invalidKey, s => Utr.isValid(s.toUpperCase), args: _*))
+      .verifying(verify[String](invalidKey, s => Utr.isValid(s.toUpperCase), args*))
       .transform[Utr](s => Utr(s.toUpperCase), _.utr.toUpperCase)
 
   def crn(requiredKey: String, invalidKey: String, minMaxLengthErrorKey: String, args: Any*): Mapping[Crn] =
     text(requiredKey, args.toList)
-      .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args: _*))
-      .verifying(verify[String](minMaxLengthErrorKey, s => Crn.isLengthInRange(s.toUpperCase), args: _*))
+      .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args*))
+      .verifying(verify[String](minMaxLengthErrorKey, s => Crn.isLengthInRange(s.toUpperCase), args*))
       .transform[Crn](s => Crn(s.toUpperCase.replaceAll(" ", "")), _.crn.toUpperCase)
 
   def ninoNoDuplicates(
@@ -295,12 +295,12 @@ trait Mappings extends Formatters with Constraints {
     args: Any*
   ): Mapping[Nino] =
     text(requiredKey, args.toList)
-      .verifying(verify[String](invalidKey, s => Nino.isValid(s.filterNot(_.isWhitespace).toUpperCase), args: _*))
+      .verifying(verify[String](invalidKey, s => Nino.isValid(s.filterNot(_.isWhitespace).toUpperCase), args*))
       .verifying(
         verify[String](
           duplicateKey,
           s => !duplicates.map(_.nino.filterNot(_.isWhitespace)).contains(s.filterNot(_.isWhitespace)),
-          args: _*
+          args*
         )
       )
       .transform[Nino](s => Nino(s.filterNot(_.isWhitespace).toUpperCase), _.nino.toUpperCase)
@@ -321,14 +321,14 @@ trait Mappings extends Formatters with Constraints {
     inputFormErrors.regexChecks
       .foldLeft(text(inputFormErrors.requiredKey, inputFormErrors.args.toList)) { case (mapping, (regex, key)) =>
         mapping.verifying(
-          verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), inputFormErrors.args: _*)
+          verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), inputFormErrors.args*)
         )
       }
       .verifying(
         verify[String](
           inputFormErrors.max._2,
           _.filterNot(_.isWhitespace).length <= inputFormErrors.max._1,
-          inputFormErrors.args: _*
+          inputFormErrors.args*
         )
       )
       .transform[String](_.filterNot(_.isWhitespace).toUpperCase, _.filterNot(_.isWhitespace).toUpperCase)
@@ -341,7 +341,7 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[String] =
     regexChecks
       .foldLeft(optionalText()) { case (mapping, (regex, key)) =>
-        mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), args: _*))
+        mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).toUpperCase.matches(regex), args*))
       }
       .verifying(verify[String](maxLengthErrorKey, _.filterNot(_.isWhitespace).length <= maxLength, args))
       .transform[String](_.filterNot(_.isWhitespace).toUpperCase, _.filterNot(_.isWhitespace).toUpperCase)
@@ -352,7 +352,7 @@ trait Mappings extends Formatters with Constraints {
         formErrors.regexChecks,
         formErrors.max._1,
         formErrors.max._2,
-        formErrors.args: _*
+        formErrors.args*
       )
     )
 }

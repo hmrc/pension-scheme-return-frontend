@@ -52,7 +52,7 @@ class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec with ControllerB
   }
 
   def setSchemeDate(date: Option[DateRange]): Unit =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(date)
 
   "WhenWasAssetSoldController" - {
 

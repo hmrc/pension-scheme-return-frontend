@@ -93,7 +93,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
           MockPsrSubmissionService.submitPsrDetails()
         )
         .after(
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
         )
     )
 
@@ -192,7 +192,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(using any(), any(), any())
       ).withName("Submit redirects to view only tasklist")
     )
 
@@ -200,5 +200,5 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
   private def mockTaxYear(
     taxYear: DateRange
   ): OngoingStubbing[Option[DateRange]] =
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(taxYear))
+    when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(Some(taxYear))
 }

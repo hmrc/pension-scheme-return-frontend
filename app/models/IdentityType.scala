@@ -40,7 +40,7 @@ object IdentityType extends Enumerable.Implicits {
 
   val values: List[IdentityType] = List(Individual, UKCompany, UKPartnership, Other)
 
-  implicit val enumerable: Enumerable[IdentityType] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[IdentityType] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[IdentityType] = (value: IdentityType) => value.name
 }

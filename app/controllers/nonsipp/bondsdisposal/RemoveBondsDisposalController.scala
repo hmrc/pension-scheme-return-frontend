@@ -117,7 +117,7 @@ class RemoveBondsDisposalController @Inject() (
                     removedUserAnswers,
                     fallbackCall =
                       controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1)
-                  )(
+                  )(using
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

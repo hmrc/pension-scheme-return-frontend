@@ -77,7 +77,7 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
         Some(
           JsPath \ "membersPayments" \ "memberDetails" \ "memberLumpSumReceived" \ index.arrayIndex.toString
         ),
-        formData(form, lumpSumData.from[(Money, Money)]): _*
+        formData(form, lumpSumData.from[(Money, Money)])*
       )
     )
 

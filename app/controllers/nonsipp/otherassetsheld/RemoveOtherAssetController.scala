@@ -104,7 +104,7 @@ class RemoveOtherAssetController @Inject() (
                     removedUserAnswers,
                     fallbackCall =
                       controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, mode)
-                  )(
+                  )(using
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

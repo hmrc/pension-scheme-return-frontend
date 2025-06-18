@@ -34,7 +34,7 @@ object ManualOrUpload extends Enumerable.Implicits {
 
   val values: List[ManualOrUpload] = List(Manual, Upload)
 
-  implicit val enumerable: Enumerable[ManualOrUpload] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[ManualOrUpload] = Enumerable(values.map(v => (v.toString, v))*)
 
   implicit val jsLiteral: JavascriptLiteral[ManualOrUpload] = (value: ManualOrUpload) => value.name
 }

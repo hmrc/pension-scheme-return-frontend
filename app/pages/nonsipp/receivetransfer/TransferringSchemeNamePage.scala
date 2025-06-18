@@ -41,7 +41,7 @@ case class TransferringSchemeNamePage(srn: Srn, memberIndex: Max300, index: Max5
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[?]] =
     List(
       TransferringSchemeTypePage(srn, memberIndex, index),
       TotalValueTransferPage(srn, memberIndex, index),

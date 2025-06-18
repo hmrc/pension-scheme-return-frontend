@@ -221,7 +221,7 @@ class SharesListController @Inject() (
   }
 
   private def shares(srn: Srn)(implicit
-    request: DataRequest[_],
+    request: DataRequest[?],
     logger: Logger
   ): Either[Result, (List[SharesData], List[SharesData])] = {
     // if return has been pre-populated, partition shares by those that need to be checked

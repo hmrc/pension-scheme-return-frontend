@@ -86,10 +86,10 @@ class CheckMemberDetailsFileControllerSpec
     when(mockUploadService.getUploadStatus(any())).thenReturn(Future.successful(uploadStatus))
 
   private def mockStream(): Unit =
-    when(mockUploadService.stream(any())(any())).thenReturn(Future.successful((200, Source.single(byteString))))
+    when(mockUploadService.stream(any())(using any())).thenReturn(Future.successful((200, Source.single(byteString))))
 
   private def mockValidateCSV(result: (Upload, Int, Long)): Unit =
-    when(mockMemberDetailsUploadValidator.validateCSV(any(), any())(any(), any()))
+    when(mockMemberDetailsUploadValidator.validateCSV(any(), any())(using any(), any()))
       .thenReturn(Future.successful(result))
 
   private def mockSaveValidatedUpload(): Unit =
@@ -98,7 +98,7 @@ class CheckMemberDetailsFileControllerSpec
   private def mockTaxYear(
     taxYear: DateRange
   ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
-    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(using any())).thenReturn(Some(Left(taxYear)))
 
   "CheckMemberDetailsFileController" - {
 
@@ -117,7 +117,7 @@ class CheckMemberDetailsFileControllerSpec
           val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
           mockTaxYear(dateRange)
         }.after {
-          verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
+          verify(mockAuditService, times(2)).sendEvent(any())(using any(), any())
           reset(mockAuditService)
         }.withName("should redirect to the next page when the form submission is valid and upload is successful")
       )
@@ -133,7 +133,7 @@ class CheckMemberDetailsFileControllerSpec
           val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
           mockTaxYear(dateRange)
         }.after {
-          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
           reset(mockAuditService)
         }.withName("should redirect to the error page when upload status is failed during onSubmit")
       )
@@ -173,7 +173,7 @@ class CheckMemberDetailsFileControllerSpec
             mockTaxYear(dateRange)
             mockGetUploadStatus(Some(uploadedSuccessfully))
           }.after {
-            verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+            verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
             reset(mockAuditService)
           }.withName("should render the view when upload status is Success")
         )
@@ -231,7 +231,7 @@ class CheckMemberDetailsFileControllerSpec
             mockTaxYear(dateRange)
             mockGetUploadStatus(Some(uploadedSuccessfully))
           }.after {
-            verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+            verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
             reset(mockAuditService)
           }
         )
@@ -260,7 +260,7 @@ class CheckMemberDetailsFileControllerSpec
               mockGetUploadStatus(Some(uploadedSuccessfully))
             }
             .after {
-              verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
+              verify(mockAuditService, times(2)).sendEvent(any())(using any(), any())
               reset(mockAuditService)
             }
         )

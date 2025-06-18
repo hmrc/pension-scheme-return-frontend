@@ -136,7 +136,7 @@ class TransferReceivedMemberListController @Inject() (
     }
 
   private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
-    request: DataRequest[_]
+    request: DataRequest[?]
   ): List[MemberWithReceiveTransfer] = indexes.map { case (index, nameDOB) =>
     MemberWithReceiveTransfer(
       memberIndex = index,

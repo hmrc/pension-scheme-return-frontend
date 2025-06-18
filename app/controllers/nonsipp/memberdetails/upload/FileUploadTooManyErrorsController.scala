@@ -93,6 +93,6 @@ object FileUploadTooManyErrorsController {
       case ValidationErrorType.NinoFormat => "fileUploadTooManyErrors.ninoFormat"
     }.distinct
 
-    ListMessage.Bullet(errorMessages.head, errorMessages.tail.map(Message(_)): _*)
+    ListMessage.Bullet(errorMessages.head, errorMessages.tail.map(Message(_))*)
   }
 }

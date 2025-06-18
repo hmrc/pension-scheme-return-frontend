@@ -37,7 +37,7 @@ object InputFormErrors {
     requiredKey,
     List((textAreaRegex, invalidCharactersKey)),
     (maxInputLength, maxError),
-    args: _*
+    args*
   )
 
   def genericInput(
@@ -51,7 +51,7 @@ object InputFormErrors {
     requiredKey,
     List((regex, invalidCharactersKey)),
     (maxLength, maxError),
-    args: _*
+    args*
   )
 
   def textArea(
@@ -63,7 +63,7 @@ object InputFormErrors {
     requiredKey,
     List((textAreaRegex, invalidCharactersKey)),
     (maxTextAreaLength, maxError),
-    args: _*
+    args*
   )
 
   def postcode(
@@ -79,6 +79,6 @@ object InputFormErrors {
         (postcodeFormatRegex, invalidFormatKey)
       ),
       (maxTextAreaLength, invalidFormatKey),
-      args: _*
+      args*
     )
 }

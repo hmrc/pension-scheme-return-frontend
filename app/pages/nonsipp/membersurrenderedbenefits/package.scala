@@ -29,7 +29,7 @@ package object membersurrenderedbenefits {
     val memberPensionSurrender: JsPath = memberDetails \ "memberPensionSurrender"
   }
 
-  def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[_]] = List(
+  def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[?]] = List(
     SurrenderedBenefitsAmountPage(srn, index),
     WhenDidMemberSurrenderBenefitsPage(srn, index),
     WhyDidMemberSurrenderBenefitsPage(srn, index),

@@ -74,7 +74,7 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec with Control
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       injected[DatePageView]
         .apply(
-          form(injected[DatePageFormProvider])(date, createMessages(app)),
+          form(injected[DatePageFormProvider])(date, createMessages(using app)),
           viewModel(srn, index, NormalMode, schemeName, address.addressLine1)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
@@ -84,7 +84,7 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec with Control
         implicit app => implicit request =>
           injected[DatePageView]
             .apply(
-              form(injected[DatePageFormProvider])(date, createMessages(app))
+              form(injected[DatePageFormProvider])(date, createMessages(using app))
                 .fill(date),
               viewModel(srn, index, NormalMode, schemeName, address.addressLine1)
             )
@@ -118,7 +118,7 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec with Control
     )
 
     act.like(
-      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm: _*)
+      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm*)
         .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
   }
