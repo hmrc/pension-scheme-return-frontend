@@ -20,7 +20,6 @@ object AppDependencies {
     "org.apache.pekko"   %% "pekko-slf4j"                            % "1.1.3",
     "org.apache.pekko"   %% "pekko-actor-typed"                      % "1.1.3",
     "org.apache.pekko"   %% "pekko-serialization-jackson"            % "1.1.3",
-    "org.typelevel"      %% "shapeless3-deriving"                    % "3.5.0"
   )
 
   val test: Seq[ModuleID] = Seq(
