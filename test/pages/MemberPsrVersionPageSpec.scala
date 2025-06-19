@@ -36,7 +36,7 @@ class MemberPsrVersionPageSpec extends PageBehaviours {
     beRemovable[String](MemberPsrVersionPage(srn, memberIndex))
 
     "must return the correct JsPath" in {
-      MemberPsrVersionPage.all(srn).path mustEqual Paths.memberDetails \ "memberPSRVersion"
+      MemberPsrVersionPage.all().path mustEqual Paths.memberDetails \ "memberPSRVersion"
     }
   }
 

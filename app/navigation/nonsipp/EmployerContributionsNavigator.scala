@@ -87,7 +87,7 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         (
           for {
-            map <- userAnswers.get(EmployerContributionsProgress.all(srn, index)).getOrRecoverJourney
+            map <- userAnswers.get(EmployerContributionsProgress.all(index)).getOrRecoverJourney
             filtered = map.filter { case (_, status) => status.completed }
             indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
             nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
@@ -198,7 +198,7 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             (
               for {
-                map <- userAnswers.get(EmployerContributionsProgress.all(srn, index)).getOrRecoverJourney
+                map <- userAnswers.get(EmployerContributionsProgress.all(index)).getOrRecoverJourney
                 filtered = map.filter { case (_, status) => status.completed }
                 indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
                 nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney

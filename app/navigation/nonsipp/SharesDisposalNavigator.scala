@@ -108,7 +108,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
     case SharesDisposalListPage(srn, shareIndex) =>
       {
         val inProgressIndex: Either[Call, Option[Max50]] = userAnswers
-          .map(SharesDisposalProgress.all(srn, shareIndex))
+          .map(SharesDisposalProgress.all(shareIndex))
           .find {
             case (_, SectionJourneyStatus.InProgress(_)) => true
             case _ => false
@@ -126,7 +126,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
           case None =>
             for {
               indexes <- userAnswers
-                .map(SharesDisposalProgress.all(srn, shareIndex))
+                .map(SharesDisposalProgress.all(shareIndex))
                 .keys
                 .toList
                 .traverse(_.toIntOption)

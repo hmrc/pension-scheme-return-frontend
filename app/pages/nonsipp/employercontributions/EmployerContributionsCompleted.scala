@@ -34,7 +34,7 @@ case class EmployerContributionsCompleted(srn: Srn, memberIndex: Max300, seconda
 }
 
 object EmployerContributionsCompleted {
-  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionCompleted.type]] =
+  def all(): IndexedQuestionPage[Map[String, SectionCompleted.type]] =
     new IndexedQuestionPage[Map[String, SectionCompleted.type]] {
 
       override def path: JsPath = JsPath \ toString
@@ -42,7 +42,7 @@ object EmployerContributionsCompleted {
       override def toString: String = "employerContributionsCompleted"
     }
 
-  def all(srn: Srn, memberIndex: Max300): IndexedQuestionPage[SectionCompleted.type] =
+  def all(memberIndex: Max300): IndexedQuestionPage[SectionCompleted.type] =
     new IndexedQuestionPage[SectionCompleted.type] {
 
       override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
@@ -51,7 +51,7 @@ object EmployerContributionsCompleted {
     }
 
   implicit class EmployerContributionsUserAnswersOps(userAnswers: UserAnswers) {
-    def employerContributionsCompleted(srn: Srn, memberIndex: Max300): List[Max50] =
-      userAnswers.map(EmployerContributionsCompleted.all(srn, memberIndex)).keys.toList.refine[Max50.Refined]
+    def employerContributionsCompleted(memberIndex: Max300): List[Max50] =
+      userAnswers.map(EmployerContributionsCompleted.all(memberIndex)).keys.toList.refine[Max50.Refined]
   }
 }

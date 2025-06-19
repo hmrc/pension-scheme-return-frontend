@@ -42,7 +42,7 @@ case class TransfersInSectionCompletedForMember(srn: Srn, index: Max300) extends
 
 object TransfersInSectionCompleted {
 
-  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionCompleted]] =
+  def all(): IndexedQuestionPage[Map[String, SectionCompleted]] =
     new IndexedQuestionPage[Map[String, SectionCompleted]] {
 
       override def path: JsPath = JsPath \ toString
@@ -50,7 +50,7 @@ object TransfersInSectionCompleted {
       override def toString: String = "transfersInCYA"
     }
 
-  def all(srn: Srn, index: Max300): IndexedQuestionPage[Map[String, SectionCompleted]] =
+  def all(index: Max300): IndexedQuestionPage[Map[String, SectionCompleted]] =
     new IndexedQuestionPage[Map[String, SectionCompleted]] {
 
       override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
@@ -58,7 +58,7 @@ object TransfersInSectionCompleted {
       override def toString: String = "transfersInCYA"
     }
 
-  def exists(srn: Srn, userAnswers: UserAnswers): Boolean = userAnswers.map(all(srn)).values.exists(_.values.nonEmpty)
+  def exists(userAnswers: UserAnswers): Boolean = userAnswers.map(all()).values.exists(_.values.nonEmpty)
 
   implicit class TransfersInSectionCompletedUserAnswersOps(ua: UserAnswers) {
     def transfersInSectionCompleted(srn: Srn, index: Max300): List[Max5] =

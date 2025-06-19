@@ -108,9 +108,9 @@ class ReportedSharesDisposalListController @Inject() (
   )(implicit
     request: DataRequest[AnyContent]
   ): Result =
-    getCompletedDisposals(srn).map { completedDisposals =>
+    getCompletedDisposals().map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
+      val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all()).size
       val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
       getSharesDisposalsWithIndexes(srn, completedDisposals).map { sharesDisposalsWithIndexes =>
@@ -153,10 +153,10 @@ class ReportedSharesDisposalListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      getCompletedDisposals(srn)
+      getCompletedDisposals()
         .traverse { completedDisposals =>
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-          val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
+          val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all()).size
           val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
           val allSharesFullyDisposed: Boolean = completedDisposals.forall { case (shareIndex, disposalIndexes) =>
@@ -280,17 +280,15 @@ class ReportedSharesDisposalListController @Inject() (
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
     }
 
-  private def getCompletedDisposals(
-    srn: Srn
-  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] = {
+  private def getCompletedDisposals()(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] = {
     val all = request.userAnswers
-      .map(SharesCompleted.all(srn))
+      .map(SharesCompleted.all())
     Right(
       all.keys.toList
         .refine[Max5000.Refined]
         .map { index =>
           index -> request.userAnswers
-            .map(SharesDisposalProgress.all(srn, index))
+            .map(SharesDisposalProgress.all(index))
             .filter(_._2.completed)
             .keys
             .toList

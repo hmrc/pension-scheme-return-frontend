@@ -32,12 +32,12 @@ case class LandOrPropertyDisposalProgress(srn: Srn, landOrPropertyIndex: Max5000
 }
 
 object LandOrPropertyDisposalProgress {
-  def all(srn: Srn, landOrPropertyIndex: Max5000): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(landOrPropertyIndex: Max5000): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
       override def path: JsPath = landOrPropertyDisposalProgress \ landOrPropertyIndex.arrayIndex.toString
     }
 
-  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
+  def all(): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
     new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
       override def path: JsPath = landOrPropertyDisposalProgress
     }

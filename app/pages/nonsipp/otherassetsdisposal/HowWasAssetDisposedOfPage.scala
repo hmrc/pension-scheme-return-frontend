@@ -47,7 +47,7 @@ case class HowWasAssetDisposedOfPage(
       case (Some(HowDisposed.Other(_)), Some(HowDisposed.Other(_))) => Try(userAnswers)
       case (Some(_), Some(_)) => removePages(userAnswers, pages(srn, assetIndex, disposalIndex, isLastRecord = false))
       case (None, _) =>
-        val completedPages = userAnswers.map(OtherAssetsDisposalProgress.all(srn))
+        val completedPages = userAnswers.map(OtherAssetsDisposalProgress.all())
         removePages(
           userAnswers,
           pages(

@@ -31,7 +31,7 @@ case class MemberDetailsManualProgress(srn: Srn, index: Max300) extends Question
 }
 
 object MemberDetailsManualProgress {
-  def all(srn: Srn): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
       override def path: JsPath = JsPath \ toString
       override def toString: String = "memberDetailsManualProgress"

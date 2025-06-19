@@ -34,10 +34,10 @@ case class PensionPaymentsReceivedPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(false), Some(true)) => PageUtils.removePages(userAnswers, pages(srn))
+      case (Some(false), Some(true)) => PageUtils.removePages(userAnswers, pages())
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[?]] =
-    List(TotalAmountPensionPaymentsPage.all(srn))
+  private def pages(): List[Removable[?]] =
+    List(TotalAmountPensionPaymentsPage.all())
 }

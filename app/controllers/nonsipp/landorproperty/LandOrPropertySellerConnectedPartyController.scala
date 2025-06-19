@@ -108,7 +108,6 @@ class LandOrPropertySellerConnectedPartyController @Inject() (
       case IdentityType.UKPartnership => request.userAnswers.get(PartnershipSellerNamePage(srn, index))
       case IdentityType.Other =>
         request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller)).map(_.name)
-      case _ => None
     }
 }
 

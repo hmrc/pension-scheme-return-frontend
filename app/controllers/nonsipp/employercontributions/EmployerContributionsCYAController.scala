@@ -82,7 +82,7 @@ class EmployerContributionsCYAController @Inject() (
     (
       for {
         membersName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-        indexes <- buildCompletedSecondaryIndexes(srn, index)
+        indexes <- buildCompletedSecondaryIndexes(index)
         employerCYAs <- indexes.map(secondaryIndex => buildCYA(srn, index, secondaryIndex)).sequence
         orderedCYAs = employerCYAs.sortBy(_.secondaryIndex.value)
         _ <- recoverJourneyWhen(
@@ -115,7 +115,7 @@ class EmployerContributionsCYAController @Inject() (
   def onSubmit(srn: Srn, index: Int, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       // Set EmployerContributionsCompleted for each journey that's no longer In Progress:
-      val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(srn, index).map(
+      val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(index).map(
         _.foldLeft(Try(request.userAnswers))((userAnswers, secondaryIndex) =>
           userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
         )
@@ -156,11 +156,11 @@ class EmployerContributionsCYAController @Inject() (
       )
     }
 
-  private def buildCompletedSecondaryIndexes(srn: Srn, index: Max300)(implicit
+  private def buildCompletedSecondaryIndexes(index: Max300)(implicit
     request: DataRequest[?]
   ): Either[Result, List[Max50]] =
     request.userAnswers
-      .map(EmployerContributionsProgress.all(srn, index))
+      .map(EmployerContributionsProgress.all(index))
       .filter { case (_, status) => status.completed }
       .keys
       .toList

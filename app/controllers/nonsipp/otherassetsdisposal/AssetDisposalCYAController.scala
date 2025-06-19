@@ -173,7 +173,7 @@ class AssetDisposalCYAController @Inject() (
           schemeName = request.schemeDetails.schemeName
 
           disposalAmount = updatedUserAnswers
-            .map(OtherAssetsDisposalProgress.all(srn, index))
+            .map(OtherAssetsDisposalProgress.all(index))
             .count { case (_, progress) => progress.completed }
 
           isMaximumReached = disposalAmount >= maxDisposalPerOtherAsset

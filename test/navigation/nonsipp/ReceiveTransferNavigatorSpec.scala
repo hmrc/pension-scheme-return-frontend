@@ -142,7 +142,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .unsafeSet(ReportAnotherTransferInPage(srn, index, secondaryIndex), true)
           .unsafeSet(TotalValueTransferPages(srn, index), existingIndexes.map(_ -> money).toMap)
           .unsafeSet(
-            ReceiveTransferProgress.all(srn, index),
+            ReceiveTransferProgress.all(index),
             existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
           )
 

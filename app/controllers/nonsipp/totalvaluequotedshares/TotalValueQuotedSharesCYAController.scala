@@ -77,8 +77,6 @@ class TotalValueQuotedSharesCYAController @Inject() (
               Paths.quotedShares
             ) == Updated
             updated
-          case None =>
-            false
           case _ => false
         },
         year = year,
@@ -106,8 +104,6 @@ class TotalValueQuotedSharesCYAController @Inject() (
               Paths.quotedShares
             ) == Updated
             updated
-          case None =>
-            false
           case _ => false
         },
         year = year,

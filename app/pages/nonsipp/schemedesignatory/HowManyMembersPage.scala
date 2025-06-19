@@ -29,7 +29,7 @@ case class HowManyMembersPage(srn: Srn, request: PensionSchemeId) extends Questi
 }
 
 object HowManyMembersPage {
-  def bySrn(srn: Srn): QuestionPage[SchemeMemberNumbers] = new QuestionPage[SchemeMemberNumbers] {
+  def bySrn(): QuestionPage[SchemeMemberNumbers] = new QuestionPage[SchemeMemberNumbers] {
     override def path: JsPath = Paths.schemeDesignatory \ toString
 
     override def toString: String = "howManyMembersPage"

@@ -118,7 +118,7 @@ class TaskListController @Inject() (
         case false => request.userAnswers.get(WhyNoBankAccountPage(srn))
         case _ => Some(())
       }
-      _ <- request.userAnswers.get(HowManyMembersPage.bySrn(srn))
+      _ <- request.userAnswers.get(HowManyMembersPage.bySrn())
       dates <- request.userAnswers.get(WhichTaxYearPage(srn))
     } yield dates
 

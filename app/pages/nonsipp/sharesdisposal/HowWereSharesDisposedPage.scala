@@ -52,7 +52,7 @@ case class HowWereSharesDisposedPage(
           pages(srn, shareIndex, disposalIndex, removeExtraPages = false, isLastRecord = false)
         )
       case (None, _) =>
-        val completedPages = userAnswers.map(SharesDisposalProgress.all(srn))
+        val completedPages = userAnswers.map(SharesDisposalProgress.all())
         removePages(
           userAnswers,
           pages(

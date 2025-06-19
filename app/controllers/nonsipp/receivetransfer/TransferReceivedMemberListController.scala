@@ -94,7 +94,7 @@ class TransferReceivedMemberListController @Inject() (
               srn,
               page,
               mode,
-              membersWithTransfers = buildReceiveTransfer(srn, completedMemberDetails),
+              membersWithTransfers = buildReceiveTransfer(completedMemberDetails),
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
@@ -135,14 +135,14 @@ class TransferReceivedMemberListController @Inject() (
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
+  private def buildReceiveTransfer(indexes: List[(Max300, NameDOB)])(implicit
     request: DataRequest[?]
   ): List[MemberWithReceiveTransfer] = indexes.map { case (index, nameDOB) =>
     MemberWithReceiveTransfer(
       memberIndex = index,
       transferFullName = nameDOB.fullName,
       receive = request.userAnswers
-        .receiveTransferProgress(srn, index)
+        .receiveTransferProgress(index)
         .map { case (secondaryIndex, status) =>
           ReceiveTransfer(secondaryIndex, status)
         }

@@ -32,7 +32,7 @@ case class MemberSurrenderedBenefitsProgress(srn: Srn, memberIndex: Max300) exte
 }
 
 object MemberSurrenderedBenefitsProgress {
-  def all(srn: Srn, memberIndex: Max300): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(memberIndex: Max300): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
 
       override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
@@ -40,7 +40,7 @@ object MemberSurrenderedBenefitsProgress {
       override def toString: String = "memberSurrenderedBenefitsProgress"
     }
 
-  private def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
+  private def all() =
     new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
 
       override def path: JsPath = JsPath \ toString
@@ -48,8 +48,8 @@ object MemberSurrenderedBenefitsProgress {
       override def toString: String = "memberSurrenderedBenefitsProgress"
     }
 
-  def exist(srn: Srn, userAnswers: UserAnswers): Boolean =
-    userAnswers.map(MemberSurrenderedBenefitsProgress.all(srn)).values.exists(_.values.nonEmpty)
+  def exist(userAnswers: UserAnswers): Boolean =
+    userAnswers.map(MemberSurrenderedBenefitsProgress.all()).values.exists(_.values.nonEmpty)
 
   implicit class SurrenderedBenefitsUserAnswersOps(userAnswers: UserAnswers) {
 

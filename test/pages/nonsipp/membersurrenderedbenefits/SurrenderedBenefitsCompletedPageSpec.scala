@@ -55,7 +55,7 @@ class SurrenderedBenefitsCompletedPageSpec extends PageBehaviours {
         .success
         .value
 
-      val result = userAnswers.surrenderedBenefitsCompleted(srn)
+      val result = userAnswers.surrenderedBenefitsCompleted()
       result mustEqual List(index)
     }
   }

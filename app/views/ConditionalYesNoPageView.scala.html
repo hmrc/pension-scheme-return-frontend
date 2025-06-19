@@ -62,11 +62,13 @@
           case (message, FieldType.Input) => input("value.yes", message, viewModel.page.yes.hint)
           case (message, FieldType.Textarea) => textArea("value.yes", message, viewModel.page.yes.hint)
           case (message, FieldType.Currency) => currency("value.yes", message, viewModel.page.yes.hint)
+          case _ => Html("")
         },
         whenNo = {
           case (message, FieldType.Input) => input("value.no", message, viewModel.page.no.hint)
           case (message, FieldType.Textarea) => textArea("value.no", message, viewModel.page.no.hint)
           case (message, FieldType.Currency) => currency("value.no", message, viewModel.page.no.hint)
+          case _ => Html("")
         },
         legend = viewModel.page.legend,
         heading = viewModel.heading

@@ -108,9 +108,9 @@ class ReportedOtherAssetsDisposalListController @Inject() (
   )(implicit
     request: DataRequest[AnyContent]
   ): Result =
-    getCompletedDisposals(srn).map { completedDisposals =>
+    getCompletedDisposals().map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
+      val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all()).size
       val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
       getOtherAssetsDisposalsWithIndexes(srn, completedDisposals).map { assetsDisposalsWithIndexes =>
@@ -153,10 +153,10 @@ class ReportedOtherAssetsDisposalListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      getCompletedDisposals(srn)
+      getCompletedDisposals()
         .traverse { completedDisposals =>
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-          val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
+          val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all()).size
           val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
           val allAssetsFullyDisposed: Boolean = completedDisposals.forall { case (assetIndex, disposalIndexes) =>
@@ -270,17 +270,15 @@ class ReportedOtherAssetsDisposalListController @Inject() (
         }
     }
 
-  private def getCompletedDisposals(
-    srn: Srn
-  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] = {
+  private def getCompletedDisposals()(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] = {
     val all = request.userAnswers
-      .map(OtherAssetsCompleted.all(srn))
+      .map(OtherAssetsCompleted.all())
     Right(
       all.keys.toList
         .refine[Max5000.Refined]
         .map { index =>
           index -> request.userAnswers
-            .map(OtherAssetsDisposalProgress.all(srn, index))
+            .map(OtherAssetsDisposalProgress.all(index))
             .filter(_._2.completed)
             .keys
             .toList

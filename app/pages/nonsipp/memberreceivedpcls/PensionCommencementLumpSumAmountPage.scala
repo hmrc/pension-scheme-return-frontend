@@ -33,7 +33,7 @@ case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300)
 }
 
 object PensionCommencementLumpSumAmountPage {
-  def all(srn: Srn): IndexedQuestionPage[PensionCommencementLumpSum] =
+  def all(): IndexedQuestionPage[PensionCommencementLumpSum] =
     new IndexedQuestionPage[PensionCommencementLumpSum] {
 
       override def path: JsPath = memberDetails \ toString

@@ -33,18 +33,16 @@ case class SharesDisposalProgress(srn: Srn, shareIndex: Max5000, disposalIndex: 
 }
 
 object SharesDisposalProgress {
-  def all(
-    srn: Srn,
-    shareIndex: Max5000
-  ): IndexedQuestionPage[SectionJourneyStatus] = new IndexedQuestionPage[SectionJourneyStatus] {
+  def all(shareIndex: Max5000): IndexedQuestionPage[SectionJourneyStatus] =
+    new IndexedQuestionPage[SectionJourneyStatus] {
 
-    override def path: JsPath =
-      Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString
+      override def path: JsPath =
+        Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString
 
-    override def toString: String = "sharesDisposalProgress"
-  }
+      override def toString: String = "sharesDisposalProgress"
+    }
 
-  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
+  def all(): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
     new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
 
       override def path: JsPath =

@@ -55,7 +55,7 @@ class WhichEmployerContributionRemoveController @Inject() (
 
   def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max50] = request.userAnswers
-      .map(EmployerContributionsProgress.all(srn, memberIndex))
+      .map(EmployerContributionsProgress.all(memberIndex))
       .filter { case (_, status) =>
         status.completed
       }
@@ -107,7 +107,7 @@ class WhichEmployerContributionRemoveController @Inject() (
     request: DataRequest[?]
   ): Either[Result, List[(Max50, Money, String)]] =
     request.userAnswers
-      .map(EmployerContributionsProgress.all(srn, memberIndex))
+      .map(EmployerContributionsProgress.all(memberIndex))
       .filter { case (_, status) =>
         status.completed
       }

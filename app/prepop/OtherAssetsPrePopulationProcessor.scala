@@ -51,7 +51,7 @@ class OtherAssetsPrePopulationProcessor @Inject() () {
       .prune(OtherAssetsHeldPage(srn).path)
       .prune(OtherAssetsDisposalPage(srn).path)
       .prune(assetsDisposed)
-      .prune(OtherAssetsDisposalProgress.all(srn).path)
+      .prune(OtherAssetsDisposalProgress.all().path)
       .prune(Paths.otherAssetsTransactions \ "movableSchedule29A")
       .prune(Paths.otherAssetsTransactions \ "totalIncomeOrReceipts") match {
       case JsSuccess(value, _) =>

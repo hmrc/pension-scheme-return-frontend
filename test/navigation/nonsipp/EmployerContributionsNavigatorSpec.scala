@@ -265,7 +265,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true)
           .unsafeSet(TotalEmployerContributionPages(srn, index), existingIndexes.map(_ -> money).toMap)
           .unsafeSet(
-            EmployerContributionsProgress.all(srn, index),
+            EmployerContributionsProgress.all(index),
             existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
           )
 

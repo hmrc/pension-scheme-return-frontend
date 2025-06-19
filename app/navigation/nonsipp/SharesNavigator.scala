@@ -187,7 +187,7 @@ object SharesNavigator extends JourneyNavigator {
         case Some(true) =>
           (
             for {
-              map <- userAnswers.get(SharesCompleted.all(srn)).getOrRecoverJourney
+              map <- userAnswers.get(SharesCompleted.all()).getOrRecoverJourney
               indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
               _ <-
                 if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))

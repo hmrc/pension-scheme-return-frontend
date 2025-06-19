@@ -43,7 +43,7 @@
         ) { component =>
             @hmrcCharacterCount(
                 form("value").errors.headOption.fold(component)(error =>
-                    component.withError(messages(error.message, error.args: _*))
+                    component.withError(messages(error.message, error.args*))
                 )
             )
         }

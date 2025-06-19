@@ -155,9 +155,9 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockSharesPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLoansPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockBondsPrePopulationProcessor, times(1)).clean(any(), any())(any())
-          verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
+          verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())
           verify(mockOtherAssetsPrePopulationProcessor, times(1)).clean(any(), any())(any())
-          verify(mockSharesProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
+          verify(mockSharesProgressPrePopulationProcessor, times(1)).clean(any(), any())
         }
       }
       "when pre population is disabled" - {
@@ -179,9 +179,9 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockSharesPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLoansPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockBondsPrePopulationProcessor, never()).clean(any(), any())(any())
-          verify(mockLoansProgressPrePopulationProcessor, never()).clean(any(), any())(any())
+          verify(mockLoansProgressPrePopulationProcessor, never()).clean(any(), any())
           verify(mockOtherAssetsPrePopulationProcessor, never()).clean(any(), any())(any())
-          verify(mockSharesProgressPrePopulationProcessor, never()).clean(any(), any())(any())
+          verify(mockSharesProgressPrePopulationProcessor, never()).clean(any(), any())
         }
       }
     }
@@ -221,7 +221,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     ).thenReturn(Success(bondsUa))
     when(
       mockLoansProgressPrePopulationProcessor
-        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(bondsUa))(ArgumentMatchers.eq(srn))
+        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(bondsUa))
     ).thenReturn(Success(loansProgressUa))
     when(
       mockOtherAssetsPrePopulationProcessor
@@ -229,7 +229,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     ).thenReturn(Success(otherAssetsUa))
     when(
       mockSharesProgressPrePopulationProcessor
-        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsUa))(ArgumentMatchers.eq(srn))
+        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsUa))
     ).thenReturn(Success(sharesProgressUa))
     when(mockConfig.prePopulationEnabled).thenReturn(prePopulationEnabled)
     (baseReturnUA, currentUa)

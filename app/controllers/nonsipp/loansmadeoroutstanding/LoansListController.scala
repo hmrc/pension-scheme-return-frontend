@@ -111,7 +111,7 @@ class LoansListController @Inject() (
     request: DataRequest[AnyContent]
   ): Result = {
     val indexes: List[Max5000] =
-      request.userAnswers.map(LoanCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      request.userAnswers.map(LoanCompleted.all()).keys.toList.refine[Max5000.Refined]
 
     if (indexes.nonEmpty || mode.isViewOnlyMode) {
       loansToTraverse(srn).map { case (loansToCheck, loans) =>

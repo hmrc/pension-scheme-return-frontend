@@ -94,7 +94,7 @@ class TransferOutMemberListController @Inject() (
               srn,
               page,
               mode,
-              membersWithTransfers = buildTransferOut(srn, completedMemberDetails),
+              membersWithTransfers = buildTransferOut(completedMemberDetails),
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
@@ -141,14 +141,14 @@ class TransferOutMemberListController @Inject() (
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(implicit
+  private def buildTransferOut(memberTransferOutList: List[(Max300, NameDOB)])(implicit
     request: DataRequest[?]
   ): List[MemberWithTransferOut] = memberTransferOutList.map { case (index, nameDOB) =>
     MemberWithTransferOut(
       memberIndex = index,
       transferFullName = nameDOB.fullName,
       transfer = request.userAnswers
-        .memberTransferOutProgress(srn, index)
+        .memberTransferOutProgress(index)
         .map { case (secondaryIndex, status) =>
           TransferOut(secondaryIndex, status)
         }

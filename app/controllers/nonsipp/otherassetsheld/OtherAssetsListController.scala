@@ -108,7 +108,7 @@ class OtherAssetsListController @Inject() (
     request: DataRequest[AnyContent]
   ): Result = {
     val completedIndexes: List[String] =
-      request.userAnswers.map(OtherAssetsProgress.all(srn)).filter(_._2.completed).keys.toList
+      request.userAnswers.map(OtherAssetsProgress.all()).filter(_._2.completed).keys.toList
 
     val filledForm = request.userAnswers.get(OtherAssetsListPage(srn)).fold(form)(form.fill)
 
@@ -138,7 +138,7 @@ class OtherAssetsListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val progressPages = request.userAnswers.map(OtherAssetsProgress.all(srn))
+      val progressPages = request.userAnswers.map(OtherAssetsProgress.all())
       val completedIndexes: List[String] = progressPages.filter(_._2.completed).keys.toList
       val inProgressUrl = progressPages.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
       otherAssetsToTraverse(srn, completedIndexes).traverse { case (otherAssetsToCheck, otherAssets) =>

@@ -94,7 +94,7 @@ class EmployerContributionsMemberListController @Inject() (
               srn,
               page,
               mode,
-              employerContributions = buildEmployerContributions(srn, completedMemberDetails),
+              employerContributions = buildEmployerContributions(completedMemberDetails),
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
@@ -140,14 +140,14 @@ class EmployerContributionsMemberListController @Inject() (
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(implicit
+  private def buildEmployerContributions(indexes: List[(Max300, NameDOB)])(implicit
     request: DataRequest[?]
   ): List[MemberWithEmployerContributions] = indexes.map { case (index, nameDOB) =>
     MemberWithEmployerContributions(
       memberIndex = index,
       employerFullName = nameDOB.fullName,
       contributions = request.userAnswers
-        .employerContributionsProgress(srn, index)
+        .employerContributionsProgress(index)
         .map { case (secondaryIndex, status) =>
           EmployerContributions(secondaryIndex, status)
         }

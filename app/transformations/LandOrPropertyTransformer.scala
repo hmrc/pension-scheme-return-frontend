@@ -716,7 +716,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
   ): Seq[DisposedPropertyTransaction] =
     request.userAnswers
       .map(
-        LandOrPropertyDisposalProgress.all(srn, landOrPropertyIndex)
+        LandOrPropertyDisposalProgress.all(landOrPropertyIndex)
       )
       .filter(_._2.completed)
       .keys

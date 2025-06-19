@@ -30,7 +30,7 @@ case class BondsProgress(srn: Srn, bondIndex: Max5000) extends QuestionPage[Sect
 }
 
 object BondsProgress {
-  def all(srn: Srn): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
       override def path: JsPath = Paths.bonds \ toString
       override def toString: String = "bondsProgress"

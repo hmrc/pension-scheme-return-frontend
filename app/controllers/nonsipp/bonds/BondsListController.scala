@@ -144,8 +144,8 @@ class BondsListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
-      val inProgressUrl = request.userAnswers.map(BondsProgress.all(srn)).collectFirst {
+      val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all()).keys.toList.refine[Max5000.Refined]
+      val inProgressUrl = request.userAnswers.map(BondsProgress.all()).collectFirst {
         case (_, SectionJourneyStatus.InProgress(url)) => url
       }
 
@@ -242,7 +242,7 @@ class BondsListController @Inject() (
 
     val completedIndexesOrError = for {
       indexes <- request.userAnswers
-        .map(BondsProgress.all(srn))
+        .map(BondsProgress.all())
         .refine[Max5000.Refined]
         .getOrRecoverJourney
       completedIndexes = indexes

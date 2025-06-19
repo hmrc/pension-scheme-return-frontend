@@ -77,9 +77,9 @@ class PrePopulationService @Inject() (
         ua2 <- sharesPrePopulationProcessor.clean(baseReturnUA, ua1)(srn)
         ua3 <- loanPrePopulationProcessor.clean(baseReturnUA, ua2)(srn)
         ua4 <- bondsPrePopulationProcessor.clean(baseReturnUA, ua3)(srn)
-        ua5 <- loanProgressPrePopulationProcessor.clean(baseReturnUA, ua4)(srn)
+        ua5 <- loanProgressPrePopulationProcessor.clean(baseReturnUA, ua4)
         ua6 <- otherAssetsPrePopulationProcessor.clean(baseReturnUA, ua5)(srn)
-        ua7 <- sharesProgressPrePopulationProcessor.clean(baseReturnUA, ua6)(srn)
+        ua7 <- sharesProgressPrePopulationProcessor.clean(baseReturnUA, ua6)
       } yield ua7
     } else {
       Try(userAnswers)

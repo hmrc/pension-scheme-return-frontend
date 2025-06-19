@@ -34,7 +34,7 @@ case class EmployerContributionsProgress(srn: Srn, memberIndex: Max300, secondar
 }
 
 object EmployerContributionsProgress {
-  def all(srn: Srn, memberIndex: Max300): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(memberIndex: Max300): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
 
       override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
@@ -42,7 +42,7 @@ object EmployerContributionsProgress {
       override def toString: String = "employerContributionsProgress"
     }
 
-  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
+  def all(): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
     new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
 
       override def path: JsPath = JsPath \ toString
@@ -50,16 +50,16 @@ object EmployerContributionsProgress {
       override def toString: String = "employerContributionsProgress"
     }
 
-  def exist(srn: Srn, userAnswers: UserAnswers): Boolean =
-    userAnswers.map(EmployerContributionsProgress.all(srn)).values.exists(_.values.nonEmpty)
+  def exist(userAnswers: UserAnswers): Boolean =
+    userAnswers.map(EmployerContributionsProgress.all()).values.exists(_.values.nonEmpty)
 
   implicit class EmployerContributionsUserAnswersOps(userAnswers: UserAnswers) {
-    def employerContributionsProgress(srn: Srn, memberIndex: Max300): List[(Max50, SectionJourneyStatus)] =
-      userAnswers.map(EmployerContributionsProgress.all(srn, memberIndex)).toList.refine_1[Max50.Refined]
+    def employerContributionsProgress(memberIndex: Max300): List[(Max50, SectionJourneyStatus)] =
+      userAnswers.map(EmployerContributionsProgress.all(memberIndex)).toList.refine_1[Max50.Refined]
 
-    def employerContributionsCompleted(srn: Srn, memberIndex: Max300): List[Max50] =
+    def employerContributionsCompleted(memberIndex: Max300): List[Max50] =
       userAnswers
-        .map(EmployerContributionsProgress.all(srn, memberIndex))
+        .map(EmployerContributionsProgress.all(memberIndex))
         .toList
         .refine_1[Max50.Refined]
         .collect { case (index, SectionJourneyStatus.Completed) => index }

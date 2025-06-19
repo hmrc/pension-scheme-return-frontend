@@ -29,7 +29,7 @@ case class LandOrPropertyCompleted(srn: Srn, index: Max5000) extends QuestionPag
 }
 
 object LandOrPropertyCompleted {
-  def all(srn: Srn): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
+  def all(): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
     override def path: JsPath = Paths.landOrProperty \ toString
     override def toString: String = "landOrPropertyCompleted"
   }

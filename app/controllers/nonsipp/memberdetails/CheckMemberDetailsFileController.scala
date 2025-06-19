@@ -88,10 +88,6 @@ class CheckMemberDetailsFileController @Inject() (
 
               case UploadStatus.InProgress =>
                 Ok(view(preparedForm, viewModel(srn, None, mode)))
-
-              case _ =>
-                logger.warn("Unknown upload status error")
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
         }
 
@@ -247,7 +243,7 @@ class CheckMemberDetailsFileController @Inject() (
       case errors: UploadErrors => errors.errors.size
       case _: UploadMaxRowsError.type => 1
       case _: UploadFormatError.type => 1
-      case _ => 0
+      case null => 0
     }
   )
 }

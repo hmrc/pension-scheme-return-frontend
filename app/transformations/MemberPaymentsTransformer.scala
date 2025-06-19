@@ -528,7 +528,7 @@ class MemberPaymentsTransformer @Inject() (
     userAnswers: UserAnswers
   ): Option[List[EmployerContributions]] = {
     val secondaryIndexes =
-      keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompleted.all(srn, index)))
+      keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompleted.all(index)))
 
     secondaryIndexes.traverse(secondaryIndex =>
       for {

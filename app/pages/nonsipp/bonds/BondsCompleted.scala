@@ -32,7 +32,7 @@ case class BondsCompleted(srn: Srn, index: Max5000) extends QuestionPage[Section
 }
 
 object BondsCompleted {
-  def all(srn: Srn): IndexedQuestionPage[SectionCompleted] =
+  def all(): IndexedQuestionPage[SectionCompleted] =
     new IndexedQuestionPage[SectionCompleted] {
 
       override def path: JsPath =

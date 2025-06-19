@@ -93,7 +93,7 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
         case Some(true) =>
           (
             for {
-              map <- userAnswers.get(BondsCompleted.all(srn)).getOrRecoverJourney
+              map <- userAnswers.get(BondsCompleted.all()).getOrRecoverJourney
               indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
               _ <-
                 if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))

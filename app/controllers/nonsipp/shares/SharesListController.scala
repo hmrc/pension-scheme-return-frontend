@@ -109,7 +109,7 @@ class SharesListController @Inject() (
   )(implicit
     request: DataRequest[AnyContent]
   ): Result = {
-    val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+    val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all()).keys.toList.refine[Max5000.Refined]
 
     if (indexes.nonEmpty || mode.isViewOnlyMode) {
       shares(srn).map { case (sharesToCheck, shares) =>
@@ -139,7 +139,7 @@ class SharesListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val inProgressAnswers = request.userAnswers.map(SharesProgress.all(srn))
+      val inProgressAnswers = request.userAnswers.map(SharesProgress.all())
       val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
 
       shares(srn).traverse { case (sharesToCheck, shares) =>
@@ -234,7 +234,7 @@ class SharesListController @Inject() (
         canRemove = request.userAnswers.get(SharePrePopulated(srn, index)).isEmpty
       } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate, canRemove)
 
-    val completedIndexes = request.userAnswers.map(SharesProgress.all(srn)).filter(_._2.completed).keys.toList
+    val completedIndexes = request.userAnswers.map(SharesProgress.all()).filter(_._2.completed).keys.toList
     if (isPrePopulation) {
       for {
         indexes <- request.userAnswers
