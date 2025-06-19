@@ -35,7 +35,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
     act.like(
       normalmode
         .navigateToWithData(
-          MemberContributionsPage,
+          MemberContributionsPage.apply,
           Gen.const(true),
           (srn, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionListController
@@ -47,7 +47,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
     act.like(
       normalmode
         .navigateToWithData(
-          MemberContributionsPage,
+          MemberContributionsPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -59,7 +59,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
     act.like(
       normalmode
         .navigateTo(
-          MemberContributionsListPage,
+          MemberContributionsListPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from member contribution list page to task list page")
@@ -71,7 +71,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
       normalmode
         .navigateToWithIndex(
           index,
-          TotalMemberContributionPage,
+          TotalMemberContributionPage.apply,
           (srn, index: Int, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
               .onPageLoad(srn, index, NormalMode)
@@ -85,7 +85,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
       normalmode
         .navigateToWithIndex(
           index,
-          RemoveMemberContributionPage,
+          RemoveMemberContributionPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionListController
               .onPageLoad(srn, 1, NormalMode)
@@ -98,7 +98,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
     act.like(
       normalmode
         .navigateTo(
-          MemberContributionsCYAPage,
+          MemberContributionsCYAPage.apply,
           (srn, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionListController
               .onPageLoad(srn, page = 1, NormalMode)

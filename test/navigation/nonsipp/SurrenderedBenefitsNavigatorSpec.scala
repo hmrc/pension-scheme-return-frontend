@@ -39,7 +39,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithData(
-              SurrenderedBenefitsPage,
+              SurrenderedBenefitsPage.apply,
               Gen.const(true),
               (srn, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.WhatYouWillNeedSurrenderedBenefitsController
@@ -51,7 +51,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithData(
-              SurrenderedBenefitsPage,
+              SurrenderedBenefitsPage.apply,
               Gen.const(false),
               (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
             )
@@ -64,7 +64,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateTo(
-              WhatYouWillNeedSurrenderedBenefitsPage,
+              WhatYouWillNeedSurrenderedBenefitsPage.apply,
               (srn, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                   .onPageLoad(srn, 1, NormalMode)
@@ -78,7 +78,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateTo(
-              SurrenderedBenefitsMemberListPage,
+              SurrenderedBenefitsMemberListPage.apply,
               (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
             )
             .withName("go from Surrendered Benefits Member List page to Task List page")
@@ -91,7 +91,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           normalmode
             .navigateToWithIndex(
               memberIndex,
-              SurrenderedBenefitsAmountPage,
+              SurrenderedBenefitsAmountPage.apply,
               (srn, memberIndex: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.WhenDidMemberSurrenderBenefitsController
                   .onPageLoad(srn, memberIndex, NormalMode)
@@ -106,7 +106,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           normalmode
             .navigateToWithIndex(
               memberIndex,
-              WhenDidMemberSurrenderBenefitsPage,
+              WhenDidMemberSurrenderBenefitsPage.apply,
               (srn, memberIndex: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.WhyDidMemberSurrenderBenefitsController
                   .onPageLoad(srn, memberIndex, NormalMode)
@@ -121,7 +121,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           normalmode
             .navigateToWithIndex(
               memberIndex,
-              WhyDidMemberSurrenderBenefitsPage,
+              WhyDidMemberSurrenderBenefitsPage.apply,
               (srn, memberIndex: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
                   .onPageLoad(srn, memberIndex, NormalMode)
@@ -136,8 +136,8 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           normalmode
             .navigateToWithIndex(
               memberIndex,
-              SurrenderedBenefitsCYAPage,
-              (srn, memberIndex: Int, _) =>
+              SurrenderedBenefitsCYAPage.apply,
+              (srn, _: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                   .onPageLoad(srn, page = 1, NormalMode)
             )
@@ -151,7 +151,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           normalmode
             .navigateToWithIndex(
               memberIndex,
-              RemoveSurrenderedBenefitsPage,
+              RemoveSurrenderedBenefitsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                   .onPageLoad(srn, 1, NormalMode)
@@ -169,7 +169,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           checkmode
             .navigateToWithIndex(
               memberIndex,
-              SurrenderedBenefitsAmountPage,
+              SurrenderedBenefitsAmountPage.apply,
               (srn, memberIndex: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
                   .onPageLoad(srn, memberIndex, NormalMode)
@@ -184,7 +184,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           checkmode
             .navigateToWithIndex(
               memberIndex,
-              WhenDidMemberSurrenderBenefitsPage,
+              WhenDidMemberSurrenderBenefitsPage.apply,
               (srn, memberIndex: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
                   .onPageLoad(srn, memberIndex, NormalMode)
@@ -199,7 +199,7 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           checkmode
             .navigateToWithIndex(
               memberIndex,
-              WhyDidMemberSurrenderBenefitsPage,
+              WhyDidMemberSurrenderBenefitsPage.apply,
               (srn, memberIndex: Int, _) =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
                   .onPageLoad(srn, memberIndex, NormalMode)

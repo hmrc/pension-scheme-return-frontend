@@ -37,5 +37,6 @@ trait DisplayMessageUtils {
       } ++ heading.toList.flatMap { case (k, v) => allMessages(k) ++ allMessages(v) }
     case ListMessage(messages, _) => messages.toList.flatMap(allMessages)
     case Heading2(content, _) => allMessages(content)
+    case _ => throw new Exception("Unrecognised DisplayMessage type")
   }
 }

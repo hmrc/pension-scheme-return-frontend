@@ -103,9 +103,7 @@ trait BasicGenerators extends EitherValues {
   val uniqueStringGen: Gen[String] = Gen.uuid.map(_.toString)
 
   def nonEmptyListOf[A](gen: Gen[A]): Gen[NonEmptyList[A]] =
-    Gen.nonEmptyListOf(gen).map { case head :: tail =>
-      NonEmptyList(head, tail)
-    }
+    Gen.nonEmptyListOf(gen).map(list => NonEmptyList(list.head, list.tail))
 
   def stringLengthBetween(minLength: Int, maxLength: Int, charGen: Gen[Char]): Gen[String] =
     for {
@@ -240,7 +238,7 @@ trait BasicGenerators extends EitherValues {
   implicit val max99: Gen[Max300] = chooseNum(1, 99).map(refineV[OneTo300](_).value)
 
   val jsStringGen: Gen[JsString] =
-    Gen.alphaStr.map(JsString)
+    Gen.alphaStr.map(JsString.apply)
 
   val jsBooleanGen: Gen[JsBoolean] =
     Gen.oneOf(true, false).map(JsBoolean)

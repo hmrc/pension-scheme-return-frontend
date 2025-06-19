@@ -32,7 +32,7 @@ class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          ActiveBankAccountPage,
+          ActiveBankAccountPage.apply,
           Gen.const(true),
           routes.HowManyMembersController.onPageLoad
         )
@@ -42,7 +42,7 @@ class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          ActiveBankAccountPage,
+          ActiveBankAccountPage.apply,
           Gen.const(false),
           schemedesignatory.routes.WhyNoBankAccountController.onPageLoad
         )
@@ -51,7 +51,7 @@ class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode.navigateTo(
-        WhyNoBankAccountPage,
+        WhyNoBankAccountPage.apply,
         routes.HowManyMembersController.onPageLoad
       )
     )

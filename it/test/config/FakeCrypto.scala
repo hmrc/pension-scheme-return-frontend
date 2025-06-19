@@ -29,6 +29,6 @@ object FakeCrypto extends Crypto {
     Base64.getEncoder.encodeToString(aesKey)
   }
 
-  override def getCrypto: Encrypter with Decrypter =
+  override def getCrypto: Encrypter & Decrypter =
     SymmetricCryptoFactory.aesGcmCrypto(aesKey)
 }

@@ -39,7 +39,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          DidSchemeReceiveTransferPage,
+          DidSchemeReceiveTransferPage.apply,
           Gen.const(true),
           (srn, _) =>
             controllers.nonsipp.receivetransfer.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
@@ -50,7 +50,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          DidSchemeReceiveTransferPage,
+          DidSchemeReceiveTransferPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -63,7 +63,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          WhatYouWillNeedReceivedTransferPage,
+          WhatYouWillNeedReceivedTransferPage.apply,
           (srn, _) =>
             controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
               .onPageLoad(srn, 1, NormalMode)
@@ -76,7 +76,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          TransferReceivedMemberListPage,
+          TransferReceivedMemberListPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from transfer received member list page to task list page")
@@ -90,7 +90,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          TransferringSchemeNamePage,
+          TransferringSchemeNamePage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -106,7 +106,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          TotalValueTransferPage,
+          TotalValueTransferPage.apply,
           controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController.onPageLoad
         )
         .withName("go from total value transfer page to when was transfer received page")
@@ -121,7 +121,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
-          ReportAnotherTransferInPage,
+          ReportAnotherTransferInPage.apply,
           Gen.const(false),
           (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
@@ -151,7 +151,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDoubleIndex(
             index,
             secondaryIndex,
-            ReportAnotherTransferInPage,
+            ReportAnotherTransferInPage.apply,
             (srn, index: Int, _: Int, _) =>
               controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
                 .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
@@ -170,7 +170,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          DidTransferIncludeAssetPage,
+          DidTransferIncludeAssetPage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
@@ -185,7 +185,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          RemoveTransferInPage,
+          RemoveTransferInPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
               .onPageLoad(srn, 1, NormalMode)
@@ -201,7 +201,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TransfersInSectionCompleted.apply,
-          (srn, index: Int, secondaryIndex: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (_, _: Int, _: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from TransfersInCYACompletedPage to ??? page")
     )

@@ -40,7 +40,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          LandOrPropertyHeldPage,
+          LandOrPropertyHeldPage.apply,
           Gen.const(true),
           (srn, _) => controllers.nonsipp.landorproperty.routes.WhatYouWillNeedLandOrPropertyController.onPageLoad(srn)
         )
@@ -50,7 +50,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          LandOrPropertyHeldPage,
+          LandOrPropertyHeldPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -61,7 +61,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandPropertyInUKPage,
+          LandPropertyInUKPage.apply,
           Gen.const(true),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyPostcodeLookupController.onPageLoad
         )
@@ -72,7 +72,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandPropertyInUKPage,
+          LandPropertyInUKPage.apply,
           Gen.const(false),
           (srn, index: Int, mode) =>
             controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
@@ -85,7 +85,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandOrPropertyChosenAddressPage,
+          LandOrPropertyChosenAddressPage.apply,
           Gen.const(address),
           controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController.onPageLoad
         )
@@ -96,7 +96,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandRegistryTitleNumberPage,
+          LandRegistryTitleNumberPage.apply,
           Gen.const(ConditionalYesNo.yes[String, String]("test")),
           controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad
         )
@@ -107,7 +107,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            LandOrPropertyTotalCostPage,
+            LandOrPropertyTotalCostPage.apply,
             Gen.const(money),
             controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad
           )
@@ -120,7 +120,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            LandOrPropertyTotalCostPage,
+            LandOrPropertyTotalCostPage.apply,
             Gen.const(money),
             controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad,
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
@@ -145,7 +145,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandOrPropertyWhenDidSchemeAcquirePage,
+          LandOrPropertyWhenDidSchemeAcquirePage.apply,
           Gen.const(localDate),
           controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad,
           srn =>
@@ -162,7 +162,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDataIndexAndSubjects(
           index,
           subject,
-          CompanySellerNamePage,
+          CompanySellerNamePage.apply,
           Gen.const(""),
           controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
         )
@@ -180,7 +180,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            OtherRecipientDetailsPage,
+            OtherRecipientDetailsPage.apply,
             Gen.const(recipientDetails),
             controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
           )
@@ -192,7 +192,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          IndividualSellerNiPage,
+          IndividualSellerNiPage.apply,
           controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
         )
         .withName("go from idividual seller NI page to recipient connected party page")
@@ -202,7 +202,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          LandPropertyIndividualSellersNamePage,
+          LandPropertyIndividualSellersNamePage.apply,
           controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad
         )
         .withName("go from land or property individual seller name page to ? page")
@@ -214,7 +214,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            LandOrPropertySellerConnectedPartyPage,
+            LandOrPropertySellerConnectedPartyPage.apply,
             Gen.const(true),
             controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
           )
@@ -225,7 +225,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            LandOrPropertySellerConnectedPartyPage,
+            LandOrPropertySellerConnectedPartyPage.apply,
             Gen.const(true),
             controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad,
             srn =>
@@ -241,7 +241,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            LandOrPropertySellerConnectedPartyPage,
+            LandOrPropertySellerConnectedPartyPage.apply,
             Gen.const(true),
             controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad,
             srn =>
@@ -301,7 +301,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          LandPropertyIndependentValuationPage,
+          LandPropertyIndependentValuationPage.apply,
           controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
         )
         .withName(
@@ -313,7 +313,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandPropertyIndependentValuationPage,
+          LandPropertyIndependentValuationPage.apply,
           Gen.const(false),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
         )
@@ -329,7 +329,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          IsLandOrPropertyResidentialPage,
+          IsLandOrPropertyResidentialPage.apply,
           Gen.const(true),
           controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad
         )
@@ -340,7 +340,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          IsLandOrPropertyResidentialPage,
+          IsLandOrPropertyResidentialPage.apply,
           Gen.const(false),
           controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad
         )
@@ -354,7 +354,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          IsLandPropertyLeasedPage,
+          IsLandPropertyLeasedPage.apply,
           Gen.const(true),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController.onPageLoad
         )
@@ -365,7 +365,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          IsLandPropertyLeasedPage,
+          IsLandPropertyLeasedPage.apply,
           Gen.const(false),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
@@ -379,7 +379,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          IndividualSellerNiPage,
+          IndividualSellerNiPage.apply,
           controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
         )
         .withName("go from individual sellerNi page to land Or property seller connected party page when yes selected")
@@ -391,7 +391,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          LandOrPropertyLeaseDetailsPage,
+          LandOrPropertyLeaseDetailsPage.apply,
           controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController.onPageLoad
         )
         .withName("go from land Or property lease details page to is lessee connected party page")
@@ -404,7 +404,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          IsLesseeConnectedPartyPage,
+          IsLesseeConnectedPartyPage.apply,
           controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
         .withName("go from is lessee connected party page to Land or property CYA page")
@@ -416,7 +416,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          LandOrPropertyTotalIncomePage,
+          LandOrPropertyTotalIncomePage.apply,
           controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad
         )
         .withName("go from LandOrPropertyTotalIncome page to Land or property CYA page")
@@ -430,7 +430,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDataIndexAndSubjectBoth(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.Other),
             controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
           )
@@ -442,7 +442,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.Individual),
             controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController.onPageLoad
           )
@@ -454,7 +454,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.UKCompany),
             controllers.nonsipp.landorproperty.routes.CompanySellerNameController.onPageLoad
           )
@@ -466,7 +466,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDataIndexAndSubject(
             index,
             subject,
-            IdentityTypePage,
+            IdentityTypePage.apply,
             Gen.const(IdentityType.UKPartnership),
             controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController.onPageLoad
           )
@@ -575,7 +575,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            IsLandPropertyLeasedPage,
+            IsLandPropertyLeasedPage.apply,
             Gen.const(true),
             controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController.onPageLoad
           )
@@ -586,7 +586,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            IsLandPropertyLeasedPage,
+            IsLandPropertyLeasedPage.apply,
             Gen.const(false),
             controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
           )
@@ -768,7 +768,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubjectBoth(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.Other),
               controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
             )
@@ -780,7 +780,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.Individual),
               controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController.onPageLoad
             )
@@ -792,7 +792,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.UKCompany),
               controllers.nonsipp.landorproperty.routes.CompanySellerNameController.onPageLoad
             )
@@ -804,7 +804,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.UKPartnership),
               controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController.onPageLoad
             )

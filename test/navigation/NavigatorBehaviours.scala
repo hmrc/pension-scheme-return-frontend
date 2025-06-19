@@ -233,7 +233,7 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
         userAnswers
       )
 
-    def navigateToWithIndexAndSubject[A: Writes, B](
+    def navigateToWithIndexAndSubject[A, B](
       index: Refined[Int, B],
       subject: IdentitySubject,
       page: (Srn, Refined[Int, B], IdentitySubject) => QuestionPage[A],
@@ -347,7 +347,7 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
         userAnswers
       )
 
-    def navigateToWithIndexAndSubject[A: Writes, B](
+    def navigateToWithIndexAndSubject[A, B](
       index: Refined[Int, B],
       subject: IdentitySubject,
       page: (Srn, Refined[Int, B], IdentitySubject) => QuestionPage[A],

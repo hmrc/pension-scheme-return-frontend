@@ -39,7 +39,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithData(
-          EmployerContributionsPage,
+          EmployerContributionsPage.apply,
           Gen.const(true),
           (srn, _) =>
             controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
@@ -53,7 +53,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithData(
-          EmployerContributionsPage,
+          EmployerContributionsPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -66,7 +66,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateTo(
-          WhatYouWillNeedEmployerContributionsPage,
+          WhatYouWillNeedEmployerContributionsPage.apply,
           (srn, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
               .onPageLoad(srn, 1, NormalMode)
@@ -79,7 +79,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateTo(
-          EmployerContributionsMemberListPage,
+          EmployerContributionsMemberListPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from employer contribution page to task list page")
@@ -92,7 +92,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          EmployerNamePage,
+          EmployerNamePage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -121,7 +121,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .navigateToWithDoubleIndex(
             index,
             secondaryIndex,
-            EmployerNamePage,
+            EmployerNamePage.apply,
             (srn, index: Int, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
                 .onPageLoad(srn, index, expectedPage, NormalMode),
@@ -140,7 +140,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
-          EmployerTypeOfBusinessPage,
+          EmployerTypeOfBusinessPage.apply,
           Gen.const(IdentityType.UKCompany),
           (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
@@ -154,7 +154,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
-          EmployerTypeOfBusinessPage,
+          EmployerTypeOfBusinessPage.apply,
           Gen.const(IdentityType.UKPartnership),
           (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
@@ -168,7 +168,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
-          EmployerTypeOfBusinessPage,
+          EmployerTypeOfBusinessPage.apply,
           Gen.const(IdentityType.Other),
           (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
@@ -184,7 +184,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          OtherEmployeeDescriptionPage,
+          OtherEmployeeDescriptionPage.apply,
           controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController.onPageLoad
         )
         .withName("go from OtherEmployeeDescriptionPage to TotalEmployerContribution page")
@@ -198,7 +198,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          PartnershipEmployerUtrPage,
+          PartnershipEmployerUtrPage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -213,7 +213,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          TotalEmployerContributionPage,
+          TotalEmployerContributionPage.apply,
           (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -228,7 +228,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          EmployerCompanyCrnPage,
+          EmployerCompanyCrnPage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -244,7 +244,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          ContributionsFromAnotherEmployerPage,
+          ContributionsFromAnotherEmployerPage.apply,
           (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
               .onPageLoad(srn, index, page = 1, NormalMode)
@@ -274,7 +274,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .navigateToWithDoubleIndex(
             index,
             secondaryIndex,
-            ContributionsFromAnotherEmployerPage,
+            ContributionsFromAnotherEmployerPage.apply,
             (srn, index: Int, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerNameController
                 .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
@@ -293,7 +293,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         normalmode
           .navigateToWithIndex(
             index,
-            RemoveEmployerContributionsPage,
+            RemoveEmployerContributionsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsController
                 .onPageLoad(srn, NormalMode)
@@ -306,7 +306,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         normalmode
           .navigateToWithIndex(
             index,
-            RemoveEmployerContributionsPage,
+            RemoveEmployerContributionsPage.apply,
             (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                 .onPageLoad(srn, 1, NormalMode),
@@ -321,7 +321,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateTo(
-          EmployerContributionsCYAPage,
+          EmployerContributionsCYAPage.apply,
           (srn, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
               .onPageLoad(srn, page = 1, NormalMode)

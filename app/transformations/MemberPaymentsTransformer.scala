@@ -645,6 +645,6 @@ class MemberPaymentsTransformer @Inject() (
       case IdentityType.Other =>
         userAnswers
           .get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex))
-          .map(EmployerType.Other)
+          .map(EmployerType.Other.apply)
     }
 }

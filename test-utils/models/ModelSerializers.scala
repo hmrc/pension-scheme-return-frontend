@@ -17,6 +17,7 @@
 package models
 
 import play.api.libs.json.Json.JsValueWrapper
+import org.openqa.selenium.InvalidArgumentException
 import models.cache.PensionSchemeUser
 import play.api.libs.json._
 
@@ -48,6 +49,7 @@ trait ModelSerializers {
             )
             .++(middle.fold(Json.obj())(m => Json.obj("middleName" -> m)))
         )
+      case _: EstablisherKind => throw new InvalidArgumentException("Unrecognised EstablisherKind value")
     }) ++ Json.obj("establisherKind" -> establisher.kind.value)
 
   implicit val writeSchemeDetails: Writes[SchemeDetails] = { details =>

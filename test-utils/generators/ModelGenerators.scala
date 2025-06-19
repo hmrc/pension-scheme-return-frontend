@@ -116,8 +116,8 @@ trait ModelGenerators extends BasicGenerators {
   val pensionSchemeUserGen: Gen[PensionSchemeUser] =
     Gen.oneOf(Administrator, Practitioner)
 
-  val psaIdGen: Gen[PsaId] = nonEmptyString.map(PsaId)
-  val pspIdGen: Gen[PspId] = nonEmptyString.map(PspId)
+  val psaIdGen: Gen[PsaId] = nonEmptyString.map(PsaId.apply)
+  val pspIdGen: Gen[PspId] = nonEmptyString.map(PspId.apply)
   val pensionSchemeIdGen: Gen[PensionSchemeId] = Gen.oneOf(psaIdGen, pspIdGen)
 
   val addressGen: Gen[Address] = for {
@@ -136,7 +136,7 @@ trait ModelGenerators extends BasicGenerators {
     LookupAddress
   )
 
-  val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)
+  val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr.apply)
 
   val schemeIdGen: Gen[SchemeId] = Gen.oneOf(srnGen, pstrGen)
 

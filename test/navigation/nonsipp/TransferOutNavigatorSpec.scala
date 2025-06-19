@@ -39,7 +39,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          SchemeTransferOutPage,
+          SchemeTransferOutPage.apply,
           Gen.const(true),
           (srn, _) => controllers.nonsipp.membertransferout.routes.WhatYouWillNeedTransferOutController.onPageLoad(srn)
         )
@@ -49,7 +49,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          SchemeTransferOutPage,
+          SchemeTransferOutPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -62,7 +62,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          WhatYouWillNeedTransferOutPage,
+          WhatYouWillNeedTransferOutPage.apply,
           (srn, _) =>
             controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
               .onPageLoad(srn, 1, NormalMode)
@@ -76,7 +76,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          TransferOutMemberListPage,
+          TransferOutMemberListPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from transfer out member list page to task list page")
@@ -90,7 +90,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          ReceivingSchemeNamePage,
+          ReceivingSchemeNamePage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -106,7 +106,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          WhenWasTransferMadePage,
+          WhenWasTransferMadePage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
@@ -123,7 +123,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
-          ReportAnotherTransferOutPage,
+          ReportAnotherTransferOutPage.apply,
           Gen.const(false),
           (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
@@ -153,7 +153,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDoubleIndex(
             index,
             secondaryIndex,
-            ReportAnotherTransferOutPage,
+            ReportAnotherTransferOutPage.apply,
             (srn, index: Int, _: Int, _) =>
               controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                 .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
@@ -173,8 +173,8 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          ReceivingSchemeNamePage,
-          (srn, index: Int, secondaryIndex: Int, _) =>
+          ReceivingSchemeNamePage.apply,
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
               .onPageLoad(srn, index, NormalMode)
         )
@@ -189,7 +189,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          WhenWasTransferMadePage,
+          WhenWasTransferMadePage.apply,
           (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
@@ -206,7 +206,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
-          ReportAnotherTransferOutPage,
+          ReportAnotherTransferOutPage.apply,
           Gen.const(false),
           (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
@@ -236,7 +236,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithDoubleIndex(
             index,
             secondaryIndex,
-            ReportAnotherTransferOutPage,
+            ReportAnotherTransferOutPage.apply,
             (srn, index: Int, _: Int, _) =>
               controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                 .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
@@ -255,7 +255,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithIndex(
           index,
-          RemoveTransferOutPage,
+          RemoveTransferOutPage.apply,
           (srn, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransferOutMemberListController.onPageLoad(srn, 1, NormalMode)
         )

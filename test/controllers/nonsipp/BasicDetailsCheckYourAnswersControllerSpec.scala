@@ -363,7 +363,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.schemeDetails.taxYear"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(dateRange.show)
       }
@@ -384,13 +384,13 @@ class BasicDetailsCheckYourAnswersControllerSpec
           )
         )
 
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(dateRange1.show)
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(dateRange2.show)
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(dateRange3.show)
       }
@@ -402,7 +402,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
           vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
             "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"
           )
-          vm.page.sections.flatMap(_.rows.map(_.value match {
+          vm.page.sections.flatMap(_.rows.collect(_.value match {
             case m: Message => m.key
           })) must contain("site.yes")
         }
@@ -414,7 +414,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
           vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
             "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"
           )
-          vm.page.sections.flatMap(_.rows.map(_.value match {
+          vm.page.sections.flatMap(_.rows.collect(_.value match {
             case m: Message => m.key
           })) must contain("site.no")
         }
@@ -430,7 +430,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(reason)
       }
@@ -449,13 +449,13 @@ class BasicDetailsCheckYourAnswersControllerSpec
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(schemeMemberNumbers.noOfActiveMembers.toString)
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(schemeMemberNumbers.noOfDeferredMembers.toString)
-        vm.page.sections.flatMap(_.rows.map(_.value match {
+        vm.page.sections.flatMap(_.rows.collect(_.value match {
           case m: Message => m.key
         })) must contain(
           schemeMemberNumbers.noOfPensionerMembers.toString

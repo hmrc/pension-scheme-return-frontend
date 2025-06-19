@@ -28,8 +28,6 @@ import play.api.test.FakeRequest
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
-import java.time.LocalDate
-
 class SurrenderedBenefitsMemberListControllerSpec
     extends ControllerBaseSpec
     with ControllerBehaviours
@@ -108,9 +106,6 @@ class SurrenderedBenefitsMemberListControllerSpec
     }
 
     "viewModel should show '2 Surrendered Benefits' when there is 2 Surrendered Benefit" in {
-
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1990, 12, 12))
 
       val memberList: List[MemberSurrenderedBenefits] = List(
         MemberSurrenderedBenefits(

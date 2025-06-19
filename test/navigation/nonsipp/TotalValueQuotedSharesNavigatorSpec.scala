@@ -29,7 +29,7 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          QuotedSharesManagedFundsHeldPage,
+          QuotedSharesManagedFundsHeldPage.apply,
           Gen.const(true),
           (srn, _) => controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController.onPageLoad(srn)
         )
@@ -39,7 +39,7 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          QuotedSharesManagedFundsHeldPage,
+          QuotedSharesManagedFundsHeldPage.apply,
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
@@ -52,7 +52,7 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateToWithData(
-          TotalValueQuotedSharesPage,
+          TotalValueQuotedSharesPage.apply,
           moneyGen,
           (srn, _) =>
             controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
@@ -66,7 +66,7 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
     act.like(
       normalmode
         .navigateTo(
-          TotalValueQuotedSharesCYAPage,
+          TotalValueQuotedSharesCYAPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName(

@@ -29,7 +29,7 @@ class DeclarationNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          PsaDeclarationPage,
+          PsaDeclarationPage.apply,
           (srn, _) => controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
         )
         .withName("go from psa declaration page to return submitted")
@@ -38,7 +38,7 @@ class DeclarationNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          PspDeclarationPage,
+          PspDeclarationPage.apply,
           (srn, _) => controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
         )
         .withName("go from psp declaration page to return submitted")

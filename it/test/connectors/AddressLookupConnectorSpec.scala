@@ -35,7 +35,7 @@ class AddressLookupConnectorSpec extends BaseConnectorSpec {
 
   val url = "/lookup"
 
-  def stubGet(key: String, id: String, response: ResponseDefinitionBuilder): StubMapping =
+  def stubGet(response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer.stubFor(
       post(urlEqualTo(url))
         .withHeader(HeaderNames.CONTENT_TYPE, equalTo("application/json"))
@@ -51,8 +51,6 @@ class AddressLookupConnectorSpec extends BaseConnectorSpec {
 
     "return address lookup details" in runningApplication { implicit app =>
       stubGet(
-        "psaId",
-        psaId.value,
         ok(
           Json.stringify(
             Json.arr(

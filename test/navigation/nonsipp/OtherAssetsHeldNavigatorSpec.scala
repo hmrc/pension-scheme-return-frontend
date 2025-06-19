@@ -47,7 +47,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateToWithData(
-              OtherAssetsHeldPage,
+              OtherAssetsHeldPage.apply,
               Gen.const(true),
               (srn, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)
@@ -58,7 +58,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateToWithData(
-              OtherAssetsHeldPage,
+              OtherAssetsHeldPage.apply,
               Gen.const(false),
               (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
             )
@@ -70,7 +70,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateTo(
-              WhatYouWillNeedOtherAssetsPage,
+              WhatYouWillNeedOtherAssetsPage.apply,
               (srn, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
                   .onPageLoad(srn, index, NormalMode)
@@ -86,7 +86,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              WhatIsOtherAssetPage,
+              WhatIsOtherAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
                   .onPageLoad(srn, index, NormalMode)
@@ -102,7 +102,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              IsAssetTangibleMoveablePropertyPage,
+              IsAssetTangibleMoveablePropertyPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
                   .onPageLoad(srn, index, NormalMode)
@@ -118,7 +118,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
                   .onPageLoad(srn, index, NormalMode),
@@ -137,7 +137,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
                   .onPageLoad(srn, index, NormalMode),
@@ -156,7 +156,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
                   .onPageLoad(srn, index, NormalMode),
@@ -177,7 +177,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireAssetsPage,
+              WhenDidSchemeAcquireAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.common.routes.IdentityTypeController
                   .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller),
@@ -196,7 +196,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireAssetsPage,
+              WhenDidSchemeAcquireAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
                   .onPageLoad(srn, index, NormalMode),
@@ -218,7 +218,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubjectBoth(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.Individual),
               (srn, _: Int, _, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
@@ -232,7 +232,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubjectBoth(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.Other),
               controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
             )
@@ -244,7 +244,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.UKCompany),
               controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
             )
@@ -256,7 +256,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.UKPartnership),
               controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
             )
@@ -269,7 +269,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              IndividualNameOfOtherAssetSellerPage,
+              IndividualNameOfOtherAssetSellerPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
                   .onPageLoad(srn, index, NormalMode)
@@ -285,7 +285,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              CompanyNameOfOtherAssetSellerPage,
+              CompanyNameOfOtherAssetSellerPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.common.routes.CompanyRecipientCrnController
                   .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
@@ -301,7 +301,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              PartnershipOtherAssetSellerNamePage,
+              PartnershipOtherAssetSellerNamePage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.common.routes.PartnershipRecipientUtrController
                   .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
@@ -317,7 +317,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              OtherAssetIndividualSellerNINumberPage,
+              OtherAssetIndividualSellerNINumberPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, NormalMode)
@@ -334,7 +334,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               subject,
-              CompanyRecipientCrnPage,
+              CompanyRecipientCrnPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, NormalMode)
@@ -351,7 +351,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               subject,
-              PartnershipRecipientUtrPage,
+              PartnershipRecipientUtrPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, NormalMode)
@@ -368,7 +368,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               subject,
-              OtherRecipientDetailsPage,
+              OtherRecipientDetailsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, NormalMode)
@@ -384,7 +384,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              OtherAssetSellerConnectedPartyPage,
+              OtherAssetSellerConnectedPartyPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
                   .onPageLoad(srn, index, NormalMode)
@@ -400,7 +400,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              CostOfOtherAssetPage,
+              CostOfOtherAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
                   .onPageLoad(srn, index, NormalMode),
@@ -419,7 +419,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              CostOfOtherAssetPage,
+              CostOfOtherAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
                   .onPageLoad(srn, index, NormalMode),
@@ -438,7 +438,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              CostOfOtherAssetPage,
+              CostOfOtherAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
                   .onPageLoad(srn, index, NormalMode),
@@ -459,7 +459,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              IndependentValuationPage,
+              IndependentValuationPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
                   .onPageLoad(srn, index, NormalMode)
@@ -475,7 +475,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateToWithIndex(
               index,
-              IncomeFromAssetPage,
+              IncomeFromAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode)
@@ -490,7 +490,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateTo(
-              OtherAssetsCYAPage,
+              OtherAssetsCYAPage.apply,
               (srn, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
                   .onPageLoad(srn, 1, NormalMode)
@@ -507,7 +507,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             normalmode
               .navigateToWithIndex(
                 index,
-                RemoveOtherAssetPage,
+                RemoveOtherAssetPage.apply,
                 (srn, _: Int, _) =>
                   controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
                     .onPageLoad(srn, NormalMode)
@@ -526,7 +526,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             normalmode
               .navigateToWithIndex(
                 index,
-                RemoveOtherAssetPage,
+                RemoveOtherAssetPage.apply,
                 (srn, _: Int, _) =>
                   controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
                     .onPageLoad(srn, 1, NormalMode),
@@ -545,7 +545,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhatIsOtherAssetPage,
+              WhatIsOtherAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode)
@@ -561,7 +561,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              IsAssetTangibleMoveablePropertyPage,
+              IsAssetTangibleMoveablePropertyPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode)
@@ -577,7 +577,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -596,7 +596,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -615,7 +615,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.common.routes.IdentityTypeController
                   .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
@@ -634,7 +634,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -653,7 +653,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
                   .onPageLoad(srn, index, CheckMode),
@@ -672,7 +672,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
                   .onPageLoad(srn, index, CheckMode),
@@ -691,7 +691,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
                   .onPageLoad(srn, index, CheckMode),
@@ -711,7 +711,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhyDoesSchemeHoldAssetsPage,
+              WhyDoesSchemeHoldAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -732,7 +732,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireAssetsPage,
+              WhenDidSchemeAcquireAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.common.routes.IdentityTypeController
                   .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
@@ -751,7 +751,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireAssetsPage,
+              WhenDidSchemeAcquireAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
                   .onPageLoad(srn, index, CheckMode),
@@ -770,7 +770,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              WhenDidSchemeAcquireAssetsPage,
+              WhenDidSchemeAcquireAssetsPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -794,7 +794,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubjectBoth(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.Individual),
               (srn, _: Int, _, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
@@ -808,7 +808,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.UKCompany),
               controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
             )
@@ -820,7 +820,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.UKPartnership),
               controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
             )
@@ -832,7 +832,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubjectBoth(
               index,
               subject,
-              IdentityTypePage,
+              IdentityTypePage.apply,
               Gen.const(IdentityType.Other),
               controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
             )
@@ -845,7 +845,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              IndividualNameOfOtherAssetSellerPage,
+              IndividualNameOfOtherAssetSellerPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -862,7 +862,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              IndividualNameOfOtherAssetSellerPage,
+              IndividualNameOfOtherAssetSellerPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
                   .onPageLoad(srn, index, CheckMode),
@@ -883,7 +883,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              CompanyNameOfOtherAssetSellerPage,
+              CompanyNameOfOtherAssetSellerPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -900,7 +900,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              CompanyNameOfOtherAssetSellerPage,
+              CompanyNameOfOtherAssetSellerPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.common.routes.CompanyRecipientCrnController
                   .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
@@ -919,7 +919,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              PartnershipOtherAssetSellerNamePage,
+              PartnershipOtherAssetSellerNamePage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -936,7 +936,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              PartnershipOtherAssetSellerNamePage,
+              PartnershipOtherAssetSellerNamePage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.common.routes.PartnershipRecipientUtrController
                   .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
@@ -955,7 +955,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetIndividualSellerNINumberPage,
+              OtherAssetIndividualSellerNINumberPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -972,7 +972,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetIndividualSellerNINumberPage,
+              OtherAssetIndividualSellerNINumberPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -989,7 +989,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetIndividualSellerNINumberPage,
+              OtherAssetIndividualSellerNINumberPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -1008,7 +1008,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetIndividualSellerNINumberPage,
+              OtherAssetIndividualSellerNINumberPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -1030,7 +1030,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              CompanyRecipientCrnPage,
+              CompanyRecipientCrnPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
               srn =>
@@ -1047,7 +1047,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              CompanyRecipientCrnPage,
+              CompanyRecipientCrnPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
               srn =>
@@ -1064,7 +1064,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              CompanyRecipientCrnPage,
+              CompanyRecipientCrnPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -1084,7 +1084,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              CompanyRecipientCrnPage,
+              CompanyRecipientCrnPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -1104,7 +1104,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              PartnershipRecipientUtrPage,
+              PartnershipRecipientUtrPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
               srn =>
@@ -1121,7 +1121,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              PartnershipRecipientUtrPage,
+              PartnershipRecipientUtrPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
               srn =>
@@ -1138,7 +1138,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              PartnershipRecipientUtrPage,
+              PartnershipRecipientUtrPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -1158,7 +1158,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithIndexAndSubject(
               index,
               IdentitySubject.OtherAssetSeller,
-              PartnershipRecipientUtrPage,
+              PartnershipRecipientUtrPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
@@ -1180,7 +1180,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              OtherRecipientDetailsPage,
+              OtherRecipientDetailsPage.apply,
               Gen.const(recipientDetails),
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad,
               srn =>
@@ -1197,7 +1197,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              OtherRecipientDetailsPage,
+              OtherRecipientDetailsPage.apply,
               Gen.const(recipientDetails),
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad,
               srn =>
@@ -1214,7 +1214,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              OtherRecipientDetailsPage,
+              OtherRecipientDetailsPage.apply,
               Gen.const(recipientDetails),
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onPageLoad,
               srn =>
@@ -1233,7 +1233,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDataIndexAndSubject(
               index,
               subject,
-              OtherRecipientDetailsPage,
+              OtherRecipientDetailsPage.apply,
               Gen.const(recipientDetails),
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onPageLoad,
               srn =>
@@ -1251,7 +1251,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetSellerConnectedPartyPage,
+              OtherAssetSellerConnectedPartyPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -1268,7 +1268,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetSellerConnectedPartyPage,
+              OtherAssetSellerConnectedPartyPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode),
@@ -1285,7 +1285,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              OtherAssetSellerConnectedPartyPage,
+              OtherAssetSellerConnectedPartyPage.apply,
               (srn, index: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
                   .onPageLoad(srn, index, CheckMode),
@@ -1304,7 +1304,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              CostOfOtherAssetPage,
+              CostOfOtherAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode)
@@ -1320,7 +1320,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              IndependentValuationPage,
+              IndependentValuationPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode)
@@ -1336,7 +1336,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateToWithIndex(
               index,
-              IncomeFromAssetPage,
+              IncomeFromAssetPage.apply,
               (srn, _: Int, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onPageLoad(srn, index, NormalMode)
@@ -1351,7 +1351,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           checkmode
             .navigateTo(
-              OtherAssetsCYAPage,
+              OtherAssetsCYAPage.apply,
               (srn, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
                   .onPageLoad(srn, 1, CheckMode)

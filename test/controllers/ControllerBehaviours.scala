@@ -356,7 +356,7 @@ trait ControllerBehaviours extends ControllerBaseSpec {
     continueNoSave(call, defaultUserAnswers, form*)
 
   def agreeAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
-    agreeAndContinue(call, userAnswers, emptyUserAnswers)
+    agreeAndContinue(call, userAnswers, emptyUserAnswers, form*)
   def agreeAndContinue(
     call: => Call,
     userAnswers: UserAnswers,
