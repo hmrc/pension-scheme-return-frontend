@@ -202,7 +202,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         (
           for {
             indexes <- userAnswers
-              .map(LandOrPropertyCompleted.all(srn))
+              .map(LandOrPropertyCompleted.all())
               .keys
               .toList
               .traverse(_.toIntOption)

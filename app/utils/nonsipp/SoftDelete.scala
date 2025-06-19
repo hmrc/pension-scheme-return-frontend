@@ -70,9 +70,9 @@ trait SoftDelete extends PSRController {
     def get[A: Reads](f: (Srn, Max300) => Gettable[A]): Option[A] = ua.get(f(srn, index))
 
     val memberDetails: Try[MemberPersonalDetails] = (
-      get(MemberDetailsPage),
-      get(NoNINOPage),
-      get(MemberDetailsNinoPage).map(_.value)
+      get(MemberDetailsPage.apply),
+      get(NoNINOPage.apply),
+      get(MemberDetailsNinoPage.apply).map(_.value)
     ) match {
       case (None, _, _) => Failure(new Exception("Missing member details when trying to soft delete member"))
       case (_, None, None) =>
@@ -146,22 +146,22 @@ trait SoftDelete extends PSRController {
     )
 
     val employerContributions: List[EmployerContributions] = ua
-      .employerContributionsCompleted(srn, index)
+      .employerContributionsCompleted(index)
       .foldLeft(List.empty[EmployerContributions]) { (acc, secondaryIndex) =>
         def get[A: Reads](f: (Srn, Max300, Max50) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
         (
-          get(EmployerNamePage),
-          get(EmployerTypeOfBusinessPage),
-          get(TotalEmployerContributionPage)
+          get(EmployerNamePage.apply),
+          get(EmployerTypeOfBusinessPage.apply),
+          get(TotalEmployerContributionPage.apply)
         ).flatMapN { (employerName, employerTypeOfBusiness, totalEmployerContribution) =>
           val employerType: Option[EmployerType] = employerTypeOfBusiness match {
             case IdentityType.Individual => None
             case IdentityType.UKCompany =>
-              get(EmployerCompanyCrnPage).map(v => EmployerType.UKCompany(v.value.map(_.value)))
+              get(EmployerCompanyCrnPage.apply).map(v => EmployerType.UKCompany(v.value.map(_.value)))
             case IdentityType.UKPartnership =>
-              get(PartnershipEmployerUtrPage).map(v => EmployerType.UKPartnership(v.value.map(_.value)))
+              get(PartnershipEmployerUtrPage.apply).map(v => EmployerType.UKPartnership(v.value.map(_.value)))
             case IdentityType.Other =>
-              get(OtherEmployeeDescriptionPage).map(EmployerType.Other)
+              get(OtherEmployeeDescriptionPage.apply).map(EmployerType.Other.apply)
           }
 
           employerType.map(empType =>
@@ -179,11 +179,11 @@ trait SoftDelete extends PSRController {
       .foldLeft(List.empty[TransfersIn]) { (acc, secondaryIndex) =>
         def get[A: Reads](f: (Srn, Max300, Max5) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
         (
-          get(TransferringSchemeNamePage),
-          get(WhenWasTransferReceivedPage),
-          get(TransferringSchemeTypePage),
-          get(TotalValueTransferPage).map(_.value),
-          get(DidTransferIncludeAssetPage)
+          get(TransferringSchemeNamePage.apply),
+          get(WhenWasTransferReceivedPage.apply),
+          get(TransferringSchemeTypePage.apply),
+          get(TotalValueTransferPage.apply).map(_.value),
+          get(DidTransferIncludeAssetPage.apply)
         ).mapN(TransfersIn.apply).fold(List.empty[TransfersIn])(acc :+ _)
       }
 
@@ -192,16 +192,16 @@ trait SoftDelete extends PSRController {
       .foldLeft(List.empty[TransfersOut]) { (acc, secondaryIndex) =>
         def get[A: Reads](f: (Srn, Max300, Max5) => Gettable[A]): Option[A] = ua.get(f(srn, index, secondaryIndex))
         (
-          get(ReceivingSchemeNamePage),
-          get(WhenWasTransferMadePage),
-          get(ReceivingSchemeTypePage)
+          get(ReceivingSchemeNamePage.apply),
+          get(WhenWasTransferMadePage.apply),
+          get(ReceivingSchemeTypePage.apply)
         ).mapN(TransfersOut.apply).fold(List.empty[TransfersOut])(acc :+ _)
       }
 
     val surrenderedBenefits: Option[SurrenderedBenefits] = (
-      get(SurrenderedBenefitsAmountPage).map(_.value),
-      get(WhenDidMemberSurrenderBenefitsPage),
-      get(WhyDidMemberSurrenderBenefitsPage)
+      get(SurrenderedBenefitsAmountPage.apply).map(_.value),
+      get(WhenDidMemberSurrenderBenefitsPage.apply),
+      get(WhyDidMemberSurrenderBenefitsPage.apply)
     ).mapN(SurrenderedBenefits.apply)
 
     val memberLumpSumReceived: Option[MemberLumpSumReceived] =
@@ -221,7 +221,7 @@ trait SoftDelete extends PSRController {
         transfersOut,
         surrenderedBenefits,
         memberLumpSumReceived,
-        get(TotalMemberContributionPage),
+        get(TotalMemberContributionPage.apply),
         get(TotalAmountPensionPaymentsPage.apply)
       )
     )
@@ -236,10 +236,10 @@ trait SoftDelete extends PSRController {
         )
         .remove(memberDetailsPages)
         .flatMap { ua =>
-          ua.employerContributionsCompleted(srn, index)
+          ua.employerContributionsCompleted(index)
             .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(employerContributionsPages(secondaryIndex)))
             .when(_.get(EmployerContributionsPage(srn)))(
-              ifTrue = _.removeOnlyWhen(!EmployerContributionsProgress.exist(srn, _))(EmployerContributionsPage(srn)),
+              ifTrue = _.removeOnlyWhen(!EmployerContributionsProgress.exist(_))(EmployerContributionsPage(srn)),
               ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(EmployerContributionsPage(srn))
             )
         }
@@ -247,7 +247,9 @@ trait SoftDelete extends PSRController {
           ua.transfersInSectionCompleted(srn, index)
             .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersInPages(secondaryIndex)))
             .when(_.get(DidSchemeReceiveTransferPage(srn)))(
-              ifTrue = _.removeOnlyWhen(!TransfersInSectionCompleted.exists(srn, _))(DidSchemeReceiveTransferPage(srn)),
+              ifTrue = _.removeOnlyWhen(!TransfersInSectionCompleted.exists(_))(
+                DidSchemeReceiveTransferPage(srn)
+              ),
               ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(DidSchemeReceiveTransferPage(srn))
             )
         )
@@ -255,21 +257,23 @@ trait SoftDelete extends PSRController {
           ua.transfersOutSectionCompleted(srn, index)
             .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersOutPages(secondaryIndex)))
             .when(_.get(SchemeTransferOutPage(srn)))(
-              ifTrue = _.removeOnlyWhen(!TransfersOutSectionCompleted.exists(srn, _))(SchemeTransferOutPage(srn)),
+              ifTrue = _.removeOnlyWhen(!TransfersOutSectionCompleted.exists(_))(
+                SchemeTransferOutPage(srn)
+              ),
               ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SchemeTransferOutPage(srn))
             )
         )
         .flatMap { ua =>
           ua.removeOnly(surrenderedBenefitsPages)
             .when(_.get(SurrenderedBenefitsPage(srn)))(
-              ifTrue = _.removeOnlyWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(SurrenderedBenefitsPage(srn)),
+              ifTrue = _.removeOnlyWhen(_.surrenderedBenefitsCompleted().isEmpty)(SurrenderedBenefitsPage(srn)),
               ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SurrenderedBenefitsPage(srn))
             )
         }
         .flatMap { ua =>
           ua.removeOnly(memberCommencementLumpSumPages)
             .when(_.get(PensionCommencementLumpSumPage(srn)))(
-              ifTrue = _.removeOnlyWhen(_.map(PensionCommencementLumpSumAmountPage.all(srn)).isEmpty)(
+              ifTrue = _.removeOnlyWhen(_.map(PensionCommencementLumpSumAmountPage.all()).isEmpty)(
                 PensionCommencementLumpSumPage(srn)
               ),
               ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
@@ -280,7 +284,7 @@ trait SoftDelete extends PSRController {
         .flatMap { ua =>
           ua.removeOnly(memberPensionPaymentsPages)
             .when(_.get(PensionPaymentsReceivedPage(srn)))(
-              ifTrue = _.removeOnlyWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
+              ifTrue = _.removeOnlyWhen(_.map(TotalAmountPensionPaymentsPage.all()).isEmpty)(
                 PensionPaymentsReceivedPage(srn)
               ),
               ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(PensionPaymentsReceivedPage(srn))

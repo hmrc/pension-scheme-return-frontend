@@ -49,7 +49,7 @@ class AssetsTransformer @Inject() (
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
     val optOtherAssetsHeldOrList = Option.when(
-      optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty
+      optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all()).toList.nonEmpty
     )(true)
 
     Option.when(

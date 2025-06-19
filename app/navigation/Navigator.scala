@@ -68,7 +68,7 @@ class RootNavigator @Inject() extends Navigator {
       userAnswers.get(AccountingPeriods(srn)),
       userAnswers.get(ActiveBankAccountPage(srn)),
       userAnswers.get(WhyNoBankAccountPage(srn)),
-      userAnswers.get(HowManyMembersPage.bySrn(srn))
+      userAnswers.get(HowManyMembersPage.bySrn())
     ) == TaskListStatus.InProgress
 }
 

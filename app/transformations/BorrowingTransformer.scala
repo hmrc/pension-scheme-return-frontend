@@ -42,7 +42,7 @@ class BorrowingTransformer @Inject() extends Transformer {
       optMoneyWasBorrowed.isEmpty ||
       (
         optMoneyWasBorrowed.getOrElse(false) && !request.userAnswers
-          .map(MoneyBorrowedProgress.all(srn))
+          .map(MoneyBorrowedProgress.all())
           .toList
           .exists(_._2.completed)
       )
@@ -62,7 +62,7 @@ class BorrowingTransformer @Inject() extends Transformer {
 
   private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[?]): List[MoneyBorrowed] =
     request.userAnswers
-      .get(MoneyBorrowedProgress.all(srn))
+      .get(MoneyBorrowedProgress.all())
       .map { value =>
         value
           .filter(_._2.completed)

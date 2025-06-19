@@ -32,7 +32,7 @@ case class MoneyBorrowedProgress(srn: Srn, index: Max5000) extends QuestionPage[
 
 object MoneyBorrowedProgress {
 
-  def all(srn: Srn): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
 
       override def path: JsPath = JsPath \ toString

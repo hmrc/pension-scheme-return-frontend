@@ -56,7 +56,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
   )(implicit
     request: DataRequest[?]
   ): Option[OtherAssets] =
-    Option.when(optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty) {
+    Option.when(optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all()).toList.nonEmpty) {
       val optDisposeAnyOtherAsset = request.userAnswers.get(OtherAssetsDisposalPage(srn))
       val dispose =
         if (isPrePopulation && optDisposeAnyOtherAsset.isEmpty && !isSubmitted) {
@@ -80,7 +80,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     request: DataRequest[?]
   ): List[OtherAssetTransaction] =
     request.userAnswers
-      .map(OtherAssetsCompleted.all(srn))
+      .map(OtherAssetsCompleted.all())
       .keys
       .toList
       .flatMap { key =>
@@ -268,7 +268,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
   ): Seq[OtherAssetDisposed] =
     request.userAnswers
       .map(
-        OtherAssetsDisposalProgress.all(srn, otherAssetIndex)
+        OtherAssetsDisposalProgress.all(otherAssetIndex)
       )
       .filter(_._2.completed)
       .keys

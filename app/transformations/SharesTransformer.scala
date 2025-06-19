@@ -83,7 +83,7 @@ class SharesTransformer @Inject() extends Transformer {
     sharesDisposal: Boolean
   )(implicit request: DataRequest[?]): Option[List[ShareTransaction]] = {
     val optSchemeHadShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
-    val anyCompleted = request.userAnswers.map(SharesProgress.all(srn)).toList.exists(_._2.completed)
+    val anyCompleted = request.userAnswers.map(SharesProgress.all()).toList.exists(_._2.completed)
     if (optSchemeHadShares.nonEmpty && !optSchemeHadShares.get) {
       // don't build any share transactions if DidSchemeHoldAnySharesPage was 'No'
       None
@@ -287,7 +287,7 @@ class SharesTransformer @Inject() extends Transformer {
   ): Seq[DisposedSharesTransaction] =
     request.userAnswers
       .map(
-        SharesDisposalProgress.all(srn, shareIndex)
+        SharesDisposalProgress.all(shareIndex)
       )
       .filter(_._2.completed)
       .keys
@@ -649,7 +649,7 @@ class SharesTransformer @Inject() extends Transformer {
     val sharesDisposalMade =
       userAnswersWithTransactions
         .getOrElse(userAnswers)
-        .map(SharesDisposalProgress.all(srn))
+        .map(SharesDisposalProgress.all())
         .nonEmpty
 
     if (sharesDisposalMade) {

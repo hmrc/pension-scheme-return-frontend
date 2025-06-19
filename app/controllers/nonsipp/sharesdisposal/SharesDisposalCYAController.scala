@@ -195,7 +195,7 @@ class SharesDisposalCYAController @Inject() (
           schemeName = request.schemeDetails.schemeName
 
           disposalAmount = request.userAnswers
-            .map(SharesDisposalProgress.all(srn, shareIndex))
+            .map(SharesDisposalProgress.all(shareIndex))
             .count { case (_, progress) => progress.completed }
 
         } yield {

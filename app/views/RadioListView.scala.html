@@ -61,6 +61,7 @@
                                     case RadioItemConditional(FieldType.ConditionalTextarea(prefix), hint) => textArea(s"$prefix-conditional", hint, row)
                                     case RadioItemConditional(FieldType.Input, hint) => input("conditional", hint.get)
                                     case RadioItemConditional(FieldType.ConditionalInput(prefix), hint) => input(s"$prefix-conditional", hint.get)
+                                    case _ => Html("")
                                 }
                             )
                     },
@@ -89,6 +90,7 @@
                                     case RadioItemConditional(FieldType.ConditionalTextarea(prefix), hint) => textArea(s"$prefix-conditional", hint, row)
                                     case RadioItemConditional(FieldType.Input, hint) => input("conditional", hint.get)
                                     case RadioItemConditional(FieldType.ConditionalInput(prefix), hint) => input(s"$prefix-conditional", hint.get)
+                                    case _ => Html("")
                                 }
                             )
                     },

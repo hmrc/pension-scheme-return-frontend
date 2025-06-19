@@ -51,7 +51,7 @@ class EmployerContributionsCompletedSpec extends PageBehaviours {
       .success
       .value
 
-    val result = userAnswers.employerContributionsCompleted(srnSample, index)
+    val result = userAnswers.employerContributionsCompleted(index)
     result must contain theSameElementsAs List(secondaryIndex)
 
   }

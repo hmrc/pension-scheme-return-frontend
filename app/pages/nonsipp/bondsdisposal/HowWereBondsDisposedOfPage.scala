@@ -51,7 +51,7 @@ case class HowWereBondsDisposedOfPage(
           pages(srn, bondIndex, disposalIndex, removeExtraPages = false, isLastRecord = false)
         )
       case (None, _) =>
-        val completedPages = userAnswers.map(BondsDisposalProgress.all(srn))
+        val completedPages = userAnswers.map(BondsDisposalProgress.all())
         removePages(
           userAnswers,
           pages(

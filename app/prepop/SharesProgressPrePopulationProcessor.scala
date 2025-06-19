@@ -17,7 +17,6 @@
 package prepop
 
 import models.UserAnswers.SensitiveJsObject
-import models.SchemeId.Srn
 import pages.nonsipp.shares.Paths.sharesProgress
 import play.api.libs.json._
 import models.UserAnswers
@@ -29,7 +28,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class SharesProgressPrePopulationProcessor @Inject() {
 
-  def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
+  def clean(baseUA: UserAnswers, currentUA: UserAnswers): Try[UserAnswers] = {
 
     val baseUaJson = baseUA.data.decryptedValue
 

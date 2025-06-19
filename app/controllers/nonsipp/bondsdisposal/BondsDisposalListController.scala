@@ -58,7 +58,7 @@ class BondsDisposalListController @Inject() (
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val completedBonds = request.userAnswers.map(BondsCompleted.all(srn))
+      val completedBonds = request.userAnswers.map(BondsCompleted.all())
 
       if (completedBonds.nonEmpty) {
         bondsData(srn, completedBonds.keys.toList.refine[Max5000.Refined]).map { data =>
@@ -75,14 +75,14 @@ class BondsDisposalListController @Inject() (
       .fold(
         errors => {
           val completedBondIndexes: List[Max5000] =
-            request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+            request.userAnswers.map(BondsCompleted.all()).keys.toList.refine[Max5000.Refined]
           bondsData(srn, completedBondIndexes).map { bondsList =>
             BadRequest(view(errors, viewModel(srn, page, bondsList, mode, request.userAnswers)))
           }.merge
         },
         answer => {
           val inProgressUrl = request.userAnswers
-            .map(BondsDisposalProgress.all(srn, answer))
+            .map(BondsDisposalProgress.all(answer))
             .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
           inProgressUrl match {
             case Some(url) => Redirect(url)
@@ -118,7 +118,7 @@ object BondsDisposalListController {
   private def buildRows(srn: Srn, bondsList: List[BondsData], userAnswers: UserAnswers): List[ListRadiosRow] =
     bondsList.flatMap { bondsData =>
       val completedDisposalsPerBondKeys = userAnswers
-        .map(BondsDisposalProgress.all(srn, bondsData.index))
+        .map(BondsDisposalProgress.all(bondsData.index))
         .toList
         .filter(progress => progress._2.completed)
         .map(_._1)

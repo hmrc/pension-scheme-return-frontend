@@ -59,7 +59,7 @@ class StartReportingAssetsDisposalController @Inject() (
     implicit request =>
       val userAnswers = request.userAnswers
       val indexes: List[Max5000] =
-        userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+        userAnswers.map(OtherAssetsCompleted.all()).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
         assetsData(srn, indexes).map(assets => Ok(view(form, viewModel(srn, page, assets, userAnswers)))).merge
@@ -71,7 +71,7 @@ class StartReportingAssetsDisposalController @Inject() (
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val userAnswers = request.userAnswers
     val assetsCompletedIndexes: List[Max5000] =
-      userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      userAnswers.map(OtherAssetsCompleted.all()).keys.toList.refine[Max5000.Refined]
 
     form
       .bindFromRequest()
@@ -82,7 +82,7 @@ class StartReportingAssetsDisposalController @Inject() (
           }.merge,
         answer => {
           val inProgressUrl = request.userAnswers
-            .map(OtherAssetsDisposalProgress.all(srn, answer))
+            .map(OtherAssetsDisposalProgress.all(answer))
             .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
           inProgressUrl match {
             case Some(url) => Redirect(url)
@@ -116,7 +116,7 @@ object StartReportingAssetsDisposalController {
   private def buildRows(srn: Srn, assets: List[AssetData], userAnswers: UserAnswers): List[ListRadiosRow] =
     assets.flatMap { assetData =>
       val completedDisposalsPerAssetKeys = userAnswers
-        .map(OtherAssetsDisposalProgress.all(srn, assetData.index))
+        .map(OtherAssetsDisposalProgress.all(assetData.index))
         .toList
         .filter(progress => progress._2.completed)
         .map(_._1)

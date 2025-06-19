@@ -33,7 +33,7 @@ case class SurrenderedBenefitsCompletedPage(srn: Srn, index: Max300) extends Que
 }
 
 object SurrenderedBenefitsCompleted {
-  def all(srn: Srn): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
+  def all(): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
 
     override def path: JsPath = Paths.memberPensionSurrender \ toString
 
@@ -41,8 +41,8 @@ object SurrenderedBenefitsCompleted {
   }
 
   implicit class SurrenderedBenefitsUserAnswersOps(ua: UserAnswers) {
-    def surrenderedBenefitsCompleted(srn: Srn): List[Max300] =
-      ua.map(SurrenderedBenefitsCompleted.all(srn))
+    def surrenderedBenefitsCompleted(): List[Max300] =
+      ua.map(SurrenderedBenefitsCompleted.all())
         .toList
         .collect { case (index, _) =>
           index

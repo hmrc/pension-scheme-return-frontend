@@ -58,7 +58,7 @@ class SharesDisposalListController @Inject() (
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val indexes = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      val indexes = request.userAnswers.map(SharesCompleted.all()).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
         sharesDisposalData(srn, indexes).map { data =>
@@ -70,7 +70,7 @@ class SharesDisposalListController @Inject() (
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+    val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all()).keys.toList.refine[Max5000.Refined]
 
     form
       .bindFromRequest()
@@ -81,7 +81,7 @@ class SharesDisposalListController @Inject() (
           }.merge,
         answer => {
           val inProgressUrl = request.userAnswers
-            .map(SharesDisposalProgress.all(srn, answer))
+            .map(SharesDisposalProgress.all(answer))
             .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
           inProgressUrl match {
             case Some(url) => Redirect(url)
@@ -120,7 +120,7 @@ object SharesDisposalListController {
   private def buildRows(srn: Srn, shares: List[SharesDisposalData], userAnswers: UserAnswers): List[ListRadiosRow] =
     shares.flatMap { sharesDisposalData =>
       val completedDisposalsPerShareKeys = userAnswers
-        .map(SharesDisposalProgress.all(srn, sharesDisposalData.index))
+        .map(SharesDisposalProgress.all(sharesDisposalData.index))
         .toList
         .filter(progress => progress._2.completed)
         .map(_._1)

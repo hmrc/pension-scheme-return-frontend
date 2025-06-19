@@ -175,7 +175,7 @@ class LandPropertyDisposalCYAController @Inject() (
           )
 
           disposalAmount = updatedUserAnswers
-            .map(LandPropertyDisposalCompleted.all(srn, landOrPropertyIndex))
+            .map(LandPropertyDisposalCompleted.all(landOrPropertyIndex))
             .size
 
           schemeName = request.schemeDetails.schemeName

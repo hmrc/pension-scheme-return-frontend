@@ -37,7 +37,7 @@ class SharesProgressPrePopulationProcessorSpec extends BaseSpec with TestValues 
         val result = processor.clean(
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnJsValue.as[JsObject])),
           currentUA = currentUa
-        )(srn)
+        )
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultJsValue.as[JsObject]))
         )

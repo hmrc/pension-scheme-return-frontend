@@ -129,7 +129,7 @@ class BondsDisposalCYAController @Inject() (
             .getOrRecoverJourneyT
 
           disposalAmount = request.userAnswers
-            .map(BondsDisposalProgress.all(srn, bondIndex))
+            .map(BondsDisposalProgress.all(bondIndex))
             .count { case (_, progress) => progress.completed }
 
           schemeName = request.schemeDetails.schemeName

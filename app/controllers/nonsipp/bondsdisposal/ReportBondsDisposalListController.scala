@@ -110,9 +110,9 @@ class ReportBondsDisposalListController @Inject() (
   )(implicit
     request: DataRequest[AnyContent]
   ): Result =
-    getCompletedDisposals(srn).map { completedDisposals =>
+    getCompletedDisposals().map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
+      val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all()).size
       val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
 
       getBondsDisposalsWithIndexes(srn, completedDisposals).map { bondsDisposalsWithIndexes =>
@@ -159,10 +159,10 @@ class ReportBondsDisposalListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      getCompletedDisposals(srn)
+      getCompletedDisposals()
         .traverse { completedDisposals =>
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-          val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
+          val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all()).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
 
           val allBondsFullyDisposed: Boolean = completedDisposals.forall { case (bondIndex, disposalIndexes) =>
@@ -264,18 +264,16 @@ class ReportBondsDisposalListController @Inject() (
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def getCompletedDisposals(
-    srn: Srn
-  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] =
+  private def getCompletedDisposals()(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] =
     Right(
       request.userAnswers
-        .map(BondsCompleted.all(srn))
+        .map(BondsCompleted.all())
         .keys
         .toList
         .refine[Max5000.Refined]
         .map { index =>
           index -> request.userAnswers
-            .map(BondsDisposalProgress.all(srn, index))
+            .map(BondsDisposalProgress.all(index))
             .filter(_._2.completed)
             .keys
             .toList

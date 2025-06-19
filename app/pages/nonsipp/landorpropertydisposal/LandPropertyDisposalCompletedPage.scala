@@ -31,15 +31,13 @@ case class LandPropertyDisposalCompletedPage(srn: Srn, landOrPropertyIndex: Max5
 }
 
 object LandPropertyDisposalCompleted {
-  def all(
-    srn: Srn,
-    landOrPropertyIndex: Max5000
-  ): IndexedQuestionPage[SectionCompleted.type] = new IndexedQuestionPage[SectionCompleted.type] {
-    override def path: JsPath =
-      Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString
+  def all(landOrPropertyIndex: Max5000): IndexedQuestionPage[SectionCompleted.type] =
+    new IndexedQuestionPage[SectionCompleted.type] {
+      override def path: JsPath =
+        Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString
 
-    override def toString: String = "disposalCompleted"
-  }
+      override def toString: String = "disposalCompleted"
+    }
 }
 
 case class LandPropertyDisposalCompletedPages(srn: Srn)

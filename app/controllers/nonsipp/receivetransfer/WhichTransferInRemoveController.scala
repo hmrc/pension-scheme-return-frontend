@@ -51,7 +51,7 @@ class WhichTransferInRemoveController @Inject() (
 
   def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max5] = request.userAnswers
-      .map(ReceiveTransferProgress.all(srn, memberIndex))
+      .map(ReceiveTransferProgress.all(memberIndex))
       .filter { case (_, status) =>
         status.completed
       }
@@ -102,7 +102,7 @@ class WhichTransferInRemoveController @Inject() (
     request: DataRequest[?]
   ) =
     request.userAnswers
-      .map(ReceiveTransferProgress.all(srn, memberIndex))
+      .map(ReceiveTransferProgress.all(memberIndex))
       .filter { case (_, status) =>
         status.completed
       }

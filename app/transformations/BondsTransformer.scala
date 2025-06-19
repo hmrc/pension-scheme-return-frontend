@@ -79,7 +79,7 @@ class BondsTransformer @Inject() extends Transformer {
     request: DataRequest[?]
   ): List[BondTransactions] =
     request.userAnswers
-      .map(BondsProgress.all(srn))
+      .map(BondsProgress.all())
       .filter { case (_, status) => status.completed }
       .keys
       .toList
@@ -126,7 +126,7 @@ class BondsTransformer @Inject() extends Transformer {
   ): Seq[BondDisposed] =
     request.userAnswers
       .map(
-        BondsDisposalProgress.all(srn, bondIndex)
+        BondsDisposalProgress.all(bondIndex)
       )
       .filter(_._2.completed)
       .keys

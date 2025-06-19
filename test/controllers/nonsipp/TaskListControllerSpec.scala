@@ -70,7 +70,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
       .unsafeSet(CheckReturnDatesPage(srn), true)
       .unsafeSet(ActiveBankAccountPage(srn), true)
-      .unsafeSet(HowManyMembersPage.bySrn(srn), schemeMemberNumbers)
+      .unsafeSet(HowManyMembersPage.bySrn(), schemeMemberNumbers)
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
       .unsafeSet(FbVersionPage(srn), commonVersion)
     val populatedUserAnswersV2 = populatedUserAnswers.unsafeSet(FbVersionPage(srn), "002")

@@ -34,7 +34,7 @@ case class ReceiveTransferProgress(srn: Srn, memberIndex: Max300, secondaryIndex
 }
 
 object ReceiveTransferProgress {
-  def all(srn: Srn, memberIndex: Max300): IndexedQuestionPage[SectionJourneyStatus] =
+  def all(memberIndex: Max300): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
 
       override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
@@ -42,7 +42,7 @@ object ReceiveTransferProgress {
       override def toString: String = "receiveTransferProgress"
     }
 
-  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
+  def all(): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
     new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
 
       override def path: JsPath = JsPath \ toString
@@ -50,17 +50,17 @@ object ReceiveTransferProgress {
       override def toString: String = "receiveTransferProgress"
     }
 
-  def exist(srn: Srn, userAnswers: UserAnswers): Boolean =
-    userAnswers.map(ReceiveTransferProgress.all(srn)).values.exists(_.values.nonEmpty)
+  def exist(userAnswers: UserAnswers): Boolean =
+    userAnswers.map(ReceiveTransferProgress.all()).values.exists(_.values.nonEmpty)
 
   implicit class TransfersInSectionCompletedUserAnswersOps(userAnswers: UserAnswers) {
 
-    def receiveTransferProgress(srn: Srn, memberIndex: Max300): List[(Max5, SectionJourneyStatus)] =
-      userAnswers.map(ReceiveTransferProgress.all(srn, memberIndex)).toList.refine_1[Max5.Refined]
+    def receiveTransferProgress(memberIndex: Max300): List[(Max5, SectionJourneyStatus)] =
+      userAnswers.map(ReceiveTransferProgress.all(memberIndex)).toList.refine_1[Max5.Refined]
 
-    def transfersInSectionCompleted(srn: Srn, memberIndex: Max300): List[Max5] =
+    def transfersInSectionCompleted(memberIndex: Max300): List[Max5] =
       userAnswers
-        .map(ReceiveTransferProgress.all(srn, memberIndex))
+        .map(ReceiveTransferProgress.all(memberIndex))
         .toList
         .refine_1[Max5.Refined]
         .collect { case (index, SectionJourneyStatus.Completed) => index }

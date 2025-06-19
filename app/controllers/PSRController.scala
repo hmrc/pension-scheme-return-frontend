@@ -213,7 +213,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     ): Option[List[EmployerContributions]] = {
       val secondaryIndexes =
         userAnswers
-          .map(EmployerContributionsCompleted.all(srn, index))
+          .map(EmployerContributionsCompleted.all(index))
           .keys
           .toList
           .flatMap(_.toIntOption.flatMap(i => refineV[Max50.Refined](i + 1).leftMap(new Exception(_)).toOption))
@@ -235,7 +235,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
             case IdentityType.Other =>
               userAnswers
                 .get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex))
-                .map(EmployerType.Other)
+                .map(EmployerType.Other.apply)
           }
           total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
         } yield EmployerContributions(
@@ -252,7 +252,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     ): Option[List[TransfersIn]] = {
       val secondaryIndexes =
         userAnswers
-          .map(TransfersInSectionCompleted.all(srn, index))
+          .map(TransfersInSectionCompleted.all(index))
           .keys
           .toList
           .flatMap(_.toIntOption.flatMap(i => refineV[Max5.Refined](i + 1).leftMap(new Exception(_)).toOption))
@@ -280,7 +280,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     ): Option[List[TransfersOut]] = {
       val secondaryIndexes =
         userAnswers
-          .map(TransfersOutSectionCompleted.all(srn, index))
+          .map(TransfersOutSectionCompleted.all(index))
           .keys
           .toList
           .flatMap(_.toIntOption.flatMap(i => refineV[Max5.Refined](i + 1).leftMap(new Exception(_)).toOption))

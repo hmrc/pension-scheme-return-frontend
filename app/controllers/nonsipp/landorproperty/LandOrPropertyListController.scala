@@ -136,7 +136,7 @@ class LandOrPropertyListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
 
-    val inProgressAnswers = request.userAnswers.map(LandOrPropertyProgress.all(srn))
+    val inProgressAnswers = request.userAnswers.map(LandOrPropertyProgress.all())
     val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
     addresses(srn).getOrRecoverJourney.map { case (addressesToCheck, addresses) =>
       if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
@@ -223,7 +223,7 @@ class LandOrPropertyListController @Inject() (
   private def addresses(
     srn: Srn
   )(implicit request: DataRequest[?]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] = {
-    val completedIndexes = request.userAnswers.map(LandOrPropertyProgress.all(srn)).filter(_._2.completed).keys.toList
+    val completedIndexes = request.userAnswers.map(LandOrPropertyProgress.all()).filter(_._2.completed).keys.toList
     // if return has been pre-populated, partition addresses by those that need to be checked
     if (isPrePopulation) {
       request.userAnswers

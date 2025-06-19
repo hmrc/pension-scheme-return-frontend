@@ -44,7 +44,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
     case OtherAssetsDisposalListPage(srn, assetIndex) =>
       {
         val inProgressIndex: Either[Call, Option[Max50]] = userAnswers
-          .map(OtherAssetsDisposalProgress.all(srn, assetIndex))
+          .map(OtherAssetsDisposalProgress.all(assetIndex))
           .find {
             case (_, SectionJourneyStatus.InProgress(_)) => true
             case _ => false
@@ -62,7 +62,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
           case None =>
             for {
               indexes <- userAnswers
-                .map(OtherAssetsDisposalProgress.all(srn, assetIndex))
+                .map(OtherAssetsDisposalProgress.all(assetIndex))
                 .keys
                 .toList
                 .traverse(_.toIntOption)

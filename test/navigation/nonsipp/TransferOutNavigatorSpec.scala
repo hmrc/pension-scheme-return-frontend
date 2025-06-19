@@ -144,7 +144,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
           .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
           .unsafeSet(
-            MemberTransferOutProgress.all(srn, index),
+            MemberTransferOutProgress.all(index),
             existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
           )
 
@@ -227,7 +227,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
           .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
           .unsafeSet(
-            MemberTransferOutProgress.all(srn, index),
+            MemberTransferOutProgress.all(index),
             existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
           )
 

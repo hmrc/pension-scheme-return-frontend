@@ -31,7 +31,7 @@ case class MemberPsrVersionPage(srn: Srn, index: Max300) extends QuestionPage[St
 }
 
 object MemberPsrVersionPage {
-  def all(srn: Srn): IndexedQuestionPage[String] = new IndexedQuestionPage[String] {
+  def all(): IndexedQuestionPage[String] = new IndexedQuestionPage[String] {
 
     override def path: JsPath = memberDetails \ toString
 

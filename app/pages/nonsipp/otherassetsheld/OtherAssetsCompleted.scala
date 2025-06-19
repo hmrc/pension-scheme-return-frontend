@@ -31,7 +31,7 @@ case class OtherAssetsCompleted(srn: Srn, index: Max5000) extends QuestionPage[S
 }
 
 object OtherAssetsCompleted {
-  def all(srn: Srn): IndexedQuestionPage[SectionCompleted] =
+  def all(): IndexedQuestionPage[SectionCompleted] =
     new IndexedQuestionPage[SectionCompleted] {
 
       override def path: JsPath = Paths.otherAssetsTransactions \ toString

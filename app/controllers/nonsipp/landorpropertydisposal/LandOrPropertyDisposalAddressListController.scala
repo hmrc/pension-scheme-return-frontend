@@ -57,7 +57,7 @@ class LandOrPropertyDisposalAddressListController @Inject() (
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val completedLandOrProperties = request.userAnswers.map(LandOrPropertyProgress.all(srn)).filter(_._2.completed)
+      val completedLandOrProperties = request.userAnswers.map(LandOrPropertyProgress.all()).filter(_._2.completed)
 
       if (completedLandOrProperties.nonEmpty) {
         landOrPropertyData(srn, completedLandOrProperties.keys.toList.refine[Max5000.Refined]).map { data =>
@@ -74,7 +74,7 @@ class LandOrPropertyDisposalAddressListController @Inject() (
       .fold(
         errors => {
           val completedLandOrPropertyIndexes: List[Max5000] =
-            request.userAnswers.map(LandOrPropertyCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+            request.userAnswers.map(LandOrPropertyCompleted.all()).keys.toList.refine[Max5000.Refined]
           landOrPropertyData(srn, completedLandOrPropertyIndexes).map { data =>
             BadRequest(view(errors, viewModel(srn, page, data, request.userAnswers)))
 
@@ -82,7 +82,7 @@ class LandOrPropertyDisposalAddressListController @Inject() (
         },
         answer => {
           val inProgressUrl = request.userAnswers
-            .map(LandOrPropertyDisposalProgress.all(srn, answer))
+            .map(LandOrPropertyDisposalProgress.all(answer))
             .collectFirst { case _ -> SectionJourneyStatus.InProgress(url) => url }
 
           inProgressUrl match {
@@ -123,7 +123,7 @@ object LandOrPropertyDisposalAddressListController {
   ): List[ListRadiosRow] =
     landOrPropertyList.flatMap { landOrPropertyData =>
       val completedDisposalsPerBondKeys = userAnswers
-        .map(LandPropertyDisposalCompleted.all(srn, landOrPropertyData.index))
+        .map(LandPropertyDisposalCompleted.all(landOrPropertyData.index))
         .keys
 
       if (maxLandOrPropertyDisposals == completedDisposalsPerBondKeys.size) {

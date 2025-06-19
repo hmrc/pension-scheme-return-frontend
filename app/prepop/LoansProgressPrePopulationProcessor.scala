@@ -18,7 +18,6 @@ package prepop
 
 import pages.nonsipp.loansmadeoroutstanding.Paths.loansProgress
 import models.UserAnswers.SensitiveJsObject
-import models.SchemeId.Srn
 import play.api.libs.json._
 import models.UserAnswers
 
@@ -29,7 +28,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class LoansProgressPrePopulationProcessor @Inject() {
 
-  def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
+  def clean(baseUA: UserAnswers, currentUA: UserAnswers): Try[UserAnswers] = {
 
     val baseUaJson = baseUA.data.decryptedValue
 

@@ -31,7 +31,7 @@ case class SharePrePopulated(srn: Srn, index: Max5000) extends QuestionPage[Bool
 }
 
 object SharePrePopulated {
-  def all(srn: Srn): IndexedQuestionPage[Boolean] =
+  def all(): IndexedQuestionPage[Boolean] =
     new IndexedQuestionPage[Boolean] {
 
       override def path: JsPath =

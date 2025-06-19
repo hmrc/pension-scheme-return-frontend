@@ -107,7 +107,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       (
         for {
           indexes <- userAnswers
-            .map(LandPropertyDisposalCompleted.all(srn, addressChoice))
+            .map(LandPropertyDisposalCompleted.all(addressChoice))
             .keys
             .toList
             .traverse(_.toIntOption)

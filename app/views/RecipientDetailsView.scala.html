@@ -23,7 +23,6 @@
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukInput: GovukInput,
-        govukDateInput: GovukDateInput,
         hmrcCharacterCount: HmrcCharacterCount,
         govukButton: GovukButton
 )
@@ -55,7 +54,7 @@
         ) { component =>
             @hmrcCharacterCount(
                 form("description").errors.headOption.fold(component)(error =>
-                    component.withError(messages(error.message, error.args: _*))
+                    component.withError(messages(error.message, error.args*))
                 )
             )
         }

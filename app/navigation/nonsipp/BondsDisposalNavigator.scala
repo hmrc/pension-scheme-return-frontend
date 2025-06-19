@@ -44,7 +44,7 @@ object BondsDisposalNavigator extends JourneyNavigator {
       (
         for {
           indexes <- userAnswers
-            .map(BondsDisposalProgress.all(srn, bondIndex))
+            .map(BondsDisposalProgress.all(bondIndex))
             .keys
             .toList
             .traverse(_.toIntOption)

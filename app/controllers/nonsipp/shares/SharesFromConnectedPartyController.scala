@@ -169,7 +169,6 @@ class SharesFromConnectedPartyController @Inject() (
       case IdentityType.UKPartnership => request.userAnswers.get(PartnershipShareSellerNamePage(srn, index))
       case IdentityType.Other =>
         request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller)).map(_.name)
-      case _ => None
 
     }
 

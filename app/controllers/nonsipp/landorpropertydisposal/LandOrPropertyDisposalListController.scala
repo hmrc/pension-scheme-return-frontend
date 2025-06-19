@@ -89,8 +89,6 @@ class LandOrPropertyDisposalListController @Inject() (
               pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
             ) == Updated
             updated
-          case None =>
-            false
           case _ => false
         },
         year = year,
@@ -149,7 +147,7 @@ class LandOrPropertyDisposalListController @Inject() (
     val (status, _) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
     logger.info(s"Land or property disposal status is $status")
 
-    getDisposals(srn).map { completedDisposals =>
+    getDisposals().map { completedDisposals =>
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
         val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
@@ -195,7 +193,7 @@ class LandOrPropertyDisposalListController @Inject() (
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (for {
-      completedDisposals <- getDisposals(srn)
+      completedDisposals <- getDisposals()
       numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
       maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
@@ -254,19 +252,17 @@ class LandOrPropertyDisposalListController @Inject() (
       )
     }
 
-  private def getDisposals(
-    srn: Srn
-  )(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] =
+  private def getDisposals()(implicit request: DataRequest[?]): Either[Result, Map[Max5000, List[Max50]]] =
     Right(
       request.userAnswers
-        .map(LandOrPropertyProgress.all(srn))
+        .map(LandOrPropertyProgress.all())
         .filter(_._2.completed)
         .keys
         .toList
         .refine[Max5000.Refined]
         .map { index =>
           index -> request.userAnswers
-            .map(LandOrPropertyDisposalProgress.all(srn, index))
+            .map(LandOrPropertyDisposalProgress.all(index))
             .filter(_._2.completed)
             .keys
             .toList

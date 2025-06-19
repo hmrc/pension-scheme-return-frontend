@@ -468,8 +468,8 @@ object ViewOnlyTaskListController {
       sharesDisposalsTaskListStatus
     )
 
-    val currentSharesCompleted = currentUA.get(SharesCompleted.all(srn)).filter(_.nonEmpty)
-    val previousSharesCompleted = previousUA.get(SharesCompleted.all(srn)).filter(_.nonEmpty)
+    val currentSharesCompleted = currentUA.get(SharesCompleted.all()).filter(_.nonEmpty)
+    val previousSharesCompleted = previousUA.get(SharesCompleted.all()).filter(_.nonEmpty)
 
     val viewModelList = NonEmptyList
       .fromList((currentSharesCompleted, previousSharesCompleted) match {
@@ -527,8 +527,8 @@ object ViewOnlyTaskListController {
       landOrPropertyDisposalTaskListStatus
     )
 
-    val currentLandOrPropertyCompleted = currentUA.get(LandOrPropertyCompleted.all(srn)).filter(_.nonEmpty)
-    val previousLandOrPropertyCompleted = previousUA.get(LandOrPropertyCompleted.all(srn)).filter(_.nonEmpty)
+    val currentLandOrPropertyCompleted = currentUA.get(LandOrPropertyCompleted.all()).filter(_.nonEmpty)
+    val previousLandOrPropertyCompleted = previousUA.get(LandOrPropertyCompleted.all()).filter(_.nonEmpty)
 
     val viewModelList = NonEmptyList
       .fromList((currentLandOrPropertyCompleted, previousLandOrPropertyCompleted) match {
@@ -586,8 +586,8 @@ object ViewOnlyTaskListController {
       bondsDisposalTaskListStatus
     )
 
-    val currentBondsCompleted = currentUA.get(BondsCompleted.all(srn)).filter(_.nonEmpty)
-    val previousBondsCompleted = previousUA.get(BondsCompleted.all(srn)).filter(_.nonEmpty)
+    val currentBondsCompleted = currentUA.get(BondsCompleted.all()).filter(_.nonEmpty)
+    val previousBondsCompleted = previousUA.get(BondsCompleted.all()).filter(_.nonEmpty)
 
     val viewModelList = NonEmptyList
       .fromList((currentBondsCompleted, previousBondsCompleted) match {
@@ -665,8 +665,8 @@ object ViewOnlyTaskListController {
       .get(DidSchemeHoldAnySharesPage(srn))
       .isDefined
 
-    val currentOtherAssetsCompleted = currentUA.get(OtherAssetsCompleted.all(srn)).filter(_.nonEmpty)
-    val previousOtherAssetsCompleted = previousUA.get(OtherAssetsCompleted.all(srn)).filter(_.nonEmpty)
+    val currentOtherAssetsCompleted = currentUA.get(OtherAssetsCompleted.all()).filter(_.nonEmpty)
+    val previousOtherAssetsCompleted = previousUA.get(OtherAssetsCompleted.all()).filter(_.nonEmpty)
 
     val viewModelList = NonEmptyList
       .fromList((sharesExist, currentOtherAssetsCompleted.orElse(previousOtherAssetsCompleted)) match {

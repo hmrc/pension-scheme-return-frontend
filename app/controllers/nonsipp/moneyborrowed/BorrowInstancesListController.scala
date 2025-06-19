@@ -131,7 +131,7 @@ class BorrowInstancesListController @Inject() (
     }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val inProgressAnswers = request.userAnswers.map(MoneyBorrowedProgress.all(srn))
+    val inProgressAnswers = request.userAnswers.map(MoneyBorrowedProgress.all())
     val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
 
     borrowDetails(srn).map { instances =>
@@ -202,7 +202,7 @@ class BorrowInstancesListController @Inject() (
     srn: Srn
   )(implicit request: DataRequest[?]): Either[Result, List[BorrowedMoneyDetails]] =
     request.userAnswers
-      .map(MoneyBorrowedProgress.all(srn))
+      .map(MoneyBorrowedProgress.all())
       .filter(_._2.completed)
       .refine[Max5000.Refined]
       .getOrRecoverJourney
