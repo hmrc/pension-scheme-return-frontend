@@ -16,14 +16,18 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import pages.nonsipp.otherassetsheld.{WhenDidSchemeAcquireAssetsPage, WhyDoesSchemeHoldAssetsPage}
+import pages.nonsipp.otherassetsheld.{
+  OtherAssetsCYAPointOfEntry,
+  WhenDidSchemeAcquireAssetsPage,
+  WhyDoesSchemeHoldAssetsPage
+}
 import views.html.RadioListView
 import utils.IntUtils.given
 import forms.RadioListFormProvider
 import models.IdentitySubject.OtherAssetSeller
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
-import models.{CheckMode, NormalMode}
+import models.{CheckMode, NormalMode, PointOfEntry}
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 
 class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
@@ -63,6 +67,10 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec with Cont
             viewModel(srn, index, schemeName, NormalMode)
           )
       }
+    )
+
+    act.like(
+      invalidForm(onSubmit, defaultUserAnswers)
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
@@ -105,6 +113,61 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec with Cont
           )
         )
       }
+      "redirects to CYA when point of entry was previously transfer" - {
+        act.like(
+          redirectToPage(
+            onSubmitCheckMode,
+            controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+              .onPageLoad(srn, index, CheckMode),
+            defaultUserAnswers
+              .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Contribution)
+              .unsafeSet(OtherAssetsCYAPointOfEntry(srn, index), PointOfEntry.AssetTransferToContributionPointOfEntry),
+            "value" -> Acquisition.name
+          )
+        )
+      }
+
+    }
+    "Contribution in check mode when changing from acquisition" - {
+      "redirects to whenDidSchemeAcquireAssetsPage when no date is previously saved" - {
+        act.like(
+          redirectToPage(
+            onSubmitCheckMode,
+            controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+              .onPageLoad(srn, index, CheckMode),
+            defaultUserAnswers
+              .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Acquisition),
+            "value" -> Contribution.name
+          )
+        )
+      }
+      "redirects to Identity Type page when date is previously saved " - {
+        act.like(
+          redirectToPage(
+            onSubmitCheckMode,
+            controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+              .onPageLoad(srn, index, NormalMode),
+            defaultUserAnswers
+              .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Acquisition)
+              .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index), localDate),
+            "value" -> Contribution.name
+          )
+        )
+      }
+      "redirects to CYA when point of entry was previously transfer" - {
+        act.like(
+          redirectToPage(
+            onSubmitCheckMode,
+            controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+              .onPageLoad(srn, index, CheckMode),
+            defaultUserAnswers
+              .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Acquisition)
+              .unsafeSet(OtherAssetsCYAPointOfEntry(srn, index), PointOfEntry.AssetTransferToContributionPointOfEntry),
+            "value" -> Contribution.name
+          )
+        )
+      }
+
     }
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

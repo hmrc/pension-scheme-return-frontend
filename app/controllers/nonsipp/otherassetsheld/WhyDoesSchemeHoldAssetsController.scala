@@ -101,7 +101,16 @@ class WhyDoesSchemeHoldAssetsController @Inject() (
               val previousPointOfEntry = request.userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index))
               val whenDidSchemeAcquireAssetsPage = request.userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, index))
 
-              val pointOfEntry = (previousAnswer, answer, whenDidSchemeAcquireAssetsPage) match {
+              // modifying selection multiple times
+              val previousAnswerModified = (previousPointOfEntry, previousAnswer, answer) match {
+                // Transfer > Acquisition > Contribution:
+                case (Some(AssetTransferToAcquisitionPointOfEntry), Some(Acquisition), Contribution) => Some(Transfer)
+                // Transfer > Contribution > Acquisition:
+                case (Some(AssetTransferToContributionPointOfEntry), Some(Contribution), Acquisition) => Some(Transfer)
+                case _ => previousAnswer
+              }
+
+              val pointOfEntry = (previousAnswerModified, answer, whenDidSchemeAcquireAssetsPage) match {
                 case (Some(Acquisition), Contribution, Some(_)) => Some(AssetAcquisitionToContributionPointOfEntry)
                 case (Some(Acquisition), Contribution, None) => Some(WhenDidSchemeAcquireAssetsPointOfEntry)
                 case (Some(Acquisition), Transfer, _) => Some(AssetAcquisitionToTransferPointOfEntry)
