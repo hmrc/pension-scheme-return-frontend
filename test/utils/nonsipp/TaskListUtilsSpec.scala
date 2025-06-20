@@ -50,7 +50,7 @@ import pages.nonsipp.bondsdisposal.BondsDisposalPage
 import viewmodels.DisplayMessage
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.DisplayMessage.{LinkMessage, Message}
-import viewmodels.models.{MemberState, SectionCompleted, Submitted}
+import viewmodels.models._
 
 class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -74,6 +74,7 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
     .unsafeSet(MemberDetailsNinoPage(srn, index1of300), nino)
     .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
     .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
+    .unsafeSet(MemberDetailsManualProgress(srn, index1of300), SectionJourneyStatus.Completed)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
     .unsafeSet(EmployerContributionsPage(srn), false)
