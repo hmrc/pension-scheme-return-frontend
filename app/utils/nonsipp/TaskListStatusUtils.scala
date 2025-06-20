@@ -159,7 +159,7 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers
       .get(AllTotalMemberContributionPages(srn))
       .getOrElse(Map.empty)
-      .count { case (memberIndex, amount) => !amount.isZero }
+      .count((_, amount) => !amount.isZero)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.membercontributions.routes.MemberContributionsController
@@ -230,7 +230,7 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers
       .get(PensionCommencementLumpSumAmountPage.all())
       .getOrElse(Map.empty)
-      .count { case (memberIndex, amount) => !amount.isZero }
+      .count((_, amount) => !amount.isZero)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
@@ -255,7 +255,7 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers
       .get(TotalAmountPensionPaymentsPage.all())
       .getOrElse(Map.empty)
-      .count { case (memberIndex, amount) => !amount.isZero }
+      .count((_, amount) => !amount.isZero)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
@@ -642,7 +642,7 @@ object TaskListStatusUtils {
     getMembersTaskListStatusAndLink(userAnswers, srn)._1 match {
       case TaskListStatus.InProgress =>
         userAnswers.get(MembersDetailsCompletedPages(srn)) match {
-          case Some(completed) => TaskListStatus.NotStarted
+          case Some(_) => TaskListStatus.NotStarted
           case None => TaskListStatus.UnableToStart
         }
       case TaskListStatus.Recorded(_, _) => TaskListStatus.NotStarted

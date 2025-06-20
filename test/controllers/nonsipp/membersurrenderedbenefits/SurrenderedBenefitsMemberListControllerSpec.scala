@@ -34,7 +34,7 @@ class SurrenderedBenefitsMemberListControllerSpec
     with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsMemberListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.SurrenderedBenefitsMemberListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.SurrenderedBenefitsMemberListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.SurrenderedBenefitsMemberListController.onSubmitViewOnly(
     srn,
     yearString,

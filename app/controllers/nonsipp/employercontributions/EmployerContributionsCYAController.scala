@@ -24,6 +24,7 @@ import config.Constants
 import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
 import controllers.actions._
+import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -35,8 +36,6 @@ import cats.data.EitherT
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.models._
@@ -44,7 +43,6 @@ import viewmodels.models._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class EmployerContributionsCYAController @Inject() (
@@ -105,8 +103,7 @@ class EmployerContributionsCYAController @Inject() (
             viewOnlyUpdated = false,
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            optPreviousVersion = request.previousVersion
           )
         )
       )
@@ -211,16 +208,15 @@ object EmployerContributionsCYAController {
 
   def viewModel(
     srn: Srn,
-    membersName: String,
+    membersName: Reason,
     memberIndex: Max300,
     page: Int,
     employerCYAs: List[EmployerCYA],
     mode: Mode,
     viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
+    optYear: Option[Reason] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
 
     val pagination = Pagination(

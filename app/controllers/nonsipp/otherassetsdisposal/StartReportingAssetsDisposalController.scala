@@ -55,17 +55,16 @@ class StartReportingAssetsDisposalController @Inject() (
 
   val form: Form[Max5000] = StartReportingAssetsDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      val userAnswers = request.userAnswers
-      val indexes: List[Max5000] =
-        userAnswers.map(OtherAssetsCompleted.all()).keys.toList.refine[Max5000.Refined]
+  def onPageLoad(srn: Srn, page: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val userAnswers = request.userAnswers
+    val indexes: List[Max5000] =
+      userAnswers.map(OtherAssetsCompleted.all()).keys.toList.refine[Max5000.Refined]
 
-      if (indexes.nonEmpty) {
-        assetsData(srn, indexes).map(assets => Ok(view(form, viewModel(srn, page, assets, userAnswers)))).merge
-      } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+    if (indexes.nonEmpty) {
+      assetsData(srn, indexes).map(assets => Ok(view(form, viewModel(srn, page, assets, userAnswers)))).merge
+    } else {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>

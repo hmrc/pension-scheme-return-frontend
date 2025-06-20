@@ -24,6 +24,7 @@ import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerBond
 import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
 import models.requests.DataRequest
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
 import models.PointOfEntry.NoPointOfEntry
@@ -32,8 +33,6 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.MessagesApi
@@ -45,7 +44,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class BondsDisposalCYAController @Inject() (
@@ -159,7 +158,6 @@ class BondsDisposalCYAController @Inject() (
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
                 isMaximumReached
               )
             )
@@ -221,7 +219,6 @@ object BondsDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None,
     isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](

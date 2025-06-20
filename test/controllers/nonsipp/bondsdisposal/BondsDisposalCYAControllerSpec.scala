@@ -260,7 +260,6 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo),
               isMaximumReached = false
             )
           )

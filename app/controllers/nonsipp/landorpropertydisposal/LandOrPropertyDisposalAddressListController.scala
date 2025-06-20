@@ -55,17 +55,16 @@ class LandOrPropertyDisposalAddressListController @Inject() (
 
   val form: Form[Max5000] = LandOrPropertyDisposalAddressListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      val completedLandOrProperties = request.userAnswers.map(LandOrPropertyProgress.all()).filter(_._2.completed)
+  def onPageLoad(srn: Srn, page: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val completedLandOrProperties = request.userAnswers.map(LandOrPropertyProgress.all()).filter(_._2.completed)
 
-      if (completedLandOrProperties.nonEmpty) {
-        landOrPropertyData(srn, completedLandOrProperties.keys.toList.refine[Max5000.Refined]).map { data =>
-          Ok(view(form, viewModel(srn, page, data, request.userAnswers)))
-        }.merge
-      } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+    if (completedLandOrProperties.nonEmpty) {
+      landOrPropertyData(srn, completedLandOrProperties.keys.toList.refine[Max5000.Refined]).map { data =>
+        Ok(view(form, viewModel(srn, page, data, request.userAnswers)))
+      }.merge
+    } else {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>

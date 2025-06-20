@@ -81,7 +81,7 @@ object TransferOutNavigator extends JourneyNavigator {
       controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
         .onPageLoad(srn, 1, NormalMode)
 
-    case RemoveTransferOutPage(srn, index) =>
+    case RemoveTransferOutPage(srn, _) =>
       controllers.nonsipp.membertransferout.routes.TransferOutMemberListController.onPageLoad(srn, 1, NormalMode)
   }
 

@@ -140,8 +140,7 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
             viewOnlyUpdated = false,
             optYear = Some(yearString),
             optCurrentVersion = Some(submissionNumberTwo),
-            optPreviousVersion = Some(submissionNumberOne),
-            compilationOrSubmissionDate = Some(submissionDateTwo)
+            optPreviousVersion = Some(submissionNumberOne)
           )
         )
       }.withName("Render view only mode correctly")

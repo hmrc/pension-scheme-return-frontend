@@ -22,6 +22,7 @@ import play.api.mvc._
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
 import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
+import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -31,15 +32,12 @@ import config.RefinedTypes._
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class PclsCYAController @Inject() (
@@ -88,8 +86,7 @@ class PclsCYAController @Inject() (
             viewOnlyUpdated = false, // flag is not displayed on this tier
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            optPreviousVersion = request.previousVersion
           )
         )
       )
@@ -138,8 +135,7 @@ object PclsCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,

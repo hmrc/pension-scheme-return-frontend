@@ -406,7 +406,7 @@ object SchemeMembersListController {
                 .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
             case _ =>
               controllers.nonsipp.membercontributions.routes.MemberContributionListController
-                .onSubmit(srn, page, mode)
+                .onSubmit(srn, mode)
           }
         )
       },

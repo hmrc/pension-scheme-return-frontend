@@ -59,7 +59,7 @@ class HowMuchCashController @Inject() (
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     usingSchemeDate[Id](srn) { period =>
-      val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, period)
+      val form = HowMuchCashController.form(formProvider, period)
       val viewModel = HowMuchCashController.viewModel(
         srn,
         mode,
@@ -74,7 +74,7 @@ class HowMuchCashController @Inject() (
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     usingSchemeDate(srn) { period =>
-      val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, period)
+      val form = HowMuchCashController.form(formProvider, period)
 
       form
         .bindFromRequest()
@@ -112,7 +112,7 @@ class HowMuchCashController @Inject() (
 
 object HowMuchCashController {
 
-  def form(formProvider: MoneyFormProvider, schemeName: String, period: DateRange): Form[(Money, Money)] =
+  def form(formProvider: MoneyFormProvider, period: DateRange): Form[(Money, Money)] =
     formProvider(
       MoneyFormErrors(
         "howMuchCash.start.error.required",

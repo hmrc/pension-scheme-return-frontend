@@ -58,7 +58,7 @@ class UploadMemberDetailsController @Inject() (
     extends PSRController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val redirectTag = "upload-member-details"
     val successRedirectUrl = config.urls.upscan.successEndpoint.format(srn.value, redirectTag)
     val failureRedirectUrl = config.urls.upscan.failureEndpoint.format(srn.value, redirectTag)
