@@ -149,7 +149,6 @@ class SchemeMemberDetailsAnswersController @Inject() (
             MemberState.New
           )
           .setWhen(justAdded)(SafeToHardDelete(srn, index), Flag)
-          .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .mapK[Future]
         nextPage = navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)
         updatedProgressAnswers <- saveProgress(srn, index, updatedUserAnswers, nextPage, alwaysCompleted = true)
