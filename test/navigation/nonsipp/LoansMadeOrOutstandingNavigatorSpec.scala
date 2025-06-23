@@ -318,7 +318,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
               defaultUserAnswers
                 .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.Individual)
                 .unsafeSet(LoanCompleted(srn, 2), SectionCompleted)
-                .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
+                .unsafeSet(LoansProgress(srn, 2), SectionJourneyStatus.Completed)
           )
           .withName("go to who received the loan at index 3")
       )

@@ -17,7 +17,7 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import utils.RefinedUtils.RefinedIntOps
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
@@ -26,11 +26,4 @@ import viewmodels.models.SectionCompleted
 case class LoanCompleted(srn: Srn, index: Max5000) extends QuestionPage[SectionCompleted.type] {
   override def path: JsPath = Paths.loans \ toString \ index.arrayIndex.toString
   override def toString: String = "loanCompleted"
-}
-
-object LoanCompleted {
-  def all(): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
-    override def path: JsPath = Paths.loans \ toString
-    override def toString: String = "loanCompleted"
-  }
 }
