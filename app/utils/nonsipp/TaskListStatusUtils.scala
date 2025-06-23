@@ -311,8 +311,7 @@ object TaskListStatusUtils {
       )
     } else {
       val wereLoans = userAnswers.get(LoansMadeOrOutstandingPage(srn))
-      val numRecorded = userAnswers.get(LoanCompleted.all()).getOrElse(Map.empty).size
-
+      val numRecorded = userAnswers.get(LoansProgress.all()).getOrElse(Map.empty).count(_._2.completed)
       val firstQuestionPageUrl =
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
           .onPageLoad(srn, NormalMode)

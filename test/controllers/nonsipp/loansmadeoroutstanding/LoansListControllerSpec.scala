@@ -66,7 +66,6 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
     .unsafeSet(SecurityGivenForLoanPage(srn, index2of5000), ConditionalYesNo.no[Unit, Security](()))
     .unsafeSet(ArrearsPrevYears(srn, index2of5000), false)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index2of5000), ConditionalYesNo.no[Unit, Money](()))
-    .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
     .unsafeSet(LoansProgress(srn, index2of5000), SectionJourneyStatus.Completed)
 
   private val userAnswersToCheck = completedUserAnswers

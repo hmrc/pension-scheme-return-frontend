@@ -130,7 +130,8 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       (
         for {
           indexes <- userAnswers
-            .map(LoanCompleted.all())
+            .map(LoansProgress.all())
+            .filter(_._2.completed)
             .keys
             .toList
             .traverse(_.toIntOption)
