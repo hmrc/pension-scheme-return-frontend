@@ -810,9 +810,10 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
             .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.Individual)
             .unsafeSet(LoanCompleted(srn, 1), SectionCompleted)
+            .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
             .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
             .unsafeSet(LoanCompleted(srn, 2), SectionCompleted)
-            .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
+            .unsafeSet(LoansProgress(srn, 2), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithLoans,

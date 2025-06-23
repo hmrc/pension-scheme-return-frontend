@@ -320,10 +320,11 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // First loan:
           .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
           .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
           // Second loan:
           .unsafeSet(IdentityTypePage(srn, 2, IdentitySubject.LoanRecipient), IdentityType.Individual)
           .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(LoansProgress(srn, 2), SectionJourneyStatus.Completed)
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
