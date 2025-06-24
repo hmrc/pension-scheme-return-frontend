@@ -20,12 +20,12 @@ import play.api.test.FakeRequest
 import pages.nonsipp.otherassetsdisposal._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import models.IdentityType.{Individual, UKCompany}
+import models.IdentityType.{Individual, UKCompany, UKPartnership}
 import controllers.TestValues
 import utils.IntUtils.given
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
-import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
+import pages.nonsipp.common._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import play.api.mvc.AnyContentAsEmpty
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
@@ -35,7 +35,7 @@ import models.requests.psr._
 import config.Constants.PREPOPULATION_FLAG
 import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
-import models._
+import models.{IdentityType, _}
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 import com.softwaremill.diffx.generic.auto.diffForCaseClass
 import models.requests.{AllowedAccessRequest, DataRequest}
@@ -119,7 +119,7 @@ class OtherAssetsTransformerSpec
     }
 
     "should return recordVersion when there is no change among UAs" - {
-      "should return transformed List without disposed other assets" in {
+      "should return transformed List without disposed other assets for individual with no nino reason" in {
         val userAnswers = emptyUserAnswers
           // index-1
           .unsafeSet(OtherAssetsHeldPage(srn), true)
@@ -222,7 +222,522 @@ class OtherAssetsTransformerSpec
         )
       }
 
-      "should return transformed List with disposed other assets" in {
+      "should return transformed List without disposed other assets for individual with nino" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
+          .unsafeSet(
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
+            ConditionalYesNo.yes(nino)
+          )
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(false),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("individualSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = Individual,
+                    idNumber = Some(nino.toString),
+                    reasonNoIdNumber = None,
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List without disposed other assets for company with crn" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), UKCompany)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(CompanyNameOfOtherAssetSellerPage(srn, 1), "companySellerName")
+          .unsafeSet(
+            CompanyRecipientCrnPage(srn, 1, IdentitySubject.OtherAssetSeller),
+            ConditionalYesNo.yes[String, Crn](crn)
+          )
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(false),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("companySellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = UKCompany,
+                    idNumber = Some(crn.toString),
+                    reasonNoIdNumber = None,
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List without disposed other assets for company with no crn" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), UKCompany)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(CompanyNameOfOtherAssetSellerPage(srn, 1), "companySellerName")
+          .unsafeSet(
+            CompanyRecipientCrnPage(srn, 1, IdentitySubject.OtherAssetSeller),
+            ConditionalYesNo.no[String, Crn]("reason")
+          )
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(false),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("companySellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = UKCompany,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List without disposed other assets for uk partnership with utr" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), UKPartnership)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(PartnershipOtherAssetSellerNamePage(srn, 1), "partnershipSellerName")
+          .unsafeSet(
+            PartnershipRecipientUtrPage(srn, 1, IdentitySubject.OtherAssetSeller),
+            ConditionalYesNo.yes[String, Utr](utr)
+          )
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(false),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("partnershipSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = UKPartnership,
+                    idNumber = Some(utr.toString),
+                    reasonNoIdNumber = None,
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List without disposed other assets for uk partnership with no utr" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), UKPartnership)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(PartnershipOtherAssetSellerNamePage(srn, 1), "partnershipSellerName")
+          .unsafeSet(
+            PartnershipRecipientUtrPage(srn, 1, IdentitySubject.OtherAssetSeller),
+            ConditionalYesNo.no[String, Utr]("reason")
+          )
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(false),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("partnershipSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = UKPartnership,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = None
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List with disposed other assets individual with no nino" in {
         val userAnswers = emptyUserAnswers
           // index-1
           .unsafeSet(OtherAssetsHeldPage(srn), true)
@@ -322,6 +837,876 @@ class OtherAssetsTransformerSpec
                       optPropertyAcquiredFrom = Some(
                         PropertyAcquiredFrom(
                           identityType = Individual,
+                          idNumber = None,
+                          reasonNoIdNumber = Some("reason"),
+                          otherDescription = None
+                        )
+                      ),
+                      optTotalAmountReceived = Some(money.value),
+                      optConnectedStatus = Some(true),
+                      optSupportedByIndepValuation = Some(false),
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Transferred.name,
+                      optOtherMethod = None,
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = false
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Other.name,
+                      optOtherMethod = Some("OtherMethod"),
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List with disposed other assets individual with nino" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
+          .unsafeSet(
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
+            ConditionalYesNo.no[String, Nino]("reason")
+          )
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(WhenWasAssetSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleAssetPage(srn, 1, 1), money)
+          .unsafeSet(TypeOfAssetBuyerPage(srn, 1, 1), Individual)
+          .unsafeSet(IndividualNameOfAssetBuyerPage(srn, 1, 1), "individualBuyerName")
+          .unsafeSet(
+            AssetIndividualBuyerNiNumberPage(srn, 1, 1),
+            ConditionalYesNo.yes[String, Nino](nino)
+          )
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+          .unsafeSet(AssetSaleIndependentValuationPage(srn, 1, 1), false)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 2, 1), Transferred)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 2, 1), false)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 2, 1), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 3, 1), Other("OtherMethod"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 3, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 3, 1), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(true),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("individualSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = Individual,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Sold.name,
+                      optOtherMethod = None,
+                      optDateSold = Some(localDate),
+                      optPurchaserName = Some("individualBuyerName"),
+                      optPropertyAcquiredFrom = Some(
+                        PropertyAcquiredFrom(
+                          identityType = Individual,
+                          idNumber = Some(nino.toString),
+                          reasonNoIdNumber = None,
+                          otherDescription = None
+                        )
+                      ),
+                      optTotalAmountReceived = Some(money.value),
+                      optConnectedStatus = Some(true),
+                      optSupportedByIndepValuation = Some(false),
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Transferred.name,
+                      optOtherMethod = None,
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = false
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Other.name,
+                      optOtherMethod = Some("OtherMethod"),
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List with disposed other assets company buyer with utr" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
+          .unsafeSet(
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
+            ConditionalYesNo.no[String, Nino]("reason")
+          )
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(WhenWasAssetSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleAssetPage(srn, 1, 1), money)
+          .unsafeSet(TypeOfAssetBuyerPage(srn, 1, 1), UKCompany)
+          .unsafeSet(CompanyNameOfAssetBuyerPage(srn, 1, 1), "companyBuyerName")
+          .unsafeSet(
+            AssetCompanyBuyerCrnPage(srn, 1, 1),
+            ConditionalYesNo.yes[String, Crn](crn)
+          )
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+          .unsafeSet(AssetSaleIndependentValuationPage(srn, 1, 1), false)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 2, 1), Transferred)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 2, 1), false)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 2, 1), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 3, 1), Other("OtherMethod"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 3, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 3, 1), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(true),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("individualSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = Individual,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Sold.name,
+                      optOtherMethod = None,
+                      optDateSold = Some(localDate),
+                      optPurchaserName = Some("companyBuyerName"),
+                      optPropertyAcquiredFrom = Some(
+                        PropertyAcquiredFrom(
+                          identityType = UKCompany,
+                          idNumber = Some(crn.toString),
+                          reasonNoIdNumber = None,
+                          otherDescription = None
+                        )
+                      ),
+                      optTotalAmountReceived = Some(money.value),
+                      optConnectedStatus = Some(true),
+                      optSupportedByIndepValuation = Some(false),
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Transferred.name,
+                      optOtherMethod = None,
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = false
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Other.name,
+                      optOtherMethod = Some("OtherMethod"),
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List with disposed other assets company buyer with no utr" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
+          .unsafeSet(
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
+            ConditionalYesNo.no[String, Nino]("reason")
+          )
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(WhenWasAssetSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleAssetPage(srn, 1, 1), money)
+          .unsafeSet(TypeOfAssetBuyerPage(srn, 1, 1), UKCompany)
+          .unsafeSet(CompanyNameOfAssetBuyerPage(srn, 1, 1), "companyBuyerName")
+          .unsafeSet(
+            AssetCompanyBuyerCrnPage(srn, 1, 1),
+            ConditionalYesNo.no[String, Crn]("reason")
+          )
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+          .unsafeSet(AssetSaleIndependentValuationPage(srn, 1, 1), false)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 2, 1), Transferred)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 2, 1), false)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 2, 1), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 3, 1), Other("OtherMethod"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 3, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 3, 1), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(true),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("individualSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = Individual,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Sold.name,
+                      optOtherMethod = None,
+                      optDateSold = Some(localDate),
+                      optPurchaserName = Some("companyBuyerName"),
+                      optPropertyAcquiredFrom = Some(
+                        PropertyAcquiredFrom(
+                          identityType = UKCompany,
+                          idNumber = None,
+                          reasonNoIdNumber = Some("reason"),
+                          otherDescription = None
+                        )
+                      ),
+                      optTotalAmountReceived = Some(money.value),
+                      optConnectedStatus = Some(true),
+                      optSupportedByIndepValuation = Some(false),
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Transferred.name,
+                      optOtherMethod = None,
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = false
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Other.name,
+                      optOtherMethod = Some("OtherMethod"),
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List with disposed other assets partnership with utr" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
+          .unsafeSet(
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
+            ConditionalYesNo.no[String, Nino]("reason")
+          )
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(WhenWasAssetSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleAssetPage(srn, 1, 1), money)
+          .unsafeSet(TypeOfAssetBuyerPage(srn, 1, 1), UKPartnership)
+          .unsafeSet(PartnershipBuyerNamePage(srn, 1, 1), "partnershipBuyerName")
+          .unsafeSet(
+            PartnershipBuyerUtrPage(srn, 1, 1),
+            ConditionalYesNo.yes[String, Utr](utr)
+          )
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+          .unsafeSet(AssetSaleIndependentValuationPage(srn, 1, 1), false)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 2, 1), Transferred)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 2, 1), false)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 2, 1), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 3, 1), Other("OtherMethod"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 3, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 3, 1), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(true),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("individualSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = Individual,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Sold.name,
+                      optOtherMethod = None,
+                      optDateSold = Some(localDate),
+                      optPurchaserName = Some("partnershipBuyerName"),
+                      optPropertyAcquiredFrom = Some(
+                        PropertyAcquiredFrom(
+                          identityType = UKPartnership,
+                          idNumber = Some(utr.toString),
+                          reasonNoIdNumber = None,
+                          otherDescription = None
+                        )
+                      ),
+                      optTotalAmountReceived = Some(money.value),
+                      optConnectedStatus = Some(true),
+                      optSupportedByIndepValuation = Some(false),
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Contribution,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = Some(true),
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Transferred.name,
+                      optOtherMethod = None,
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = false
+                    )
+                  )
+                )
+              ),
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Transfer,
+                optDateOfAcqOrContrib = None,
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedStatus = None,
+                optIndepValuationSupport = None,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Other.name,
+                      optOtherMethod = Some("OtherMethod"),
+                      optDateSold = None,
+                      optPurchaserName = None,
+                      optPropertyAcquiredFrom = None,
+                      optTotalAmountReceived = None,
+                      optConnectedStatus = None,
+                      optSupportedByIndepValuation = None,
+                      anyPartAssetStillHeld = true
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed List with disposed other assets partnership with no utr" in {
+        val userAnswers = emptyUserAnswers
+          // index-1
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(OtherAssetsRecordVersionPage(srn), "001")
+          .unsafeSet(OtherAssetsCompleted(srn, 1), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 1), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 1), Acquisition)
+          .unsafeSet(CostOfOtherAssetPage(srn, 1), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 1), true)
+          .unsafeSet(IncomeFromAssetPage(srn, 1), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 1), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 1), false)
+          .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.OtherAssetSeller), Individual)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, 1), true)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, 1), "individualSellerName")
+          .unsafeSet(
+            OtherAssetIndividualSellerNINumberPage(srn, 1),
+            ConditionalYesNo.no[String, Nino]("reason")
+          )
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 1, 1), Sold)
+          .unsafeSet(WhenWasAssetSoldPage(srn, 1, 1), localDate)
+          .unsafeSet(TotalConsiderationSaleAssetPage(srn, 1, 1), money)
+          .unsafeSet(TypeOfAssetBuyerPage(srn, 1, 1), UKPartnership)
+          .unsafeSet(PartnershipBuyerNamePage(srn, 1, 1), "partnershipBuyerName")
+          .unsafeSet(
+            PartnershipBuyerUtrPage(srn, 1, 1),
+            ConditionalYesNo.no[String, Utr]("reason")
+          )
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+          .unsafeSet(AssetSaleIndependentValuationPage(srn, 1, 1), false)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 1, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 1), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+
+          // index-2
+          .unsafeSet(OtherAssetsCompleted(srn, 2), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 2), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 2), Contribution)
+          .unsafeSet(CostOfOtherAssetPage(srn, 2), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 2), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 2), money)
+          .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, 2), localDate)
+          .unsafeSet(IndependentValuationPage(srn, 2), true)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 2, 1), Transferred)
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 2, 1), false)
+          .unsafeSet(OtherAssetsProgress(srn, 2), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 2, 1), SectionJourneyStatus.Completed)
+          // index-3
+          .unsafeSet(OtherAssetsCompleted(srn, 3), SectionCompleted)
+          .unsafeSet(WhatIsOtherAssetPage(srn, 3), "assetDescription")
+          .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, 3), Transfer)
+          .unsafeSet(CostOfOtherAssetPage(srn, 3), money)
+          .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, 3), false)
+          .unsafeSet(IncomeFromAssetPage(srn, 3), money)
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, 3, 1), Other("OtherMethod"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, 3, 1), true)
+          .unsafeSet(OtherAssetsProgress(srn, 3), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, 3, 1), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(using request)
+        result shouldMatchTo Some(
+          OtherAssets(
+            recordVersion = Some("001"),
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(true),
+            otherAssetTransactions = Seq(
+              OtherAssetTransaction(
+                prePopulated = None,
+                assetDescription = "assetDescription",
+                methodOfHolding = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                costOfAsset = money.value,
+                optPropertyAcquiredFromName = Some("individualSellerName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(
+                    identityType = Individual,
+                    idNumber = None,
+                    reasonNoIdNumber = Some("reason"),
+                    otherDescription = None
+                  )
+                ),
+                optConnectedStatus = Some(true),
+                optIndepValuationSupport = Some(false),
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
+                optOtherAssetDisposed = Some(
+                  Seq(
+                    OtherAssetDisposed(
+                      methodOfDisposal = Sold.name,
+                      optOtherMethod = None,
+                      optDateSold = Some(localDate),
+                      optPurchaserName = Some("partnershipBuyerName"),
+                      optPropertyAcquiredFrom = Some(
+                        PropertyAcquiredFrom(
+                          identityType = UKPartnership,
                           idNumber = None,
                           reasonNoIdNumber = Some("reason"),
                           otherDescription = None
