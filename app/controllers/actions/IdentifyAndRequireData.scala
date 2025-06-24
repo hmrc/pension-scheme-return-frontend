@@ -98,13 +98,6 @@ class IdentifyAndRequireData @Inject() (
    */
   def apply(srn: Srn, year: String, current: String): ActionBuilder[DataRequest, AnyContent] =
     current.toIntOption match {
-      case Some(1) =>
-        identify
-          .andThen(allowAccess(srn))
-          .andThen(getDataFromETMP.versionForYear(year, 1))
-          .andThen(requireData)
-          .andThen(saveData)
-
       case Some(currentVersion) =>
         if (currentVersion > 1) {
           identify
@@ -113,8 +106,11 @@ class IdentifyAndRequireData @Inject() (
             .andThen(requireData)
             .andThen(saveData)
         } else {
-          logger.error(s"Unexpected PSA version number: $currentVersion")
-          errorAction
+          identify
+            .andThen(allowAccess(srn))
+            .andThen(getDataFromETMP.versionForYear(year, 1))
+            .andThen(requireData)
+            .andThen(saveData)
         }
 
       case None =>

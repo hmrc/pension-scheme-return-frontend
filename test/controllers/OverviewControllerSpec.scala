@@ -47,9 +47,9 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         lastSubmittedPsrFbInPreviousYears
       )
       .url
-  lazy val onSelectContinue: String =
+  private def onSelectContinue(version: String): String =
     routes.OverviewController
-      .onSelectContinue(srn, commonStartDate, commonVersion, Some(commonFbNumber), PsrReportType.Standard.name, None)
+      .onSelectContinue(srn, commonStartDate, version, Some(commonFbNumber), PsrReportType.Standard.name, None)
       .url
   lazy val onSelectViewAndChange: String =
     routes.OverviewController
@@ -188,17 +188,27 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           .onPageLoad(srn)
           .url
     }
+    List(commonVersion, "002").foreach { version =>
+      s"onSelectContinue redirects to task list page with version $version" in runningApplication { implicit app =>
+        val request = FakeRequest(GET, onSelectContinue(version))
 
-    "onSelectContinue redirects to task list page" in runningApplication { implicit app =>
-      val request = FakeRequest(GET, onSelectContinue)
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+      }
+    }
+
+    "onSelectContinue redirects to unauthorised when version is not an integer" in runningApplication { implicit app =>
+      val request = FakeRequest(GET, onSelectContinue("invalidInt"))
 
       val result = route(app, request).value
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+      redirectLocation(result).value mustEqual controllers.routes.UnauthorisedController.onPageLoad().url
     }
 
-    "onSelectContinue redirects to the BasicDetailsCYA page when members over threshold" in {
+    "onSelectViewAndChange redirects to the BasicDetailsCYA page when members over threshold" in {
       when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
         Future.successful(Seq())
       )
