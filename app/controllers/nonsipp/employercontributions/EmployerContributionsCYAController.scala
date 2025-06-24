@@ -208,13 +208,13 @@ object EmployerContributionsCYAController {
 
   def viewModel(
     srn: Srn,
-    membersName: Reason,
+    membersName: String,
     memberIndex: Max300,
     page: Int,
     employerCYAs: List[EmployerCYA],
     mode: Mode,
     viewOnlyUpdated: Boolean,
-    optYear: Option[Reason] = None,
+    optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
