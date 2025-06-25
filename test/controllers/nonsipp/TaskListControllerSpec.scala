@@ -665,6 +665,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
             .unsafeSet(DoesMemberHaveNinoPage(srn, 1), true)
             .unsafeSet(MemberDetailsNinoPage(srn, 1), nino)
             .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
 
           testViewModel(
             userAnswers,
@@ -685,6 +686,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
             .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
             .unsafeSet(NoNINOPage(srn, 1), reason)
             .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
 
           testViewModel(
             userAnswers,
@@ -706,6 +708,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
             .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
             .unsafeSet(NoNINOPage(srn, 1), reason)
             .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
             // member Index Two
             .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, 2), false)
@@ -738,11 +741,13 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
             .unsafeSet(DoesMemberHaveNinoPage(srn, 1), false)
             .unsafeSet(NoNINOPage(srn, 1), reason)
             .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
             // member Index Two
             .unsafeSet(MemberDetailsPage(srn, 2), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, 2), true)
             .unsafeSet(MemberDetailsNinoPage(srn, 2), nino)
             .unsafeSet(MemberDetailsCompletedPage(srn, 2), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 2), SectionJourneyStatus.Completed)
 
           testViewModel(
             userAnswers,

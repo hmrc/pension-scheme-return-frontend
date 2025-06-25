@@ -75,7 +75,8 @@ object TaskListStatusUtils {
 
   def getMembersTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val numRecorded = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty).size
+    val numRecorded =
+      userAnswers.get(MemberDetailsManualProgress.all()).getOrElse(Map.empty).count(_._2.completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController

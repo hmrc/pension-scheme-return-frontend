@@ -30,7 +30,7 @@ import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers, ViewOnlyMode}
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import viewmodels.models.{MemberState, SectionCompleted}
+import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
@@ -68,6 +68,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec with Controller
     .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
     .unsafeSet(MemberStatus(srn, 1), MemberState.New)
     .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+    .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
 
   private val userAnswersWith300MembersDetails =
     (1 to 300).foldLeft(defaultUserAnswers)((ua, i) =>
@@ -86,6 +87,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec with Controller
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+    .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
     .unsafeSet(MemberContributionsPage(srn), true)
 
   private val userAnswersToCheck = userAnswers
@@ -238,6 +240,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec with Controller
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
         .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
         .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+        .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
 
       val previousUserAnswers = currentUserAnswers
         .unsafeSet(FbVersionPage(srn), "001")

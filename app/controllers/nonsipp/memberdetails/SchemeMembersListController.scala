@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberdetails
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.{MembersDetailsChecked, MembersDetailsCompletedPages, SchemeMembersListPage}
+import pages.nonsipp.memberdetails.{MemberDetailsManualProgress, MembersDetailsChecked, SchemeMembersListPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -101,7 +101,8 @@ class SchemeMembersListController @Inject() (
   def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(implicit
     request: DataRequest[?]
   ): Result = {
-    val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
+    val completedMembers =
+      request.userAnswers.get(MemberDetailsManualProgress.all()).getOrElse(Map.empty).filter(_._2.completed)
     val membersDetails = request.userAnswers.membersDetails(srn)
     val completedMembersDetails = completedMembers.keySet
       .intersect(membersDetails.keySet)
