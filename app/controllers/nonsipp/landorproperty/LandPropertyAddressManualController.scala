@@ -216,7 +216,7 @@ object LandPropertyAddressManualController {
       Mappings.optionalPostcode(postCodeFormErrors)
     )
 
-  private val internationalAddressForm: List[SelectInput] => Form[ManualAddressAnswers] =
+  val internationalAddressForm: List[SelectInput] => Form[ManualAddressAnswers] =
     countryOptions =>
       MultipleQuestionFormProvider(
         Mappings.input(field1Errors),
@@ -258,7 +258,7 @@ object LandPropertyAddressManualController {
       QuestionField.input("landPropertyAddressManual.field5.label.uk")
     )
 
-  private def internationalPage(
+  def internationalPage(
     form: Form[ManualAddressAnswers],
     countryOptions: Seq[SelectInput]
   ): ManualAddressQuestions =

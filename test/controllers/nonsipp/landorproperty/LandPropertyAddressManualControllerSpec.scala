@@ -17,6 +17,7 @@
 package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandPropertyAddressManualController._
+import utils.Country
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import views.html.MultipleQuestionView
 import models.NormalMode
@@ -28,8 +29,13 @@ class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec with Co
   private val index = 1
   private lazy val onPageLoad =
     routes.LandPropertyAddressManualController.onPageLoad(srn, index, isUkAddress = true, NormalMode)
+  private lazy val onPageLoadInternational =
+    routes.LandPropertyAddressManualController.onPageLoad(srn, index, isUkAddress = false, NormalMode)
+
   private lazy val onSubmit =
     routes.LandPropertyAddressManualController.onSubmit(srn, index, isUkAddress = true, NormalMode)
+  private lazy val onSubmitInternational =
+    routes.LandPropertyAddressManualController.onSubmit(srn, index, isUkAddress = false, NormalMode)
 
   "LandPropertyAddressManualController" - {
 
@@ -39,6 +45,19 @@ class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec with Co
         viewModel(srn, index, ukPage(ukAddressForm), isUkAddress = true, NormalMode)
       )
     })
+
+    act.like(renderView(onPageLoadInternational) { implicit app => implicit request =>
+      injected[MultipleQuestionView].apply(
+        internationalAddressForm(Country.countries),
+        viewModel(
+          srn,
+          index,
+          internationalPage(internationalAddressForm(Country.countries), Country.countries),
+          isUkAddress = false,
+          NormalMode
+        )
+      )
+    }.updateName(_ + " - International"))
 
     act.like(renderPrePopView(onPageLoad, LandOrPropertyChosenAddressPage(srn, index), address) {
       implicit app => implicit request =>
@@ -57,6 +76,18 @@ class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec with Co
         "value.4" -> "test town",
         "value.5" -> "ZZ1 1ZZ"
       )
+    )
+
+    act.like(
+      redirectNextPage(
+        onSubmitInternational,
+        "value.1" -> "test address line 1",
+        "value.2" -> "test address line 2",
+        "value.3" -> "test address line 3",
+        "value.4" -> "test town",
+        "value.5" -> "test postal code",
+        "value.6" -> "GB"
+      ).updateName(_ + " - International")
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
