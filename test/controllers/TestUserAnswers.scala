@@ -44,6 +44,9 @@ trait TestUserAnswers extends ControllerBaseSpec with ControllerBehaviours with 
   val currentReturnTaxYearSubmissionDate: LocalDateTime = LocalDateTime.of(2023, 4, 5, 0, 0, 0)
   val declarationData: DeclarationViewModel = DeclarationViewModel("PSP", "20000008", Some("A0000001"))
 
+  val currentTaxYearUserAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)
+
   // UserAnswers for the current return from the current tax year
   val currentTaxYearUserAnswersWithFewMembers: UserAnswers = defaultUserAnswers
     .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)

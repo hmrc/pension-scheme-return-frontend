@@ -19,12 +19,14 @@ package controllers.nonsipp.landorproperty
 import services.{PsrSubmissionService, SaveService}
 import models.ConditionalYesNo._
 import play.api.mvc.Call
-import models.SchemeHoldLandProperty.Transfer
+import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.FbVersionPage
 import models._
+import pages.nonsipp.common._
+import models.IdentitySubject.LandOrPropertySeller
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -84,6 +86,26 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
 
+  private val filledAcquisitionLeasedUserAnswers = defaultUserAnswers
+    .unsafeSet(LandPropertyInUKPage(srn, index), true)
+    .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index), postcodeLookup)
+    .unsafeSet(AddressLookupResultsPage(srn, index), List(address, address, address))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("landRegistryTitleNumber"))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), Acquisition)
+    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), localDate)
+    .unsafeSet(IdentityTypePage(srn, index, LandOrPropertySeller), IdentityType.UKCompany)
+    .unsafeSet(CompanySellerNamePage(srn, index), companyName)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index, LandOrPropertySeller), conditionalYesNoCrn)
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index), false)
+    .unsafeSet(LandPropertyIndependentValuationPage(srn, index), false)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, index), money)
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index), false)
+    .unsafeSet(IsLandPropertyLeasedPage(srn, index), true)
+    .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index), ("lessee name", money, localDate))
+    .unsafeSet(IsLesseeConnectedPartyPage(srn, index), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
+
   private val incompleteUserAnswers = filledUserAnswers
     .unsafeSet(
       LandOrPropertyProgress(srn, index),
@@ -124,6 +146,36 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
             )
           )
         }.withName(s"render correct ${mode.toString} view")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), filledAcquisitionLeasedUserAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            LandOrPropertyCYAController.viewModel(
+              srn = srn,
+              index = index,
+              schemeName = schemeName,
+              landOrPropertyInUk = true,
+              landRegistryTitleNumber = ConditionalYesNo(Right("landRegistryTitleNumber")),
+              holdLandProperty = Acquisition,
+              landOrPropertyAcquire = Some(localDate),
+              landOrPropertyTotalCost = money,
+              landPropertyIndependentValuation = Some(false),
+              receivedLandType = Some(IdentityType.UKCompany),
+              recipientName = Some(companyName),
+              recipientDetails = Some(crn.crn),
+              recipientReasonNoDetails = None,
+              landOrPropertySellerConnectedParty = Some(false),
+              landOrPropertyResidential = false,
+              landOrPropertyLease = true,
+              landOrPropertyTotalIncome = money,
+              addressLookUpPage = address,
+              leaseDetails = Some(("lessee name", money, localDate, false)),
+              mode = mode,
+              viewOnlyUpdated = true
+            )
+          )
+        }.withName(s"render correct ${mode.toString} view - acquisition & leased")
       )
 
       act.like(

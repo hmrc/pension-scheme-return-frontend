@@ -21,14 +21,19 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.DateTimeUtils
 import viewmodels.implicits._
 import play.api.mvc.Call
-import controllers.{ControllerBaseSpec, ControllerBehaviours}
-import models.NormalMode
+import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
+import views.html.YesNoPageView
+import pages.nonsipp.{BasicDetailsCompletedPage, CheckReturnDatesPage}
+import forms.YesNoPageFormProvider
+import models.{DateRange, NormalMode}
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models.SectionCompleted
 
 class CheckReturnDatesControllerSpec
     extends ControllerBaseSpec
     with ControllerBehaviours
-    with ScalaCheckPropertyChecks { self =>
+    with ScalaCheckPropertyChecks
+    with TestUserAnswers { self =>
 
   private implicit val mockSaveService: SaveService = mock[SaveService]
 
@@ -40,6 +45,52 @@ class CheckReturnDatesControllerSpec
   lazy val checkReturnDatesRoute: String = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
   lazy val onPageLoad: Call = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
   lazy val onSubmit: Call = routes.CheckReturnDatesController.onSubmit(srn, NormalMode)
+
+  "onPageLoad" - {
+    val DateRange(fromDate, toDate) = currentReturnTaxYear
+
+    act.like(
+      renderView(onPageLoad, currentTaxYearUserAnswers) { implicit app => implicit request =>
+        injected[YesNoPageView].apply(
+          CheckReturnDatesController.form(new YesNoPageFormProvider()),
+          CheckReturnDatesController.viewModel(
+            srn,
+            NormalMode,
+            fromDate,
+            toDate
+          )
+        )
+      }
+    )
+
+    act.like(
+      redirectNextPage(
+        onSubmit,
+        currentTaxYearUserAnswers,
+        "value" -> "true"
+      )
+    )
+
+    act.like(
+      redirectNextPage(
+        onSubmit,
+        currentTaxYearUserAnswers
+          .unsafeSet(CheckReturnDatesPage(srn), false),
+        "value" -> "true"
+      ).withName("redirect to next page when change from false to true")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmit,
+        controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode),
+        currentTaxYearUserAnswersWithFewMembers
+          .unsafeSet(CheckReturnDatesPage(srn), true)
+          .unsafeSet(BasicDetailsCompletedPage(srn), SectionCompleted),
+        "value" -> "true"
+      )
+    )
+  }
 
   "CheckReturnDates.viewModel" - {
 
@@ -101,5 +152,4 @@ class CheckReturnDatesControllerSpec
       }
     }
   }
-
 }
