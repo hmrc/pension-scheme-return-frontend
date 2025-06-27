@@ -52,7 +52,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
 
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onPageLoadWithCheckMode = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
-  private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
+  private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn)
   private lazy val onPageLoadViewOnly = routes.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(
     srn,
     yearString,

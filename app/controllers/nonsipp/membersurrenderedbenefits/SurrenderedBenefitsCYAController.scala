@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
 import pages.nonsipp.membersurrenderedbenefits._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
 import models.requests.DataRequest
@@ -30,8 +31,6 @@ import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.MessagesApi
@@ -42,7 +41,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class SurrenderedBenefitsCYAController @Inject() (
@@ -103,8 +102,7 @@ class SurrenderedBenefitsCYAController @Inject() (
             viewOnlyUpdated = false,
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            optPreviousVersion = request.previousVersion
           )
         )
       )
@@ -157,8 +155,7 @@ object SurrenderedBenefitsCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,

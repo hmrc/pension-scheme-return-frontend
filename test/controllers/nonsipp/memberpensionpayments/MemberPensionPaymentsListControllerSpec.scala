@@ -36,7 +36,7 @@ class MemberPensionPaymentsListControllerSpec
     with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.MemberPensionPaymentsListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.MemberPensionPaymentsListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.MemberPensionPaymentsListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.MemberPensionPaymentsListController.onSubmitViewOnly(
     srn,
     yearString,

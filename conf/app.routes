@@ -34,10 +34,8 @@ GET         /account/signed-out                                                 
 
 GET         /unauthorised                                                                                      controllers.UnauthorisedController.onPageLoad()
 
-GET         /:srn/what-you-will-need/:fbNumber                                                                 controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
-GET         /:srn/what-you-will-need/:taxYear/:version                                                         controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String, version: String)
-GET         /:srn/what-you-will-need                                                                           controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
-GET         /:srn/what-you-will-need-next-page                                                                 controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
+GET         /:srn/what-you-will-need                                                                           controllers.WhatYouWillNeedController.onPageLoad(srn: Srn)
+GET         /:srn/what-you-will-need-next-page                                                                 controllers.WhatYouWillNeedController.onSubmit(srn: Srn)
 
 GET         /:srn/check-update-information-provided                                                            controllers.CheckUpdateInformationController.onPageLoad(srn: Srn)
 GET         /:srn/check-update-information-provided-next-page                                                  controllers.CheckUpdateInformationController.onSubmit(srn: Srn)
@@ -158,7 +156,7 @@ POST        /:srn/remove-member-details/:index                                  
 GET         /:srn/change-remove-member-details/:index                                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Int, mode: Mode = CheckMode)
 POST        /:srn/change-remove-member-details/:index                                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Int, mode: Mode = CheckMode)
 
-GET         /:srn/upload-member-details-file                                                                   controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/upload-member-details-file                                                                   controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-upload-member-details-file                                                            controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
 GET         /:srn/did-scheme-have-bank-account                                                                 controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
@@ -183,7 +181,7 @@ POST        /:srn/fees-commissions-wages-salaries                               
 GET         /:srn/change-fees-commissions-wages-salaries                                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-fees-commissions-wages-salaries                                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/return-submitted                                                                             controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/return-submitted                                                                             controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn)
 GET         /:srn/view-only-return-submitted/:year/:version                                                    controllers.nonsipp.ViewOnlyReturnSubmittedController.onPageLoad(srn: Srn, year: String, version: Int)
 
 GET         /:srn/unallocated-employer-contributions                                                           controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
@@ -273,10 +271,10 @@ POST        /:srn/change-is-individual-recipient-connected-party                
 POST        /:srn/change-is-individual-recipient-connected-party/:index                                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Int, mode: Mode = CheckMode)
 
 GET         /:srn/check-your-answers-basic-details                                                             controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-check-your-answers-basic-details                                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-check-your-answers-basic-details                                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn)
 GET         /:srn/change-check-your-answers-basic-details                                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/change-submit-check-your-answers-basic-details                                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-your-answers-basic-details                                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/change-submit-check-your-answers-basic-details                                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn)
+POST        /:srn/change-submit-check-your-answers-basic-details                                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn)
 GET         /:srn/check-your-answers-basic-details/view/:year/:current/:previous                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
 GET         /:srn/check-your-answers-basic-details/previous/:year/:current/:previous                           controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 GET         /:srn/submit-check-your-answers-basic-details/view/:year/:current/:previous                        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)

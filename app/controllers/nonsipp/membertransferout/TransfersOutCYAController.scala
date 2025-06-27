@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
+import navigation.Navigator
 import models.requests.DataRequest
 import utils.ListUtils.ListOps
 import models.PensionSchemeType.PensionSchemeType
@@ -31,8 +32,6 @@ import controllers.PSRController
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import pages.nonsipp.membertransferout._
@@ -44,7 +43,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class TransfersOutCYAController @Inject() (
@@ -117,8 +116,7 @@ class TransfersOutCYAController @Inject() (
                   viewOnlyUpdated = false,
                   optYear = request.year,
                   optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                  optPreviousVersion = request.previousVersion
                 )
               )
             )
@@ -171,8 +169,7 @@ object TransfersOutCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
     val heading: InlineMessage =
       mode

@@ -66,9 +66,9 @@ POST        /:srn/asset-company-buyer-crn/:assetIndex/:disposalIndex            
 GET         /:srn/change-asset-company-buyer-crn/:assetIndex/:disposalIndex                                    controllers.nonsipp.otherassetsdisposal.AssetCompanyBuyerCrnController.onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode = CheckMode)
 POST        /:srn/change-asset-company-buyer-crn/:assetIndex/:disposalIndex                                    controllers.nonsipp.otherassetsdisposal.AssetCompanyBuyerCrnController.onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode = CheckMode)
 
-GET         /:srn/start-reporting-asset-disposal/:page                                                         controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/start-reporting-asset-disposal/:page                                                         controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.onPageLoad(srn: Srn, page: Int)
 POST        /:srn/start-reporting-asset-disposal/:page                                                         controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
-GET         /:srn/change-start-reporting-asset-disposal/:page                                                  controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/change-start-reporting-asset-disposal/:page                                                  controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.onPageLoad(srn: Srn, page: Int)
 POST        /:srn/change-start-reporting-asset-disposal/:page                                                  controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 
 GET         /:srn/asset-sale-independent-valuation/:assetIndex/:disposalIndex                                  controllers.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationController.onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode = NormalMode)

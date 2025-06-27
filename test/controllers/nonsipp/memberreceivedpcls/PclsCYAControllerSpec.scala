@@ -118,8 +118,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateOne)
+              optPreviousVersion = Some(submissionNumberOne)
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")

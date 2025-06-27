@@ -138,7 +138,6 @@ class MemberDetailsUploadValidator @Inject() (
           // success
           case (previous: UploadSuccess, current: UploadSuccess) =>
             UploadSuccess(previous.memberDetails ++ current.memberDetails)
-          case (_, memberDetails: UploadSuccess) => memberDetails
         }
     } yield (validated, counter.get(), System.currentTimeMillis - startTime))
       .recover { case _: NoSuchElementException =>

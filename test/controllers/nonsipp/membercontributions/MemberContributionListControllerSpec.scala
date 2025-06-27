@@ -37,7 +37,7 @@ class MemberContributionListControllerSpec
     with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.MemberContributionListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.MemberContributionListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.MemberContributionListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.MemberContributionListController.onSubmitViewOnly(
     srn,
     yearString,

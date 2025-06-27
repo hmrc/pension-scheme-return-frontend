@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.IntUtils.toRefined5000
 import cats.implicits.toShow
 import controllers.actions._
+import navigation.Navigator
 import play.api.i18n._
 import models.requests.DataRequest
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
@@ -30,8 +31,6 @@ import controllers.PSRController
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import utils.FunctionKUtils._
@@ -41,7 +40,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class UnregulatedOrConnectedBondsHeldCYAController @Inject() (
@@ -119,8 +118,7 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject() (
                 viewOnlyUpdated = false,
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                optPreviousVersion = request.previousVersion
               )
             )
           )
@@ -177,8 +175,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,

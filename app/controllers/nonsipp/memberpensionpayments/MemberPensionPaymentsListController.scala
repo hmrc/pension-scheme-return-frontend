@@ -117,7 +117,7 @@ class MemberPensionPaymentsListController @Inject() (
     }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
       navigator.nextPage(MemberPensionPaymentsListPage(srn), mode, request.userAnswers)
     )
@@ -303,7 +303,7 @@ object MemberPensionPaymentsListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit =
-        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController.onSubmit(srn, page, mode),
+        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController.onSubmit(srn, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
@@ -342,7 +342,7 @@ object MemberPensionPaymentsListController {
                   .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-                  .onSubmit(srn, page, mode)
+                  .onSubmit(srn, mode)
             },
             noLabel = Option.when(noPageEnabled)(
               Message("memberPensionPayments.memberList.view.none", schemeName)

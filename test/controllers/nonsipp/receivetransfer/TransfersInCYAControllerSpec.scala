@@ -141,8 +141,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              optPreviousVersion = Some(submissionNumberOne)
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")

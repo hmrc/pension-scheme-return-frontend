@@ -31,7 +31,7 @@ import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 class TransferOutMemberListControllerSpec extends ControllerBaseSpec with ControllerBehaviours with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.TransferOutMemberListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.TransferOutMemberListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.TransferOutMemberListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.TransferOutMemberListController.onSubmitViewOnly(
     srn,
     yearString,

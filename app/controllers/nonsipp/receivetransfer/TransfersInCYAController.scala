@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
+import navigation.Navigator
 import models.requests.DataRequest
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import utils.ListUtils.ListOps
@@ -32,8 +33,6 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.{toShow, toTraverseOps}
 import pages.nonsipp.receivetransfer._
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.MessagesApi
@@ -44,7 +43,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class TransfersInCYAController @Inject() (
@@ -125,8 +124,7 @@ class TransfersInCYAController @Inject() (
                   viewOnlyUpdated = false, // flag is not displayed on this tier
                   optYear = request.year,
                   optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                  optPreviousVersion = request.previousVersion
                 )
               )
             )
@@ -176,8 +174,7 @@ object TransfersInCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
     val heading: InlineMessage =
       mode.fold(

@@ -24,6 +24,7 @@ import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.shares.SharesCYAController._
+import navigation.Navigator
 import pages.nonsipp.common._
 import play.api.i18n._
 import models.requests.DataRequest
@@ -34,8 +35,6 @@ import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models.{SchemeHoldShare, _}
 import viewmodels.DisplayMessage._
@@ -43,7 +42,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class SharesCYAController @Inject() (
@@ -190,8 +189,7 @@ class SharesCYAController @Inject() (
                 viewOnlyUpdated = false,
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                optPreviousVersion = request.previousVersion
               )
             )
           )
@@ -263,8 +261,7 @@ object SharesCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,

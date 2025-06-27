@@ -103,7 +103,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-    case page @ LandOrPropertyDisposalAddressListPage(srn, addressChoice) =>
+    case LandOrPropertyDisposalAddressListPage(srn, addressChoice) =>
       (
         for {
           indexes <- userAnswers

@@ -161,7 +161,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandPropertyIndividualSellersNamePage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
 
-    case page @ IndividualSellerNiPage(srn, index) =>
+    case IndividualSellerNiPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
@@ -385,7 +385,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
             .onPageLoad(srn, index, CheckMode)
 
-        case page @ IndividualSellerNiPage(srn, index) =>
+        case IndividualSellerNiPage(srn, index) =>
           controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
             .onPageLoad(srn, index, CheckMode)
 

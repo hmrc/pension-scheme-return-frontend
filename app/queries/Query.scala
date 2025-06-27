@@ -19,6 +19,7 @@ package queries
 import play.api.libs.json.{__, JsPath}
 import models.UserAnswers
 
+import scala.annotation.nowarn
 import scala.util.{Success, Try}
 
 sealed trait Query {
@@ -39,6 +40,6 @@ object SoftRemovable {
 trait Settable[A] extends Query with Cleanup[A]
 
 trait Cleanup[A] {
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
+  def cleanup(@nowarn value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
     Success(userAnswers)
 }

@@ -35,7 +35,7 @@ class EmployerContributionsMemberListControllerSpec
     with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.EmployerContributionsMemberListController.onSubmitViewOnly(
     srn,
     yearString,

@@ -24,7 +24,7 @@ import models.{NormalMode, UserAnswers}
 
 object OtherAssetsNavigator extends JourneyNavigator {
 
-  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
 
     case FeesCommissionsWagesSalariesPage(srn, mode) =>
       controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController

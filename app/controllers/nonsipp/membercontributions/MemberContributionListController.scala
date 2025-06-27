@@ -118,7 +118,7 @@ class MemberContributionListController @Inject() (
         )
     }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
       navigator.nextPage(MemberContributionsListPage(srn), mode, request.userAnswers)
     )
@@ -293,8 +293,7 @@ object MemberContributionListController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit =
-        controllers.nonsipp.membercontributions.routes.MemberContributionListController.onSubmit(srn, page, mode),
+      onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionListController.onSubmit(srn, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
@@ -333,7 +332,7 @@ object MemberContributionListController {
                   .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionListController
-                  .onSubmit(srn, page, mode)
+                  .onSubmit(srn, mode)
             },
             noLabel = Option.when(noPageEnabled)(
               Message("ReportContribution.MemberList.view.none")

@@ -474,7 +474,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo),
               isMaximumReached = false
             )
           )

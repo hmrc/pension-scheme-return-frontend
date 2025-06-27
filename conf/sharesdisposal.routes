@@ -31,7 +31,7 @@ POST        /:srn/change-shares-other-buyer-details/:index/:disposalIndex       
 GET         /:srn/what-you-will-need-shares-disposal                                                controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-shares-disposal                                         controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onSubmit(srn: Srn)
 
-GET         /:srn/start-reporting-share-disposal/:page                                              controllers.nonsipp.sharesdisposal.SharesDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/start-reporting-share-disposal/:page                                              controllers.nonsipp.sharesdisposal.SharesDisposalListController.onPageLoad(srn: Srn, page: Int)
 POST        /:srn/start-reporting-share-disposal/:page                                              controllers.nonsipp.sharesdisposal.SharesDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 
 GET         /:srn/how-were-shares-disposed-of/:shareIndex/:disposalIndex                            controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController.onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode = NormalMode)

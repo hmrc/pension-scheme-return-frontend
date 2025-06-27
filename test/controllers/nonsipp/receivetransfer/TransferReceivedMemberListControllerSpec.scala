@@ -34,7 +34,7 @@ class TransferReceivedMemberListControllerSpec
     with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.TransferReceivedMemberListController.onPageLoad(srn, page, NormalMode)
-  private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, page, NormalMode)
+  private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.TransferReceivedMemberListController.onSubmitViewOnly(
     srn,
     yearString,

@@ -22,6 +22,7 @@ import play.api.mvc._
 import models.HowDisposed._
 import utils.ListUtils.ListOps
 import controllers.actions._
+import navigation.Navigator
 import models.requests.DataRequest
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
@@ -33,8 +34,6 @@ import cats.implicits.toShow
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import config.Constants.maxLandOrPropertyDisposals
 import pages.nonsipp.landorpropertydisposal._
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n._
@@ -44,7 +43,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class LandPropertyDisposalCYAController @Inject() (
@@ -211,7 +210,6 @@ class LandPropertyDisposalCYAController @Inject() (
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
                 isMaximumReached = isMaximumReached
               )
             )
@@ -286,7 +284,6 @@ object LandPropertyDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None,
     isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](

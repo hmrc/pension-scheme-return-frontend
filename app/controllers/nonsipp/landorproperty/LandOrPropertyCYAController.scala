@@ -23,6 +23,7 @@ import utils.ListUtils.ListOps
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import cats.implicits.toShow
 import controllers.actions._
+import navigation.Navigator
 import controllers.nonsipp.landorproperty.LandOrPropertyCYAController._
 import pages.nonsipp.common._
 import play.api.i18n._
@@ -33,8 +34,6 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import utils.IntUtils.{toInt, toRefined5000}
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import utils.FunctionKUtils._
@@ -43,7 +42,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class LandOrPropertyCYAController @Inject() (
@@ -194,8 +193,7 @@ class LandOrPropertyCYAController @Inject() (
                 viewOnlyUpdated = false,
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                optPreviousVersion = request.previousVersion
               )
             )
           )
@@ -263,8 +261,7 @@ object LandOrPropertyCYAController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
@@ -402,7 +399,6 @@ object LandOrPropertyCYAController {
                 leaseDetails._2,
                 leaseDetails._3,
                 leaseDetails._4,
-                addressLookUpPage.addressLine1,
                 mode
               )
             }
@@ -444,7 +440,6 @@ object LandOrPropertyCYAController {
                 leaseDetails._2,
                 leaseDetails._3,
                 leaseDetails._4,
-                addressLookUpPage.addressLine1,
                 mode
               )
             )
@@ -792,7 +787,6 @@ object LandOrPropertyCYAController {
     leaseValue: Money,
     leaseDate: LocalDate,
     leaseConnectedParty: Boolean,
-    address: String,
     mode: Mode
   ): List[CheckYourAnswersSection] =
     List(

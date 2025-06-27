@@ -56,17 +56,16 @@ class SharesDisposalListController @Inject() (
 
   val form: Form[Max5000] = SharesDisposalListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      val indexes = request.userAnswers.map(SharesCompleted.all()).keys.toList.refine[Max5000.Refined]
+  def onPageLoad(srn: Srn, page: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val indexes = request.userAnswers.map(SharesCompleted.all()).keys.toList.refine[Max5000.Refined]
 
-      if (indexes.nonEmpty) {
-        sharesDisposalData(srn, indexes).map { data =>
-          Ok(view(form, viewModel(srn, page, data, request.userAnswers)))
-        }.merge
-      } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+    if (indexes.nonEmpty) {
+      sharesDisposalData(srn, indexes).map { data =>
+        Ok(view(form, viewModel(srn, page, data, request.userAnswers)))
+      }.merge
+    } else {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>

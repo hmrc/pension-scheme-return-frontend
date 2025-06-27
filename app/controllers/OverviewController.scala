@@ -282,7 +282,7 @@ class OverviewController @Inject() (
                   .addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(true))
               } else {
                 Redirect(
-                  controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version)
+                  controllers.routes.WhatYouWillNeedController.onPageLoad(srn)
                 ).addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false))
               }
         }

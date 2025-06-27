@@ -116,7 +116,7 @@ class TransferOutMemberListController @Inject() (
         )
     }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
       navigator.nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
     )
@@ -350,7 +350,7 @@ object TransferOutMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-        .onSubmit(srn, page, mode),
+        .onSubmit(srn, mode),
       optViewOnlyDetails = if (mode.isViewOnlyMode) {
         val sumTransfersOut: Int = membersWithTransfers.map(_.transfer.size).sum
         Some(
@@ -390,7 +390,7 @@ object TransferOutMemberListController {
                   .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-                  .onSubmit(srn, page, mode)
+                  .onSubmit(srn, mode)
             },
             noLabel = Option.when(noPageEnabled)(
               Message("transferOut.memberList.view.none", schemeName)

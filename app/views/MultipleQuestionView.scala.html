@@ -161,7 +161,7 @@
 
 @errorLinkOverrideHelper = @{
   viewModel.page.fields.zipWithIndex.collect {
-    case (field @ QuestionField(_, _, _, _, FieldType.Date), index) =>
+    case (QuestionField(_, _, _, _, FieldType.Date), index) =>
       s"value.${index + 1}" -> s"value.${index + 1}.day"
   }.toMap
 }
