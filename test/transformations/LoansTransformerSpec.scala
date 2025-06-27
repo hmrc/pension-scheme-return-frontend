@@ -524,6 +524,44 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           )
         )
       }
+
+      "should not transform a loan if mandatory data is missing" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
+          .unsafeSet(IndividualRecipientNamePage(srn, 1), "IndividualRecipientName")
+          .unsafeSet(IndividualRecipientNinoPage(srn, 1), ConditionalYesNo.yes[String, Nino](nino))
+          // Missing AreRepaymentsInstalmentsPage
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(1.0), 12))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
+
+        result.value.loanTransactions mustBe empty
+      }
+
+      "should ignore loans that are not completed" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
+          .unsafeSet(IndividualRecipientNamePage(srn, 1), "IndividualRecipientName")
+          .unsafeSet(IndividualRecipientNinoPage(srn, 1), ConditionalYesNo.yes[String, Nino](nino))
+          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, 1), true)
+          .unsafeSet(DatePeriodLoanPage(srn, 1), (localDate, Money(1.0), 12))
+          .unsafeSet(AmountOfTheLoanPage(srn, 1), amountOfTheLoan)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, 1), true)
+          .unsafeSet(InterestOnLoanPage(srn, 1), interestOnLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, 1), ConditionalYesNo.no[Unit, Security](()))
+          .unsafeSet(LoansProgress(srn, 1), SectionJourneyStatus.InProgress("/test-url"))
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+        val result = transformer.transformToEtmp(srn, userAnswers)(using request)
+
+        result.value.loanTransactions mustBe empty
+      }
     }
   }
 
@@ -875,6 +913,23 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             Money(0)
           )
         }
+      )
+    }
+
+    "when no security was given for a loan" in {
+      val userAnswers = emptyUserAnswers
+      val etmpPayload = loans(
+        individualRecipientName,
+        RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None)
+      )
+      val updatedTransactions = etmpPayload.loanTransactions.map(_.copy(optSecurityGivenDetails = None))
+      val finalPayload = etmpPayload.copy(loanTransactions = updatedTransactions)
+
+      val result = transformer.transformFromEtmp(userAnswers, srn, finalPayload)
+
+      result.fold(
+        ex => fail(ex.getMessage),
+        ua => ua.get(SecurityGivenForLoanPage(srn, 1)) mustBe Some(ConditionalYesNo.no[Unit, Security](()))
       )
     }
 

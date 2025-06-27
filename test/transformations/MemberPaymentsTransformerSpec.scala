@@ -440,6 +440,23 @@ class MemberPaymentsTransformerSpec
       result.get.memberDetails(2).personalDetails.firstName shouldMatchTo memberDetailsIndexThree.firstName
     }
 
+    "should retain memberPSRVersion if member details are identical after normalisation" in {
+      val initialUA = userAnswersAllSections
+      val currentUA = userAnswersAllSections // No changes
+
+      val result = memberPaymentsTransformer.transformToEtmp(srn, currentUA, initialUA)
+      result.value.memberDetails.head.memberPSRVersion mustBe Some("001")
+    }
+
+    "should remove memberPSRVersion if member details have changed" in {
+      val initialUA = userAnswersAllSections
+      val currentUA = userAnswersAllSections
+        .unsafeSet(TotalMemberContributionPage(srn, index), Money(99.99)) // Simulate a change
+
+      val result = memberPaymentsTransformer.transformToEtmp(srn, currentUA, initialUA)
+      result.value.memberDetails.head.memberPSRVersion mustBe None
+    }
+
     "Member state" - {
       "should return member state New when member was just added" in {
         val userAnswersNewMember = defaultUserAnswers
@@ -500,6 +517,42 @@ class MemberPaymentsTransformerSpec
 
         result shouldMatchTo Some(expected)
       }
+
+      "should keep member state as Changed if it was Changed in initial UA and changed in current UA" in {
+        val initialUA = defaultUserAnswers
+          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+          .unsafeSet(MemberStatus(srn, index), MemberState.Changed)
+          .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
+          .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+        val currentUA = initialUA
+          .unsafeSet(MemberDetailsNinoPage(srn, index), nino) // Simulate another change
+          .unsafeSet(MemberStatus(srn, index), MemberState.Changed)
+
+        val result = memberPaymentsTransformer.transformToEtmp(srn, currentUA, initialUA)
+        result.value.memberDetails.head.state mustBe MemberState.Changed
+        result.value.memberDetails.head.memberPSRVersion mustBe None // Should be removed due to change
+      }
+
+      "should keep member state as Changed if previousVersionUA contains the member" in {
+        val initialUA = defaultUserAnswers
+          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+          .unsafeSet(MemberStatus(srn, index), MemberState.New)
+          .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
+          .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+        val previousUA =
+          initialUA.unsafeSet(MemberStatus(srn, index), MemberState.New) // Member existed in previous version
+
+        val currentUA = initialUA
+          .unsafeSet(MemberDetailsNinoPage(srn, index), nino) // Simulate a change
+          .unsafeSet(MemberStatus(srn, index), MemberState.Changed)
+
+        val result = memberPaymentsTransformer.transformToEtmp(srn, currentUA, initialUA, Some(previousUA))
+        result.value.memberDetails.head.state mustBe MemberState.Changed
+        result.value.memberDetails.head.memberPSRVersion mustBe None
+      }
+
     }
   }
 
@@ -837,5 +890,115 @@ class MemberPaymentsTransformerSpec
       }
 
     }
+
+    "should NOT set SafeToHardDelete when previousVersionUA exists and member state is Changed" in {
+      val previousUA = defaultUserAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+        .unsafeSet(MemberStatus(srn, index), MemberState.New)
+        .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+      val currentUA = defaultUserAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(FbStatus(srn), Compiled)
+        .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+        .unsafeSet(MemberStatus(srn, index), MemberState.Changed)
+        .unsafeSet(MemberPsrVersionPage(srn, index), "002")
+
+      val memberPayments = memberPaymentsNoSections.copy(
+        memberDetails = List(activeMemberNoSections.copy(state = MemberState.Changed, memberPSRVersion = Some("002")))
+      )
+
+      val result = memberPaymentsTransformer.transformFromEtmp(currentUA, Some(previousUA), srn, memberPayments).get
+      result.get(SafeToHardDelete(srn, index)) mustBe None
+    }
+
+    "should NOT set SafeToHardDelete when previousVersionUA exists, member is New, PSR is Submitted, and versions match" in {
+      val previousUA = defaultUserAnswers // Could be empty or contain older data
+      val currentUA = defaultUserAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(FbStatus(srn), Submitted)
+        .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+        .unsafeSet(MemberStatus(srn, index), MemberState.New)
+        .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+      val memberPayments = memberPaymentsNoSections.copy(
+        memberDetails = List(activeMemberNoSections.copy(state = MemberState.New, memberPSRVersion = Some("001")))
+      )
+
+      val result = memberPaymentsTransformer.transformFromEtmp(currentUA, Some(previousUA), srn, memberPayments).get
+      result.get(SafeToHardDelete(srn, index)) mustBe None
+    }
+
+    "should NOT set SafeToHardDelete when previousVersionUA exists, member is New, PSR is Compiled, but versions mismatch" in {
+      val previousUA = defaultUserAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+        .unsafeSet(MemberStatus(srn, index), MemberState.New)
+        .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+      val currentUA = defaultUserAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(FbStatus(srn), Compiled)
+        .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+        .unsafeSet(MemberStatus(srn, index), MemberState.New)
+        .unsafeSet(MemberPsrVersionPage(srn, index), "001") // Member version is old
+
+      val memberPayments = memberPaymentsNoSections.copy(
+        memberDetails = List(activeMemberNoSections.copy(state = MemberState.New, memberPSRVersion = Some("001")))
+      )
+
+      val result = memberPaymentsTransformer.transformFromEtmp(currentUA, Some(previousUA), srn, memberPayments).get
+      result.get(SafeToHardDelete(srn, index)) mustBe None
+    }
+
+    "should NOT set SafeToHardDelete when previousVersionUA is None, member is New, but versions mismatch" in {
+      val currentUA = defaultUserAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(FbStatus(srn), Compiled)
+        .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+        .unsafeSet(MemberStatus(srn, index), MemberState.New)
+        .unsafeSet(MemberPsrVersionPage(srn, index), "001") // Member version is old
+
+      val memberPayments = memberPaymentsNoSections.copy(
+        memberDetails = List(activeMemberNoSections.copy(state = MemberState.New, memberPSRVersion = Some("001")))
+      )
+
+      val result = memberPaymentsTransformer.transformFromEtmp(currentUA, None, srn, memberPayments).get
+      result.get(SafeToHardDelete(srn, index)) mustBe None
+    }
+
+    "should correctly transform soft-deleted members from ETMP to UserAnswers" in {
+      val memberPaymentsWithSoftDeleted = MemberPayments(
+        checked = None,
+        recordVersion = Some("001"),
+        memberDetails = List(deletedMemberAllSections), // Only a deleted member
+        employerContributionMade = Some(true),
+        transfersInMade = Some(true),
+        transfersOutMade = Some(true),
+        unallocatedContribsMade = Some(true),
+        unallocatedContribAmount = Some(money.value),
+        memberContributionMade = Some(true),
+        lumpSumReceived = Some(true),
+        surrenderMade = Some(true),
+        pensionReceived = Some(true)
+      )
+
+      val result =
+        memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, None, srn, memberPaymentsWithSoftDeleted).get
+
+      val softDeletedMembersInUA = result.get(SoftDeletedMembers(srn)).value
+      softDeletedMembersInUA.size mustBe 1
+      softDeletedMembersInUA.head.memberPSRVersion mustBe Some("001")
+      softDeletedMembersInUA.head.memberDetails.firstName mustBe memberDetails.firstName
+      softDeletedMembersInUA.head.employerContributions.size mustBe 1
+      softDeletedMembersInUA.head.transfersIn.size mustBe 1
+      softDeletedMembersInUA.head.totalMemberContribution mustBe Some(money)
+      softDeletedMembersInUA.head.memberLumpSumReceived.value.lumpSumAmount mustBe money.value
+      softDeletedMembersInUA.head.transfersOut.size mustBe 1
+      softDeletedMembersInUA.head.pensionSurrendered.value.totalSurrendered mustBe 12.34
+      softDeletedMembersInUA.head.totalAmountPensionPaymentsPage mustBe Some(Money(12.34))
+    }
+
   }
 }

@@ -621,6 +621,37 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "IsLandPropertyLeasedPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            IsLandPropertyLeasedPage(_, index),
+            Gen.const(true),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from land or property leased page to Land or property lease details page when the value is true"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            IsLandPropertyLeasedPage(_, index),
+            Gen.const(false),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from land or property leased page to Land or property total income page when the value is false"
+          )
+      )
+    }
+
     "LandOrPropertyTotalCost" - {
 
       act.like(
@@ -724,6 +755,25 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName("go from land or property when did scheme acquire page to Land or property CYA page")
     )
 
+    act.like(
+      checkmode
+        .navigateToWithData(
+          LandOrPropertyWhenDidSchemeAcquirePage(_, index),
+          Gen.const(localDate),
+          (srn, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckMode),
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldLandPropertyPage(srn, index),
+              SchemeHoldLandProperty.Transfer
+            ) // Needed to mock the user input from 2 pages "ago"
+        )
+        .withName(
+          "go from land or property when did scheme acquire page to Land or property CYA page when not a contribution"
+        )
+    )
+
     "WhyDoesSchemeHoldLandPropertyNavigator" - {
 
       act.like(
@@ -757,6 +807,34 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
           )
           .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Transfer")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            WhyDoesSchemeHoldLandPropertyPage(_, index),
+            Gen.const(Transfer),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName(
+            "why does scheme hold land property page to CYA page when a transfer exists"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            WhyDoesSchemeHoldLandPropertyPage(_, index),
+            Gen.const(Acquisition),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "why does scheme hold land property page to CYA page when not a transfer"
+          )
       )
 
     }
@@ -809,6 +887,64 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController.onPageLoad
             )
             .withName("go from identity type page to UKPartnership to partnership recipient name page")
+        )
+      }
+
+      "CheckMode" - {
+        act.like(
+          checkmode
+            .navigateToWithData(
+              IdentityTypePage(_, index, IdentitySubject.LandOrPropertySeller),
+              Gen.const(IdentityType.Individual),
+              (srn, _) =>
+                controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
+                  .onPageLoad(srn, index, NormalMode)
+            )
+            .withName(
+              "go from identity type page to individual seller name page"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithData(
+              IdentityTypePage(_, index, IdentitySubject.LandOrPropertySeller),
+              Gen.const(IdentityType.UKCompany),
+              (srn, _) =>
+                controllers.nonsipp.landorproperty.routes.CompanySellerNameController
+                  .onPageLoad(srn, index, NormalMode)
+            )
+            .withName(
+              "go from identity type page to uk company seller name page"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithData(
+              IdentityTypePage(_, index, IdentitySubject.LandOrPropertySeller),
+              Gen.const(IdentityType.UKPartnership),
+              (srn, _) =>
+                controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
+                  .onPageLoad(srn, index, NormalMode)
+            )
+            .withName(
+              "go from identity type page to uk partnership seller name page"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithData(
+              IdentityTypePage(_, index, IdentitySubject.LandOrPropertySeller),
+              Gen.const(IdentityType.Other),
+              (srn, _) =>
+                controllers.nonsipp.common.routes.OtherRecipientDetailsController
+                  .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+            )
+            .withName(
+              "go from identity type page to other type seller name page"
+            )
         )
       }
     }
