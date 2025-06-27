@@ -27,7 +27,7 @@ import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import models._
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.scalatest.freespec.AnyFreeSpec
@@ -387,6 +387,82 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       val result = transformer.transformToEtmp(srn, incompleteUserAnswers)(using request)
 
       result mustBe Some(Shares(Some("001"), Some(true), None, Some(123456.0)))
+    }
+
+    "should transform acquisition from a UK Partnership seller with UTR" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+        .unsafeSet(TypeOfSharesHeldPage(srn, 1), SponsoringEmployer)
+        .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, 1), Acquisition)
+        .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, 1), localDate)
+        .unsafeSet(CompanyNameRelatedSharesPage(srn, 1), "nameOfSharesCompany")
+        .unsafeSet(SharesCompanyCrnPage(srn, 1), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+        .unsafeSet(ClassOfSharesPage(srn, 1), "classOfShares")
+        .unsafeSet(HowManySharesPage(srn, 1), 123)
+        .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.SharesSeller), IdentityType.UKPartnership)
+        .unsafeSet(PartnershipShareSellerNamePage(srn, 1), "partnershipName")
+        .unsafeSet(PartnershipRecipientUtrPage(srn, 1, IdentitySubject.SharesSeller), ConditionalYesNo.yes(utr))
+        .unsafeSet(CostOfSharesPage(srn, 1), money)
+        .unsafeSet(SharesIndependentValuationPage(srn, 1), true)
+        .unsafeSet(TotalAssetValuePage(srn, 1), money)
+        .unsafeSet(SharesTotalIncomePage(srn, 1), money)
+        .unsafeSet(SharesProgress(srn, 1), SectionJourneyStatus.Completed)
+
+      val result = transformer.transformToEtmp(srn, userAnswers)(using DataRequest(allowedAccessRequest, userAnswers))
+
+      val heldTransaction = result.value.optShareTransactions.value.head.heldSharesTransaction
+      heldTransaction.optAcquiredFromName mustBe Some("partnershipName")
+      heldTransaction.optPropertyAcquiredFrom mustBe Some(
+        PropertyAcquiredFrom(
+          identityType = IdentityType.UKPartnership,
+          idNumber = Some(utr.value),
+          reasonNoIdNumber = None,
+          otherDescription = None
+        )
+      )
+    }
+
+    "should transform a sale to an Other buyer" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+        .unsafeSet(TypeOfSharesHeldPage(srn, 1), Unquoted)
+        .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, 1), Acquisition)
+        .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, 1), localDate)
+        .unsafeSet(CompanyNameRelatedSharesPage(srn, 1), "nameOfSharesCompany")
+        .unsafeSet(SharesCompanyCrnPage(srn, 1), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+        .unsafeSet(ClassOfSharesPage(srn, 1), "classOfShares")
+        .unsafeSet(HowManySharesPage(srn, 1), 123)
+        .unsafeSet(IdentityTypePage(srn, 1, IdentitySubject.SharesSeller), IdentityType.Individual)
+        .unsafeSet(IndividualNameOfSharesSellerPage(srn, 1), "sellerName")
+        .unsafeSet(SharesIndividualSellerNINumberPage(srn, 1), ConditionalYesNo.no(noninoReason))
+        .unsafeSet(CostOfSharesPage(srn, 1), money)
+        .unsafeSet(SharesFromConnectedPartyPage(srn, 1), false)
+        .unsafeSet(SharesIndependentValuationPage(srn, 1), true)
+        .unsafeSet(SharesTotalIncomePage(srn, 1), money)
+        .unsafeSet(SharesProgress(srn, 1), SectionJourneyStatus.Completed)
+        .unsafeSet(SharesDisposalPage(srn), true)
+        .unsafeSet(HowWereSharesDisposedPage(srn, 1, 1), Sold)
+        .unsafeSet(WhenWereSharesSoldPage(srn, 1, 1), localDate)
+        .unsafeSet(HowManySharesSoldPage(srn, 1, 1), 100)
+        .unsafeSet(TotalConsiderationSharesSoldPage(srn, 1, 1), money)
+        .unsafeSet(WhoWereTheSharesSoldToPage(srn, 1, 1), IdentityType.Other)
+        .unsafeSet(OtherBuyerDetailsPage(srn, 1, 1), RecipientDetails("otherBuyer", "description"))
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, 1, 1), true)
+        .unsafeSet(IndependentValuationPage(srn, 1, 1), false)
+        .unsafeSet(HowManyDisposalSharesPage(srn, 1, 1), 23)
+        .unsafeSet(SharesDisposalProgress(srn, 1, 1), SectionJourneyStatus.Completed)
+
+      val result = transformer.transformToEtmp(srn, userAnswers)(using DataRequest(allowedAccessRequest, userAnswers))
+      val salesQuestions =
+        result.value.optShareTransactions.value.head.optDisposedSharesTransaction.value.head.optSalesQuestions.value
+
+      salesQuestions.nameOfPurchaser mustBe "otherBuyer"
+      salesQuestions.purchaserType mustBe PropertyAcquiredFrom(
+        identityType = IdentityType.Other,
+        idNumber = None,
+        reasonNoIdNumber = None,
+        otherDescription = Some("description")
+      )
     }
   }
 
@@ -791,6 +867,98 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => userAnswers.get(SharesTotalIncomePage(srn, 1)) mustBe Some(Money(0))
+      )
+    }
+
+    "when shareTransactionList has no disposals" in {
+      val shares = Shares(
+        recordVersion = Some("001"),
+        optDidSchemeHoldAnyShares = Some(true),
+        optShareTransactions = Some(
+          List(
+            ShareTransaction(
+              prePopulated = None,
+              typeOfSharesHeld = SponsoringEmployer,
+              shareIdentification = ShareIdentification(
+                nameOfSharesCompany = "nameOfSharesCompany",
+                optCrnNumber = None,
+                optReasonNoCRN = Some("optReasonNoCRN"),
+                classOfShares = "classOfShares"
+              ),
+              heldSharesTransaction = HeldSharesTransaction(
+                schemeHoldShare = SchemeHoldShare.Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                totalShares = totalShares,
+                optAcquiredFromName = Some("optAcquiredFromName"),
+                optPropertyAcquiredFrom =
+                  Some(PropertyAcquiredFrom(IdentityType.Individual, None, Some(noninoReason), None)),
+                optConnectedPartyStatus = None,
+                costOfShares = money.value,
+                supportedByIndepValuation = true,
+                optTotalAssetValue = Some(money.value),
+                optTotalDividendsOrReceipts = Some(money.value)
+              ),
+              optDisposedSharesTransaction = None // No disposals
+            )
+          )
+        ),
+        optTotalValueQuotedShares = None
+      )
+
+      val result = transformer.transformFromEtmp(emptyUserAnswers, srn, shares)
+
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(SharesDisposalPage(srn)) mustBe Some(false)
+          userAnswers.get(SharesDisposalCompleted(srn)) mustBe Some(SectionCompleted)
+        }
+      )
+    }
+
+    "should transform from ETMP for UK Company seller with CRN" in {
+      val shares = Shares(
+        recordVersion = None,
+        optDidSchemeHoldAnyShares = Some(true),
+        optShareTransactions = Some(
+          List(
+            ShareTransaction(
+              prePopulated = None,
+              typeOfSharesHeld = SponsoringEmployer,
+              shareIdentification = ShareIdentification("company", Some(crn.value), None, "class"),
+              heldSharesTransaction = HeldSharesTransaction(
+                schemeHoldShare = Acquisition,
+                optDateOfAcqOrContrib = Some(localDate),
+                totalShares = 1,
+                optAcquiredFromName = Some("companyName"),
+                optPropertyAcquiredFrom = Some(
+                  PropertyAcquiredFrom(IdentityType.UKCompany, Some(crn.value), None, None)
+                ),
+                optConnectedPartyStatus = None,
+                costOfShares = money.value,
+                supportedByIndepValuation = true,
+                optTotalAssetValue = Some(money.value),
+                optTotalDividendsOrReceipts = Some(money.value)
+              ),
+              optDisposedSharesTransaction = None
+            )
+          )
+        ),
+        optTotalValueQuotedShares = None
+      )
+
+      val result = transformer.transformFromEtmp(emptyUserAnswers, srn, shares)
+
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(SharesCompanyCrnPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(crn))
+          userAnswers.get(IdentityTypePage(srn, 1, IdentitySubject.SharesSeller)) mustBe Some(IdentityType.UKCompany)
+          userAnswers.get(CompanyNameOfSharesSellerPage(srn, 1)) mustBe Some("companyName")
+          userAnswers.get(CompanyRecipientCrnPage(srn, 1, IdentitySubject.SharesSeller)) mustBe Some(
+            ConditionalYesNo.yes(crn)
+          )
+        }
       )
     }
   }
