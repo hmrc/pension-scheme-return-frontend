@@ -31,9 +31,9 @@ import org.mockito.Mockito._
 import pages.nonsipp.shares._
 import play.api.mvc.Call
 import play.api.inject.bind
-import models.SchemeHoldShare.Contribution
+import models.SchemeHoldShare._
 import views.html.CheckYourAnswersView
-import models.TypeOfShares.ConnectedParty
+import models.TypeOfShares._
 
 import scala.concurrent.Future
 
@@ -78,7 +78,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
     submissionNumberOne
   )
 
-  private val filledUserAnswers = defaultUserAnswers
+  private val filledUserAnswersContribution = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), ConnectedParty)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), Contribution)
     .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
@@ -94,7 +94,37 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
     .unsafeSet(TotalAssetValuePage(srn, index), money)
     .unsafeSet(SharesTotalIncomePage(srn, index), money)
 
-  private val incompleteUserAnswers = filledUserAnswers
+  private val filledUserAnswersAcquisition = defaultUserAnswers
+    .unsafeSet(TypeOfSharesHeldPage(srn, index), SponsoringEmployer)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+    .unsafeSet(SharesCompanyCrnPage(srn, index), ConditionalYesNo.no[String, Crn](noCrnReason))
+    .unsafeSet(ClassOfSharesPage(srn, index), companyName)
+    .unsafeSet(HowManySharesPage(srn, index), totalShares)
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Individual)
+    .unsafeSet(IndividualNameOfSharesSellerPage(srn, index), individualName)
+    .unsafeSet(SharesIndividualSellerNINumberPage(srn, index), conditionalYesNoNino)
+    .unsafeSet(SharesFromConnectedPartyPage(srn, index), false)
+    .unsafeSet(CostOfSharesPage(srn, index), money)
+    .unsafeSet(SharesIndependentValuationPage(srn, index), true)
+    .unsafeSet(TotalAssetValuePage(srn, index), money)
+    .unsafeSet(SharesTotalIncomePage(srn, index), money)
+
+  private val filledUserAnswersTransfer = defaultUserAnswers
+    .unsafeSet(TypeOfSharesHeldPage(srn, index), Unquoted)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), Transfer)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+    .unsafeSet(SharesCompanyCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(ClassOfSharesPage(srn, index), companyName)
+    .unsafeSet(HowManySharesPage(srn, index), totalShares)
+    .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
+    .unsafeSet(CostOfSharesPage(srn, index), money)
+    .unsafeSet(SharesIndependentValuationPage(srn, index), false)
+    .unsafeSet(TotalAssetValuePage(srn, index), money)
+    .unsafeSet(SharesTotalIncomePage(srn, index), money)
+
+  private val incompleteUserAnswers = filledUserAnswersContribution
     .unsafeSet(
       SharesProgress(srn, index),
       SectionJourneyStatus.InProgress(
@@ -107,7 +137,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
   "SharesCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswersContribution) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               srn,
@@ -134,7 +164,68 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct ${mode.toString} view")
+          .withName(s"render correct Contribution ${mode.toString} view")
+      )
+      act.like(
+        renderView(onPageLoad(mode), filledUserAnswersAcquisition) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              typeOfShare = SponsoringEmployer,
+              holdShares = Acquisition,
+              whenDidSchemeAcquire = Some(localDate),
+              companyNameRelatedShares = companyName,
+              companySharesCrn = ConditionalYesNo.no[String, Crn](noCrnReason),
+              companyName,
+              howManyShares = totalShares,
+              identityType = Some(IdentityType.Individual),
+              recipientName = Some(individualName),
+              recipientDetails = Some(nino.value),
+              recipientReasonNoDetails = None,
+              sharesFromConnectedParty = None,
+              costOfShares = money,
+              shareIndependentValue = true,
+              totalAssetValue = Some(money),
+              sharesTotalIncome = money,
+              mode = mode,
+              viewOnlyUpdated = true
+            )
+          )
+        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+          .withName(s"render correct Acquisition ${mode.toString} view")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), filledUserAnswersTransfer) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              typeOfShare = Unquoted,
+              holdShares = Transfer,
+              whenDidSchemeAcquire = None,
+              companyNameRelatedShares = companyName,
+              companySharesCrn = ConditionalYesNo.yes[String, Crn](crn),
+              companyName,
+              howManyShares = totalShares,
+              identityType = Some(IdentityType.Other),
+              recipientName = Some(otherRecipientName),
+              recipientDetails = Some(otherRecipientDescription),
+              recipientReasonNoDetails = None,
+              sharesFromConnectedParty = Some(true),
+              costOfShares = money,
+              shareIndependentValue = false,
+              totalAssetValue = None,
+              sharesTotalIncome = money,
+              mode = mode,
+              viewOnlyUpdated = true
+            )
+          )
+        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+          .withName(s"render correct Transfer ${mode.toString} view")
       )
       act.like(
         redirectNextPage(onSubmit(mode))
@@ -172,7 +263,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
 
   "SharesCYAController in view only mode" - {
 
-    val currentUserAnswers = filledUserAnswers
+    val currentUserAnswers = filledUserAnswersContribution
       .unsafeSet(FbVersionPage(srn), "002")
 
     val previousUserAnswers = currentUserAnswers

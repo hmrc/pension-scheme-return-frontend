@@ -39,6 +39,17 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertyPostcodeLookupPage.apply,
+          Gen.const(PostcodeLookup("ZZ1 1ZZ", None)),
+          controllers.nonsipp.landorproperty.routes.LandPropertyAddressResultsController.onPageLoad
+        )
+        .withName("go from land or property postcode lookup page to address results page")
+    )
+
+    act.like(
+      normalmode
         .navigateToWithData(
           LandOrPropertyHeldPage.apply,
           Gen.const(true),
@@ -155,6 +166,23 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             ) // Needed to mock the user input from 2 pages "ago"
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertyWhenDidSchemeAcquirePage.apply,
+          Gen.const(localDate),
+          controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(_, _, _, IdentitySubject.LandOrPropertySeller),
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldLandPropertyPage(srn, index),
+              SchemeHoldLandProperty.Acquisition
+            ) // Needed to mock the user input from 2 pages "ago"
+        )
+        .withName("go from land or property when did scheme acquire page to land property acquired from identity page")
     )
 
     act.like(
@@ -529,6 +557,32 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   }
 
   "CheckMode" - {
+
+    "LandPropertyInUKPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            LandPropertyInUKPage.apply,
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyPostcodeLookupController.onPageLoad,
+            srn => defaultUserAnswers.unsafeSet(LandPropertyInUKPage(srn, index), true)
+          )
+          .withName("go from land or property in uk page to land or property address lookup when yes selected")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            LandPropertyInUKPage.apply,
+            (srn, index: Int, mode) =>
+              controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
+                .onPageLoad(srn, index, isUkAddress = false, mode),
+            srn => defaultUserAnswers.unsafeSet(LandPropertyInUKPage(srn, index), false)
+          )
+          .withName("go from land or property in uk page to manual land or property address lookup when no selected")
+      )
+    }
 
     "LandOrPropertyTotalIncomePage" - {
       act.like(
