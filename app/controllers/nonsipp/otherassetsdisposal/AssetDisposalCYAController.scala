@@ -32,7 +32,6 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
 import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -45,7 +44,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class AssetDisposalCYAController @Inject() (
@@ -203,7 +202,6 @@ class AssetDisposalCYAController @Inject() (
               optYear = request.year,
               optCurrentVersion = request.currentVersion,
               optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = updatedUserAnswers.get(CompilationOrSubmissionDatePage(srn)),
               isMaximumReached = isMaximumReached
             )
           )
@@ -268,7 +266,6 @@ object AssetDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None,
     isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](

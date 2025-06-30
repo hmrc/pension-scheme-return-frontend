@@ -143,7 +143,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
     )
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId, isPrePopulation)) {
       auditAndRedirect(srn)(using implicitly)
     } else {
@@ -268,7 +268,7 @@ object BasicDetailsCheckYourAnswersController {
       onSubmit = if (journeyByPassed) {
         controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
       } else {
-        routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode)
+        routes.BasicDetailsCheckYourAnswersController.onSubmit(srn)
       },
       showBackLink = showBackLink,
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
@@ -308,7 +308,7 @@ object BasicDetailsCheckYourAnswersController {
                   .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-                  .onSubmit(srn, mode)
+                  .onSubmit(srn)
             },
             showBackLink = showBackLink
           )

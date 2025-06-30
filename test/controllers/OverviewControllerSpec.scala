@@ -173,7 +173,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.WhatYouWillNeedController
-        .onPageLoad(srn, "", commonStartDate, commonVersion)
+        .onPageLoad(srn)
         .url
     }
 

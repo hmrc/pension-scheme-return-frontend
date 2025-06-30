@@ -211,8 +211,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              optPreviousVersion = Some(submissionNumberOne)
             )
           )
       }

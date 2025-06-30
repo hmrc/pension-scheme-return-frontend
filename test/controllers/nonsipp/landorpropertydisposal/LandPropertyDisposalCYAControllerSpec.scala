@@ -383,7 +383,6 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo),
               isMaximumReached = false
             )
           )

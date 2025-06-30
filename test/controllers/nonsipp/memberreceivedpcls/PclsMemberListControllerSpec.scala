@@ -32,7 +32,7 @@ import viewmodels.models.SectionCompleted
 class PclsMemberListControllerSpec extends ControllerBaseSpec with ControllerBehaviours with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.PclsMemberListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.PclsMemberListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.PclsMemberListController.onSubmit(srn, NormalMode)
   private lazy val onSubmitViewOnly = routes.PclsMemberListController.onSubmitViewOnly(
     srn,
     yearString,

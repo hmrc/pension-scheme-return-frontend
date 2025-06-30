@@ -33,7 +33,6 @@ import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
 import uk.gov.hmrc.domain.Nino
 import play.api.Logger
 import navigation.Navigator
@@ -45,7 +44,6 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class SchemeMemberDetailsAnswersController @Inject() (
@@ -109,8 +107,7 @@ class SchemeMemberDetailsAnswersController @Inject() (
                 viewOnlyUpdated = false,
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                optPreviousVersion = request.previousVersion
               )
             )
           )
@@ -260,8 +257,7 @@ object SchemeMemberDetailsAnswersController {
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    optPreviousVersion: Option[Int] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel(
       mode = mode,

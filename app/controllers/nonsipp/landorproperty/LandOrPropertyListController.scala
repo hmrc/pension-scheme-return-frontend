@@ -340,11 +340,11 @@ object LandOrPropertyListController {
       case (ViewOnlyMode, _, _) =>
         ("landOrPropertyList.viewOnly.title", "landOrPropertyList.viewOnly.heading")
       // Pre-pop
-      case (_, _, isPrePop @ true) if addresses.nonEmpty =>
+      case (_, _, true) if addresses.nonEmpty =>
         ("landOrPropertyList.title.prepop.check", "landOrPropertyList.heading.prepop.check")
-      case (_, addressesSize, isPrePop @ true) if addressesSize > 1 =>
+      case (_, addressesSize, true) if addressesSize > 1 =>
         ("landOrPropertyList.title.prepop.plural", "landOrPropertyList.heading.prepop.plural")
-      case (_, _, isPrePop @ true) =>
+      case (_, _, true) =>
         ("landOrPropertyList.title.prepop", "landOrPropertyList.heading.prepop")
       // Normal
       case (_, addressesSize, _) if addressesSize > 1 =>

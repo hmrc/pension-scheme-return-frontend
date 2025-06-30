@@ -115,7 +115,7 @@ class EmployerContributionsMemberListController @Inject() (
         )
     }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
       navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
     )
@@ -345,7 +345,7 @@ object EmployerContributionsMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-        .onSubmit(srn, page, mode),
+        .onSubmit(srn, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         val sumContributions: Int = employerContributions.map(_.contributions.size).sum
         Some(
@@ -385,7 +385,7 @@ object EmployerContributionsMemberListController {
                   .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-                  .onSubmit(srn, page, mode)
+                  .onSubmit(srn, mode)
             },
             noLabel = Option.when(noPageEnabled)(
               Message("employerContributions.MemberList.view.none")

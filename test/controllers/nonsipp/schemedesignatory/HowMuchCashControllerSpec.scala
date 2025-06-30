@@ -51,7 +51,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec with ControllerBehavi
 
     val schemeName = defaultSchemeDetails.schemeName
 
-    val form = HowMuchCashController.form(new MoneyFormProvider(), schemeName, schemeDatePeriod)
+    val form = HowMuchCashController.form(new MoneyFormProvider(), schemeDatePeriod)
     lazy val viewModel = HowMuchCashController.viewModel(srn, NormalMode, schemeName, schemeDatePeriod, _)
 
     val moneyInPeriodData = moneyInPeriodGen.sample.value

@@ -121,7 +121,7 @@ class SurrenderedBenefitsMemberListController @Inject() (
         )
     }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
       navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
     )
@@ -176,14 +176,13 @@ object SurrenderedBenefitsMemberListController {
   ): List[List[TableElemBase]] =
     memberList
       .map {
-        case MemberSurrenderedBenefits(index, memberName, None, None) =>
+        case MemberSurrenderedBenefits(_, memberName, Some(SectionJourneyStatus.InProgress(url)), _) =>
           List(
             TableElem(memberName),
             TableElem("surrenderedBenefits.memberList.status.no.items"),
             if (!mode.isViewOnlyMode) {
               TableElem.add(
-                controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
-                  .onSubmit(srn, index, mode),
+                url,
                 Message(
                   "surrenderedBenefits.memberList.add.hidden.text",
                   memberName
@@ -193,14 +192,14 @@ object SurrenderedBenefitsMemberListController {
               TableElem.empty
             }
           )
-
-        case MemberSurrenderedBenefits(_, memberName, Some(SectionJourneyStatus.InProgress(url)), _) =>
+        case MemberSurrenderedBenefits(index, memberName, _, None) =>
           List(
             TableElem(memberName),
             TableElem("surrenderedBenefits.memberList.status.no.items"),
             if (!mode.isViewOnlyMode) {
               TableElem.add(
-                url,
+                controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
+                  .onSubmit(srn, index, mode),
                 Message(
                   "surrenderedBenefits.memberList.add.hidden.text",
                   memberName
@@ -341,7 +340,7 @@ object SurrenderedBenefitsMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-        .onSubmit(srn, page, mode),
+        .onSubmit(srn, mode),
       optViewOnlyDetails = if (mode.isViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
@@ -380,7 +379,7 @@ object SurrenderedBenefitsMemberListController {
                   .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-                  .onSubmit(srn, page, mode)
+                  .onSubmit(srn, mode)
             },
             noLabel = Option.when(noPageEnabled)(
               Message("surrenderedBenefits.memberList.view.none", schemeName)

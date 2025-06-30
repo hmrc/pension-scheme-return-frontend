@@ -144,8 +144,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with Contr
             viewOnlyUpdated = false,
             optYear = Some(yearString),
             optCurrentVersion = Some(submissionNumberTwo),
-            optPreviousVersion = Some(submissionNumberOne),
-            compilationOrSubmissionDate = Some(submissionDateTwo)
+            optPreviousVersion = Some(submissionNumberOne)
           )
         )
       }

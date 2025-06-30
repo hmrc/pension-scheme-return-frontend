@@ -48,7 +48,7 @@ class WhatYouWillNeedController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
+  def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val dashboardUrl =
         if (request.pensionSchemeId.isPSP) {
@@ -61,9 +61,6 @@ class WhatYouWillNeedController @Inject() (
         view(
           WhatYouWillNeedController.viewModel(
             srn,
-            fbNumber,
-            taxYear,
-            version,
             request.schemeDetails.schemeName,
             dashboardUrl
           )
@@ -71,7 +68,7 @@ class WhatYouWillNeedController @Inject() (
       )
     }
 
-  def onSubmit(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
+  def onSubmit(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
       // as we cannot access pensionSchemeId in the navigator
       val members = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
@@ -89,9 +86,6 @@ object WhatYouWillNeedController {
 
   def viewModel(
     srn: Srn,
-    fbNumber: String,
-    taxYear: String,
-    version: String,
     schemeName: String,
     dashboardUrl: String
   ): FormPageViewModel[ContentPageViewModel] =
@@ -99,7 +93,7 @@ object WhatYouWillNeedController {
       Message("whatYouWillNeed.title"),
       Message("whatYouWillNeed.heading"),
       ContentPageViewModel(isStartButton = true),
-      routes.WhatYouWillNeedController.onSubmit(srn, fbNumber, taxYear, version)
+      routes.WhatYouWillNeedController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("whatYouWillNeed.paragraph") ++

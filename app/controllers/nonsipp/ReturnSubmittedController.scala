@@ -29,7 +29,7 @@ import cats.data.NonEmptyList
 import views.html.SubmissionView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
-import models.{DateRange, Mode}
+import models.DateRange
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage
@@ -53,7 +53,7 @@ class ReturnSubmittedController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).async { implicit request =>
       val dashboardLink = if (request.pensionSchemeId.isPSP) {
         config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
