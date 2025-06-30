@@ -23,7 +23,7 @@ import utils.IntUtils.given
 import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
 import models._
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common._
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -94,7 +94,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
     .unsafeSet(TotalAssetValuePage(srn, index), money)
     .unsafeSet(SharesTotalIncomePage(srn, index), money)
 
-  private val filledUserAnswersAcquisition = defaultUserAnswers
+  private val filledUserAnswersAcquisitionIndividual = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), SponsoringEmployer)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), Acquisition)
     .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
@@ -110,6 +110,20 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
     .unsafeSet(SharesIndependentValuationPage(srn, index), true)
     .unsafeSet(TotalAssetValuePage(srn, index), money)
     .unsafeSet(SharesTotalIncomePage(srn, index), money)
+
+  private val filledUserAnswersAcquisitionCompany = filledUserAnswersAcquisitionIndividual
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
+    .unsafeSet(CompanyNameOfSharesSellerPage(srn, index), companyName)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller), conditionalYesNoCrn)
+
+  private val filledUserAnswersAcquisitionPartnership = filledUserAnswersAcquisitionIndividual
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipShareSellerNamePage(srn, index), partnershipName)
+    .unsafeSet(PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller), conditionalYesNoUtr)
+
+  private val filledUserAnswersAcquisitionOther = filledUserAnswersAcquisitionIndividual
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
+    .unsafeSet(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller), otherRecipientDetails)
 
   private val filledUserAnswersTransfer = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), Unquoted)
@@ -166,36 +180,44 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
           .withName(s"render correct Contribution ${mode.toString} view")
       )
-      act.like(
-        renderView(onPageLoad(mode), filledUserAnswersAcquisition) { implicit app => implicit request =>
-          injected[CheckYourAnswersView].apply(
-            viewModel(
-              srn,
-              index,
-              schemeName,
-              typeOfShare = SponsoringEmployer,
-              holdShares = Acquisition,
-              whenDidSchemeAcquire = Some(localDate),
-              companyNameRelatedShares = companyName,
-              companySharesCrn = ConditionalYesNo.no[String, Crn](noCrnReason),
-              companyName,
-              howManyShares = totalShares,
-              identityType = Some(IdentityType.Individual),
-              recipientName = Some(individualName),
-              recipientDetails = Some(nino.value),
-              recipientReasonNoDetails = None,
-              sharesFromConnectedParty = None,
-              costOfShares = money,
-              shareIndependentValue = true,
-              totalAssetValue = Some(money),
-              sharesTotalIncome = money,
-              mode = mode,
-              viewOnlyUpdated = true
+
+      List(
+        (filledUserAnswersAcquisitionIndividual, IdentityType.Individual, individualName, nino.value),
+        (filledUserAnswersAcquisitionCompany, IdentityType.UKCompany, companyName, crn.crn),
+        (filledUserAnswersAcquisitionPartnership, IdentityType.UKPartnership, partnershipName, utr.value),
+        (filledUserAnswersAcquisitionOther, IdentityType.Other, otherRecipientName, otherRecipientDescription)
+      ).foreach { (filledAnswers, sellerType, sellerName, sellerDetails) =>
+        act.like(
+          renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                srn,
+                index,
+                schemeName,
+                typeOfShare = SponsoringEmployer,
+                holdShares = Acquisition,
+                whenDidSchemeAcquire = Some(localDate),
+                companyNameRelatedShares = companyName,
+                companySharesCrn = ConditionalYesNo.no[String, Crn](noCrnReason),
+                companyName,
+                howManyShares = totalShares,
+                identityType = Some(sellerType),
+                recipientName = Some(sellerName),
+                recipientDetails = Some(sellerDetails),
+                recipientReasonNoDetails = None,
+                sharesFromConnectedParty = None,
+                costOfShares = money,
+                shareIndependentValue = true,
+                totalAssetValue = Some(money),
+                sharesTotalIncome = money,
+                mode = mode,
+                viewOnlyUpdated = true
+              )
             )
-          )
-        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct Acquisition ${mode.toString} view")
-      )
+          }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+            .withName(s"render correct Acquisition ${mode.toString} view - $sellerType Seller")
+        )
+      }
 
       act.like(
         renderView(onPageLoad(mode), filledUserAnswersTransfer) { implicit app => implicit request =>
