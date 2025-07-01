@@ -16,21 +16,7 @@
 
 package forms
 
-import play.api.data.validation._
-
 package object mappings {
 
   type Regex = String
-
-  object implicits {
-    implicit class ConstraintOps[A](constraint: Constraint[A]) {
-      def or(other: Constraint[A]): Constraint[A] =
-        Constraint[A]((value: A) =>
-          constraint(value) match {
-            case Valid => Valid
-            case Invalid(_) => other(value)
-          }
-        )
-    }
-  }
 }

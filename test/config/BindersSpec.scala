@@ -21,6 +21,8 @@ import utils.BaseSpec
 import models.SchemeId.Srn
 import org.scalacheck.Gen.alphaNumStr
 import org.scalatest.EitherValues
+import models.IdentitySubject
+import models.IdentitySubject._
 
 class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValues {
 
@@ -40,6 +42,29 @@ class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValu
             Binders.srnBinder.bind("srn", invalidSrn) mustBe Left("Invalid scheme reference number")
           }
         }
+      }
+    }
+  }
+
+  "IdentitySubject binder" - {
+    "should return a valid identity subject" - {
+      "when identity subject is valid" in {
+        List(
+          LoanRecipient,
+          LandOrPropertySeller,
+          SharesSeller,
+          OtherAssetSeller,
+          Unknown
+        ).foreach { identitySubject =>
+          val x = Binders.identitySubjectBinder.bind("srn", identitySubject.name)
+          x.value mustBe identitySubject
+        }
+      }
+    }
+
+    "should return Unknow" - {
+      "when identity subject is invalid" in {
+        Binders.identitySubjectBinder.bind("key", "invalid") mustBe Right(IdentitySubject.Unknown)
       }
     }
   }

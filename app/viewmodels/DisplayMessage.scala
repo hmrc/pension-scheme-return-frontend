@@ -98,11 +98,6 @@ object DisplayMessage {
       def apply(headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
         ListMessage(NonEmptyList(headContent, tailContents.toList), ListType.Bullet)
     }
-
-    object NewLine {
-      def apply(headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
-        ListMessage(NonEmptyList(headContent, tailContents.toList), ListType.NewLine)
-    }
   }
 
   sealed trait ListType

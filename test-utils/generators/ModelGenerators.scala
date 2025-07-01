@@ -181,15 +181,6 @@ trait ModelGenerators extends BasicGenerators {
       if (date1.isBefore(date2)) DateRange(date1, date2)
       else DateRange(date2, date1)
 
-  val bankAccountGen: Gen[BankAccount] =
-    for {
-      bankName <- nonEmptyAlphaString.map(_.take(28))
-      accountNumber <- Gen.listOfN(8, numChar).map(_.mkString)
-      separator <- Gen.oneOf("", " ", "-")
-      pairs = Gen.listOfN(2, numChar).map(_.mkString)
-      sortCode <- Gen.listOfN(3, pairs).map(_.mkString(separator))
-    } yield BankAccount(bankName, accountNumber, sortCode)
-
   val localDateTimeGen: Gen[LocalDateTime] =
     for {
       seconds <- Gen.chooseNum(

@@ -17,11 +17,9 @@
 package config
 
 import eu.timepit.refined.boolean.And
-import eu.timepit.refined.refineV
-import play.api.libs.json._
 import models.Enumerable
 import eu.timepit.refined.numeric.{Greater, LessEqual}
-import eu.timepit.refined.api.{Refined, Validate}
+import eu.timepit.refined.api.Refined
 
 object RefinedTypes {
   type OneTo[N] = Greater[0] And LessEqual[N]
@@ -40,22 +38,10 @@ object RefinedTypes {
 
   type OneTo5 = Greater[0] And LessEqual[5]
   type Max5 = Int Refined OneTo5
-  implicit def indexReads[A](implicit ev: Validate[Int, A]): Reads[Refined[Int, A]] = {
-    case JsNumber(value) =>
-      refineV[A](value.toInt) match {
-        case Left(err) => JsError(err)
-        case Right(refined) => JsSuccess(refined)
-      }
-    case _ => JsError("index was not a number")
-  }
-
-  implicit def indexWrites[A]: Writes[Refined[Int, A]] = (o: Refined[Int, A]) => JsNumber(o.value)
 
   // used by generators
   object Max300 {
     type Refined = Greater[0] And LessEqual[300]
-
-    implicit val enumerable: Enumerable[Max300] = Enumerable.index(1 to 300)
   }
 
   object Max5000 {
