@@ -16,9 +16,7 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class ContentTablePageViewModel(
   inset: Option[DisplayMessage], // will be displayed under the table
@@ -26,27 +24,3 @@ case class ContentTablePageViewModel(
   afterTable: Option[DisplayMessage],
   rows: List[(DisplayMessage, DisplayMessage)]
 )
-
-object ContentTablePageViewModel {
-
-  def apply(
-    inset: DisplayMessage,
-    rows: List[(DisplayMessage, DisplayMessage)]
-  ): ContentTablePageViewModel =
-    ContentTablePageViewModel(Some(inset), beforeTable = None, afterTable = None, rows)
-
-  def apply(
-    title: Message,
-    heading: InlineMessage,
-    inset: DisplayMessage,
-    buttonText: Message,
-    onSubmit: Call,
-    rows: (DisplayMessage, DisplayMessage)*
-  ): FormPageViewModel[ContentTablePageViewModel] =
-    FormPageViewModel(
-      title,
-      heading,
-      ContentTablePageViewModel(inset, rows.toList),
-      onSubmit
-    ).withButtonText(buttonText)
-}
