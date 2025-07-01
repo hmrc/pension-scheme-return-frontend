@@ -1250,7 +1250,7 @@ removeTotalValueQuotedShares.heading = Are you sure you want to remove the quote
 removeTotalValueQuotedShares.error.required = Select yes if you are sure you want to remove the quoted shares and third party managed funds
 
 totalValueQuotedSharesCYA.normal.title = Check your answers: quoted shares and managed funds
-totalValueQuotedSharesCYA.normal.heading = Check your answers: quotes shares and managed funds
+totalValueQuotedSharesCYA.normal.heading = Check your answers: quoted shares and managed funds
 totalValueQuotedSharesCYA.title.change = Change details of quoted shares and managed funds
 totalValueQuotedSharesCYA.heading.change = Change details of quoted shares and third party managed funds
 totalValueQuotedSharesCYA.title.view = View details of quoted shares and managed funds
