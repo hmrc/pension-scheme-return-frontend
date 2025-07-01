@@ -86,7 +86,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
 
-  private val filledAcquisitionLeasedUserAnswers = defaultUserAnswers
+  private val filledAcquiredFromCompanyLeasedUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, index), true)
     .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index), postcodeLookup)
     .unsafeSet(AddressLookupResultsPage(srn, index), List(address, address, address))
@@ -105,6 +105,23 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
     .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index), ("lessee name", money, localDate))
     .unsafeSet(IsLesseeConnectedPartyPage(srn, index), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
+
+  private val filledAcquiredFromIndividualLeasedUserAnswers = filledAcquiredFromCompanyLeasedUserAnswers
+    .unsafeSet(IdentityTypePage(srn, index, LandOrPropertySeller), IdentityType.Individual)
+    .unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), individualName)
+    .unsafeSet(IndividualSellerNiPage(srn, index), conditionalYesNoNino)
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index), false)
+
+  private val filledAcquiredFromPartnershipLeasedUserAnswers = filledAcquiredFromCompanyLeasedUserAnswers
+    .unsafeSet(IdentityTypePage(srn, index, LandOrPropertySeller), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipSellerNamePage(srn, index), partnershipName)
+    .unsafeSet(PartnershipRecipientUtrPage(srn, index, LandOrPropertySeller), conditionalYesNoUtr)
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index), false)
+
+  private val filledAcquiredFromOtherLeasedUserAnswers = filledAcquiredFromCompanyLeasedUserAnswers
+    .unsafeSet(IdentityTypePage(srn, index, LandOrPropertySeller), IdentityType.Other)
+    .unsafeSet(OtherRecipientDetailsPage(srn, index, LandOrPropertySeller), otherRecipientDetails)
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index), false)
 
   private val incompleteUserAnswers = filledUserAnswers
     .unsafeSet(
@@ -148,35 +165,42 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
         }.withName(s"render correct ${mode.toString} view")
       )
 
-      act.like(
-        renderView(onPageLoad(mode), filledAcquisitionLeasedUserAnswers) { implicit app => implicit request =>
-          injected[CheckYourAnswersView].apply(
-            LandOrPropertyCYAController.viewModel(
-              srn = srn,
-              index = index,
-              schemeName = schemeName,
-              landOrPropertyInUk = true,
-              landRegistryTitleNumber = ConditionalYesNo(Right("landRegistryTitleNumber")),
-              holdLandProperty = Acquisition,
-              landOrPropertyAcquire = Some(localDate),
-              landOrPropertyTotalCost = money,
-              landPropertyIndependentValuation = Some(false),
-              receivedLandType = Some(IdentityType.UKCompany),
-              recipientName = Some(companyName),
-              recipientDetails = Some(crn.crn),
-              recipientReasonNoDetails = None,
-              landOrPropertySellerConnectedParty = Some(false),
-              landOrPropertyResidential = false,
-              landOrPropertyLease = true,
-              landOrPropertyTotalIncome = money,
-              addressLookUpPage = address,
-              leaseDetails = Some(("lessee name", money, localDate, false)),
-              mode = mode,
-              viewOnlyUpdated = true
+      List(
+        (filledAcquiredFromCompanyLeasedUserAnswers, IdentityType.UKCompany, companyName, crn.crn),
+        (filledAcquiredFromIndividualLeasedUserAnswers, IdentityType.Individual, individualName, nino.value),
+        (filledAcquiredFromPartnershipLeasedUserAnswers, IdentityType.UKPartnership, partnershipName, utr.value),
+        (filledAcquiredFromOtherLeasedUserAnswers, IdentityType.Other, otherRecipientName, otherRecipientDescription)
+      ).foreach { (filledAnswers, sellerType, sellerName, sellerDetails) =>
+        act.like(
+          renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
+            injected[CheckYourAnswersView].apply(
+              LandOrPropertyCYAController.viewModel(
+                srn = srn,
+                index = index,
+                schemeName = schemeName,
+                landOrPropertyInUk = true,
+                landRegistryTitleNumber = ConditionalYesNo(Right("landRegistryTitleNumber")),
+                holdLandProperty = Acquisition,
+                landOrPropertyAcquire = Some(localDate),
+                landOrPropertyTotalCost = money,
+                landPropertyIndependentValuation = Some(false),
+                receivedLandType = Some(sellerType),
+                recipientName = Some(sellerName),
+                recipientDetails = Some(sellerDetails),
+                recipientReasonNoDetails = None,
+                landOrPropertySellerConnectedParty = Some(false),
+                landOrPropertyResidential = false,
+                landOrPropertyLease = true,
+                landOrPropertyTotalIncome = money,
+                addressLookUpPage = address,
+                leaseDetails = Some(("lessee name", money, localDate, false)),
+                mode = mode,
+                viewOnlyUpdated = true
+              )
             )
-          )
-        }.withName(s"render correct ${mode.toString} view - acquisition & leased")
-      )
+          }.withName(s"render correct ${mode.toString} view - acquisition from $sellerType & leased")
+        )
+      }
 
       act.like(
         redirectNextPage(onSubmit(mode))

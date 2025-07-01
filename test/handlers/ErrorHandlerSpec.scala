@@ -70,7 +70,7 @@ class ErrorHandlerSpec extends ControllerBaseSpec {
   }
 
   "must render standardErrorTemplate" in {
-    val result: Future[Html] = handler.standardErrorTemplate(title, heading, message)(new FakeRequestHeader)
+    val result: Future[Html] = handler.standardErrorTemplate(title, heading, message)(using new FakeRequestHeader)
     result.value mustBe defined
 
   }

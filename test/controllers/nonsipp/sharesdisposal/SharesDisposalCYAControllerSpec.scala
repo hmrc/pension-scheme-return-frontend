@@ -97,7 +97,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
   // Final parameter
   private val sharesStillHeld = totalShares - 1
 
-  private val soldUserAnswers = defaultUserAnswers
+  private val soldToIndividualUserAnswers = defaultUserAnswers
     // Shares pages
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.SponsoringEmployer)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
@@ -108,17 +108,31 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
     .unsafeSet(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex), dateSharesSold.get)
     .unsafeSet(HowManySharesSoldPage(srn, shareIndex, disposalIndex), numberSharesSold.get)
     .unsafeSet(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), considerationSharesSold.get)
-    .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), buyerIdentity.get)
-    .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex), nameOfBuyer.get)
+    .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.Individual)
+    .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex), buyerName)
     .unsafeSet(
       IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex),
-      ConditionalYesNo.yes[String, Nino](buyerDetails)
+      ConditionalYesNo.yes[String, Nino](nino)
     )
     .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(IndependentValuationPage(srn, shareIndex, disposalIndex), isIndependentValuation.get)
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
     .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry)
     .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
+
+  private val soldToCompanyUserAnswers = soldToIndividualUserAnswers
+    .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.UKCompany)
+    .unsafeSet(CompanyBuyerNamePage(srn, shareIndex, disposalIndex), companyName)
+    .unsafeSet(CompanyBuyerCrnPage(srn, shareIndex, disposalIndex), conditionalYesNoCrn)
+
+  private val soldToPartnershipUserAnswers = soldToIndividualUserAnswers
+    .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipBuyerNamePage(srn, shareIndex, disposalIndex), partnershipName)
+    .unsafeSet(PartnershipBuyerUtrPage(srn, shareIndex, disposalIndex), conditionalYesNoUtr)
+
+  private val soldToOtherUserAnswers = soldToIndividualUserAnswers
+    .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.Other)
+    .unsafeSet(OtherBuyerDetailsPage(srn, shareIndex, disposalIndex), otherRecipientDetails)
 
   private val redeemedUserAnswers = defaultUserAnswers
     // Shares pages
@@ -158,45 +172,53 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
   "SharesDisposalCYAController" - {
 
     List(NormalMode, CheckMode).foreach { mode =>
+
       // Sold
-      act.like(
-        renderView(onPageLoad(mode), soldUserAnswers) { implicit app => implicit request =>
-          injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                shareIndex,
-                disposalIndex,
-                TypeOfShares.SponsoringEmployer,
-                companyName,
-                SchemeHoldShare.Acquisition,
-                acquisitionDate,
-                HowSharesDisposed.Sold,
-                dateSharesSold,
-                numberSharesSold,
-                considerationSharesSold,
-                buyerIdentity,
-                Some(buyerName),
-                Some(buyerDetails.toString),
-                buyerReasonNoDetails,
-                isBuyerConnectedParty,
-                isIndependentValuation,
-                None,
-                None,
-                None,
-                sharesStillHeld,
-                schemeName,
-                mode
-              ),
-              viewOnlyUpdated = true,
-              isMaximumReached = false
+      List(
+        (soldToIndividualUserAnswers, IdentityType.Individual, buyerName, nino.value),
+        (soldToCompanyUserAnswers, IdentityType.UKCompany, companyName, crn.crn),
+        (soldToPartnershipUserAnswers, IdentityType.UKPartnership, partnershipName, utr.value),
+        (soldToOtherUserAnswers, IdentityType.Other, otherRecipientName, otherRecipientDescription)
+      ).foreach { (soldAnswers, soldToType, soldToName, soldToDetails) =>
+        act.like(
+          renderView(onPageLoad(mode), soldAnswers) { implicit app => implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                ViewModelParameters(
+                  srn,
+                  shareIndex,
+                  disposalIndex,
+                  TypeOfShares.SponsoringEmployer,
+                  companyName,
+                  SchemeHoldShare.Acquisition,
+                  acquisitionDate,
+                  HowSharesDisposed.Sold,
+                  dateSharesSold,
+                  numberSharesSold,
+                  considerationSharesSold,
+                  Some(soldToType),
+                  Some(soldToName),
+                  Some(soldToDetails),
+                  buyerReasonNoDetails,
+                  isBuyerConnectedParty,
+                  isIndependentValuation,
+                  None,
+                  None,
+                  None,
+                  sharesStillHeld,
+                  schemeName,
+                  mode
+                ),
+                viewOnlyUpdated = true,
+                isMaximumReached = false
+              )
             )
-          )
-        }.after {
-          verify(mockSaveService, times(1)).save(any())(using any(), any())
-          reset(mockPsrSubmissionService)
-        }.withName(s"render correct $mode view for Sold journey")
-      )
+          }.after {
+            verify(mockSaveService, times(1)).save(any())(using any(), any())
+            reset(mockPsrSubmissionService)
+          }.withName(s"render correct $mode view for Sold to $soldToType journey")
+        )
+      }
 
       // Redeemed
       act.like(
@@ -335,7 +357,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
         redirectToPage(
           call = onPageLoad(mode),
           page = routes.SharesDisposalListController.onPageLoad(srn, 1),
-          userAnswers = soldUserAnswers
+          userAnswers = soldToIndividualUserAnswers
             .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.InProgress("any")),
           previousUserAnswers = emptyUserAnswers
         ).withName(s"Redirect to shares list when incomplete when in $mode mode")
@@ -355,7 +377,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
     act.like(
       renderView(
         onPageLoad(CheckMode),
-        soldUserAnswers
+        soldToIndividualUserAnswers
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
           viewModel(
@@ -400,7 +422,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
       redirectToPage(
         call = onPageLoad(CheckMode),
         page = routes.SharesDisposalListController.onPageLoad(srn, 1),
-        userAnswers = soldUserAnswers
+        userAnswers = soldToIndividualUserAnswers
           .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.InProgress(anyUrl))
           .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry),
         previousUserAnswers = emptyUserAnswers

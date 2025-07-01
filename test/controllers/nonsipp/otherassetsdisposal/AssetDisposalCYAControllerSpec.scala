@@ -77,7 +77,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
   private val isBuyerConnectedParty = Some(true)
   private val otherAsset = "name"
 
-  private val userAnswers = defaultUserAnswers
+  private val userAnswersSoldPartnership = defaultUserAnswers
     .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Sold)
     .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), otherAsset)
     .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), true)
@@ -89,11 +89,46 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
     .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
 
+  private val userAnswersSoldIndividual = userAnswersSoldPartnership
+    .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.Individual)
+    .unsafeSet(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), recipientName)
+    .unsafeSet(AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex), conditionalYesNoNino)
+    .unsafeRemove(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex))
+    .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), false)
+    .unsafeSet(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex), false)
+
+  private val userAnswersSoldCompany = userAnswersSoldPartnership
+    .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.UKCompany)
+    .unsafeSet(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), recipientName)
+    .unsafeSet(AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex), ConditionalYesNo.no(noCrnReason))
+    .unsafeRemove(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex))
+    .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), true)
+    .unsafeSet(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex), true)
+
+  private val userAnswersSoldOther = userAnswersSoldPartnership
+    .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.Other)
+    .unsafeSet(OtherBuyerDetailsPage(srn, assetIndex, disposalIndex), otherRecipientDetails)
+    .unsafeRemove(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex))
+    .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), true)
+    .unsafeSet(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex), true)
+
+  private val userAnswersTransferred = defaultUserAnswers
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Transferred)
+    .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), otherAsset)
+    .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), true)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
+
+  private val userAnswersOther = defaultUserAnswers
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Other(otherDetails))
+    .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), otherAsset)
+    .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), true)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
+
   "AssetDisposalCYAController" - {
 
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(mode), userAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), userAnswersSoldPartnership) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
@@ -118,7 +153,152 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
               isMaximumReached = false
             )
           )
-        }.withName(s"render correct $mode view for Sold journey")
+        }.withName(s"render correct $mode view for Sold to UKPartnership journey")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), userAnswersSoldIndividual) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                assetIndex,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed = HowDisposed.Sold,
+                dateAssetSold,
+                otherAsset,
+                assetDisposedType = Some(IdentityType.Individual),
+                Some(false),
+                considerationAssetSold,
+                independentValuation = Some(false),
+                anyPartAssetStillHeld = true,
+                Some(recipientName),
+                Some(nino.value),
+                None,
+                mode
+              ),
+              viewOnlyUpdated = true,
+              isMaximumReached = false
+            )
+          )
+        }.withName(s"render correct $mode view for Sold to Individual journey")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), userAnswersSoldCompany) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                assetIndex,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed = HowDisposed.Sold,
+                dateAssetSold,
+                otherAsset,
+                assetDisposedType = Some(IdentityType.UKCompany),
+                isBuyerConnectedParty,
+                considerationAssetSold,
+                independentValuation = Some(true),
+                anyPartAssetStillHeld = true,
+                Some(recipientName),
+                None,
+                Some(noCrnReason),
+                mode
+              ),
+              viewOnlyUpdated = true,
+              isMaximumReached = false
+            )
+          )
+        }.withName(s"render correct $mode view for Sold to UKCompany journey")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), userAnswersSoldOther) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                assetIndex,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed = HowDisposed.Sold,
+                dateAssetSold,
+                otherAsset,
+                assetDisposedType = Some(IdentityType.Other),
+                isBuyerConnectedParty,
+                considerationAssetSold,
+                independentValuation = Some(true),
+                anyPartAssetStillHeld = true,
+                Some(otherRecipientName),
+                Some(otherRecipientDescription),
+                None,
+                mode
+              ),
+              viewOnlyUpdated = true,
+              isMaximumReached = false
+            )
+          )
+        }.withName(s"render correct $mode view for Sold to Other journey")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), userAnswersTransferred) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                assetIndex,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed = HowDisposed.Transferred,
+                None,
+                otherAsset,
+                assetDisposedType = None,
+                None,
+                None,
+                independentValuation = None,
+                anyPartAssetStillHeld = true,
+                None,
+                None,
+                None,
+                mode
+              ),
+              viewOnlyUpdated = true,
+              isMaximumReached = false
+            )
+          )
+        }.withName(s"render correct $mode view for Transferred journey")
+      )
+
+      act.like(
+        renderView(onPageLoad(mode), userAnswersOther) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                assetIndex,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed = HowDisposed.Other(otherDetails),
+                None,
+                otherAsset,
+                assetDisposedType = None,
+                None,
+                None,
+                independentValuation = None,
+                anyPartAssetStillHeld = true,
+                None,
+                None,
+                None,
+                mode
+              ),
+              viewOnlyUpdated = true,
+              isMaximumReached = false
+            )
+          )
+        }.withName(s"render correct $mode view for Other journey")
       )
 
       act.like(
@@ -144,7 +324,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
         redirectToPage(
           call = onPageLoad(mode),
           page = routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1),
-          userAnswers = userAnswers
+          userAnswers = userAnswersSoldPartnership
             .unsafeSet(
               OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex),
               SectionJourneyStatus.InProgress("any")
