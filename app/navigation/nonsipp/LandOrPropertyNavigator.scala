@@ -92,11 +92,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
             .onPageLoad(srn, index, NormalMode) // 27h6
 
-        case Some(IdentityType.Other) =>
+        case _ =>
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
-
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
 
       }
 
@@ -357,11 +355,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
               controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
                 .onPageLoad(srn, index, NormalMode) // 27h6
 
-            case Some(IdentityType.Other) =>
+            case _ =>
               controllers.nonsipp.common.routes.OtherRecipientDetailsController
                 .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
-
-            case _ => controllers.routes.UnauthorisedController.onPageLoad()
 
           }
 
