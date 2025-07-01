@@ -39,7 +39,6 @@ class BondsDisposalSpec extends ControllerBaseSpec with ControllerBehaviours {
   private val cyaPageCall = Call("GET", cyaUrl)
   private val changeCyaPageCall = Call("GET", changeCyaUrl)
   private val nonCyaPageCall = Call("GET", nonCyaUrl)
-  private val excludedCyaPageCall = Call("GET", excludedCyaUrl)
 
   "CallOps" - {
 

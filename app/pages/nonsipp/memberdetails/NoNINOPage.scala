@@ -17,7 +17,7 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
@@ -27,12 +27,4 @@ case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
   override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
 
   override def toString: String = "noNINO"
-}
-
-case class NoNinoPages(srn: Srn) extends IndexedQuestionPage[String] {
-
-  override def path: JsPath = Paths.personalDetails \ toString
-
-  override def toString: String = "noNINO"
-
 }

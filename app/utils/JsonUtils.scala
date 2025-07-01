@@ -16,28 +16,12 @@
 
 package utils
 
-import cats.data.NonEmptyList
-import cats.syntax.either._
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 object JsonUtils {
-  implicit def nelWrites[A: Writes]: Writes[NonEmptyList[A]] = Writes(nel => Json.toJson(nel.toList))
-
   implicit class JsObjectOps(json: JsObject) {
     def +?(o: Option[JsObject]): JsObject = o.fold(json)(_ ++ json)
   }
-
-  // Creates a Json format for an either value type
-  def eitherFormat[A: Format, B: Format](leftName: String, rightName: String): Format[Either[A, B]] =
-    Format(
-      fjs = (__ \ leftName).read[A].map(_.asLeft[B]) |
-        (__ \ rightName).read[B].map(_.asRight[A]),
-      tjs = _.fold(
-        left => Json.obj(leftName -> left),
-        right => Json.obj(rightName -> right)
-      )
-    )
 
   implicit class JsResultOps(result: JsResult[JsObject]) {
 
@@ -51,22 +35,5 @@ object JsonUtils {
      */
     def prune(path: JsPath): JsResult[JsObject] =
       result.flatMap(_.transform(path.prune(_)))
-
-    /**
-     * Conditionally prunes a path from a JsResult[JsObject]
-     *
-     * @param path
-     *   The path to the value being pruned
-     * @param condition
-     *   The condition that controls whether the path is pruned or not
-     * @return
-     *   A new json object with the path removed
-     */
-    def pruneIf(path: JsPath, condition: Boolean): JsResult[JsObject] =
-      if (condition) {
-        result.prune(path)
-      } else {
-        result
-      }
   }
 }

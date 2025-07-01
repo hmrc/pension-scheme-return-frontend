@@ -176,18 +176,6 @@ trait Formatters {
     }
 
   private[mappings] def doubleFormatter(
-    doubleFormErrors: DoubleFormErrors,
-    args: Seq[String]
-  ): Formatter[Double] =
-    doubleFormatter(
-      doubleFormErrors.requiredKey,
-      doubleFormErrors.nonNumericKey,
-      doubleFormErrors.max,
-      doubleFormErrors.min,
-      args
-    )
-
-  private[mappings] def doubleFormatter(
     requiredKey: String,
     nonNumericKey: String,
     max: (Double, String),

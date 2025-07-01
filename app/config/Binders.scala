@@ -16,11 +16,9 @@
 
 package config
 
-import play.api.mvc.{JavascriptLiteral, PathBindable}
+import play.api.mvc.PathBindable
 import models.SchemeId.Srn
-import eu.timepit.refined.refineV
 import models.IdentitySubject
-import eu.timepit.refined.api.{Refined, Validate}
 
 object Binders {
 
@@ -32,24 +30,10 @@ object Binders {
     override def unbind(key: String, value: Srn): String = value.value
   }
 
-  implicit def refinedIntPathBinder[T](implicit ev: Validate[Int, T]): PathBindable[Refined[Int, T]] =
-    new PathBindable[Refined[Int, T]] {
-      override def bind(key: String, value: String): Either[String, Refined[Int, T]] =
-        value.toIntOption
-          .toRight(s"value for key $key was not an Integer")
-          .flatMap(refineV[T](_))
-
-      override def unbind(key: String, value: Refined[Int, T]): String = value.value.toString
-    }
-
-  implicit def refinedIntJSLiteral[T]: JavascriptLiteral[Refined[Int, T]] =
-    (value: Refined[Int, T]) => value.value.toString
-
   implicit val identitySubjectBinder: PathBindable[IdentitySubject] = new PathBindable[IdentitySubject] {
 
     override def bind(key: String, value: String): Either[String, IdentitySubject] =
-      Option(IdentitySubject.withNameWithDefault(value))
-        .toRight(s" $key value $value unknown identity type")
+      Right(IdentitySubject.withNameWithDefault(value))
 
     override def unbind(key: String, value: IdentitySubject): String = value.name
   }

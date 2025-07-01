@@ -49,10 +49,3 @@ case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5)
       MemberTransferOutProgress(srn, index, transferIndex)
     )
 }
-
-case class ReceivingSchemeNamePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, String]] {
-  override def path: JsPath =
-    Paths.memberTransfersOut \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "schemeName"
-}

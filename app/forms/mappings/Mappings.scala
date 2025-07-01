@@ -75,17 +75,6 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Double] =
     of(using doubleFormatter(requiredKey, nonNumericKey, max, min, args))
 
-  def double(
-    doubleFormErrors: DoubleFormErrors,
-    args: Seq[String]
-  ): FieldMapping[Double] =
-    of(using doubleFormatter(doubleFormErrors, args))
-
-  def double(
-    doubleFormErrors: DoubleFormErrors
-  ): FieldMapping[Double] =
-    of(using doubleFormatter(doubleFormErrors, Nil))
-
   def money(
     moneyFormErrors: MoneyFormErrors,
     args: Seq[String] = Seq.empty
