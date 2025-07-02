@@ -24,7 +24,7 @@ import views.html.CheckYourAnswersView
 import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
+import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
@@ -72,7 +72,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     submissionNumberOne
   )
 
-  private val filledUserAnswers = defaultUserAnswers
+  private val filledUserAnswersCompanyConnectedParty = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
     .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
@@ -87,41 +87,84 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     .unsafeSet(LoanCompleted(srn, index), SectionCompleted)
     .unsafeSet(LoansProgress(srn, index), SectionJourneyStatus.Completed)
 
+  private val filledUserAnswersIndividualSponsoring = filledUserAnswersCompanyConnectedParty
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, index), recipientName)
+    .unsafeSet(IndividualRecipientNinoPage(srn, index), conditionalYesNoNino)
+    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index), false)
+
+  private val filledUserAnswersPartnershipNeither = filledUserAnswersCompanyConnectedParty
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipRecipientNamePage(srn, index), recipientName)
+    .unsafeSet(PartnershipRecipientUtrPage(srn, index, subject), conditionalYesNoUtr)
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.Neither)
+
+  private val filledUserAnswersOtherSponsoring = filledUserAnswersCompanyConnectedParty
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
+    .unsafeSet(
+      OtherRecipientDetailsPage(srn, index, subject),
+      RecipientDetails(recipientName, otherRecipientDescription)
+    )
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.Sponsoring)
+
   "LoansCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
-      act.like(
-        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
-          injected[CheckYourAnswersView].apply(
-            viewModel(
-              srn,
-              index,
-              schemeName,
-              IdentityType.UKCompany,
-              recipientName,
-              recipientDetails = Some(crn.value),
-              recipientReasonNoDetails = None,
-              connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
-              datePeriodLoan = (localDate, money, loanPeriod),
-              amountOfTheLoan = amountOfTheLoan,
-              returnEndDate = dateRange.to,
-              repaymentInstalments = true,
-              interestOnLoan = interestOnLoan,
-              arrearsPrevYears = Some(true),
-              outstandingArrearsOnLoan = Some(money),
-              securityOnLoan = Some(security),
-              mode,
-              viewOnlyUpdated = true
+
+      List(
+        (
+          filledUserAnswersCompanyConnectedParty,
+          Right(SponsoringOrConnectedParty.ConnectedParty),
+          IdentityType.UKCompany,
+          crn.crn
+        ),
+        (filledUserAnswersIndividualSponsoring, Left(false), IdentityType.Individual, nino.value),
+        (
+          filledUserAnswersPartnershipNeither,
+          Right(SponsoringOrConnectedParty.Neither),
+          IdentityType.UKPartnership,
+          utr.value
+        ),
+        (
+          filledUserAnswersOtherSponsoring,
+          Right(SponsoringOrConnectedParty.Sponsoring),
+          IdentityType.Other,
+          otherRecipientDescription
+        )
+      ).foreach { (filledAnswers, sponsoringOrConnected, identityType, description) =>
+        act.like(
+          renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                srn,
+                index,
+                schemeName,
+                identityType,
+                recipientName,
+                recipientDetails = Some(description),
+                recipientReasonNoDetails = None,
+                connectedParty = sponsoringOrConnected,
+                datePeriodLoan = (localDate, money, loanPeriod),
+                amountOfTheLoan = amountOfTheLoan,
+                returnEndDate = dateRange.to,
+                repaymentInstalments = true,
+                interestOnLoan = interestOnLoan,
+                arrearsPrevYears = Some(true),
+                outstandingArrearsOnLoan = Some(money),
+                securityOnLoan = Some(security),
+                mode,
+                viewOnlyUpdated = true
+              )
             )
-          )
-        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct $mode view")
-      )
+          }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+            .withName(s"render correct $mode view for $identityType")
+        )
+      }
 
       act.like(
         redirectToPage(
           call = onPageLoad(mode),
           page = routes.LoansListController.onPageLoad(srn, 1, mode),
-          userAnswers = filledUserAnswers
+          userAnswers = filledUserAnswersCompanyConnectedParty
             .unsafeSet(LoansProgress(srn, index), SectionJourneyStatus.InProgress(anyUrl)),
           previousUserAnswers = emptyUserAnswers
         ).withName(s"Redirect to loans list when incomplete when in $mode mode")

@@ -100,6 +100,9 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec with C
     .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
     .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
+  private val threeDisposedUserAnswers = completedUserAnswers
+    .unsafeRemove(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo))
+
   private val noDisposalsUserAnswers = defaultUserAnswers
     .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
     // Shares Disposal #1
@@ -182,6 +185,20 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec with C
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, threeDisposedUserAnswers, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+        .updateName(_ + " threeDisposedUserAnswers")
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+        .updateName(_ + " completedUserAnswers")
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

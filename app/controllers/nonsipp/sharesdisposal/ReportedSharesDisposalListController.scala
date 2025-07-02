@@ -406,21 +406,10 @@ object ReportedSharesDisposalListController {
           "sharesDisposal.reportedSharesDisposalList.view.title",
           "sharesDisposal.reportedSharesDisposalList.view.heading.none"
         )
-
       case (ViewOnlyMode, _) if numberOfDisposals > 1 =>
         (
           "sharesDisposal.reportedSharesDisposalList.view.title.plural",
           "sharesDisposal.reportedSharesDisposalList.view.heading.plural"
-        )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
-        (
-          "sharesDisposal.reportedSharesDisposalList.view.title",
-          "sharesDisposal.reportedSharesDisposalList.view.heading"
-        )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
-        (
-          "sharesDisposal.reportedSharesDisposalList.title.plural",
-          "sharesDisposal.reportedSharesDisposalList.heading.plural"
         )
       case _ =>
         (
