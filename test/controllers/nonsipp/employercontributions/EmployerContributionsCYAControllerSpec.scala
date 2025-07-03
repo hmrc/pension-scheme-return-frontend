@@ -43,6 +43,10 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
     EmployerCYA(secondaryIndex, employerName, IdentityType.UKCompany, Right(crn.value), money)
   )
 
+  private def employerCyasFor(identityType: IdentityType, idOrReason: Either[String, String]) = List(
+    EmployerCYA(secondaryIndex, employerName, identityType, idOrReason, money)
+  )
+
   private def onPageLoad(mode: Mode) =
     routes.EmployerContributionsCYAController.onPageLoad(srn, index, page, mode)
   private def onSubmit(mode: Mode) = routes.EmployerContributionsCYAController.onSubmit(srn, index, page, mode)
@@ -70,7 +74,7 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  private val userAnswers = defaultUserAnswers
+  private val userAnswersCompanyCrn = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
@@ -79,7 +83,21 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
     .unsafeSet(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
     .unsafeSet(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
 
-  private val userAnswersInProgress = userAnswers
+  private val userAnswersCompanyNoCrn = userAnswersCompanyCrn
+    .unsafeSet(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo.no[String, Crn](noCrnReason))
+
+  private val userAnswersPartnershipUtr = userAnswersCompanyCrn
+    .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipEmployerUtrPage(srn, index, secondaryIndex), conditionalYesNoUtr)
+
+  private val userAnswersPartnershipNoUtr = userAnswersPartnershipUtr
+    .unsafeSet(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo.no[String, Utr](noUtrReason))
+
+  private val userAnswersOther = userAnswersCompanyCrn
+    .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
+    .unsafeSet(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), otherRecipientDescription)
+
+  private val userAnswersInProgress = userAnswersCompanyCrn
     .unsafeSet(
       EmployerContributionsProgress(srn, index, index1of50),
       SectionJourneyStatus.InProgress(anyUrl)
@@ -94,11 +112,20 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
   "EmployerContributionsCYAController" - {
 
     List(NormalMode, CheckMode).foreach { mode =>
-      act.like(renderView(onPageLoad(mode), userAnswers) { implicit app => implicit request =>
-        injected[CheckYourAnswersView].apply(
-          viewModel(srn, memberDetails.fullName, index, page, employerCYAs, mode, viewOnlyUpdated = true)
-        )
-      }.withName(s"render correct ${mode.toString} view"))
+
+      List(
+        (userAnswersCompanyCrn, employerCyasFor(IdentityType.UKCompany, Right(crn.value))),
+        (userAnswersCompanyNoCrn, employerCyasFor(IdentityType.UKCompany, Left(noCrnReason))),
+        (userAnswersPartnershipUtr, employerCyasFor(IdentityType.UKPartnership, Right(utr.value))),
+        (userAnswersPartnershipNoUtr, employerCyasFor(IdentityType.UKPartnership, Left(noUtrReason))),
+        (userAnswersOther, employerCyasFor(IdentityType.Other, Right(otherRecipientDescription)))
+      ).foreach { (answers, CYAs) =>
+        act.like(renderView(onPageLoad(mode), answers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(srn, memberDetails.fullName, index, page, CYAs, mode, viewOnlyUpdated = true)
+          )
+        }.withName(s"render correct ${mode.toString} view for $CYAs"))
+      }
 
       act.like(
         redirectToPage(
@@ -111,14 +138,14 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
       act.like(
         redirectNextPage(
           onSubmit(mode),
-          userAnswers
+          userAnswersCompanyCrn
         ).updateName(s"${mode.toString} onSubmit" + _)
       )
 
       act.like(
         redirectNextPage(
           onSubmit(mode),
-          userAnswers
+          userAnswersCompanyCrn
             .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKPartnership)
             .unsafeSet(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo.yes[String, Utr](utr))
         ).updateName(s"${mode.toString} onSubmit as partnership" + _)
@@ -127,7 +154,7 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
       act.like(
         redirectNextPage(
           onSubmit(mode),
-          userAnswers
+          userAnswersCompanyCrn
             .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
             .unsafeSet(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), otherDetails)
         ).updateName(s"${mode.toString} onSubmit as other" + _)
@@ -141,10 +168,10 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
 
   "EmployerContributionsCYAController in view only mode" - {
 
-    val currentUserAnswers = userAnswers
+    val currentUserAnswers = userAnswersCompanyCrn
       .unsafeSet(FbVersionPage(srn), "002")
 
-    val previousUserAnswers = userAnswers
+    val previousUserAnswers = userAnswersCompanyCrn
       .unsafeSet(FbVersionPage(srn), "001")
 
     act.like(

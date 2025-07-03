@@ -94,7 +94,7 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec with ControllerBe
       )
     })
 
-    act.like(redirectNextPage(onSubmit, userAnswers ))
+    act.like(redirectNextPage(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

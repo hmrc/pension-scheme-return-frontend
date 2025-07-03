@@ -24,7 +24,7 @@ import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
 import models._
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common._
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -75,7 +75,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
     submissionNumberOne
   )
 
-  private val filledUserAnswers = defaultUserAnswers
+  private val filledUserAnswersIndividual = defaultUserAnswers
     .unsafeSet(WhatIsOtherAssetPage(srn, index), otherAssetDescription)
     .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index), true)
     .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Acquisition)
@@ -89,7 +89,21 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
     .unsafeSet(IncomeFromAssetPage(srn, index), money)
     .unsafeSet(OtherAssetsProgress(srn, index), SectionJourneyStatus.Completed)
 
-  private val incompleteUserAnswers = filledUserAnswers
+  private val filledUserAnswersCompany = filledUserAnswersIndividual
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
+    .unsafeSet(CompanyNameOfOtherAssetSellerPage(srn, index), companyName)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), conditionalYesNoCrn)
+
+  private val filledUserAnswersPartnership = filledUserAnswersIndividual
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipOtherAssetSellerNamePage(srn, index), partnershipName)
+    .unsafeSet(PartnershipRecipientUtrPage(srn, index, subject), conditionalYesNoUtr)
+
+  private val filledUserAnswersOther = filledUserAnswersIndividual
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
+    .unsafeSet(OtherRecipientDetailsPage(srn, index, subject), otherRecipientDetails)
+
+  private val incompleteUserAnswers = filledUserAnswersIndividual
     .unsafeSet(
       OtherAssetsProgress(srn, index),
       SectionJourneyStatus.InProgress(
@@ -102,7 +116,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
   "OtherAssetsCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswersIndividual) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
@@ -242,4 +256,44 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
     )
   }
 
+  "OtherAssetsCYAController identity subject variations" - {
+
+    List(
+      (filledUserAnswersCompany, IdentityType.UKCompany, companyName, crn.crn),
+      (filledUserAnswersPartnership, IdentityType.UKPartnership, partnershipName, utr.value),
+      (filledUserAnswersOther, IdentityType.Other, otherRecipientName, otherRecipientDescription)
+    ).foreach { (filledAnswers, identityType, sellerName, sellerDescription) =>
+      act.like(
+        renderView(onPageLoad(NormalMode), filledAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                index,
+                schemeName,
+                description = otherAssetDescription,
+                isTangibleMoveableProperty = true,
+                whyHeld = SchemeHoldAsset.Acquisition,
+                acquisitionOrContributionDate = Some(localDate),
+                sellerIdentityType = Some(identityType),
+                sellerName = Some(sellerName),
+                sellerDetails = Some(sellerDescription),
+                sellerReasonNoDetails = None,
+                isSellerConnectedParty = Some(true),
+                totalCost = money,
+                isIndependentValuation = Some(true),
+                totalIncome = money,
+                mode = NormalMode
+              ),
+              viewOnlyUpdated = true
+            )
+          )
+        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+          .after {
+            reset(mockPsrSubmissionService)
+          }
+          .withName(s"render correct NormalMode view for $identityType")
+      )
+    }
+  }
 }
