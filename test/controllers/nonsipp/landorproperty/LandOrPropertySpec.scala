@@ -32,7 +32,6 @@ class LandOrPropertySpec extends ControllerBaseSpec with ControllerBehaviours {
   private val cyaUrl = s"/pension-scheme-return/${srn.value}/check-answers-land-property"
   private val changeCyaUrl = s"/pension-scheme-return/${srn.value}/change-check-answers-land-property"
   private val nonCyaUrl = s"/pension-scheme-return/${srn.value}/some-other-land-or-property-page"
-  private val urlWithIndices = s"/pension-scheme-return/${srn.value}/check-answers-land-property/1/1"
 
   // Call objects for testing
   private val cyaPageCall = Call("GET", cyaUrl)

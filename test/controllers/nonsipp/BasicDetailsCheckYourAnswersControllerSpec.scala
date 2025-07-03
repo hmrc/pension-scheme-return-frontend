@@ -705,6 +705,15 @@ class BasicDetailsCheckYourAnswersControllerSpec
     )
   }
 
+  "Required page is missing" - {
+    act.like(
+      journeyRecoveryPage(onPageLoad, Some(emptyUserAnswers))
+        .updateName("onPageLoad" + _)
+        .before(mockTaxYear(currentReturnTaxYear))
+        .withName("required page is missing")
+    )
+  }
+
   private def buildViewModel(
     srn: Srn = srn,
     mode: Mode = NormalMode,

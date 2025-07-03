@@ -105,7 +105,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
       )
     })
 
-    act.like(redirectNextPage(onSubmit))
+    act.like(redirectNextPage(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
