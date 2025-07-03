@@ -169,10 +169,6 @@ class MemberPaymentsTransformer @Inject() (
               val same = normalisedInitialMember == normalisedCurrentMember
               if (!same) {
                 logger.info(s"member $index has changed, removing memberPSRVersion")
-//                // we can still use this on localhost if needed:
-//                if (logger.isDebugEnabled) {
-//                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
-//                }
               }
               currentMemberDetail.copy(
                 memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
