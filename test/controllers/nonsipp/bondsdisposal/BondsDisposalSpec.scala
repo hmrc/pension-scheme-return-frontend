@@ -33,7 +33,6 @@ class BondsDisposalSpec extends ControllerBaseSpec with ControllerBehaviours {
   private val cyaUrl = s"/pension-scheme-return/${srn.value}/check-answers-bond-disposal/"
   private val changeCyaUrl = s"/pension-scheme-return/${srn.value}/change-bond-disposal/"
   private val nonCyaUrl = s"/pension-scheme-return/${srn.value}/some-other-disposal-page"
-  private val excludedCyaUrl = s"/pension-scheme-return/${srn.value}/check-answers-bond-disposal/1/1"
 
   // Call objects for testing
   private val cyaPageCall = Call("GET", cyaUrl)

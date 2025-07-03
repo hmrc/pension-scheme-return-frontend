@@ -21,13 +21,13 @@ import play.api.inject.bind
 import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
-import viewmodels.models.SectionJourneyStatus
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions._
 import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import org.mockito.Mockito.{reset, when, _}
+import org.mockito.Mockito._
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 
@@ -76,6 +76,7 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
     .unsafeSet(TotalEmployerContributionPage(srn, index, secondaryIndex), money)
     .unsafeSet(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
     .unsafeSet(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
 
   private val userAnswersInProgress = userAnswers
@@ -107,7 +108,30 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
         ).withName(s"Redirect to list page if the only entry is incomplete in mode $mode")
       )
 
-      act.like(redirectNextPage(onSubmit(mode)).updateName(s"${mode.toString} onSubmit" + _))
+      act.like(
+        redirectNextPage(
+          onSubmit(mode),
+          userAnswers
+        ).updateName(s"${mode.toString} onSubmit" + _)
+      )
+
+      act.like(
+        redirectNextPage(
+          onSubmit(mode),
+          userAnswers
+            .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKPartnership)
+            .unsafeSet(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo.yes[String, Utr](utr))
+        ).updateName(s"${mode.toString} onSubmit as partnership" + _)
+      )
+
+      act.like(
+        redirectNextPage(
+          onSubmit(mode),
+          userAnswers
+            .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
+            .unsafeSet(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), otherDetails)
+        ).updateName(s"${mode.toString} onSubmit as other" + _)
+      )
 
       act.like(journeyRecoveryPage(onPageLoad(mode)).updateName(s"${mode.toString} onPageLoad" + _))
 
