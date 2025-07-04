@@ -79,11 +79,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-        case Some(IdentityType.Other) =>
+        case Some(_) =>
           controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
 
       }
 

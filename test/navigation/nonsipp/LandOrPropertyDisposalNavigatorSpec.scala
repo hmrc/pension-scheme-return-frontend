@@ -21,7 +21,7 @@ import config.RefinedTypes.{Max50, Max5000}
 import utils.IntUtils.given
 import pages.nonsipp.landorpropertydisposal._
 import navigation.{Navigator, NavigatorBehaviours}
-import models.{IdentityType, NormalMode}
+import models._
 import viewmodels.models.SectionCompleted
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
@@ -54,6 +54,60 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from LandOrPropertyDisposalPage to task list page on no")
+    )
+  }
+
+  "WhatYouWillNeedLandPropertyDisposalPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedLandPropertyDisposalPage.apply,
+          (srn, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController
+              .onPageLoad(srn, page = 1)
+        )
+        .withName("go from WhatYouWillNeedLandPropertyDisposalPage to LandOrPropertyDisposalAddressListController")
+    )
+  }
+
+  "HowWasPropertyDisposedOfPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          HowWasPropertyDisposedOfPage.apply,
+          (srn, index: Int, disposalIndex: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from LandOrPropertyStillHeldPage to UnauthorisedController")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndexAndData(
+          index,
+          disposalIndex,
+          HowWasPropertyDisposedOfPage.apply,
+          Gen.const(HowDisposed.Sold),
+          (srn, index: Int, disposalIndex: Int, mode) =>
+            controllers.nonsipp.landorpropertydisposal.routes.WhenWasPropertySoldController
+              .onPageLoad(srn, index, disposalIndex, mode)
+        )
+        .withName("go from LandOrPropertyStillHeldPage to WhenWasPropertySoldController page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndexAndData(
+          index,
+          disposalIndex,
+          HowWasPropertyDisposedOfPage.apply,
+          Gen.const(HowDisposed.Transferred),
+          (srn, index: Int, disposalIndex: Int, mode) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
+              .onPageLoad(srn, index, disposalIndex, mode)
+        )
+        .withName("go from LandOrPropertyStillHeldPage to LandOrPropertyStillHeldController page")
     )
   }
 
@@ -230,8 +284,37 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
     )
   }
 
-  "LandOrPropertyDisposalBuyerConnectedPartyPage" - {
+  "CompanyBuyerNamePage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          CompanyBuyerNamePage.apply,
+          (srn, index: Int, disposalIndex: Int, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from CompanyBuyerNamePage to CompanyBuyerCrnController")
+    )
+  }
 
+  "CompanyBuyerCrnPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          CompanyBuyerCrnPage.apply,
+          (srn, index: Int, disposalIndex: Int, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from CompanyBuyerCrnPage to LandOrPropertyDisposalBuyerConnectedPartyController")
+    )
+  }
+
+  "LandOrPropertyDisposalBuyerConnectedPartyPage" - {
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
@@ -245,6 +328,22 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName(
           "go from land or property disposal buyer connected party Page to independent valuation page"
         )
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => LandOrPropertyDisposalBuyerConnectedPartyPage(srn, 1, 1),
+          (srn, mode) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+              .onPageLoad(srn, index, disposalIndex, mode),
+          srn =>
+            defaultUserAnswers
+              .unsafeSet(TotalProceedsSaleLandPropertyPage(srn, 1, 1), Money(123456))
+              .unsafeSet(DisposalIndependentValuationPage(srn, 1, 1), true)
+              .unsafeSet(LandOrPropertyStillHeldPage(srn, 1, 1), true)
+        )
+        .withName("go from land or property disposal buyer connected party Page to LandPropertyDisposalCYAController")
     )
   }
 
@@ -261,6 +360,44 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
         .withName("go from total proceeds sale land property page to land or property still held page")
+    )
+  }
+
+  "LandPropertyDisposalCompletedPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          LandPropertyDisposalCompletedPage.apply,
+          (srn, index: Int, disposalIndex: Int, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+              .onPageLoad(srn, 1)
+        )
+        .withName("go from LandPropertyDisposalCompletedPage to LandOrPropertyDisposalListController")
+    )
+  }
+
+  "LandOrPropertyDisposalListPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => LandOrPropertyDisposalListPage(srn, true),
+          (srn, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController
+              .onPageLoad(srn, 1)
+        )
+        .withName("go from LandOrPropertyDisposalListPage to LandOrPropertyDisposalAddressListController on yes")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => LandOrPropertyDisposalListPage(srn, false),
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from LandOrPropertyDisposalListPage to task list page on no")
     )
   }
 
