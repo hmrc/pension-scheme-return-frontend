@@ -70,12 +70,15 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] with Matchers
 
       val updateResult: Unit = repository.updateStatus(reference, failure).futureValue
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
+      val getAfterUpdateResult = repository.getUploadDetails(UploadKey("test-userid", srn)).futureValue.value
 
       updateResult mustBe ()
       findAfterUpdateResult mustBe initialMongoUpload.copy(
         status = SensitiveUploadStatus(failure),
         lastUpdated = instant
       )
+
+      getAfterUpdateResult mustBe initialUploadDetails.copy(status = failure, lastUpdated = instant)
     }
 
     "successfully update the ttl and status to success" in {
