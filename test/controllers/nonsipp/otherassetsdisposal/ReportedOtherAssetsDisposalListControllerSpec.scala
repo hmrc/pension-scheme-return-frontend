@@ -164,13 +164,19 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec w
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      invalidForm(onSubmit, completedUserAnswers)
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
