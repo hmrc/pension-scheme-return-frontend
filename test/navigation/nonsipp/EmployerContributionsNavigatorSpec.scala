@@ -34,102 +34,70 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
   private val index: Max300 = 1
   private val secondaryIndex: Max50 = 1
 
-  "EmployerContributionsNavigator" - {
-
-    act.like(
-      normalmode
-        .navigateToWithData(
-          EmployerContributionsPage.apply,
-          Gen.const(true),
-          (srn, _) =>
-            controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
-              .onPageLoad(srn)
-        )
-        .withName(
-          "go from employer contribution page to what you will need employer contributions page when yes selected"
-        )
-    )
-
-    act.like(
-      normalmode
-        .navigateToWithData(
-          EmployerContributionsPage.apply,
-          Gen.const(false),
-          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-        )
-        .withName("go from employer contribution page to task list page when no selected")
-    )
-
-  }
-
-  "WhatYouWillNeedEmployerContributionsPage" - {
-    act.like(
-      normalmode
-        .navigateTo(
-          WhatYouWillNeedEmployerContributionsPage.apply,
-          (srn, _) =>
-            controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-              .onPageLoad(srn, 1, NormalMode)
-        )
-        .withName("go from what you will need employer contributions page to employer contributions list page ")
-    )
-  }
-
-  "EmployerContributionsMemberListPage" - {
-    act.like(
-      normalmode
-        .navigateTo(
-          EmployerContributionsMemberListPage.apply,
-          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-        )
-        .withName("go from employer contribution page to task list page")
-    )
-  }
-
-  "EmployerNamePage" - {
-    act.like(
-      normalmode
-        .navigateToWithDoubleIndex(
-          index,
-          secondaryIndex,
-          EmployerNamePage.apply,
-          (srn, index: Int, secondaryIndex: Int, _) =>
-            controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode)
-        )
-        .withName("go from employer name page to employer type of business page")
-    )
-
-    def userAnswersWithEmployerNames(num: Int)(srn: Srn): UserAnswers =
-      (1 to num).foldLeft(defaultUserAnswers) { (ua, i) =>
-        val secondaryIndex: Max50 = i
-        ua.unsafeSet(EmployerNamePage(srn, 1, secondaryIndex), "test employer name")
-      }
-
-    List(
-      (1, 1),
-      (5, 1),
-      (6, 2),
-      (10, 2),
-      (12, 3),
-      (49, 10)
-    ).foreach { case (navigatingFromIndex, expectedPage) =>
-      val userAnswers = userAnswersWithEmployerNames(50)
-      val secondaryIndex: Max50 = navigatingFromIndex
+  "normalMode" - {
+    "EmployerContributionsPage" - {
       act.like(
-        checkmode
+        normalmode
+          .navigateToWithData(
+            EmployerContributionsPage.apply,
+            Gen.const(true),
+            (srn, _) =>
+              controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
+                .onPageLoad(srn)
+          )
+          .withName(
+            "go from employer contribution page to what you will need employer contributions page when yes selected"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithData(
+            EmployerContributionsPage.apply,
+            Gen.const(false),
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          )
+          .withName("go from employer contribution page to task list page when no selected")
+      )
+
+    }
+
+    "WhatYouWillNeedEmployerContributionsPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedEmployerContributionsPage.apply,
+            (srn, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                .onPageLoad(srn, 1, NormalMode)
+          )
+          .withName("go from what you will need employer contributions page to employer contributions list page ")
+      )
+    }
+
+    "EmployerContributionsMemberListPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            EmployerContributionsMemberListPage.apply,
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          )
+          .withName("go from employer contribution page to task list page")
+      )
+    }
+
+    "EmployerNamePage" - {
+      act.like(
+        normalmode
           .navigateToWithDoubleIndex(
             index,
             secondaryIndex,
             EmployerNamePage.apply,
-            (srn, index: Int, _: Int, _) =>
-              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, expectedPage, NormalMode),
-            userAnswers
+            (srn, index: Int, secondaryIndex: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
+                .onPageLoad(srn, index, secondaryIndex, NormalMode)
           )
-          .withName(
-            s"go from employer name page to employer contributions CYA page $expectedPage when navigating from page with index $navigatingFromIndex"
-          )
+          .withName("go from employer name page to employer type of business page")
       )
     }
   }
@@ -328,5 +296,161 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         )
         .withName("go from EmployerContributionsCYAPage to ??? page")
     )
+  }
+  "checkMode" - {
+    "EmployerNamePage" - {
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            EmployerNamePage.apply,
+            (srn, index: Int, secondaryIndex: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, secondaryIndex, NormalMode)
+          )
+          .withName("go from employer name page to employer type of business page")
+      )
+
+      def userAnswersWithEmployerNames(num: Int)(srn: Srn): UserAnswers =
+        (1 to num).foldLeft(defaultUserAnswers) { (ua, i) =>
+          val secondaryIndex: Max50 = i
+          ua.unsafeSet(EmployerNamePage(srn, 1, secondaryIndex), "test employer name")
+        }
+
+      List(
+        (1, 1),
+        (5, 1),
+        (6, 2),
+        (10, 2),
+        (12, 3),
+        (49, 10)
+      ).foreach { case (navigatingFromIndex, expectedPage) =>
+        val userAnswers = userAnswersWithEmployerNames(50)
+        val secondaryIndex: Max50 = navigatingFromIndex
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              index,
+              secondaryIndex,
+              EmployerNamePage.apply,
+              (srn, index: Int, _: Int, _) =>
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onPageLoad(srn, index, expectedPage, NormalMode),
+              userAnswers
+            )
+            .withName(
+              s"go from employer name page to employer contributions CYA page $expectedPage when navigating from page with index $navigatingFromIndex"
+            )
+        )
+      }
+    }
+
+    "EmployerTypeOfBusinessPage" - {
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            index,
+            secondaryIndex,
+            EmployerTypeOfBusinessPage.apply,
+            Gen.const(IdentityType.UKCompany),
+            (srn, memberIndex: Int, index: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+                .onPageLoad(srn, memberIndex, index, CheckMode)
+          )
+          .withName("go from employer type of business page to unauthorised")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            index,
+            secondaryIndex,
+            EmployerTypeOfBusinessPage.apply,
+            Gen.const(IdentityType.UKPartnership),
+            (srn, memberIndex: Int, index: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
+                .onPageLoad(srn, memberIndex, index, CheckMode)
+          )
+          .withName("go from employer type of business page to unauthorised page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            index,
+            secondaryIndex,
+            EmployerTypeOfBusinessPage.apply,
+            Gen.const(IdentityType.Other),
+            (srn, memberIndex: Int, index: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+                .onPageLoad(srn, memberIndex, index, CheckMode)
+          )
+          .withName("go from employer type of business page to unauthorised controller page")
+      )
+    }
+
+    "OtherEmployeeDescriptionPage" - {
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            OtherEmployeeDescriptionPage.apply,
+            (srn, index: Int, secondaryIndex: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, secondaryIndex, NormalMode)
+          )
+          .withName("go from OtherEmployeeDescriptionPage to TotalEmployerContribution page")
+      )
+
+    }
+
+    "PartnershipEmployerUtrPage" - {
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            PartnershipEmployerUtrPage.apply,
+            (srn, index: Int, secondaryIndex: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, secondaryIndex, NormalMode)
+          )
+          .withName("go from partnership employer utr page to unauthorised page")
+      )
+    }
+
+    "EmployerCompanyCrnPage" - {
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            EmployerCompanyCrnPage.apply,
+            (srn, index: Int, secondaryIndex: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, secondaryIndex, NormalMode)
+          )
+          .withName("go from employer company crn page to total employer contribution page")
+      )
+    }
+
+    "ContributionsFromAnotherEmployerPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ContributionsFromAnotherEmployerPage.apply,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, page = 1, NormalMode)
+          )
+          .withName("go from contribution from another employer page to unauthorised page")
+      )
+
+    }
   }
 }
