@@ -18,7 +18,7 @@ package controllers.nonsipp.schemedesignatory
 
 import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SchemeDateService}
-import pages.nonsipp.schemedesignatory.{HowManyMembersPage, ValueOfAssetsPage}
+import pages.nonsipp.schemedesignatory._
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -72,14 +72,19 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
       .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-    act.like(renderView(onPageLoad, userAnswersWithTaxYear) { implicit app => implicit request =>
+    val userAnswers = userAnswersWithTaxYear
+      .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
+      .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
+      .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
+
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
         viewModel(
           srn,
           NormalMode,
-          howMuchCashPage = None,
-          valueOfAssetsPage = None,
-          feesCommissionsWagesSalariesPage = None,
+          howMuchCashPage = Some(moneyInPeriod),
+          valueOfAssetsPage = Some(moneyInPeriod),
+          feesCommissionsWagesSalariesPage = Some(money),
           dateRange,
           defaultSchemeDetails,
           viewOnlyUpdated = false
