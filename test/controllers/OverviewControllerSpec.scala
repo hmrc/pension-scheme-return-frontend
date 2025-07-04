@@ -23,7 +23,7 @@ import play.api.inject.bind
 import views.html.OverviewView
 import utils.IntUtils.given
 import pages.nonsipp.WhichTaxYearPage
-import models.backend.responses.PsrReportType
+import models.backend.responses._
 import models.CheckMode
 import viewmodels.OverviewSummary
 import org.mockito.ArgumentMatchers.any
@@ -33,6 +33,8 @@ import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 
 import scala.concurrent.Future
+
+import java.time.{LocalDate, LocalDateTime}
 
 class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviours with CommonTestValues {
 
@@ -55,6 +57,26 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     routes.OverviewController
       .onSelectViewAndChange(srn, commonFbNumber, commonStartDate, PsrReportType.Standard.name)
       .url
+  def onSelectStartSipp(lastSubmittedPsrFbInPreviousYears: Option[String]): String =
+    routes.OverviewController
+      .onSelectStart(
+        srn,
+        commonStartDate,
+        commonVersion,
+        PsrReportType.Sipp.name,
+        lastSubmittedPsrFbInPreviousYears
+      )
+      .url
+  private def onSelectContinueSipp(version: String): String =
+    routes.OverviewController
+      .onSelectContinue(srn, commonStartDate, version, Some(commonFbNumber), PsrReportType.Sipp.name, None)
+      .url
+  lazy val onSelectViewAndChangeSipp: String =
+    routes.OverviewController
+      .onSelectViewAndChange(srn, commonFbNumber, commonStartDate, PsrReportType.Sipp.name)
+      .url
+  val sippStartUrl = s"http://localhost:10703/pension-scheme-return-sipp/${srn.value}/what-you-will-need"
+  val sippViewOrChangeUrl = s"http://localhost:10703/pension-scheme-return-sipp/${srn.value}/view-change-question"
 
   private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
   private implicit val mockPsrOverviewService: PsrOverviewService = mock[PsrOverviewService]
@@ -74,6 +96,39 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     reset(mockPsrVersionsService)
     reset(mockPrePopulationService)
   }
+
+  val compiledOverviewResponse: Seq[OverviewResponse] =
+    Seq(
+      OverviewResponse(
+        periodStartDate = LocalDate.parse("2022-04-06"),
+        periodEndDate = LocalDate.parse("2023-04-05"),
+        numberOfVersions = Some(1),
+        submittedVersionAvailable = Some(YesNo.No),
+        compiledVersionAvailable = Some(YesNo.Yes),
+        ntfDateOfIssue = Some(LocalDate.parse("2022-12-06")),
+        psrDueDate = Some(LocalDate.parse("2023-03-31")),
+        psrReportType = Some(PsrReportType.Standard),
+        tpssReportPresent = None
+      )
+    )
+
+  val compiledVersionsResponse2022: PsrVersionsResponse = PsrVersionsResponse(
+    startDate = Some(LocalDate.parse("2022-04-06")),
+    reportFormBundleNumber = commonFbNumber,
+    reportVersion = commonVersion.toInt,
+    reportStatus = ReportStatus.ReportStatusCompiled,
+    compilationOrSubmissionDate = LocalDateTime.parse("2020-04-08T12:00:00.000"),
+    reportSubmitterDetails = None,
+    psaDetails = None
+  )
+
+  val compiledVersionsForYearsInProgressResponse: Seq[PsrVersionsForYearsResponse] =
+    Seq(
+      PsrVersionsForYearsResponse(
+        startDate = "2022-04-06",
+        data = Seq(compiledVersionsResponse2022)
+      )
+    )
 
   "OverviewController" - {
 
@@ -166,6 +221,29 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         verify(mockPrePopulationService, times(1)).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
+    "onPageLoads returns OK and expected content - when in compile responses returned" in runningApplication {
+      implicit app =>
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(using any(), any(), any())).thenReturn(
+          Future.successful(Some(compiledOverviewResponse))
+        )
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(using any(), any(), any())).thenReturn(
+          Future.successful(compiledVersionsForYearsInProgressResponse)
+        )
+        when(mockPrePopulationService.findLastSubmittedPsrFbInPreviousYears(any(), any())).thenReturn(
+          Some("1")
+        )
+        val request = FakeRequest(GET, onPageLoad)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual OK
+        val content = contentAsString(result)
+        content must include("/select-continue")
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(using any(), any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(using any(), any(), any())
+        verify(mockPrePopulationService, times(1)).findLastSubmittedPsrFbInPreviousYears(any(), any())
+    }
+
     "onSelectStart redirects to what you will need page" in runningApplication { implicit app =>
       val request = FakeRequest(GET, onSelectStart(None))
 
@@ -188,6 +266,17 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           .onPageLoad(srn)
           .url
     }
+
+    "onSelectStart redirects to what you will need page when report type is Sipp" in runningApplication {
+      implicit app =>
+        val request = FakeRequest(GET, onSelectStartSipp(None))
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual sippStartUrl
+    }
+
     List(commonVersion, "002").foreach { version =>
       s"onSelectContinue redirects to task list page with version $version" in runningApplication { implicit app =>
         val request = FakeRequest(GET, onSelectContinue(version))
@@ -196,6 +285,21 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+      }
+    }
+
+    List(
+      (commonVersion, sippStartUrl),
+      ("002", sippViewOrChangeUrl)
+    ).foreach { (version, expectedRedirect) =>
+      s"onSelectContinue for SIPP type redirects to expected page when version is $version" in runningApplication {
+        implicit app =>
+          val request = FakeRequest(GET, onSelectContinueSipp(version))
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual expectedRedirect
       }
     }
 
@@ -346,5 +450,15 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
             .url
         }
       }
+
+    "onSelectViewAndChange redirects to the Sipp view or change page when type is Sipp" in runningApplication {
+      implicit app =>
+        val request = FakeRequest(GET, onSelectViewAndChangeSipp)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual sippViewOrChangeUrl
+    }
   }
 }
