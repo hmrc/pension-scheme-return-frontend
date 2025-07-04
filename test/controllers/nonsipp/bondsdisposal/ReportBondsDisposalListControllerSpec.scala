@@ -124,7 +124,13 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec with Cont
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      invalidForm(onSubmit, completedUserAnswers)
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
