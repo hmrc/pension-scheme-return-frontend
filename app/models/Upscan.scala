@@ -88,6 +88,11 @@ object UploadStatus {
 
   case class Success(name: String, mimeType: String, downloadUrl: String, size: Option[Long]) extends UploadStatus
 
+  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.Success] = Json.format[UploadStatus.Success]
+  implicit val uploadedFailedFormat: OFormat[UploadStatus.Failed] = Json.format[UploadStatus.Failed]
+  implicit val uploadedInProgressFormat: OFormat[UploadStatus.InProgress.type] =
+    Json.format[UploadStatus.InProgress.type]
+  implicit val uploadedStatusFormat: OFormat[UploadStatus] = Json.format[UploadStatus]
 }
 
 sealed trait CallbackBody {
@@ -121,6 +126,10 @@ case class UploadDetails(
 )
 
 case class ErrorDetails(failureReason: String, message: String)
+
+object ErrorDetails {
+  implicit val errorDetailsFormat: OFormat[ErrorDetails] = Json.format[ErrorDetails]
+}
 
 object CallbackBody {
   // must be in scope to create Reads for ReadyCallbackBody

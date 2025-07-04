@@ -18,6 +18,7 @@ package repositories
 
 import org.mongodb.scala.model.Updates.{combine, set}
 import uk.gov.hmrc.mongo.MongoComponent
+import models.SchemeId.asSrn
 import uk.gov.hmrc.mongo.play.json.Codecs._
 import play.api.libs.json._
 import models._
@@ -29,8 +30,6 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import org.mongodb.scala.model._
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import config.{Crypto, FrontendAppConfig}
-import cats.data.NonEmptyList
-import models.SchemeId.asSrn
 import models.UploadStatus.UploadStatus
 import play.api.libs.functional.syntax._
 
@@ -181,23 +180,8 @@ object UploadRepository {
 
   implicit val uploadKeyWrites: Writes[UploadKey] = Writes.StringWrites.contramap(_.value)
 
-  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.Success] =
-    Json.format[UploadStatus.Success]
-  implicit val errorDetailsFormat: OFormat[ErrorDetails] = Json.format[ErrorDetails]
-  implicit val uploadedFailedFormat: OFormat[UploadStatus.Failed] = Json.format[UploadStatus.Failed]
-  implicit val uploadedInProgressFormat: OFormat[UploadStatus.InProgress.type] =
-    Json.format[UploadStatus.InProgress.type]
-  implicit val uploadedStatusFormat: OFormat[UploadStatus] = Json.format[UploadStatus]
-
   private implicit val referenceFormat: Format[Reference] =
     stringFormat[Reference](Reference(_), _.reference)
-
-  implicit val uploadSuccessFormat: OFormat[UploadSuccess] = Json.format[UploadSuccess]
-  implicit val validationErrorsFormat: OFormat[NonEmptyList[ValidationError]] =
-    Json.format[NonEmptyList[ValidationError]]
-  implicit val uploadErrorsFormat: OFormat[UploadErrors] = Json.format[UploadErrors]
-  implicit val uploadFormatErrorFormat: OFormat[UploadFormatError.type] = Json.format[UploadFormatError.type]
-  implicit val uploadMaxRowsErrorFormat: OFormat[UploadMaxRowsError.type] = Json.format[UploadMaxRowsError.type]
 
   implicit val uploadFormat: OFormat[Upload] = Json.format[Upload]
 
