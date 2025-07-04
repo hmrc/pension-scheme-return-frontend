@@ -201,6 +201,13 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec with C
         .updateName(_ + " completedUserAnswers")
     )
 
+    act.like(
+      invalidForm(onSubmit, completedUserAnswers)
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+        .updateName(_ + " completedUserAnswers")
+    )
+
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
