@@ -53,6 +53,8 @@ object ValidationError {
     Json.format[ValidationErrorType.NoNinoReason.type]
   implicit val errorTypeFormat: Format[ValidationErrorType] = Json.format[ValidationErrorType]
   implicit val format: Format[ValidationError] = Json.format[ValidationError]
+  implicit val validationErrorsFormat: OFormat[NonEmptyList[ValidationError]] =
+    Json.format[NonEmptyList[ValidationError]]
 
   def fromCell(cell: String, row: Int, errorType: ValidationErrorType, errorMessage: String): ValidationError =
     ValidationError(cell + (row + 1), errorType: ValidationErrorType, errorMessage)
@@ -83,14 +85,26 @@ sealed trait Upload
 
 case class UploadSuccess(memberDetails: List[UploadMemberDetails]) extends Upload
 
+object UploadSuccess {
+  implicit val uploadSuccessFormat: OFormat[UploadSuccess] = Json.format[UploadSuccess]
+}
+
 // UploadError should not extend Upload as the nested inheritance causes issues with the play Json macros
 sealed trait UploadError
 
-case object UploadFormatError extends Upload with UploadError
+case object UploadFormatError extends Upload with UploadError {
+  implicit val uploadFormatErrorFormat: OFormat[UploadFormatError.type] = Json.format[UploadFormatError.type]
+}
 
-case object UploadMaxRowsError extends Upload with UploadError
+case object UploadMaxRowsError extends Upload with UploadError {
+  implicit val uploadMaxRowsErrorFormat: OFormat[UploadMaxRowsError.type] = Json.format[UploadMaxRowsError.type]
+}
 
 case class UploadErrors(errors: NonEmptyList[ValidationError]) extends Upload with UploadError
+
+object UploadErrors {
+  implicit val uploadErrorsFormat: OFormat[UploadErrors] = Json.format[UploadErrors]
+}
 
 case class UploadMemberDetails(row: Int, nameDOB: NameDOB, ninoOrNoNinoReason: Either[String, Nino])
 
