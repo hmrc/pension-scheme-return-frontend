@@ -97,11 +97,9 @@ object SharesNavigator extends JourneyNavigator {
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController
             .onPageLoad(srn, index, NormalMode)
-        case Some(IdentityType.UKPartnership) =>
+        case _ =>
           controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController
             .onPageLoad(srn, index, NormalMode)
-        case _ =>
-          controllers.routes.UnauthorisedController.onPageLoad()
       }
 
     case IndividualNameOfSharesSellerPage(srn, index) =>
@@ -381,9 +379,6 @@ object SharesNavigator extends JourneyNavigator {
 
       case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) match {
-          case Some(IdentityType.Other) =>
-            controllers.nonsipp.common.routes.OtherRecipientDetailsController
-              .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
           case Some(IdentityType.Individual) =>
             controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController
               .onPageLoad(srn, index, CheckMode)
@@ -394,7 +389,8 @@ object SharesNavigator extends JourneyNavigator {
             controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController
               .onPageLoad(srn, index, CheckMode)
           case _ =>
-            controllers.routes.UnauthorisedController.onPageLoad()
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController
+              .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
         }
 
       case IndividualNameOfSharesSellerPage(srn, index) =>

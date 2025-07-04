@@ -202,19 +202,41 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       "testDescription"
     )
 
-    List(OtherRecipientDetailsPage, CompanyRecipientCrnPage, PartnershipRecipientUtrPage).foreach { page =>
-      act.like(
-        normalmode
-          .navigateToWithDataIndexAndSubject(
-            index,
-            subject,
-            OtherRecipientDetailsPage.apply,
-            Gen.const(recipientDetails),
-            controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
-          )
-          .withName(s"go from $page page to recipient connected party page")
-      )
-    }
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          OtherRecipientDetailsPage.apply,
+          Gen.const(recipientDetails),
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from OtherRecipientDetailsPage page to recipient connected party page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          CompanyRecipientCrnPage.apply,
+          Gen.const(conditionalYesNoCrn),
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from CompanyRecipientCrnPage page to recipient connected party page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          PartnershipRecipientUtrPage.apply,
+          Gen.const(conditionalYesNoUtr),
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from PartnershipRecipientUtrPage page to recipient connected party page")
+    )
 
     act.like(
       normalmode
@@ -223,7 +245,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           IndividualSellerNiPage.apply,
           controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
         )
-        .withName("go from idividual seller NI page to recipient connected party page")
+        .withName("go from individual seller NI page to recipient connected party page")
     )
 
     act.like(
@@ -436,6 +458,20 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
         .withName("go from is lessee connected party page to Land or property CYA page")
+    )
+  }
+
+  "PartnershipSellerNamePage" - {
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubjects(
+          index,
+          subject,
+          PartnershipSellerNamePage.apply,
+          Gen.const(""),
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad
+        )
+        .withName("go from partnership seller name page to partnership recipient utr page")
     )
   }
 
@@ -1004,7 +1040,6 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     }
 
     "CompanySellerNamePage" - {
-
       act.like(
         checkmode
           .navigateToWithData(
@@ -1015,6 +1050,96 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from company land or property company seller  page to Land or property CYA page")
+      )
+    }
+
+    "CompanyRecipientCrnPage" - {
+      act.like(
+        checkmode
+          .navigateToWithData(
+            CompanyRecipientCrnPage(_, index, IdentitySubject.LandOrPropertySeller),
+            Gen.const(conditionalYesNoCrn),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from company recipient crn page to Land or property CYA page")
+      )
+    }
+
+    "PartnershipSellerNamePage" - {
+      act.like(
+        checkmode
+          .navigateToWithData(
+            PartnershipSellerNamePage(_, index),
+            Gen.const(""),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from partnership land or property seller name page to Land or property CYA page")
+      )
+    }
+
+    "PartnershipRecipientUtrPage" - {
+      act.like(
+        checkmode
+          .navigateToWithData(
+            PartnershipRecipientUtrPage(_, index, IdentitySubject.LandOrPropertySeller),
+            Gen.const(conditionalYesNoUtr),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from partnership recipient utr page to Land or property CYA page")
+      )
+    }
+
+    "LandPropertyIndividualSellersNamePage" - {
+      act.like(
+        checkmode
+          .navigateToWithData(
+            LandPropertyIndividualSellersNamePage(_, index),
+            Gen.const(""),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from individual land or property seller name page to Land or property CYA page")
+      )
+    }
+
+    "IndividualSellerNiPage" - {
+      act.like(
+        checkmode
+          .navigateToWithData(
+            IndividualSellerNiPage(_, index),
+            Gen.const(conditionalYesNoNino),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from individual land or property seller nino page to Land or property CYA page")
+      )
+    }
+
+    "OtherRecipientDetailsPage" - {
+
+      val recipientDetails = RecipientDetails(
+        "testName",
+        "testDescription"
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            OtherRecipientDetailsPage(_, index, IdentitySubject.LandOrPropertySeller),
+            Gen.const(recipientDetails),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from partnership recipient utr page to Land or property CYA page")
       )
     }
 

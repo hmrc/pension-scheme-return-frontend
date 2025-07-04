@@ -569,7 +569,7 @@ whenDidSchemeAcquireShares.dateOfAcquired.error.required.month = Date the scheme
 whenDidSchemeAcquireShares.dateOfAcquired.error.required.year = Date the scheme acquired these shares must include a year
 whenDidSchemeAcquireShares.dateOfAcquired.error.required.two = Date the scheme acquired these shares must include a {0} and {1}
 whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.date = Date the scheme acquired these shares must be a real date
-whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date the scheme acquired these shares must only include numbers 0 to 9
+whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 whenDidSchemeAcquireShares.dateOfAcquired.error.future = Date the scheme acquired these shares must be the same as or before {0}
 whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be the same as or after {0}
 
@@ -1250,7 +1250,7 @@ removeTotalValueQuotedShares.heading = Are you sure you want to remove the quote
 removeTotalValueQuotedShares.error.required = Select yes if you are sure you want to remove the quoted shares and third party managed funds
 
 totalValueQuotedSharesCYA.normal.title = Check your answers: quoted shares and managed funds
-totalValueQuotedSharesCYA.normal.heading = Check your answers: quotes shares and managed funds
+totalValueQuotedSharesCYA.normal.heading = Check your answers: quoted shares and managed funds
 totalValueQuotedSharesCYA.title.change = Change details of quoted shares and managed funds
 totalValueQuotedSharesCYA.heading.change = Change details of quoted shares and third party managed funds
 totalValueQuotedSharesCYA.title.view = View details of quoted shares and managed funds
@@ -1487,7 +1487,7 @@ datePeriodLoan.heading = Date and term of the loan
 datePeriodLoan.field1 = Date the loan was made
 datePeriodLoan.hint = For example, 27 6 2024
 datePeriodLoan.field1.error.required.all = Enter the date the loan was made
-datePeriodLoan.field1.error.invalid.characters = Date the loan was made must only include numbers 0 to 9
+datePeriodLoan.field1.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 datePeriodLoan.field1.error.invalid.date = Date the loan was made must be a real date
 datePeriodLoan.field1.error.required.day = Date the loan was made must include a day
 datePeriodLoan.field1.error.required.month = Date the loan was made must include a month
@@ -1738,7 +1738,7 @@ whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.month = Date th
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.year = Date the scheme acquired this land or property must include a year
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.two = Date the scheme acquired this land or property must include a {0} and {1}
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.date = Date the scheme acquired this land or property must be a real date
-whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.characters = Date the scheme acquired this land or property must only include numbers 0 to 9
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future = Date the scheme acquired this land or property must be the same as or before {0}
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.after = Date the scheme acquired this land or property must be the same as or after {0}
 
@@ -2046,7 +2046,7 @@ whenWasPropertySold.dateOfSale.error.required.day = Date the scheme sold this la
 whenWasPropertySold.dateOfSale.error.required.month = Date the scheme sold this land or property must include month
 whenWasPropertySold.dateOfSale.error.required.year = Date the scheme sold this land or property must include a day and year
 whenWasPropertySold.dateOfSale.error.invalid.date = Date the scheme sold this land or property must be a real date
-whenWasPropertySold.dateOfSale.error.invalid.characters = Date the scheme sold this land or property must only include numbers 0 to 9
+whenWasPropertySold.dateOfSale.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 whenWasPropertySold.dateOfSale.error.future = Date the scheme sold this land or property must be the same as or before {0}
 whenWasPropertySold.dateOfSale.error.after = Date the scheme sold this land or property must be the same as or after {0}
 
@@ -2291,7 +2291,7 @@ moneyBorrowed.WhenBorrowed.error.required.month = Date the scheme borrowed this 
 moneyBorrowed.WhenBorrowed.error.required.year = Date the scheme borrowed this money must include a year
 moneyBorrowed.WhenBorrowed.error.required.two = Date the scheme borrowed this money must include a {0} and {1}
 moneyBorrowed.WhenBorrowed.error.invalid.date = Date the scheme borrowed this money must be a real date
-moneyBorrowed.WhenBorrowed.error.invalid.characters = Date the scheme borrowed this money must only include numbers 0 to 9
+moneyBorrowed.WhenBorrowed.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money must be the same as or before {0}
 moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be the same as or after {0}
 
@@ -2669,7 +2669,7 @@ transferReceived.error.required.all = Enter the date the transfer was received
 transferReceived.error.date.before = Date the transfer was received must be the same as or after {0}
 transferReceived.error.date.after = Date the transfer was received must be the same as or before {0}
 transferReceived.error.invalid.date = Date the transfer was received must be a real date
-transferReceived.error.invalid.chars = Date the transfer was received must only include numbers 0 to 9
+transferReceived.error.invalid.chars = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 
 transferring.pensionType.title = What type of scheme is the transferring scheme?
 transferring.pensionType.heading = What type of scheme is {0}?
@@ -2783,7 +2783,7 @@ transferOut.transferMade.error.required.all = Enter the date the transfer was ma
 transferOut.transferMade.error.date.before = Date the transfer was made must be the same as or after {0}
 transferOut.transferMade.error.date.after = Date the transfer was made must be the same as or before {0}
 transferOut.transferMade.error.invalid.date = Date the transfer was made must be a real date
-transferOut.transferMade.error.invalid.chars = Date the transfer was made must only include numbers 0 to 9
+transferOut.transferMade.error.invalid.chars = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 
 reportAnotherTransferOut.title = Do you need to report another transfer out for this member?
 reportAnotherTransferOut.heading = Do you need to report another transfer out for {0}?
@@ -3172,7 +3172,7 @@ whenDidSchemeAcquireBonds.dateOfAcquired.error.required.month = Date the scheme 
 whenDidSchemeAcquireBonds.dateOfAcquired.error.required.year = Date the scheme acquired these bonds must include a year
 whenDidSchemeAcquireBonds.dateOfAcquired.error.required.two = Date the scheme acquired these bonds must include a {0} and {1}
 whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.date = Date the scheme acquired these bonds must be a real date
-whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.characters = Date the scheme acquired these bonds must only include numbers 0 to 9
+whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 whenDidSchemeAcquireBonds.dateOfAcquired.error.future = Date the scheme acquired these bonds must be the same as or before {0}
 whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired these bonds must be the same as or after {0}
 
@@ -3390,7 +3390,7 @@ otherAssets.whenDidSchemeAcquireAssets.error.required.month = Date the scheme ac
 otherAssets.whenDidSchemeAcquireAssets.error.required.year = Date the scheme acquired this asset must include a year
 otherAssets.whenDidSchemeAcquireAssets.error.required.two = Date the scheme acquired this asset must include a {0} and {1}
 otherAssets.whenDidSchemeAcquireAssets.error.invalid.date = Date the scheme acquired this asset must be a real date
-otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date the scheme acquired this asset must only include numbers 0 to 9
+otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 otherAssets.whenDidSchemeAcquireAssets.error.future = Date the scheme acquired this asset must be the same as or before {0}
 otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be the same as or after {0}
 
@@ -3557,7 +3557,7 @@ bondsDisposal.whenWereBondsSold.error.required.two = Date these bonds were sold 
 bondsDisposal.whenWereBondsSold.error.invalid.date = Date these bonds were sold must be a real date
 bondsDisposal.whenWereBondsSold.error.date.before = Date these bonds were sold must be the same as or after {0}
 bondsDisposal.whenWereBondsSold.error.date.after = Date these bonds were sold must be the same as or before {0}
-bondsDisposal.whenWereBondsSold.error.invalid.characters = Date these bonds were sold must only include numbers 0 to 9
+bondsDisposal.whenWereBondsSold.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 
 bondsDisposal.totalConsiderationBondsSold.title = What was the total consideration received for the sale of these bonds, in pounds and pence?
 bondsDisposal.totalConsiderationBondsSold.heading = What was the total consideration received for the sale of these bonds, in pounds and pence?
@@ -3710,7 +3710,7 @@ whenWasAssetSold.error.required.two = Date this asset was sold must include  a {
 whenWasAssetSold.error.invalid.date = Date these bonds were sold must be a real date
 whenWasAssetSold.error.date.before = Date this asset was sold must be the same as or after {0}
 whenWasAssetSold.error.date.after = Date this asset was sold must be the same as or before {0}
-whenWasAssetSold.error.invalid.characters = Date this asset was sold must only include numbers 0 to 9
+whenWasAssetSold.error.invalid.characters = Date must only include digits 0 to 9, or for the month, the full name or the first three letters, for example September or Sep
 
 totalConsiderationSaleAsset.title = What was the total consideration received for the sale of this asset, in pounds and pence?
 totalConsiderationSaleAsset.heading = What was the total consideration received for the sale of this asset, in pounds and pence?
