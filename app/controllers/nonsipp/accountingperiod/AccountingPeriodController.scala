@@ -38,7 +38,7 @@ import pages.nonsipp.WhichTaxYearPage
 import navigation.Navigator
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.ParagraphMessage
+import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
 import viewmodels.models.{DateRangeViewModel, FormPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
@@ -162,7 +162,13 @@ object AccountingPeriodController {
     "accountingPeriod.heading",
     "accountingPeriod.startDate.hint",
     "accountingPeriod.endDate.hint",
-    Some(ParagraphMessage("accountingPeriod.description")),
+    Some(
+      ParagraphMessage("accountingPeriod.description") ++ ListMessage
+        .Bullet(
+          "accountingPeriod.description.bullet.one",
+          "accountingPeriod.description.bullet.two"
+        )
+    ),
     routes.AccountingPeriodController.onSubmit(srn, index, mode)
   )
 }
