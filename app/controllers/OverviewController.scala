@@ -17,7 +17,7 @@
 package controllers
 
 import services._
-import utils.DateTimeUtils
+import utils.{DashboardUtils, DateTimeUtils}
 import viewmodels.implicits.stringToText
 import play.api.mvc._
 import config.{Constants, FrontendAppConfig}
@@ -46,6 +46,7 @@ import javax.inject.Inject
 class OverviewController @Inject() (
   override val messagesApi: MessagesApi,
   config: FrontendAppConfig,
+  dashboardUtils: DashboardUtils,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   createData: DataCreationAction,
@@ -239,7 +240,8 @@ class OverviewController @Inject() (
           .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString), srn)
         outstanding = outstandingData(srn, overviewResponse, versionsForYearsResponse)
         previous = previousData(srn, versionsForYearsResponse, overviewResponse, outstanding)
-      } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
+        dashboardUrl = dashboardUtils.dashboardUrl(request.pensionSchemeId.isPSP, srn)
+      } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName, dashboardUrl))
         .addingToSession((Constants.SRN, srn.value))
     }
 

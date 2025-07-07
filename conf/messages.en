@@ -3121,6 +3121,7 @@ overview.status.NotStarted = Not started
 overview.status.ReportStatusCompiled = In progress
 overview.status.SubmittedAndInProgress = Submitted
 overview.status.SubmittedAndSuccessfullyProcessed = Submitted
+overview.dashboard.link = Return to
 
 returnsSubmitted.title = Pension scheme returns submitted for {0} to {1}
 returnsSubmitted.heading = Pension scheme returns submitted for {0} to {1}

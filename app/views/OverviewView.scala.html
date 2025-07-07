@@ -22,7 +22,7 @@
 
 
 
-@(seqOfOutstandingReturns:Seq[OverviewSummary], seqOfPreviousReturns:Seq[OverviewSummary], schemeName: String)(implicit request: Request[?], messages: Messages)
+@(seqOfOutstandingReturns:Seq[OverviewSummary], seqOfPreviousReturns:Seq[OverviewSummary], schemeName: String, dashboardUrl: String)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("overview.title"))) {
 
@@ -92,4 +92,5 @@
             )
         }
     }
+<a lang="en" hreflang="en" class="govuk-link" href="@dashboardUrl">@messages("overview.dashboard.link") @schemeName</a>
 }

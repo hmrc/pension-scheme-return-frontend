@@ -17,10 +17,10 @@
 package controllers
 
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
+import utils.DashboardUtils
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.WhatYouWillNeedPage
-import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator
 import models.{CheckMode, NormalMode}
@@ -39,23 +39,18 @@ class WhatYouWillNeedController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("root") navigator: Navigator,
   identify: IdentifierAction,
+  dashboardUtils: DashboardUtils,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  config: FrontendAppConfig,
   view: ContentPageView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      val dashboardUrl =
-        if (request.pensionSchemeId.isPSP) {
-          config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
-        } else {
-          config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
-        }
+      val dashboardUrl = dashboardUtils.dashboardUrl(request.pensionSchemeId.isPSP, srn)
 
       Ok(
         view(
