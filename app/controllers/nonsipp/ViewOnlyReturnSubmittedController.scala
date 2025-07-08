@@ -17,10 +17,10 @@
 package controllers.nonsipp
 
 import services.{PsrRetrievalService, PsrVersionsService}
+import utils.DashboardUtils
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
-import config.FrontendAppConfig
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.WhichTaxYearPage
@@ -43,19 +43,15 @@ class ViewOnlyReturnSubmittedController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: SubmissionView,
+  dashboardUtils: DashboardUtils,
   psrRetrievalService: PsrRetrievalService,
-  psrVersionsService: PsrVersionsService,
-  config: FrontendAppConfig
+  psrVersionsService: PsrVersionsService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
   def onPageLoad(srn: Srn, year: String, version: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val dashboardLink = if (request.pensionSchemeId.isPSP) {
-        config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
-      } else {
-        config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
-      }
+      val dashboardUrl = dashboardUtils.dashboardUrl(request.pensionSchemeId.isPSP, srn)
       for {
         retrievedUserAnswers <- psrRetrievalService.getAndTransformStandardPsrDetails(
           None,
@@ -70,7 +66,7 @@ class ViewOnlyReturnSubmittedController @Inject() (
           retrievedUserAnswers,
           psrVersionsResponse,
           version,
-          dashboardLink
+          dashboardUrl
         )
       } yield Ok(view(viewModel))
     }

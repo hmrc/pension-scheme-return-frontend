@@ -145,12 +145,14 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         val request = FakeRequest(GET, onPageLoad)
         val seqOfOutstandingReturns: Seq[OverviewSummary] = Seq()
         val seqOfPreviousReturns: Seq[OverviewSummary] = Seq()
+        val dashboardUrl = s"http://localhost:8204/manage-pension-schemes/pension-scheme-summary/${srn.value}"
 
         val result = route(app, request).value
-        val expectedView = view(seqOfOutstandingReturns, seqOfPreviousReturns, defaultSchemeDetails.schemeName)(using
-          request,
-          createMessages(using app)
-        )
+        val expectedView =
+          view(seqOfOutstandingReturns, seqOfPreviousReturns, defaultSchemeDetails.schemeName, dashboardUrl)(using
+            request,
+            createMessages(using app)
+          )
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual expectedView.toString

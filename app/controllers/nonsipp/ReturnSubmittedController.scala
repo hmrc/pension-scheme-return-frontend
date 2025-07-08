@@ -16,9 +16,9 @@
 
 package controllers.nonsipp
 
+import utils.DashboardUtils
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.FrontendAppConfig
 import cats.implicits.{catsSyntaxTuple2Semigroupal, toShow}
 import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE, SUBMISSION_VIEWED_FLAG}
 import controllers.actions._
@@ -47,7 +47,7 @@ class ReturnSubmittedController @Inject() (
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   view: SubmissionView,
-  config: FrontendAppConfig,
+  dashboardUtils: DashboardUtils,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -55,11 +55,7 @@ class ReturnSubmittedController @Inject() (
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).async { implicit request =>
-      val dashboardLink = if (request.pensionSchemeId.isPSP) {
-        config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
-      } else {
-        config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
-      }
+      val dashboardUrl = dashboardUtils.dashboardUrl(request.pensionSchemeId.isPSP, srn)
       (request.session.get(RETURN_PERIODS), request.session.get(SUBMISSION_DATE))
         .mapN { (returnPeriods, submissionDate) =>
           Ok(
@@ -69,7 +65,7 @@ class ReturnSubmittedController @Inject() (
                 request.minimalDetails.email,
                 Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
                 LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
-                dashboardLink
+                dashboardUrl
               )
             )
           ).addingToSession((SUBMISSION_VIEWED_FLAG, String.valueOf(true)))
