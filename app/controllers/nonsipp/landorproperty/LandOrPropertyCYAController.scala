@@ -329,7 +329,7 @@ object LandOrPropertyCYAController {
       }
     )
 
-  private def sections(
+  def sections(
     srn: Srn,
     index: Max5000,
     schemeName: String,

@@ -86,6 +86,7 @@ GET         /:srn/member-details                                                
 GET         /:srn/member-details/:index                                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Int, mode: Mode = NormalMode)
 POST        /:srn/member-details/:index                                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Int, mode: Mode = NormalMode)
 
+GET         /:srn/pre-submission-summary                                                                       controllers.nonsipp.declaration.PreSubmissionSummaryController.onPageLoad(srn: Srn)
 
 GET         /:srn/psa-declaration                                                                              controllers.nonsipp.declaration.PsaDeclarationController.onPageLoad(srn: Srn)
 GET         /:srn/submit-psa-declaration                                                                       controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)
