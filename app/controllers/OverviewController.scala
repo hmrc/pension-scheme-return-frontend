@@ -52,6 +52,7 @@ class OverviewController @Inject() (
   createData: DataCreationAction,
   prePopulatedData: PrePopulationDataActionProvider,
   identifyAndRequireData: IdentifyAndRequireData,
+  checkLocking: DataCheckLockingAction,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
   val psrVersionsService: PsrVersionsService,
@@ -254,6 +255,7 @@ class OverviewController @Inject() (
   ): Action[AnyContent] =
     identify
       .andThen(allowAccess(srn))
+      .andThen(checkLocking)
       .andThen(createData)
       .andThen(
         prePopulatedData(

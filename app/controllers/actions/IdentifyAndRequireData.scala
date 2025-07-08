@@ -37,6 +37,7 @@ class IdentifyAndRequireData @Inject() (
   getDataFromETMP: DataRetrievalETMPActionProvider,
   saveData: DataSavingAction,
   requireData: DataRequiredAction,
+  checkLocking: DataCheckLockingAction,
   playBodyParsers: PlayBodyParsers
 )(implicit ec: ExecutionContext) {
 
@@ -88,6 +89,7 @@ class IdentifyAndRequireData @Inject() (
   def apply(srn: Srn, fbNumber: String): ActionBuilder[DataRequest, AnyContent] =
     identify
       .andThen(allowAccess(srn))
+      .andThen(checkLocking)
       .andThen(getDataFromETMP.fbNumber(fbNumber))
       .andThen(requireData)
       .andThen(saveData)
@@ -102,12 +104,14 @@ class IdentifyAndRequireData @Inject() (
         if (currentVersion > 1) {
           identify
             .andThen(allowAccess(srn))
+            .andThen(checkLocking)
             .andThen(getDataFromETMP.currentAndPreviousVersionForYear(year, currentVersion, currentVersion - 1))
             .andThen(requireData)
             .andThen(saveData)
         } else {
           identify
             .andThen(allowAccess(srn))
+            .andThen(checkLocking)
             .andThen(getDataFromETMP.versionForYear(year, 1))
             .andThen(requireData)
             .andThen(saveData)

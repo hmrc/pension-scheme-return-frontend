@@ -133,6 +133,16 @@ journeyRecovery.guidance3 = If the problem continues,
 journeyRecovery.guidance3.link = report a problem with this page
 journeyRecovery.guidance4 = We will fix the problem as soon as possible.
 
+psrLocked.title = This scheme has been locked for modification
+psrLocked.heading =  This scheme has been locked for modification
+psrLocked.guidance1 = This scheme is marked as currently being modified by another user. Please wait until the other user has finished interacting with this scheme.
+psrLocked.optionalGuidance2.paragraph = If this is not the case:
+psrLocked.optionalGuidance2.bullet1 = please log out and wait at least one hour
+psrLocked.optionalGuidance2.bullet2 = try to log in after one hour and continue with your actions
+psrLocked.guidance2a = If applicable, you can continue to work with different schemes.
+psrLocked.guidance3 = If the problem continues,
+psrLocked.guidance3.link = report a problem with this page
+
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We have saved your answers up until your latest ''Check your answers'' page.

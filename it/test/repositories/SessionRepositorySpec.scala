@@ -16,6 +16,7 @@
 
 package repositories
 
+import config.Constants.{PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
 import config.{FakeCrypto, FrontendAppConfig}
 import models.UserAnswers
 import models.UserAnswers.SensitiveJsObject
@@ -23,14 +24,16 @@ import org.mockito.Mockito.when
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import org.mongodb.scala.given
+
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SessionRepositorySpec extends BaseRepositorySpec[UserAnswers] {
 
+  private val id = "id"
+  private val otherId = "otherId"
   private val savedAnswers = jsObjectGen(maxDepth = 5).sample.value
-  private val userAnswers = UserAnswers("id", SensitiveJsObject(savedAnswers), Instant.ofEpochSecond(1))
-
+  private val userAnswers = UserAnswers(id, SensitiveJsObject(savedAnswers), Instant.ofEpochSecond(1))
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl).thenReturn(1)
 
@@ -40,6 +43,54 @@ class SessionRepositorySpec extends BaseRepositorySpec[UserAnswers] {
     clock = stubClock,
     crypto = FakeCrypto
   )
+
+  ".getBySrnAndIdNotEqual" - {
+    "must return None if no documents exist" in {
+
+      val getResult = repository.getBySrnAndIdNotEqual(id, srn).futureValue
+
+      getResult mustBe None
+    }
+
+    "must return None if duplicated document doesn't exist" in {
+
+      val userAnswersWitSrn1 = userAnswers.copy(id = id + srn)
+      repository.set(userAnswersWitSrn1)
+
+      val getResult = repository.getBySrnAndIdNotEqual(id, srn).futureValue
+
+      getResult mustBe None
+    }
+
+    "must return None if only prefixed documents exist" in {
+
+      val ua = userAnswers.copy(id = id + srn)
+      val pureUa = userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + id + srn)
+      val previousUa = userAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + id + srn)
+      repository.set(ua)
+      repository.set(pureUa)
+      repository.set(previousUa)
+
+      val getResult = repository.getBySrnAndIdNotEqual(id, srn).futureValue
+
+      getResult mustBe None
+    }
+
+    "must return duplicated document if it exist" in {
+
+      val userAnswersWitSrn1 = userAnswers.copy(id = otherId + srn)
+      val userAnswersWitSrn2 = userAnswers.copy(id = id + srn)
+
+      repository.set(userAnswersWitSrn1)
+      repository.set(userAnswersWitSrn2)
+
+      val getResult = repository.getBySrnAndIdNotEqual(id, srn).futureValue
+
+      val expectedResult = userAnswersWitSrn1.copy(lastUpdated = instant)
+
+      getResult mustBe Some(expectedResult)
+    }
+  }
 
   ".set" - {
 

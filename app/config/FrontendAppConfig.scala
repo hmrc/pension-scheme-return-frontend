@@ -70,6 +70,7 @@ class FrontendAppConfig @Inject() (config: Configuration) { self =>
   val fileReturnTemplateId: String = config.get[String]("email.fileReturnTemplateId")
   val allowedStartDateRange: LocalDate = LocalDate.parse(config.get[String]("schemeStartDate"))
   val prePopulationEnabled: Boolean = config.getOptional[Boolean]("prePopulationEnabled").getOrElse(false)
+  val lockingEnabled: Boolean = config.getOptional[Boolean]("lockingEnabled").getOrElse(false)
   val ifsTimeout: Duration = config.get[Duration]("ifs.timeout")
 
   def eventReportingEmailCallback(
