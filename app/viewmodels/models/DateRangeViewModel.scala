@@ -17,7 +17,8 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, InlineMessage, Message}
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class DateRangeViewModel(
   startDateLabel: Message,
@@ -33,7 +34,7 @@ object DateRangeViewModel {
     heading: InlineMessage,
     startDateHint: Message,
     endDateHint: Message,
-    description: Option[BlockMessage],
+    description: Option[DisplayMessage],
     onSubmit: Call
   ): FormPageViewModel[DateRangeViewModel] =
     FormPageViewModel(
