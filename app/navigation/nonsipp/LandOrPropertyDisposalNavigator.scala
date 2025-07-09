@@ -79,7 +79,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-        case Some(_) =>
+        case _ =>
           controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 

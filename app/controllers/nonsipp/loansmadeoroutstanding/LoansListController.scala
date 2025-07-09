@@ -338,7 +338,7 @@ object LoansListController {
         List()
       case (list, _) =>
         list.flatMap { case LoansData(index, loanAmount, recipientName, loansProgress, canRemove) =>
-          val validLoan = loanAmount.value > 0 && recipientName.nonEmpty
+          val validLoan = recipientName.nonEmpty
           (mode, viewOnlyViewModel) match {
             case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
               Some(

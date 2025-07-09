@@ -83,6 +83,21 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
     .unsafeSet(LoanPrePopulated(srn, index2of5000), true)
     .unsafeSet(LoanPrePopulated(srn, index3of5000), false)
 
+  private val completedUserAnswersWithZeroValue = completedUserAnswers
+    .unsafeSet(IdentityTypePage(srn, index4of5000, loanRecipient), IdentityType.UKCompany)
+    .unsafeSet(CompanyRecipientNamePage(srn, index4of5000), "recipientName4")
+    .unsafeSet(CompanyRecipientCrnPage(srn, index4of5000, loanRecipient), conditionalYesNoCrn)
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index4of5000), ConnectedParty)
+    .unsafeSet(DatePeriodLoanPage(srn, index4of5000), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, index4of5000), amountOfTheLoanZero)
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index4of5000), false)
+    .unsafeSet(InterestOnLoanPage(srn, index4of5000), interestOnLoan)
+    .unsafeSet(SecurityGivenForLoanPage(srn, index4of5000), conditionalYesNoSecurity)
+    .unsafeSet(ArrearsPrevYears(srn, index4of5000), true)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index4of5000), conditionalYesNoMoney)
+    .unsafeSet(LoanCompleted(srn, index4of5000), SectionCompleted)
+    .unsafeSet(LoansProgress(srn, index4of5000), SectionJourneyStatus.Completed)
+
   private val page = 1
 
   private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, page, NormalMode)
@@ -103,6 +118,30 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
       index2of5000,
       money,
       "recipientName2",
+      SectionJourneyStatus.Completed,
+      canRemove = true
+    )
+  )
+
+  private val loansDataWithZeroValue: List[LoansData] = List(
+    LoansData(
+      index1of5000,
+      money,
+      "recipientName1",
+      SectionJourneyStatus.Completed,
+      canRemove = true
+    ),
+    LoansData(
+      index2of5000,
+      money,
+      "recipientName2",
+      SectionJourneyStatus.Completed,
+      canRemove = true
+    ),
+    LoansData(
+      index4of5000,
+      moneyZero,
+      "recipientName4",
       SectionJourneyStatus.Completed,
       canRemove = true
     )
@@ -243,6 +282,24 @@ class LoansListControllerSpec extends ControllerBaseSpec with ControllerBehaviou
         )(using mockReq)
       )
     }.withName("PrePop Journey"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersWithZeroValue) {
+      implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn = srn,
+            page = page,
+            mode = NormalMode,
+            loansNotToCheck = loansDataWithZeroValue,
+            loansToCheck = Nil,
+            schemeName = schemeName,
+            viewOnlyViewModel = None,
+            showBackLink = true,
+            isPrePop = true
+          )(using mockReq)
+        )
+    }.withName("PrePop Journey with a zero value loan"))
 
     act.like(
       redirectToPage(

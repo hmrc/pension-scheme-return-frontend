@@ -142,6 +142,7 @@ trait TestValues extends OptionValues {
   val moneyZero: Money = Money(0)
   val moneyInPeriod: MoneyInPeriod = MoneyInPeriod(money, Money(1))
   val amountOfTheLoan: AmountOfTheLoan = AmountOfTheLoan(money, Some(money), Some(money))
+  val amountOfTheLoanZero: AmountOfTheLoan = AmountOfTheLoan(moneyZero, Some(moneyZero), Some(moneyZero))
   val partialAmountOfTheLoan: AmountOfTheLoan = AmountOfTheLoan(money, None, None)
   val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7
