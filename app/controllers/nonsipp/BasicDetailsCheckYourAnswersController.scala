@@ -17,20 +17,19 @@
 package controllers.nonsipp
 
 import services._
+import utils.CheckAnswersUtils
 import play.api.mvc._
 import _root_.config.RefinedTypes.Max3
 import utils.ListUtils.ListOps
 import controllers.{nonsipp, PSRController}
-import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import _root_.config.Constants._
 import utils.nonsipp.SchemeDetailNavigationUtils
-import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import models.audit.PSRStartAuditEvent
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import viewmodels.implicits._
 import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import cats.data.{EitherT, NonEmptyList}
@@ -89,55 +88,29 @@ class BasicDetailsCheckYourAnswersController @Inject() (
       schemeDateService.taxYearOrAccountingPeriods(srn) match {
         case Some(periods) =>
           val currentUserAnswers = request.userAnswers
-          (
-            for {
-              schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-              activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
-              whyNoBankAccount = currentUserAnswers.get(WhyNoBankAccountPage(srn))
-              whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
-              userName <- loggedInUserNameOrRedirect
-              journeyByPassed <- eitherJourneyNavigationResultOrRecovery
-            } yield {
-              val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
-              val result = Ok(
-                view(
-                  viewModel(
-                    srn,
-                    mode,
-                    schemeMemberNumbers,
-                    activeBankAccount,
-                    whyNoBankAccount,
-                    whichTaxYearPage,
-                    periods,
-                    userName,
-                    request.schemeDetails,
-                    request.pensionSchemeId,
-                    request.pensionSchemeId.isPSP,
-                    viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                      getBasicDetailsCompletedOrUpdated(currentUserAnswers, request.previousUserAnswers.get) == Updated
-                    } else {
-                      false
-                    },
-                    optYear = request.year,
-                    optCurrentVersion = request.currentVersion,
-                    optPreviousVersion = request.previousVersion,
-                    compilationOrSubmissionDate = compilationOrSubmissionDate,
-                    journeyByPassed = journeyByPassed,
-                    showBackLink = showBackLink
-                  )
-                )
-              )
-              if (journeyByPassed) {
-                result
-                  .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-                  .addingToSession(
-                    (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
-                  )
-              } else {
-                result
-              }
-            }
-          ).merge
+          val periodsAsJson = schemeDateService.returnPeriodsAsJsonString(srn)
+          // Below vals extracted so they can pass into the utils method
+          val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
+          val submissionDate = schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get)
+
+          // utils method used instead of keeping the build model logic here
+          val resultAndViewModel = CheckAnswersUtils.buildBasicDetailsViewModel(
+            srn,
+            mode,
+            showBackLink,
+            eitherJourneyNavigationResultOrRecovery,
+            periods,
+            currentUserAnswers,
+            view,
+            periodsAsJson,
+            compilationOrSubmissionDate,
+            submissionDate
+          )
+          // instead of merge, as Right is now a Tuple
+          resultAndViewModel match {
+            case Left(l) => l
+            case Right(r) => r._1 // only _.1 of the tuple is used here. Summary page would use _.2
+          }
         case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     )
