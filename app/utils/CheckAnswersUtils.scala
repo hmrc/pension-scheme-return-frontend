@@ -22,7 +22,6 @@ import play.api.mvc._
 import config.RefinedTypes.Max3
 import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController
-import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
 import models._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.Messages
@@ -30,7 +29,6 @@ import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
 import models.requests.DataRequest
 import play.api.mvc.Results.Redirect
 import cats.data.NonEmptyList
-import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.WhichTaxYearPage
 import play.api.libs.json.Reads
@@ -59,17 +57,17 @@ object CheckAnswersUtils {
 
   // Moved from BasicDetailsController
   def buildBasicDetailsViewModel(
-                                          srn: Srn,
-                                          mode: Mode,
-                                          showBackLink: Boolean,
-                                          eitherJourneyNavigationResultOrRecovery: Either[Result, Boolean],
-                                          periods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
-                                          currentUserAnswers: UserAnswers,
-                                          view: CheckYourAnswersView, // added here as parameter
-                                          periodsAsJson: String, // added here as parameter
-                                          compilationOrSubmissionDate: Option[LocalDateTime], // added here as parameter
-                                          submissionDate: String // added here as parameter
-                                        )(implicit request: DataRequest[AnyContent], messages: Messages): Either[Result, (Result, FormPageViewModel[CheckYourAnswersViewModel])] =
+    srn: Srn,
+    mode: Mode,
+    showBackLink: Boolean,
+    eitherJourneyNavigationResultOrRecovery: Either[Result, Boolean],
+    periods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
+    currentUserAnswers: UserAnswers,
+    compilationOrSubmissionDate: Option[LocalDateTime] // added here as parameter
+  )(implicit
+    request: DataRequest[AnyContent],
+    messages: Messages
+  ): Either[Result, FormPageViewModel[CheckYourAnswersViewModel]] =
     for {
       schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
       activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
@@ -77,45 +75,28 @@ object CheckAnswersUtils {
       whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
       userName <- loggedInUserNameOrRedirect
       journeyByPassed <- eitherJourneyNavigationResultOrRecovery
-    } yield {
-      val basicDetailsViewModel = BasicDetailsCheckYourAnswersController.viewModel(
-        srn,
-        mode,
-        schemeMemberNumbers,
-        activeBankAccount,
-        whyNoBankAccount,
-        whichTaxYearPage,
-        periods,
-        userName,
-        request.schemeDetails,
-        request.pensionSchemeId,
-        request.pensionSchemeId.isPSP,
-        viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-          getBasicDetailsCompletedOrUpdated(currentUserAnswers, request.previousUserAnswers.get) == Updated
-        } else {
-          false
-        },
-        optYear = request.year,
-        optCurrentVersion = request.currentVersion,
-        optPreviousVersion = request.previousVersion,
-        compilationOrSubmissionDate = compilationOrSubmissionDate,
-        journeyByPassed = journeyByPassed,
-        showBackLink = showBackLink
-      )
-      val result = play.api.mvc.Results.Ok(
-        view(
-          basicDetailsViewModel
-        )
-      )
-      if (journeyByPassed) {
-        result
-          .addingToSession((RETURN_PERIODS, periodsAsJson))
-          .addingToSession(
-            (SUBMISSION_DATE, submissionDate)
-          )
+    } yield BasicDetailsCheckYourAnswersController.viewModel(
+      srn,
+      mode,
+      schemeMemberNumbers,
+      activeBankAccount,
+      whyNoBankAccount,
+      whichTaxYearPage,
+      periods,
+      userName,
+      request.schemeDetails,
+      request.pensionSchemeId,
+      request.pensionSchemeId.isPSP,
+      viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+        getBasicDetailsCompletedOrUpdated(currentUserAnswers, request.previousUserAnswers.get) == Updated
       } else {
-        result
-      }
-      (result, basicDetailsViewModel)
-    }
+        false
+      },
+      optYear = request.year,
+      optCurrentVersion = request.currentVersion,
+      optPreviousVersion = request.previousVersion,
+      compilationOrSubmissionDate = compilationOrSubmissionDate,
+      journeyByPassed = journeyByPassed,
+      showBackLink = showBackLink
+    )
 }

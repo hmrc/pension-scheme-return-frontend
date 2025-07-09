@@ -88,10 +88,8 @@ class BasicDetailsCheckYourAnswersController @Inject() (
       schemeDateService.taxYearOrAccountingPeriods(srn) match {
         case Some(periods) =>
           val currentUserAnswers = request.userAnswers
-          val periodsAsJson = schemeDateService.returnPeriodsAsJsonString(srn)
           // Below vals extracted so they can pass into the utils method
           val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
-          val submissionDate = schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get)
 
           // utils method used instead of keeping the build model logic here
           val resultAndViewModel = CheckAnswersUtils.buildBasicDetailsViewModel(
@@ -101,15 +99,22 @@ class BasicDetailsCheckYourAnswersController @Inject() (
             eitherJourneyNavigationResultOrRecovery,
             periods,
             currentUserAnswers,
-            view,
-            periodsAsJson,
-            compilationOrSubmissionDate,
-            submissionDate
+            compilationOrSubmissionDate
           )
           // instead of merge, as Right is now a Tuple
           resultAndViewModel match {
             case Left(l) => l
-            case Right(r) => r._1 // only _.1 of the tuple is used here. Summary page would use _.2
+            case Right(vm) =>
+              val result = play.api.mvc.Results.Ok(view(vm))
+              if (eitherJourneyNavigationResultOrRecovery.contains(true)) {
+                result
+                  .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+                  .addingToSession(
+                    (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
+                  )
+              } else {
+                result
+              }
           }
         case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
