@@ -77,7 +77,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           HowWasPropertyDisposedOfPage.apply,
-          (srn, index: Int, disposalIndex: Int, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (_, _, _, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from LandOrPropertyStillHeldPage to UnauthorisedController")
     )
@@ -371,7 +371,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandPropertyDisposalCompletedPage.apply,
-          (srn, index: Int, disposalIndex: Int, _) =>
+          (srn, _, _, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
               .onPageLoad(srn, 1)
         )
