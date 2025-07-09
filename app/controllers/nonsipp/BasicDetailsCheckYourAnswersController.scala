@@ -92,7 +92,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
           val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
 
           // utils method used instead of keeping the build model logic here
-          val resultAndViewModel = CheckAnswersUtils.buildBasicDetailsViewModel(
+          val vm = CheckAnswersUtils.buildBasicDetailsViewModel(
             srn,
             mode,
             showBackLink,
@@ -102,10 +102,10 @@ class BasicDetailsCheckYourAnswersController @Inject() (
             compilationOrSubmissionDate
           )
           // instead of merge, as Right is now a Tuple
-          resultAndViewModel match {
+          vm match {
             case Left(l) => l
             case Right(vm) =>
-              val result = play.api.mvc.Results.Ok(view(vm))
+              val result = Ok(view(vm))
               if (eitherJourneyNavigationResultOrRecovery.contains(true)) {
                 result
                   .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))

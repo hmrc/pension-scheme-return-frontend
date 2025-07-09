@@ -17,21 +17,25 @@
 package utils
 
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
-import queries.Gettable
 import play.api.mvc._
-import config.RefinedTypes.Max3
+import config.RefinedTypes.{Max3, Max5000}
 import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
+import pages.nonsipp.landorproperty._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController
 import models._
-import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.Messages
 import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
-import models.requests.DataRequest
 import play.api.mvc.Results.Redirect
+import viewmodels.implicits._
+import queries.Gettable
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
 import pages.nonsipp.WhichTaxYearPage
 import play.api.libs.json.Reads
+import viewmodels.models.TaskListStatus.Updated
+import pages.nonsipp.common._
+import models.requests.DataRequest
+import controllers.nonsipp.landorproperty.LandOrPropertyCYAController
 
 import java.time.LocalDateTime
 
@@ -98,5 +102,116 @@ object CheckAnswersUtils {
       compilationOrSubmissionDate = compilationOrSubmissionDate,
       journeyByPassed = journeyByPassed,
       showBackLink = showBackLink
+    )
+
+  def buildLandOrPropertyViewModel(srn: Srn, index: Max5000, mode: Mode)(implicit
+    request: DataRequest[AnyContent],
+    messages: Messages
+  ): Either[Result, FormPageViewModel[CheckYourAnswersViewModel]] =
+    for {
+      landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
+      landRegistryTitleNumber <- requiredPage(LandRegistryTitleNumberPage(srn, index))
+      addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
+      holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
+      landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
+
+      landPropertyIndependentValuation = Option.when(holdLandProperty != SchemeHoldLandProperty.Transfer)(
+        request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
+      )
+      landOrPropertyAcquire = Option.when(holdLandProperty != SchemeHoldLandProperty.Transfer)(
+        request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
+      )
+
+      receivedLandType = Option.when(holdLandProperty == SchemeHoldLandProperty.Acquisition)(
+        request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get
+      )
+
+      landOrPropertySellerConnectedParty = Option.when(holdLandProperty == SchemeHoldLandProperty.Acquisition)(
+        request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
+      )
+
+      recipientName = Option.when(holdLandProperty == SchemeHoldLandProperty.Acquisition)(
+        List(
+          request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
+          request.userAnswers.get(CompanySellerNamePage(srn, index)),
+          request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+            .map(_.name)
+        ).flatten.head
+      )
+
+      recipientDetails = Option.when(holdLandProperty == SchemeHoldLandProperty.Acquisition)(
+        List(
+          request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+          request.userAnswers
+            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+            .flatMap(_.value.toOption.map(_.value)),
+          request.userAnswers
+            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+            .flatMap(_.value.toOption.map(_.value)),
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+            .map(_.description)
+        ).flatten.headOption
+      )
+
+      recipientReasonNoDetails = Option.when(holdLandProperty == SchemeHoldLandProperty.Acquisition)(
+        List(
+          request.userAnswers
+            .get(IndividualSellerNiPage(srn, index))
+            .flatMap(_.value.swap.toOption.map(_.value)),
+          request.userAnswers
+            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+            .flatMap(_.value.swap.toOption.map(_.value)),
+          request.userAnswers
+            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+            .flatMap(_.value.swap.toOption.map(_.value))
+        ).flatten.headOption
+      )
+
+      landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
+      landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
+      landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
+
+      leaseDetails = Option.when(landOrPropertyLease) {
+        val landOrPropertyLeaseDetailsPage =
+          request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
+        val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+
+        Tuple4(
+          landOrPropertyLeaseDetailsPage._1,
+          landOrPropertyLeaseDetailsPage._2,
+          landOrPropertyLeaseDetailsPage._3,
+          leaseConnectedParty
+        )
+      }
+
+      schemeName = request.schemeDetails.schemeName
+    } yield LandOrPropertyCYAController.viewModel(
+      srn,
+      index,
+      schemeName,
+      landOrPropertyInUk,
+      landRegistryTitleNumber,
+      holdLandProperty,
+      landOrPropertyAcquire,
+      landOrPropertyTotalCost,
+      landPropertyIndependentValuation,
+      receivedLandType,
+      recipientName,
+      recipientDetails.flatten,
+      recipientReasonNoDetails.flatten,
+      landOrPropertySellerConnectedParty,
+      landOrPropertyResidential,
+      landOrPropertyLease,
+      landOrPropertyTotalIncome,
+      addressLookUpPage,
+      leaseDetails,
+      mode,
+      viewOnlyUpdated = false,
+      optYear = request.year,
+      optCurrentVersion = request.currentVersion,
+      optPreviousVersion = request.previousVersion
     )
 }
