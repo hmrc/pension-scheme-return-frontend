@@ -359,7 +359,7 @@ object LandOrPropertyListController {
     val paragraph = Option.when(addressesSize < maxLandOrProperties) {
       if (addressesToCheck.nonEmpty) {
         ParagraphMessage("landOrPropertyList.paragraph.prepop") ++
-          ParagraphMessage("landOrPropertyList.paragraph.disposal")
+          ParagraphMessage("landOrPropertyList.paragraph.disposal.prePop")
       } else {
         ParagraphMessage("landOrPropertyList.paragraph") ++
           ParagraphMessage("landOrPropertyList.paragraph.disposal")
