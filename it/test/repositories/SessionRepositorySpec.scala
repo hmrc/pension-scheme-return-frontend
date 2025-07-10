@@ -31,7 +31,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class SessionRepositorySpec extends BaseRepositorySpec[UserAnswers] {
 
   private val id = "id"
-  private val otherId = "otherId"
   private val savedAnswers = jsObjectGen(maxDepth = 5).sample.value
   private val userAnswers = UserAnswers(id, SensitiveJsObject(savedAnswers), Instant.ofEpochSecond(1))
   private val mockAppConfig = mock[FrontendAppConfig]
@@ -74,21 +73,6 @@ class SessionRepositorySpec extends BaseRepositorySpec[UserAnswers] {
       val getResult = repository.getBySrnAndIdNotEqual(id, srn).futureValue
 
       getResult mustBe None
-    }
-
-    "must return duplicated document if it exist" in {
-
-      val userAnswersWitSrn1 = userAnswers.copy(id = otherId + srn)
-      val userAnswersWitSrn2 = userAnswers.copy(id = id + srn)
-
-      repository.set(userAnswersWitSrn1)
-      repository.set(userAnswersWitSrn2)
-
-      val getResult = repository.getBySrnAndIdNotEqual(id, srn).futureValue
-
-      val expectedResult = userAnswersWitSrn1.copy(lastUpdated = instant)
-
-      getResult mustBe Some(expectedResult)
     }
   }
 

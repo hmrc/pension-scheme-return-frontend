@@ -94,17 +94,14 @@ class SessionRepository @Inject() (
 
   def getBySrnAndIdNotEqual(userId: String, srn: Srn): Future[Option[UserAnswers]] = {
     val userIdKey = userId + srn
-    val hits = collection
+    collection
       .find(
         Filters.and(
           byIdNotInSessionIdsList(userIdKey),
           Filters.regex("_id", "^.*" + Pattern.quote(srn.value) + ".*$", "i")
         )
       )
-      .map { doc =>
-        UserAnswers(id = doc.id, data = doc.data, lastUpdated = doc.lastUpdated)
-      }
-    hits.headOption()
+      .headOption()
   }
 
   def set(answers: UserAnswers): Future[Unit] = {

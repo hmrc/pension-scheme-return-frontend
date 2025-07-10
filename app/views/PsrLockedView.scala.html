@@ -14,10 +14,7 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-
 @this(
-    appConfig: FrontendAppConfig,
     layout: templates.Layout,
     govukButton: GovukButton
 )
@@ -31,10 +28,6 @@
     <p class="govuk-body">@messages("psrLocked.guidance1")</p>
 
     <p class="govuk-body">@messages("psrLocked.optionalGuidance2.paragraph")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("psrLocked.optionalGuidance2.bullet1")</li>
-        <li>@messages("psrLocked.optionalGuidance2.bullet2", (appConfig.timeout / 60))</li>
-    </ul>
 
     <p class="govuk-body">@messages("psrLocked.guidance3")
         <a href=@reportAProblemUrl

@@ -58,7 +58,7 @@ class DataCheckLockingActionSpec extends BaseSpec {
 
         val action = new Harness(request, sessionRepository, mockConfig)
 
-        val result = action.callTransform().futureValue
+        action.callTransform().futureValue
         verify(sessionRepository, never()).getBySrnAndIdNotEqual(any(), any())
       }
     }

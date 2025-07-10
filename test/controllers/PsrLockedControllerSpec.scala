@@ -20,7 +20,6 @@ import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import config.FrontendAppConfig
 import views.html.PsrLockedView
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class PsrLockedControllerSpec extends ControllerBaseSpec with ControllerBehaviours with TestValues {
   implicit val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -30,31 +29,28 @@ class PsrLockedControllerSpec extends ControllerBaseSpec with ControllerBehaviou
 
   "Psr locked controller" - {
 
-    "return OK and Psl locked view" - {
-      "todo" in {
+    "return OK and Psl locked view" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
-        running(application) {
-          val continueUrl = RedirectUrl("/foo")
-          val appConfig = application.injector.instanceOf[FrontendAppConfig]
-          val expectedReportAProblemUrl = appConfig.reportAProblemUrl
+      running(application) {
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val expectedReportAProblemUrl = appConfig.reportAProblemUrl
 
-          val request = FakeRequest(GET, routes.PsrLockedController.onPageLoad(srn).url)
+        val request = FakeRequest(GET, routes.PsrLockedController.onPageLoad(srn).url)
 
-          val result = route(application, request).value
+        val result = route(application, request).value
 
-          val lockedView = application.injector.instanceOf[PsrLockedView]
+        val lockedView = application.injector.instanceOf[PsrLockedView]
 
-          status(result) mustEqual OK
-          val expectedView =
-            lockedView(controllers.routes.OverviewController.onPageLoad(srn).url, expectedReportAProblemUrl)(using
-              request,
-              createMessages(using application)
-            ).toString
-          val actualView = contentAsString(result)
-          actualView mustEqual expectedView
-        }
+        status(result) mustEqual OK
+        val expectedView =
+          lockedView(controllers.routes.OverviewController.onPageLoad(srn).url, expectedReportAProblemUrl)(using
+            request,
+            createMessages(using application)
+          ).toString
+        val actualView = contentAsString(result)
+        actualView mustEqual expectedView
       }
     }
   }
