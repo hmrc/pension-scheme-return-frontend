@@ -64,33 +64,43 @@ class RemoveMemberDetailsController @Inject() (
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      form(formProvider, request.userAnswers.get(MemberDetailsPage(srn, index)).get)
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              withMemberDetails(srn, index)(nameDOB =>
-                BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
-              )
-            ),
-          removeMemberDetails =>
-            if (removeMemberDetails) {
-              for {
-                updatedAnswers <- softDeleteMember(srn, index).mapK[Future]
-                _ <- saveService.save(updatedAnswers)
-                result <- submissionService
-                  .submitPsrDetailsWithUA(srn, updatedAnswers, routes.PensionSchemeMembersController.onPageLoad(srn))
-              } yield result.getOrRecoverJourney(_ =>
-                Redirect(
-                  navigator
-                    .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
-                )
-              )
-            } else {
-              Future
-                .successful(Redirect(navigator.nextPage(RemoveMemberDetailsPage(srn), mode, request.userAnswers)))
-            }
-        )
+      request.userAnswers.get(MemberDetailsPage(srn, index)) match {
+        case None =>
+          Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
+        case Some(memberDetails) =>
+          form(formProvider, memberDetails)
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  withMemberDetails(srn, index)(nameDOB =>
+                    BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
+                  )
+                ),
+              removeMemberDetails =>
+                if (removeMemberDetails) {
+                  for {
+                    updatedAnswers <- softDeleteMember(srn, index).mapK[Future]
+                    _ <- saveService.save(updatedAnswers)
+                    result <- submissionService
+                      .submitPsrDetailsWithUA(
+                        srn,
+                        updatedAnswers,
+                        routes.PensionSchemeMembersController.onPageLoad(srn)
+                      )
+                  } yield result.getOrRecoverJourney(_ =>
+                    Redirect(
+                      navigator.nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
+                    )
+                  )
+                } else {
+                  Future.successful(
+                    Redirect(navigator.nextPage(RemoveMemberDetailsPage(srn), mode, request.userAnswers))
+                  )
+                }
+            )
+      }
     }
 
   private def withMemberDetails(srn: Srn, index: Max300)(

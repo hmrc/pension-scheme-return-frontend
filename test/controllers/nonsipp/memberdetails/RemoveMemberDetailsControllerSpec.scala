@@ -76,6 +76,11 @@ class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec with Controll
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
+    act.like(
+      redirectToPage(onSubmit, controllers.nonsipp.routes.TaskListController.onPageLoad(srn), defaultUserAnswers)
+        .updateName("onSubmit" + _)
+    )
+
   }
 
 }

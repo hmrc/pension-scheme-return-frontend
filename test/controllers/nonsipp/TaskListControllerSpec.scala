@@ -762,6 +762,29 @@ class TaskListControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           )
         }
 
+        "should ignore progress for deleted members" in {
+          val userAnswers = defaultUserAnswers
+            // Active member
+            .unsafeSet(MemberDetailsPage(srn, 1), memberDetails)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 1), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 1), SectionJourneyStatus.Completed)
+            // Deleted/stale member (not in MembersDetailsPages)
+            .unsafeSet(MemberDetailsCompletedPage(srn, 2), SectionCompleted)
+            .unsafeSet(MemberDetailsManualProgress(srn, 2), SectionJourneyStatus.Completed)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.Recorded(1, "members"),
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+              .onPageLoad(srn, 1, ManualOrUpload.Manual)
+              .url
+          )
+        }
+
       }
     }
 
