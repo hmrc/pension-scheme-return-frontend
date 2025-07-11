@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits.toShow
-import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
@@ -39,6 +38,8 @@ import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import controllers.nonsipp.membercontributions.MemberContributionListController._
+import _root_.config.Constants
+import utils.StringUtils.LastName
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -204,7 +205,7 @@ object MemberContributionListController {
           )
         }
       }
-      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString.lastName))
 
   def viewModel(
     srn: Srn,

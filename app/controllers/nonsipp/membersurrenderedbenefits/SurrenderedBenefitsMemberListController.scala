@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import utils.IntUtils.toInt
 import cats.implicits.toShow
+import utils.StringUtils.LastName
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.membersurrenderedbenefits._
 import viewmodels.models.TaskListStatus.Updated
@@ -260,7 +261,7 @@ object SurrenderedBenefitsMemberListController {
             TableElemDoubleLink((viewOrChangeLink, removeLink))
           )
       }
-      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString.lastName))
 
   def viewModel(
     srn: Srn,
