@@ -97,7 +97,9 @@ trait ControllerBaseSpec
               new FakeDataRetrievalETMPActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)
             ),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
-          bind[PrePopulationDataActionProvider].toInstance(new FakePrePopulationDataActionProvider)
+          bind[DataSavingAction].toInstance(new FakeDataSavingAction()),
+          bind[PrePopulationDataActionProvider].toInstance(new FakePrePopulationDataActionProvider),
+          bind[DataCheckLockingAction].toInstance(new FakeDataCheckLockingAction())
         ) ++ saveService.fold[List[GuiceableModule]](Nil)(service => List(bind[SaveService].toInstance(service)))
           ++ additionalBindings*
       )

@@ -52,6 +52,7 @@ class OverviewController @Inject() (
   createData: DataCreationAction,
   prePopulatedData: PrePopulationDataActionProvider,
   identifyAndRequireData: IdentifyAndRequireData,
+  checkLocking: DataCheckLockingAction,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
   val psrVersionsService: PsrVersionsService,
@@ -252,17 +253,11 @@ class OverviewController @Inject() (
     reportType: String,
     lastSubmittedPsrFbInPreviousYears: Option[String]
   ): Action[AnyContent] =
-    identify
-      .andThen(allowAccess(srn))
-      .andThen(createData)
-      .andThen(
-        prePopulatedData(
-          Option.when(reportType == PsrReportType.Standard.name)(lastSubmittedPsrFbInPreviousYears).flatten
-        )
-      )
-      .async { implicit request =>
-        reportType match {
-          case PsrReportType.Sipp.name =>
+    reportType match {
+      case PsrReportType.Sipp.name =>
+        identify
+          .andThen(allowAccess(srn))
+          .async { implicit request =>
             val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
             Future.successful(
               Redirect(sippUrl)
@@ -270,7 +265,18 @@ class OverviewController @Inject() (
                 .addingToSession(Constants.VERSION -> version)
                 .removingFromSession(Constants.FB_NUMBER)
             )
-          case _ =>
+          }
+      case _ =>
+        identify
+          .andThen(allowAccess(srn))
+          .andThen(checkLocking)
+          .andThen(createData)
+          .andThen(
+            prePopulatedData(
+              Option.when(reportType == PsrReportType.Standard.name)(lastSubmittedPsrFbInPreviousYears).flatten
+            )
+          )
+          .async { implicit request =>
             val yearFrom = LocalDate.parse(taxYear)
             val yearTo = yearFrom.plusYears(1).minusDays(1)
             val dateRange = DateRange(yearFrom, yearTo)
@@ -287,8 +293,8 @@ class OverviewController @Inject() (
                   controllers.routes.WhatYouWillNeedController.onPageLoad(srn)
                 ).addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false))
               }
-        }
-      }
+          }
+    }
 
   def onSelectContinue(
     srn: Srn,
@@ -298,33 +304,36 @@ class OverviewController @Inject() (
     reportType: String,
     lastSubmittedPsrFbInPreviousYears: Option[String]
   ): Action[AnyContent] =
-    identifyAndRequireData(srn, taxYear, version).async { implicit request =>
-      reportType match {
-        case PsrReportType.Sipp.name =>
-          version.toIntOption match {
-            case None =>
-              logger.error(s"Could not parse version [$version] to int, for report type: $reportType")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            case Some(versionInt) =>
-              val path = if (versionInt == 1) {
-                config.urls.sippContinueJourney // Standard journey - undeclared changes made
-              } else {
-                config.urls.sippViewAndChange
-              }
+    reportType match {
+      case PsrReportType.Sipp.name =>
+        identify
+          .andThen(allowAccess(srn))
+          .async { implicit request =>
+            version.toIntOption match {
+              case None =>
+                logger.error(s"Could not parse version [$version] to int, for report type: $reportType")
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Some(versionInt) =>
+                val path = if (versionInt == 1) {
+                  config.urls.sippContinueJourney // Standard journey - undeclared changes made
+                } else {
+                  config.urls.sippViewAndChange
+                }
 
-              val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}$path"
-              Future.successful {
-                val result = Redirect(sippUrl)
-                  .addingToSession(Constants.TAX_YEAR -> taxYear)
-                  .addingToSession(Constants.VERSION -> version)
+                val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}$path"
+                Future.successful {
+                  val result = Redirect(sippUrl)
+                    .addingToSession(Constants.TAX_YEAR -> taxYear)
+                    .addingToSession(Constants.VERSION -> version)
 
-                fbNumber
-                  .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
-                  .getOrElse(result)
-              }
+                  fbNumber
+                    .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
+                    .getOrElse(result)
+                }
+            }
           }
-
-        case _ =>
+      case _ =>
+        identifyAndRequireData(srn, taxYear, version).async { implicit request =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
           val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
@@ -334,8 +343,7 @@ class OverviewController @Inject() (
               Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
             )
           }
-
-      }
+        }
     }
 
   def onSelectViewAndChange(
@@ -344,23 +352,25 @@ class OverviewController @Inject() (
     taxYear: String,
     reportType: String
   ): Action[AnyContent] =
-    identifyAndRequireData(srn, fbNumber).async { implicit request =>
-      reportType match {
-        case PsrReportType.Sipp.name =>
+    reportType match {
+      case PsrReportType.Sipp.name =>
+        identify.andThen(allowAccess(srn)).async { implicit request =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
           Future.successful(
             Redirect(sippUrl)
               .addingToSession(Constants.FB_NUMBER -> fbNumber)
               .addingToSession(Constants.TAX_YEAR -> taxYear)
           )
-        case _ =>
+        }
+      case _ =>
+        identifyAndRequireData(srn, fbNumber).async { implicit request =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
           val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
           isJourneyBypassed(srn)
             .map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
             .map(_.addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false)))
-      }
+        }
     }
 }
 

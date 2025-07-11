@@ -18,12 +18,13 @@ package handlers
 
 import play.api.mvc.{RequestHeader, Result}
 import play.twirl.api.Html
-import views.html.ErrorTemplate
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import play.api.{Logger, PlayException}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Results.Redirect
+import views.html.ErrorTemplate
+import models.SchemeId.Srn
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -63,6 +64,12 @@ class ErrorHandler @Inject() (
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
     logError(request, exception)
     exception match {
+      case PsrLockedException(srn: Srn) =>
+        Future.successful(
+          Redirect(
+            controllers.routes.PsrLockedController.onPageLoad(srn)
+          )
+        )
       case GetPsrException(_, continueUrl, answersSavedDisplayVersion) =>
         Future.successful(
           Redirect(

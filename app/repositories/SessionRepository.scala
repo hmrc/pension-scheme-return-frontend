@@ -18,6 +18,7 @@ package repositories
 
 import uk.gov.hmrc.mongo.MongoComponent
 import org.mongodb.scala.model._
+import models.SchemeId.Srn
 import config.Constants.{PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
 import org.mongodb.scala.bson.conversions.Bson
 import play.api.libs.json.Format
@@ -30,6 +31,7 @@ import config.{Crypto, FrontendAppConfig}
 import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.{Clock, Instant}
+import java.util.regex.Pattern
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 
@@ -59,9 +61,19 @@ class SessionRepository @Inject() (
 
   private def byId(id: String): Bson = Filters.equal("_id", id)
 
+  private def idNotEqual(id: String): Bson = Filters.not(Filters.equal("_id", id))
+
+  private def sessionIds(id: String) =
+    List(id, UNCHANGED_SESSION_PREFIX + id, PREVIOUS_SUBMITTED_PREFIX + id)
+
   private def bySessionIds(id: String): Bson = {
-    val filters = List(id, UNCHANGED_SESSION_PREFIX + id, PREVIOUS_SUBMITTED_PREFIX + id).map(byId)
+    val filters = sessionIds(id).map(byId)
     Filters.or(filters*)
+  }
+
+  private def byIdNotInSessionIdsList(id: String): Bson = {
+    val filters = sessionIds(id).map(idNotEqual)
+    Filters.and(filters*)
   }
 
   def keepAlive(id: String): Future[Unit] =
@@ -79,6 +91,18 @@ class SessionRepository @Inject() (
         .find(byId(id))
         .headOption()
     }
+
+  def getBySrnAndIdNotEqual(userId: String, srn: Srn): Future[Option[UserAnswers]] = {
+    val userIdKey = userId + srn
+    collection
+      .find(
+        Filters.and(
+          byIdNotInSessionIdsList(userIdKey),
+          Filters.regex("_id", "^.*" + Pattern.quote(srn.value) + ".*$", "i")
+        )
+      )
+      .headOption()
+  }
 
   def set(answers: UserAnswers): Future[Unit] = {
 

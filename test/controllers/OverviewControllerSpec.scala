@@ -82,12 +82,14 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
   private implicit val mockPsrOverviewService: PsrOverviewService = mock[PsrOverviewService]
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private implicit val mockPrePopulationService: PrePopulationService = mock[PrePopulationService]
+  private implicit val mockSaveService: SaveService = mock[SaveService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrRetrievalService].toInstance(mockPsrRetrievalService),
     bind[PsrOverviewService].toInstance(mockPsrOverviewService),
     bind[PsrVersionsService].toInstance(mockPsrVersionsService),
-    bind[PrePopulationService].toInstance(mockPrePopulationService)
+    bind[PrePopulationService].toInstance(mockPrePopulationService),
+    bind[SaveService].toInstance(mockSaveService)
   )
 
   override protected def beforeEach(): Unit = {
@@ -95,6 +97,8 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
     reset(mockPsrOverviewService)
     reset(mockPsrVersionsService)
     reset(mockPrePopulationService)
+    reset(mockSaveService)
+    when(mockSaveService.save(any())(using any(), any())).thenReturn(Future.successful(()))
   }
 
   val compiledOverviewResponse: Seq[OverviewResponse] =
