@@ -22,6 +22,7 @@ import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import utils.IntUtils.toInt
+import utils.StringUtils.LastName
 import pages.nonsipp.receivetransfer.ReceiveTransferProgress.TransfersInSectionCompletedUserAnswersOps
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
@@ -252,7 +253,7 @@ object TransferReceivedMemberListController {
           )
         }
       }
-      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString.lastName))
 
   def viewModel(
     srn: Srn,

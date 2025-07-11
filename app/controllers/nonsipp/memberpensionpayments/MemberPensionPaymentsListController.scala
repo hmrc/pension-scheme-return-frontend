@@ -24,7 +24,6 @@ import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import utils.IntUtils.toInt
 import cats.implicits.toShow
-import _root_.config.Constants
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -32,6 +31,8 @@ import _root_.config.RefinedTypes.{Max300, OneTo300}
 import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
+import _root_.config.Constants
+import utils.StringUtils.LastName
 import pages.nonsipp.memberpensionpayments._
 import controllers.actions._
 import eu.timepit.refined.refineV
@@ -215,7 +216,7 @@ object MemberPensionPaymentsListController {
             )
           )
       }
-      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString.lastName))
 
   def viewModel(
     srn: Srn,
