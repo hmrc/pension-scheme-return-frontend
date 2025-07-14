@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import viewmodels.models.CheckYourAnswersViewModel
+@import viewmodels.models.CheckYourAnswersSummaryViewModel
 
 @this(
         layout: templates.Layout,
@@ -25,7 +25,7 @@
         govukButton: GovukButton,
 )
 
-    @(viewmodel: FormPageViewModel[CheckYourAnswersViewModel], schemeName: String)(implicit request: Request[?], messages: Messages)
+    @(viewmodel: FormPageViewModel[List[CheckYourAnswersSummaryViewModel]], schemeName: String)(implicit request: Request[?], messages: Messages)
 
     @layout(pageTitle = titleNoForm( if (viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = viewmodel.showBackLink) {
 
@@ -34,28 +34,10 @@
         @if(viewmodel.mode == NormalMode || viewmodel.mode == CheckMode) {
             <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
         }
-@*
-        @if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) {
-            @if(viewmodel.optViewOnlyDetails.get.updated) {
-                <strong class ="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Updated</strong><br/>
 
-                @viewmodel.optViewOnlyDetails.get.link.map { link =>
-                    <p class="govuk-body">
-                        <a href=@link.url
-                       class="govuk-link" rel="noreferrer noopener" target="_blank" >@renderMessage(link.content)</a></p>
-                }
-            }
-            @viewmodel.optViewOnlyDetails.get.submittedText.map { submittedText =>
-                <span class="govuk-caption-l">@renderMessage(submittedText)</span>
-            }
-            <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
-        }
-*@
-
-        @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.sections)(paginatedViewModel =>
-            viewmodel.page.sections.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
-        ) { sections =>
-            @sections.map { section =>
+        @for(vm <- viewmodel.page) {
+            <h1 class="govuk-heading-m">@renderMessage(vm.heading)</h1>
+            @vm.sections.map { section =>
                 @section.heading.map(renderMessage)
                 @govukSummaryList(
                     SummaryListViewModel(
@@ -63,35 +45,16 @@
                             SummaryListRowViewModel(
                                 key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
                                 value = ValueViewModel(renderMessage(row.value)),
-                                actions = if (viewmodel.mode == ViewOnlyMode) Seq() else {
-                                    row.actions.map { a =>
-                                        ActionItemViewModel(Text(a.content.toMessage), a.href).withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
-                                    }
-                                }
+                                actions = Seq()
                             )
                         }
-                    ).withMarginBottom(viewmodel.page.marginBottom)
+                    ).withMarginBottom(vm.marginBottom)
                 )
             }
-        }
 
-        @viewmodel.page.inset.map { inset =>
-            @govukInsetText(InsetTextViewModel(renderMessage(inset)))
-        }
 
-        @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
-            @if(paginatedViewModel.pagination.totalPages > 1) {
-                <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+            @vm.inset.map { inset =>
+                @govukInsetText(InsetTextViewModel(renderMessage(inset)))
             }
-            @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
-        }
-
-        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit) {
-            @govukButton(
-                if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty)
-                    ButtonViewModel(renderMessage(viewmodel.optViewOnlyDetails.get.buttonText))
-                else
-                    ButtonViewModel(renderMessage(viewmodel.buttonText)).withAttribute("data-prevent-double-click","true")
-            )
         }
     }
