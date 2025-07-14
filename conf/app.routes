@@ -154,7 +154,8 @@ POST        /:srn/remove-member-details/:index                                  
 GET         /:srn/change-remove-member-details/:index                                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Int, mode: Mode = CheckMode)
 POST        /:srn/change-remove-member-details/:index                                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Int, mode: Mode = CheckMode)
 
-GET         /:srn/upload-member-details-file                                                                   controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn)
+GET         /:srn/upload-member-details-file                                                                   controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, uploadFailed: Boolean = false)
+GET         /:srn/upload-member-details-file/upload-failed                                                     controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, uploadFailed: Boolean)
 GET         /:srn/submit-upload-member-details-file                                                            controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
 GET         /:srn/did-scheme-have-bank-account                                                                 controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)

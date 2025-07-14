@@ -189,7 +189,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             HowToUploadPage.apply,
-            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
           )
           .withName("go from how to upload page  to upload member details page")
       )
@@ -272,7 +272,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             FileUploadErrorSummaryPage.apply,
-            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
           )
           .withName("go from file upload error summary page to upload a file page")
       )
@@ -281,7 +281,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             FileUploadTooManyErrorsPage.apply,
-            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
           )
           .withName("go from too many file upload errors page to upload a file page")
       )

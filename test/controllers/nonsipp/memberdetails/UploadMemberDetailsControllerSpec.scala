@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class UploadMemberDetailsControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private lazy val onPageLoad = routes.UploadMemberDetailsController.onPageLoad(srn)
+  private lazy val onPageLoad = routes.UploadMemberDetailsController.onPageLoad(srn, false)
   private def onPageLoad(errorCode: String, errorMessage: String): Call =
     onPageLoad.copy(url = onPageLoad.url + s"?errorCode=$errorCode&errorMessage=$errorMessage")
 
