@@ -1940,6 +1940,7 @@ landOrPropertyList.heading.prepop = {0} land or property
 landOrPropertyList.heading.prepop.plural = {0} land or properties
 landOrPropertyList.heading.prepop.check = Total of {0} land or properties
 landOrPropertyList.paragraph.prepop = You must check all land or property previously added. You must tell us about all land or property the scheme held at any point during the period of this return.
+landOrPropertyList.paragraph.disposal.prePop = You can only remove assets added in this return. You can report any disposals in the ‘Disposal of land or property’ section.
 landOrPropertyList.paragraph = You must tell us about all land or property the scheme held at any point during the period of this return.
 landOrPropertyList.paragraph.disposal = You can report any disposals in the ‘Disposal of land or property’ section.
 landOrPropertyList.inset = You cannot add another land or property as you have entered the maximum of 5,000.
