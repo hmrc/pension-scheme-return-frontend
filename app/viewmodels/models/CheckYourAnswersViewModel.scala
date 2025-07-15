@@ -30,6 +30,13 @@ case class CheckYourAnswersViewModel(
   def withInset(inset: Option[DisplayMessage]): CheckYourAnswersViewModel = copy(inset = inset)
 }
 
+sealed trait SummaryPageViewModel
+
+object SummaryPageViewModel {
+  case class SummaryPageSection(viewModel: CheckYourAnswersSummaryViewModel) extends SummaryPageViewModel
+  case class Heading(value: DisplayMessage) extends SummaryPageViewModel
+}
+
 case class CheckYourAnswersSummaryViewModel(
   heading: DisplayMessage,
   sections: List[CheckYourAnswersSection],

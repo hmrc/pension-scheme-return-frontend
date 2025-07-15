@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.declaration
 
-import play.api.mvc._
 import pages.nonsipp.landorproperty._
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.SharesDisposalProgress
@@ -27,6 +26,8 @@ import play.api.i18n._
 import models.requests.DataRequest
 import pages.nonsipp.employercontributions.EmployerContributionsProgress
 import services.{PsrRetrievalService, PsrVersionsService, SchemeDateService}
+import viewmodels.models.SummaryPageViewModel.SummaryPageSection
+import play.api.mvc._
 import config.RefinedTypes.{Max300, Max50, Max5000}
 import controllers.PSRController
 import views.html.SummaryView
@@ -59,7 +60,7 @@ class PreSubmissionSummaryController @Inject() (
   def employerContributions(srn: Srn)(using
     request: DataRequest[AnyContent],
     messages: Messages
-  ): Either[Result, List[CheckYourAnswersSection]] = {
+  ): Either[Result, List[SummaryPageViewModel]] = {
     val indexes = request.userAnswers
       .map(EmployerContributionsProgress.all())
       .keys
@@ -68,6 +69,15 @@ class PreSubmissionSummaryController @Inject() (
 
     indexes.toList
       .map(EmployerContributionsCheckAnswersSectionUtils.employerContributionsSections(srn, _, NormalMode))
+      .map(emp =>
+        for {
+          empList <- emp
+          vm = CheckYourAnswersSummaryViewModel(
+            heading = Message("nonsipp.summary.heading.employerContributions.memberTitle"),
+            sections = empList
+          )
+        } yield List(SummaryPageSection(vm))
+      )
       .reduce((a, b) =>
         for {
           aRight <- a
@@ -132,7 +142,7 @@ class PreSubmissionSummaryController @Inject() (
   )(using
     request: DataRequest[AnyContent],
     messages: Messages
-  ): Future[Either[Result, FormPageViewModel[List[CheckYourAnswersSummaryViewModel]]]] =
+  ): Future[Either[Result, FormPageViewModel[List[SummaryPageViewModel]]]] =
     sharesDisposals(srn).map { sharesDisposals =>
       for {
         basicDetailsSections <- BasicDetailsCheckAnswersSectionUtils.basicDetailsSections(
@@ -143,17 +153,24 @@ class PreSubmissionSummaryController @Inject() (
         employerContributionsSections <- employerContributions(srn)
         landOrPropertySections <- landOrProperties(srn)
         sharesDisposalsVm <- sharesDisposals
-        allVms: List[CheckYourAnswersSummaryViewModel] =
+        allVms: List[SummaryPageViewModel] =
           List(
-            CheckYourAnswersSummaryViewModel(Message("nonsipp.summary.heading.basicDetails"), basicDetailsSections),
-            CheckYourAnswersSummaryViewModel(
-              Message("nonsipp.summary.heading.employerContributions"),
-              employerContributionsSections
-            ),
-            CheckYourAnswersSummaryViewModel(Message("nonsipp.summary.heading.landOrProperty"), landOrPropertySections),
-            CheckYourAnswersSummaryViewModel(sharesDisposalsVm.heading, sharesDisposalsVm.page.sections)
-          )
-      } yield FormPageViewModel[List[CheckYourAnswersSummaryViewModel]](
+            SummaryPageSection(
+              CheckYourAnswersSummaryViewModel(Message("nonsipp.summary.heading.basicDetails"), basicDetailsSections)
+            )
+          ) ++ employerContributionsSections
+            ++ List(
+              SummaryPageSection(
+                CheckYourAnswersSummaryViewModel(
+                  Message("nonsipp.summary.heading.landOrProperty"),
+                  landOrPropertySections
+                )
+              ),
+              SummaryPageSection(
+                CheckYourAnswersSummaryViewModel(sharesDisposalsVm.heading, sharesDisposalsVm.page.sections)
+              )
+            )
+      } yield FormPageViewModel[List[SummaryPageViewModel]](
         Message("nonsipp.summary.title"),
         Message("nonsipp.summary.heading"),
         allVms,
