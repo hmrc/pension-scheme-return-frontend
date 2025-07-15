@@ -25,7 +25,6 @@ import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import utils.IntUtils.toInt
 import cats.implicits.toShow
-import _root_.config.Constants
 import controllers.actions._
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import viewmodels.models.TaskListStatus.Updated
@@ -36,6 +35,8 @@ import _root_.config.RefinedTypes.{Max300, Max50}
 import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
+import _root_.config.Constants
+import utils.StringUtils.LastName
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -324,7 +325,7 @@ object EmployerContributionsMemberListController {
         rows = rows(
           srn,
           mode,
-          employerContributions.sortBy(_.employerFullName),
+          employerContributions.sortBy(_.employerFullName.lastName),
           optYear,
           optCurrentVersion,
           optPreviousVersion

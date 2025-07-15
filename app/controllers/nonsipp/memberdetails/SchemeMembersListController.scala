@@ -24,7 +24,6 @@ import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import utils.IntUtils.toInt
 import cats.implicits.{catsSyntaxApplicativeId, toShow}
-import config.Constants.maxSchemeMembers
 import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
 import config.RefinedTypes.Max300
@@ -33,6 +32,8 @@ import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
+import config.Constants.maxSchemeMembers
+import utils.StringUtils.LastName
 import controllers.actions._
 import eu.timepit.refined.refineV
 import pages.nonsipp.CompilationOrSubmissionDatePage
@@ -259,9 +260,10 @@ object SchemeMembersListController {
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
+    val rowsSorted = filteredMembers
+      .sortBy { case (_, (_, name)) => name.lastName }
 
-    val rows: List[ListRow] = filteredMembers
-      .sortBy { case (_, (_, name)) => name }
+    val rows: List[ListRow] = rowsSorted
       .flatMap { case (_, (unrefinedIndex, memberFullName)) =>
         val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
         if (mode.isViewOnlyMode) {
