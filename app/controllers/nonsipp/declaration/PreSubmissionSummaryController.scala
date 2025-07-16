@@ -109,7 +109,7 @@ class PreSubmissionSummaryController @Inject() (
     request: DataRequest[AnyContent],
     messages: Messages,
     ec: ExecutionContext
-  ): Future[Either[Result, FormPageViewModel[CheckYourAnswersViewModel]]] = {
+  ): Future[Either[Result, SummaryPageViewModel]] = {
     val indexes: List[(Max5000, Max50)] = request.userAnswers
       .map(SharesDisposalProgress.all())
       .flatMap((shareIndex, disposals) => disposals.keys.map((shareIndex, _)))
@@ -133,7 +133,15 @@ class PreSubmissionSummaryController @Inject() (
           aRight <- a
           bRight <- b
         } yield aRight.copy(page = aRight.page.copy(sections = aRight.page.sections ++ bRight.page.sections))
-      ).map(_.copy(heading = Message("nonsipp.summary.heading.sharesDisposals")))
+      ).map(vm =>
+        SummaryPageSection(
+          CheckYourAnswersSummaryViewModel(
+            heading = Message("nonsipp.summary.heading.sharesDisposals"),
+            sections = vm.page.sections,
+            marginBottom = vm.page.marginBottom
+          )
+        )
+      )
     )
   }
 
@@ -166,9 +174,7 @@ class PreSubmissionSummaryController @Inject() (
                   landOrPropertySections
                 )
               ),
-              SummaryPageSection(
-                CheckYourAnswersSummaryViewModel(sharesDisposalsVm.heading, sharesDisposalsVm.page.sections)
-              )
+              sharesDisposalsVm
             )
       } yield FormPageViewModel[List[SummaryPageViewModel]](
         Message("nonsipp.summary.title"),

@@ -33,7 +33,7 @@
         <span class="govuk-caption-xl">@schemeName</span>
 
         @if(viewmodel.mode == NormalMode || viewmodel.mode == CheckMode) {
-            <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+            <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
         }
 
         @for(vm <- viewmodel.page) {
