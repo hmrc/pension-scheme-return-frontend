@@ -92,7 +92,7 @@ lazy val root = Project(appName, file("."))
     },
     scalafmtOnCompile := true,
     scalafixOnCompile := true,
-    addCommandAlias("runLocal", "run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes")
+    addCommandAlias("runLocal", "run -Dplay.http.router=testOnlyDoNotUseInAppConf.Routes")
   )
   .settings(CodeCoverageSettings.settings *)
 
