@@ -30,6 +30,25 @@ case class CheckYourAnswersViewModel(
   def withInset(inset: Option[DisplayMessage]): CheckYourAnswersViewModel = copy(inset = inset)
 }
 
+sealed trait SummaryPageViewModel
+
+object SummaryPageViewModel {
+  case class SummaryPageSection(viewModel: CheckYourAnswersSummaryViewModel) extends SummaryPageViewModel
+  case class Heading(value: DisplayMessage) extends SummaryPageViewModel
+}
+
+case class CheckYourAnswersSummaryViewModel(
+  heading: DisplayMessage,
+  sections: List[CheckYourAnswersSection],
+  marginBottom: Option[Margin] = Some(Margin.Fixed60Bottom),
+  inset: Option[DisplayMessage] = None,
+  paginatedViewModel: Option[PaginatedViewModel] = None
+) {
+  def withMarginBottom(margin: Margin): CheckYourAnswersSummaryViewModel = copy(marginBottom = Some(margin))
+
+  def withInset(inset: Option[DisplayMessage]): CheckYourAnswersSummaryViewModel = copy(inset = inset)
+}
+
 case class CheckYourAnswersSection(
   heading: Option[DisplayMessage],
   rows: List[CheckYourAnswersRowViewModel]
@@ -72,6 +91,13 @@ case class CheckYourAnswersRowViewModel(
   def withChangeAction(changeUrl: String, hidden: String): CheckYourAnswersRowViewModel = withAction(
     SummaryAction("site.change", changeUrl).withVisuallyHiddenContent(hidden)
   )
+
+  def withChangeActionIf(changeUrl: String, hidden: String, includeAction: Boolean): CheckYourAnswersRowViewModel =
+    if (includeAction) {
+      withAction(
+        SummaryAction("site.change", changeUrl).withVisuallyHiddenContent(hidden)
+      )
+    } else this
 
   def withChangeAction(changeUrl: String, hidden: Message): CheckYourAnswersRowViewModel = withAction(
     SummaryAction("site.change", changeUrl).withVisuallyHiddenContent(hidden)

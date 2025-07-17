@@ -17,22 +17,23 @@
 package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.shares._
+import pages.nonsipp.shares.*
 import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
-import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
+import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.*
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
-import pages.nonsipp.sharesdisposal._
-import models._
+import pages.nonsipp.sharesdisposal.*
+import models.*
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
+import utils.nonsipp.SharesDisposalsCheckAnswersSectionUtils
 
 import scala.concurrent.Future
 
@@ -183,8 +184,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
         act.like(
           renderView(onPageLoad(mode), soldAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              viewModel(
-                ViewModelParameters(
+              SharesDisposalsCheckAnswersSectionUtils.viewModel(
+                SharesDisposalsCheckAnswersSectionUtils.ViewModelParameters(
                   srn,
                   shareIndex,
                   disposalIndex,
