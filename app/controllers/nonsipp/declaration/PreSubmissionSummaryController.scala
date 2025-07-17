@@ -16,27 +16,25 @@
 
 package controllers.nonsipp.declaration
 
-import services.{PsrRetrievalService, PsrVersionsService, SchemeDateService}
+import services.{PsrRetrievalService, PsrVersionsService}
 import play.api.mvc._
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import navigation.Navigator
+import viewmodels.models.SummaryPageEntry.Heading
 import utils.nonsipp._
 import play.api.i18n._
-import viewmodels.models.{SummaryPageEntry, _}
-import models.requests.DataRequest
 import views.html.SummaryView
 import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{SummaryPageEntry, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.{Inject, Named}
+import javax.inject.Inject
 
 class PreSubmissionSummaryController @Inject() (
   override val messagesApi: MessagesApi,
-  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents,
   view: SummaryView,
   val psrVersionsService: PsrVersionsService,
@@ -52,8 +50,15 @@ class PreSubmissionSummaryController @Inject() (
 
   def viewModel(
     srn: Srn
-  )(using
-    request: DataRequest[AnyContent],
-    messages: Messages
-  ): Future[Either[Result, FormPageViewModel[List[SummaryPageEntry]]]] = ???
+  ): Future[Either[Result, FormPageViewModel[List[SummaryPageEntry]]]] =
+    Future.successful(
+      Right(
+        FormPageViewModel[List[SummaryPageEntry]](
+          Message("Test"),
+          Message("Test"),
+          List(Heading(Message(srn.value))),
+          controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+        )
+      )
+    )
 }

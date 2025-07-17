@@ -154,8 +154,6 @@ abstract class PSRController
     with PrePopulationUtils
     with PsrControllerHelpers {
 
-  private val logger = Logger("PSRController")
-
   implicit def requestToUserAnswers(implicit req: DataRequest[?]): UserAnswers = req.userAnswers
 
   def formatDateForApi(date: LocalDate): String =

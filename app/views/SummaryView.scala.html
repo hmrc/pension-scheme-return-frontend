@@ -15,15 +15,12 @@
  *@
 
 @import viewmodels.models.CheckYourAnswersSummaryViewModel
-@import viewmodels.models.SummaryPageEntry.Section
+@import viewmodels.models.SummaryPageEntry.{Section, Heading}
 
 @this(
         layout: templates.Layout,
-        formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
-        govukInsetText: GovukInsetText,
-        govukPagination: GovukPagination,
-        govukButton: GovukButton,
+        govukInsetText: GovukInsetText
 )
 
     @(viewmodel: FormPageViewModel[List[SummaryPageEntry]], schemeName: String)(implicit request: Request[?], messages: Messages)
@@ -59,6 +56,9 @@
                     @vmSection.inset.map { inset =>
                         @govukInsetText(InsetTextViewModel(renderMessage(inset)))
                     }
+                }
+                case Heading(heading) => {
+                    <h2 class="govuk-heading-m">@renderMessage(heading)</h2>
                 }
             }
         }

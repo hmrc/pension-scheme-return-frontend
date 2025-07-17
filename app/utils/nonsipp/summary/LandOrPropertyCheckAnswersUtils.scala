@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils.nonsipp
+package utils.nonsipp.summary
 
 import viewmodels.implicits._
 import play.api.mvc.{AnyContent, Result}

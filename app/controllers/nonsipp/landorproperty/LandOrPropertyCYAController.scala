@@ -18,9 +18,9 @@ package controllers.nonsipp.landorproperty
 
 import services.{PsrSubmissionService, SaveService}
 import play.api.mvc._
+import utils.nonsipp.summary.LandOrPropertyCheckAnswersUtils
 import controllers.actions._
 import navigation.Navigator
-import utils.nonsipp.LandOrPropertyCheckAnswersUtils
 import models._
 import play.api.i18n._
 import models.requests.DataRequest
