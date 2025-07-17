@@ -57,7 +57,8 @@ package object shares {
       IdentityTypePage(srn, index, SharesSeller),
       CompanyRecipientCrnPage(srn, index, SharesSeller),
       OtherRecipientDetailsPage(srn, index, SharesSeller),
-      PartnershipRecipientUtrPage(srn, index, SharesSeller)
+      PartnershipRecipientUtrPage(srn, index, SharesSeller),
+      SharesProgress(srn, index)
     )
     if (isLastRecord) list :+ DidSchemeHoldAnySharesPage(srn) else list
   }
