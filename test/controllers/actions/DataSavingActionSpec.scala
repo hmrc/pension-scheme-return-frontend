@@ -16,19 +16,19 @@
 
 package controllers.actions
 
+import play.api.test.FakeRequest
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.mvc.AnyContentAsEmpty
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import repositories.SessionRepository
 import models.UserAnswers
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import repositories.SessionRepository
 import utils.BaseSpec
+import org.mockito.Mockito.{times, verify, when}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DataSavingActionSpec extends ControllerBaseSpec with ControllerBehaviours with ScalaCheckPropertyChecks {
 

@@ -72,7 +72,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
 
     case HowToUploadPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
 
     case UploadMemberDetailsPage(srn) => routes.CheckMemberDetailsFileController.onPageLoad(srn, NormalMode)
 
@@ -80,7 +80,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.memberdetails.upload.routes.CheckingMemberDetailsFileController.onPageLoad(srn, NormalMode)
       } else {
-        routes.UploadMemberDetailsController.onPageLoad(srn)
+        routes.UploadMemberDetailsController.onPageLoad(srn, false)
       }
 
     case CheckingMemberDetailsFilePage(srn, uploadSuccessful) =>
@@ -108,16 +108,16 @@ object MemberDetailsNavigator extends JourneyNavigator {
       controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyRowsController.onPageLoad(srn, NormalMode)
 
     case FileUploadErrorMissingInformationPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
 
     case FileUploadErrorSummaryPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
 
     case FileUploadTooManyErrorsPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
 
     case FileUploadTooManyRowsPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn, false)
 
     case BasicDetailsCheckYourAnswersPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
@@ -163,7 +163,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             controllers.routes.UnauthorisedController.onPageLoad()
           } else {
-            routes.UploadMemberDetailsController.onPageLoad(srn)
+            routes.UploadMemberDetailsController.onPageLoad(srn, false)
           }
       }
 }

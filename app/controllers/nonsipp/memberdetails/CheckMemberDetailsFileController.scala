@@ -83,8 +83,7 @@ class CheckMemberDetailsFileController @Inject() (
 
               case failed: UploadStatus.Failed =>
                 auditUpload(srn, failed, startTime)
-                Redirect(routes.UploadMemberDetailsController.onPageLoad(srn))
-                  .flashing("error" -> "checkMemberDetailsFile.error.failed")
+                Redirect(routes.UploadMemberDetailsController.onPageLoad(srn, true))
 
               case UploadStatus.InProgress =>
                 Ok(view(preparedForm, viewModel(srn, None, mode)))
@@ -93,7 +92,7 @@ class CheckMemberDetailsFileController @Inject() (
 
       case _ =>
         logger.warn("Upload is either initiated or never started, redirecting to upload member details")
-        Future.successful(Redirect(routes.UploadMemberDetailsController.onPageLoad(srn)))
+        Future.successful(Redirect(routes.UploadMemberDetailsController.onPageLoad(srn, false)))
     }
   }
 
@@ -135,8 +134,7 @@ class CheckMemberDetailsFileController @Inject() (
             case Some(failed: UploadStatus.Failed) =>
               auditUpload(srn, failed, startTime)
               Future.successful(
-                Redirect(routes.UploadMemberDetailsController.onPageLoad(srn))
-                  .flashing("error" -> "checkMemberDetailsFile.error.failed")
+                Redirect(routes.UploadMemberDetailsController.onPageLoad(srn, true))
               )
 
             case Some(UploadStatus.InProgress) =>
@@ -272,7 +270,7 @@ object CheckMemberDetailsFileController {
       ),
       onSubmit =
         if (doNotRefresh) routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
-        else routes.UploadMemberDetailsController.onPageLoad(srn)
+        else routes.UploadMemberDetailsController.onPageLoad(srn, false)
     ).refreshPage(refresh)
       .withDescription(
         fileName.map(name => ParagraphMessage(name))

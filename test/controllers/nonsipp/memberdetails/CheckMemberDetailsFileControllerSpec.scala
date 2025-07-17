@@ -125,7 +125,7 @@ class CheckMemberDetailsFileControllerSpec
       act.like(
         redirectToPage(
           onSubmit,
-          routes.UploadMemberDetailsController.onPageLoad(srn),
+          routes.UploadMemberDetailsController.onPageLoad(srn, true),
           defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted),
           "value" -> "true"
         ).before {
@@ -181,7 +181,7 @@ class CheckMemberDetailsFileControllerSpec
         act.like(
           redirectToPage(
             onPageLoad,
-            routes.UploadMemberDetailsController.onPageLoad(srn),
+            routes.UploadMemberDetailsController.onPageLoad(srn, true),
             defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted)
           ).before {
             val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
@@ -217,7 +217,7 @@ class CheckMemberDetailsFileControllerSpec
         act.like(
           redirectToPage(
             onPageLoad,
-            routes.UploadMemberDetailsController.onPageLoad(srn),
+            routes.UploadMemberDetailsController.onPageLoad(srn, false),
             defaultUserAnswers
           ).withName("should redirect to UploadMemberDetailsController when UploadStatusPage is not UploadSubmitted")
         )
