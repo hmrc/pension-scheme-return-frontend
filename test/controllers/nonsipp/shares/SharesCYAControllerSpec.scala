@@ -18,9 +18,9 @@ package controllers.nonsipp.shares
 
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import models.ConditionalYesNo._
+import utils.nonsipp.summary.SharesCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import utils.IntUtils.given
-import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.common._
@@ -153,7 +153,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
       act.like(
         renderView(onPageLoad(mode), filledUserAnswersContribution) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            SharesCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,
@@ -190,7 +190,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
         act.like(
           renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              viewModel(
+              SharesCheckAnswersUtils.viewModel(
                 srn,
                 index,
                 schemeName,
@@ -222,7 +222,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
       act.like(
         renderView(onPageLoad(mode), filledUserAnswersTransfer) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            SharesCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,
@@ -295,7 +295,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            SharesCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,

@@ -17,13 +17,13 @@
 package controllers.nonsipp.bonds
 
 import services.PsrSubmissionService
+import utils.nonsipp.summary.BondsCheckAnswersUtils
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
-import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -90,7 +90,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            BondsCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,
@@ -154,7 +154,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            BondsCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,

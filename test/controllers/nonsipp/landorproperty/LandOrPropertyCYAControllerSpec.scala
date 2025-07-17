@@ -24,6 +24,7 @@ import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.FbVersionPage
+import utils.nonsipp.LandOrPropertyCheckAnswersUtils
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.LandOrPropertySeller
@@ -138,7 +139,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            LandOrPropertyCYAController.viewModel(
+            LandOrPropertyCheckAnswersUtils.viewModel(
               srn = srn,
               index = index,
               schemeName = schemeName,
@@ -174,7 +175,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
         act.like(
           renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              LandOrPropertyCYAController.viewModel(
+              LandOrPropertyCheckAnswersUtils.viewModel(
                 srn = srn,
                 index = index,
                 schemeName = schemeName,
@@ -268,7 +269,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
         optPreviousAnswers = Some(previousUserAnswers)
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          LandOrPropertyCYAController.viewModel(
+          LandOrPropertyCheckAnswersUtils.viewModel(
             srn = srn,
             index = index,
             schemeName = schemeName,
