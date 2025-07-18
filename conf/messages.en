@@ -702,7 +702,11 @@ sharesDisposal.whatYouWillNeed.bullet13 = the number of shares redeemed
 sharesDisposal.whatYouWillNeed.bullet14 = the total consideration received for the redemption
 
 sharesDisposal.removeShareDisposal.title = Are you sure you want to remove details of the disposal of shares in this company?
-sharesDisposal.removeShareDisposal.heading = Are you sure you want to remove details of the disposal of shares in {0}?
+sharesDisposal.removeShareDisposal.heading = Are you sure you want to remove details of the disposal of shares in {0} by {1}?
+sharesDisposal.removeShareDisposal.methodOfDisposal.sold = sale
+sharesDisposal.removeShareDisposal.methodOfDisposal.redeemed = redemption
+sharesDisposal.removeShareDisposal.methodOfDisposal.transferred = transfer out
+sharesDisposal.removeShareDisposal.methodOfDisposal.other = another method
 sharesDisposal.removeShareDisposal.required = Select yes if you are sure you want to remove this share disposal
 
 sharesDisposal.sharesDisposalList.title = Start reporting a share disposal

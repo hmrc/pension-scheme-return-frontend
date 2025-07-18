@@ -526,4 +526,11 @@ object ReportedSharesDisposalListController {
     companyName: String,
     disposalMethod: HowSharesDisposed
   )
+
+  case class SharesDisposalDataRemoval(
+    shareIndex: Max5000,
+    disposalIndex: Max50,
+    companyName: String,
+    disposalMethod: HowSharesDisposed
+  )
 }

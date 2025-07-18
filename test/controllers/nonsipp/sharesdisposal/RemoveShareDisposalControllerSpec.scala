@@ -36,6 +36,7 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec with Controll
 
   private val index = 1
   private val disposalIndex = 1
+  private val methodOfDisposal = HowSharesDisposed.Redeemed
 
   private lazy val onPageLoad = routes.RemoveShareDisposalController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.RemoveShareDisposalController.onSubmit(srn, index, disposalIndex, NormalMode)
@@ -44,10 +45,11 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec with Controll
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-    .unsafeSet(HowWereSharesDisposedPage(srn, index, disposalIndex), HowSharesDisposed.Transferred)
+    .unsafeSet(HowWereSharesDisposedPage(srn, index, disposalIndex), HowSharesDisposed.Redeemed)
 
   private val userAnswersRelatedShares = defaultUserAnswers
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+    .unsafeSet(HowWereSharesDisposedPage(srn, index, disposalIndex), methodOfDisposal)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -66,7 +68,7 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec with Controll
 
       view(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, index, disposalIndex, companyName, NormalMode)
+        viewModel(srn, index, disposalIndex, companyName, methodOfDisposal, NormalMode)
       )
     })
 
@@ -77,8 +79,7 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec with Controll
     act.like(
       redirectToPage(
         onPageLoad,
-        controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
-        userAnswersRelatedShares
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       ).withName("relatedShares")
     )
 

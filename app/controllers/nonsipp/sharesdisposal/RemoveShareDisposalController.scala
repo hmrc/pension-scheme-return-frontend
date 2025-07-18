@@ -17,13 +17,13 @@
 package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
+import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController.SharesDisposalDataRemoval
 import viewmodels.implicits._
 import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal._
-import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{HowSharesDisposed, Mode}
 import play.api.i18n.MessagesApi
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,6 +31,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import navigation.Navigator
+import models.HowSharesDisposed.HowSharesDisposed
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import controllers.nonsipp.sharesdisposal.RemoveShareDisposalController._
@@ -58,13 +60,13 @@ class RemoveShareDisposalController @Inject() (
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          _ <- request.userAnswers
+          methodOfDisposal <- request.userAnswers
             .get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
             .getOrRedirectToTaskList(srn)
           nameOfSharesCompany <- request.userAnswers
             .get(CompanyNameRelatedSharesPage(srn, shareIndex))
             .getOrRedirectToTaskList(srn)
-        } yield Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
+        } yield Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, methodOfDisposal, mode)))
       ).merge
     }
 
@@ -75,7 +77,7 @@ class RemoveShareDisposalController @Inject() (
         .fold(
           errors =>
             request.userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).getOrRecoverJourney {
-              _ =>
+              methodOfDisposal =>
                 request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney {
                   nameOfSharesCompany =>
                     Future.successful(
@@ -83,7 +85,7 @@ class RemoveShareDisposalController @Inject() (
                         view(
                           errors,
                           RemoveShareDisposalController
-                            .viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)
+                            .viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, methodOfDisposal, mode)
                         )
                       )
                     )
@@ -124,16 +126,36 @@ object RemoveShareDisposalController {
     "sharesDisposal.removeShareDisposal.required"
   )
 
+  private def buildMessage(sharesDisposalData: SharesDisposalDataRemoval): Message = {
+    val disposalType = sharesDisposalData.disposalMethod match {
+      case HowSharesDisposed.Sold => "sharesDisposal.removeShareDisposal.methodOfDisposal.sold"
+      case HowSharesDisposed.Redeemed => "sharesDisposal.removeShareDisposal.methodOfDisposal.redeemed"
+      case HowSharesDisposed.Transferred => "sharesDisposal.removeShareDisposal.methodOfDisposal.transferred"
+      case HowSharesDisposed.Other(_) => "sharesDisposal.removeShareDisposal.methodOfDisposal.other"
+    }
+    Message("sharesDisposal.removeShareDisposal.heading", sharesDisposalData.companyName, disposalType)
+  }
+
   def viewModel(
     srn: Srn,
     shareIndex: Max5000,
     disposalIndex: Max50,
     companyName: String,
+    methodOfDisposal: HowSharesDisposed,
     mode: Mode
-  ): FormPageViewModel[YesNoPageViewModel] =
+  ): FormPageViewModel[YesNoPageViewModel] = {
+    val sharesDisposalData = SharesDisposalDataRemoval(
+      shareIndex,
+      disposalIndex,
+      companyName,
+      methodOfDisposal
+    )
+
     YesNoPageViewModel(
-      title = "sharesDisposal.removeShareDisposal.title",
-      heading = Message("sharesDisposal.removeShareDisposal.heading", companyName),
+      title = Message("sharesDisposal.removeShareDisposal.title"),
+      heading = buildMessage(sharesDisposalData),
       onSubmit = routes.RemoveShareDisposalController.onSubmit(srn, shareIndex, disposalIndex, mode)
     )
+  }
+
 }
