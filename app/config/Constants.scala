@@ -129,4 +129,5 @@ object Constants {
   val earliestDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   val defaultFbVersion = "000"
+  val incomplete = "Incomplete"
 }

@@ -16,14 +16,17 @@
 
 package controllers.nonsipp.bonds
 
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
-import views.html.ContentTablePageView
+import pages.nonsipp.bonds._
+import utils.nonsipp.summary.BondsCheckAnswersUtils
+import views.html.PrePopCheckYourAnswersView
 import utils.IntUtils.given
+import config.Constants.incomplete
 import models.NormalMode
-import controllers.nonsipp.bonds.BondsCheckAndUpdateController._
+import viewmodels.models.SectionJourneyStatus
 import eu.timepit.refined.api.Refined
 import config.RefinedTypes.OneTo5000
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import models.SchemeHoldBond.Acquisition
 
 class BondsCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
@@ -32,25 +35,73 @@ class BondsCheckAndUpdateControllerSpec extends ControllerBaseSpec with Controll
   private def onPageLoad = routes.BondsCheckAndUpdateController.onPageLoad(srn, index)
   private def onSubmit = routes.BondsCheckAndUpdateController.onSubmit(srn, index)
 
-  private val completedUserAnswers = defaultUserAnswers
-    .unsafeSet(NameOfBondsPage(srn, index), nameOfBonds)
-    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), schemeHoldBonds)
+  private val prePodDataMissingUserAnswers = defaultUserAnswers
+    .unsafeSet(NameOfBondsPage(srn, index), otherName)
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index), localDate)
     .unsafeSet(CostOfBondsPage(srn, index), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, index), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
+    .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.Completed)
+
+  private val completedUserAnswers = prePodDataMissingUserAnswers
+    .unsafeSet(IncomeFromBondsPage(srn, index), money)
 
   "BondsCheckAndUpdateController" - {
+    act.like(
+      renderView(onPageLoad, prePodDataMissingUserAnswers) { implicit app => implicit request =>
+        injected[PrePopCheckYourAnswersView].apply(
+          BondsCheckAndUpdateController.viewModel(
+            srn,
+            index,
+            BondsCheckAnswersUtils
+              .viewModel(
+                srn,
+                index,
+                schemeName,
+                otherName,
+                Acquisition,
+                Some(localDate),
+                money,
+                Some(true),
+                areBondsUnregulated = true,
+                Left(incomplete),
+                NormalMode,
+                viewOnlyUpdated = true
+              )
+              .page
+              .sections
+          )
+        )
+      }.withName(s"render correct view when prePopulation data missing")
+    )
 
     act.like(
       renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
-        injected[ContentTablePageView].apply(
-          viewModel(
-            srn = srn,
-            index = index,
-            nameOfBonds = nameOfBonds,
-            acquisitionType = schemeHoldBonds,
-            costOfBonds = money
+        injected[PrePopCheckYourAnswersView].apply(
+          BondsCheckAndUpdateController.viewModel(
+            srn,
+            index,
+            BondsCheckAnswersUtils
+              .viewModel(
+                srn,
+                index,
+                schemeName,
+                otherName,
+                Acquisition,
+                Some(localDate),
+                money,
+                Some(true),
+                areBondsUnregulated = true,
+                Right(money),
+                NormalMode,
+                viewOnlyUpdated = true
+              )
+              .page
+              .sections
           )
         )
-      }.withName(s"render correct view")
+      }.withName(s"render correct view when data complete")
     )
 
     act.like(

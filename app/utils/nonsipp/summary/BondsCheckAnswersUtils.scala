@@ -46,7 +46,7 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
       costOfBonds: Money,
       bondsFromConnectedParty: Option[Boolean],
       areBondsUnregulated: Boolean,
-      incomeFromBonds: Money,
+      incomeFromBonds: Either[String, Money],
       mode: Mode,
       viewOnlyUpdated: Boolean,
       optYear: Option[String],
@@ -70,7 +70,7 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
 
       areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
 
-      incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
+      incomeFromBonds = request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrIncomplete
 
       schemeName = request.schemeDetails.schemeName
     } yield (
@@ -101,7 +101,7 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
     costOfBonds: Money,
     bondsFromConnectedParty: Option[Boolean],
     areBondsUnregulated: Boolean,
-    incomeFromBonds: Money,
+    incomeFromBonds: Either[String, Money],
     mode: Mode,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -181,7 +181,7 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
     costOfBonds: Money,
     bondsFromConnectedParty: Option[Boolean],
     areBondsUnregulated: Boolean,
-    incomeFromBonds: Money,
+    incomeFromBonds: Either[String, Money],
     mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
@@ -299,7 +299,7 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
     srn: Srn,
     index: Int,
     areBondsUnregulated: Boolean,
-    incomeFromBonds: Money,
+    incomeFromBonds: Either[String, Money],
     mode: Mode
   ): List[CheckYourAnswersRowViewModel] = List(
     CheckYourAnswersRowViewModel(
@@ -314,7 +314,10 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
     ),
     CheckYourAnswersRowViewModel(
       "bonds.checkYourAnswers.section.incomeFromBonds",
-      s"£${incomeFromBonds.displayAs}"
+      incomeFromBonds match {
+        case Left(value) => s"$value"
+        case Right(value) => s"£${value.displayAs}"
+      }
     ).withAction(
       SummaryAction(
         "site.change",

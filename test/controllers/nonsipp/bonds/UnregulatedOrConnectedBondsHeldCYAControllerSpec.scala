@@ -100,7 +100,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
               money,
               Some(true),
               areBondsUnregulated = true,
-              money,
+              Right(money),
               mode,
               viewOnlyUpdated = true
             )
@@ -164,7 +164,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
               money,
               Some(true),
               areBondsUnregulated = true,
-              money,
+              Right(money),
               ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
