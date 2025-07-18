@@ -16,47 +16,60 @@
 
 package controllers.nonsipp.bonds
 
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.nonsipp.summary.BondsCheckAnswersUtils
 import controllers.PSRController
-import utils.IntUtils.toRefined5000
 import controllers.actions._
 import models._
-import views.html.ContentTablePageView
-import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
-import controllers.nonsipp.bonds.BondsCheckAndUpdateController._
 import viewmodels.models._
+import views.html.PrePopCheckYourAnswersView
+import models.SchemeId.Srn
 
 class BondsCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentTablePageView
+  view: PrePopCheckYourAnswersView
 ) extends PSRController {
 
   def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    (
-      for {
-        nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
-        acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
-        costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            nameOfBonds,
-            acquisitionType,
-            costOfBonds
+    BondsCheckAnswersUtils
+      .summaryData(srn, index, NormalMode)
+      .map { data =>
+        val sections = BondsCheckAnswersUtils
+          .viewModel(
+            data.srn,
+            data.index,
+            data.schemeName,
+            data.nameOfBonds,
+            data.whyDoesSchemeHoldBonds,
+            data.whenDidSchemeAcquireBonds,
+            data.costOfBonds,
+            data.bondsFromConnectedParty,
+            data.areBondsUnregulated,
+            data.incomeFromBonds,
+            data.mode,
+            data.viewOnlyUpdated,
+            data.optYear,
+            data.optCurrentVersion,
+            data.optPreviousVersion
+          )
+          .page
+          .sections
+        Ok(
+          view(
+            BondsCheckAndUpdateController.viewModel(
+              data.srn,
+              data.index,
+              sections
+            )
           )
         )
-      )
-    ).merge
+      }
+      .merge
   }
 
   def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
@@ -69,46 +82,18 @@ object BondsCheckAndUpdateController {
   def viewModel(
     srn: Srn,
     index: Int,
-    nameOfBonds: String,
-    acquisitionType: SchemeHoldBond,
-    costOfBonds: Money
-  ): FormPageViewModel[ContentTablePageViewModel] = {
-
-    val schemeHoldBond = acquisitionType match {
-      case SchemeHoldBond.Acquisition => "bondsCheckAndUpdate.Acquisition"
-      case SchemeHoldBond.Transfer => "bondsCheckAndUpdate.Transfer"
-      case SchemeHoldBond.Contribution => "bondsCheckAndUpdate.Contribution"
-    }
-
-    val rows: List[(DisplayMessage, DisplayMessage)] = List(
-      Message("bondsCheckAndUpdate.table.one") -> Message(nameOfBonds),
-      Message("bondsCheckAndUpdate.table.two") -> Message(schemeHoldBond),
-      Message("bondsCheckAndUpdate.table.three") -> Message(costOfBonds.displayAs)
-    )
-
-    FormPageViewModel(
+    sections: List[CheckYourAnswersSection]
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel[CheckYourAnswersViewModel](
       mode = NormalMode,
       title = "bondsCheckAndUpdate.title",
       heading = "bondsCheckAndUpdate.heading",
-      description = None,
-      page = ContentTablePageViewModel(
-        inset = None,
-        beforeTable = Some(ParagraphMessage("bondsCheckAndUpdate.paragraph")),
-        afterTable = Some(
-          ParagraphMessage("bondsCheckAndUpdate.bullet.paragraph") ++ ListMessage
-            .Bullet(
-              "bondsCheckAndUpdate.bullet.one",
-              "bondsCheckAndUpdate.bullet.two",
-              "bondsCheckAndUpdate.bullet.three"
-            )
-        ),
-        rows = rows
-      ),
+      description = Some("bondsCheckAndUpdate.description"),
+      page = CheckYourAnswersViewModel(sections),
       refresh = None,
       buttonText = "bondsCheckAndUpdate.button",
       details = None,
       onSubmit = routes.BondsCheckAndUpdateController.onSubmit(srn, index),
       optViewOnlyDetails = None
     )
-  }
 }

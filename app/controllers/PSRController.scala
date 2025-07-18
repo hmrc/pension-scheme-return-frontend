@@ -39,6 +39,7 @@ import cats.implicits.toTraverseOps
 import pages.nonsipp.receivetransfer._
 import cats.syntax.applicative._
 import models.requests.psr._
+import config.Constants.incomplete
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import cats.syntax.either._
 import eu.timepit.refined.refineV
@@ -121,6 +122,11 @@ trait PsrControllerHelpers extends Results {
     def getOrRecoverJourneyT(implicit ec: ExecutionContext): EitherT[Future, Result, A] = maybe match {
       case Some(value) => EitherT.right(Future.successful(value))
       case None => EitherT.left(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }
+
+    def getOrIncomplete: Either[String, A] = maybe match {
+      case Some(value) => Right(value)
+      case None => Left(incomplete)
     }
 
     def getOrRedirectToTaskList(srn: Srn): Either[Result, A] = maybe match {
