@@ -18,7 +18,7 @@ package controllers
 
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import play.api.mvc.{Call, Result}
+import play.api.mvc.{Call, Result, Results}
 import config.RefinedTypes._
 import pages.nonsipp.membersurrenderedbenefits.{
   SurrenderedBenefitsAmountPage,
@@ -56,11 +56,9 @@ import scala.util.Try
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-abstract class PSRController extends FrontendBaseController with I18nSupport with PrePopulationUtils {
+trait PsrControllerHelpers extends Results {
 
-  private val logger = Logger("PSRController")
-
-  implicit def requestToUserAnswers(implicit req: DataRequest[?]): UserAnswers = req.userAnswers
+  def requiredPageLogger: Logger = Logger("RequiredPage")
 
   def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[?]): Either[Result, A] =
     request.userAnswers.get(page) match {
@@ -77,15 +75,9 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
               .mkString(", ")
           case _ => "No parameters available"
         }
-        logger.error(s"Required page ${page.getClass.getSimpleName}($params) missing")
+        requiredPageLogger.error(s"Required page ${page.getClass.getSimpleName}($params) missing")
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
-
-  def recoverJourneyWhen(
-    bool: Boolean,
-    call: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
-  ): Either[Result, Unit] =
-    if (bool) Left(Redirect(call)) else Right(())
 
   def loggedInUserNameOrRedirect(implicit request: DataRequest[?]): Either[Result, String] =
     request.minimalDetails.individualDetails match {
@@ -96,46 +88,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
           case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }
-
-  // Used to specifically refine an index retrieved from user answers
-  // These indexes will be strings and 0 based so we need to add 1 before refining
-  def refineStringIndex[A](indexAsString: String)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
-    indexAsString.toIntOption.flatMap(refineIndex[A])
-
-  def refineIndex[A](index: Int)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
-    refineV[A](index + 1).toOption
-
-  def formatDateForApi(date: LocalDate): String =
-    date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-  def getSubmitter(response: PsrVersionsResponse): String = {
-    val emptySubmitterName = ""
-    response.reportSubmitterDetails.fold(emptySubmitterName)(submitter =>
-      submitter.individualDetails match {
-        case Some(individualDetails: IndividualDetails) =>
-          individualDetails.firstName + " " + individualDetails.lastName
-        case None =>
-          submitter.organisationOrPartnershipDetails match {
-            case Some(orgDetails) => orgDetails.organisationOrPartnershipName
-            case None => emptySubmitterName
-          }
-      }
-    )
-  }
-
-  def loggedInUserNameOrBlank(implicit request: DataRequest[?]): String =
-    request.minimalDetails.individualDetails match {
-      case Some(individual) => individual.fullName
-      case None =>
-        request.minimalDetails.organisationName match {
-          case Some(orgName) => orgName
-          case None => ""
-        }
-    }
-
-  implicit class FutureEitherOps[A](f: Future[Either[A, A]])(implicit ec: ExecutionContext) {
-    def merge: Future[A] = f.map(_.merge)
-  }
 
   implicit class EitherOps[A](maybe: Either[String, A]) {
     def getOrRecoverJourney(implicit logger: Logger): Either[Result, A] =
@@ -177,6 +129,65 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     }
   }
 
+  def refineIndex[A](index: Int)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
+    refineV[A](index + 1).toOption
+
+  // Used to specifically refine an index retrieved from user answers
+  // These indexes will be strings and 0 based so we need to add 1 before refining
+  def refineStringIndex[A](indexAsString: String)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
+    indexAsString.toIntOption.flatMap(refineIndex[A])
+
+  def recoverJourneyWhen(
+    bool: Boolean,
+    call: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+  ): Either[Result, Unit] =
+    if (bool) Left(Redirect(call)) else Right(())
+
+  implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
+    def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).min).merge)
+  }
+}
+
+abstract class PSRController
+    extends FrontendBaseController
+    with I18nSupport
+    with PrePopulationUtils
+    with PsrControllerHelpers {
+
+  implicit def requestToUserAnswers(implicit req: DataRequest[?]): UserAnswers = req.userAnswers
+
+  def formatDateForApi(date: LocalDate): String =
+    date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+  def getSubmitter(response: PsrVersionsResponse): String = {
+    val emptySubmitterName = ""
+    response.reportSubmitterDetails.fold(emptySubmitterName)(submitter =>
+      submitter.individualDetails match {
+        case Some(individualDetails: IndividualDetails) =>
+          individualDetails.firstName + " " + individualDetails.lastName
+        case None =>
+          submitter.organisationOrPartnershipDetails match {
+            case Some(orgDetails) => orgDetails.organisationOrPartnershipName
+            case None => emptySubmitterName
+          }
+      }
+    )
+  }
+
+  def loggedInUserNameOrBlank(implicit request: DataRequest[?]): String =
+    request.minimalDetails.individualDetails match {
+      case Some(individual) => individual.fullName
+      case None =>
+        request.minimalDetails.organisationName match {
+          case Some(orgName) => orgName
+          case None => ""
+        }
+    }
+
+  implicit class FutureEitherOps[A](f: Future[Either[A, A]])(implicit ec: ExecutionContext) {
+    def merge: Future[A] = f.map(_.merge)
+  }
+
   implicit class FutureOps[A](f: Future[A]) {
     def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
   }
@@ -184,10 +195,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
   implicit class ListIndexOps[A](l: List[A]) {
     def zipWithRefinedIndex[I](using Validate[Int, I]): Either[Result, List[(Refined[Int, I], A)]] =
       l.zipWithIndex.traverse { case (a, index) => refineIndex(index).map(_ -> a).getOrRecoverJourney }
-  }
-
-  implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
-    def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).min).merge)
   }
 
   implicit class UserAnswersOps(userAnswers: UserAnswers) {

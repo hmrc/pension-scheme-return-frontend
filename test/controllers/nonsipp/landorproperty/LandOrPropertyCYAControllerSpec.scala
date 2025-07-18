@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.{PsrSubmissionService, SaveService}
 import models.ConditionalYesNo._
 import play.api.mvc.Call
-import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -32,6 +31,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import models.SchemeHoldLandProperty.{Acquisition, Transfer}
+import utils.nonsipp.summary.LandOrPropertyCheckAnswersUtils
 import utils.IntUtils.given
 import pages.nonsipp.landorproperty._
 
@@ -138,7 +139,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            LandOrPropertyCYAController.viewModel(
+            LandOrPropertyCheckAnswersUtils.viewModel(
               srn = srn,
               index = index,
               schemeName = schemeName,
@@ -174,7 +175,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
         act.like(
           renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              LandOrPropertyCYAController.viewModel(
+              LandOrPropertyCheckAnswersUtils.viewModel(
                 srn = srn,
                 index = index,
                 schemeName = schemeName,
@@ -268,7 +269,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
         optPreviousAnswers = Some(previousUserAnswers)
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          LandOrPropertyCYAController.viewModel(
+          LandOrPropertyCheckAnswersUtils.viewModel(
             srn = srn,
             index = index,
             schemeName = schemeName,

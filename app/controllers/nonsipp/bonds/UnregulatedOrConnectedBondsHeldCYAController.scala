@@ -18,29 +18,23 @@ package controllers.nonsipp.bonds
 
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
-import viewmodels.implicits._
 import play.api.mvc._
+import utils.nonsipp.summary.BondsCheckAnswersUtils
+import controllers.PSRController
 import utils.IntUtils.toRefined5000
-import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
+import models._
 import play.api.i18n._
 import models.requests.DataRequest
-import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
-import controllers.PSRController
-import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import utils.DateTimeUtils.localDateShow
-import models._
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage._
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class UnregulatedOrConnectedBondsHeldCYAController @Inject() (
@@ -79,50 +73,32 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject() (
     request.userAnswers.get(BondsProgress(srn, index)) match {
       case Some(InProgress(_)) => Redirect(routes.BondsListController.onPageLoad(srn, 1, mode))
       case _ =>
-        (
-          for {
-            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
-            whyDoesSchemeHoldBonds <- request.userAnswers
-              .get(WhyDoesSchemeHoldBondsPage(srn, index))
-              .getOrRecoverJourney
-
-            whenDidSchemeAcquireBonds = Option.when(whyDoesSchemeHoldBonds != Transfer)(
-              request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
-            )
-
-            costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index)).getOrRecoverJourney
-
-            bondsFromConnectedParty = Option.when(whyDoesSchemeHoldBonds == Acquisition)(
-              request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
-            )
-
-            areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
-
-            incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
-
-            schemeName = request.schemeDetails.schemeName
-          } yield Ok(
-            view(
-              viewModel(
-                srn,
-                index,
-                schemeName,
-                nameOfBonds,
-                whyDoesSchemeHoldBonds,
-                whenDidSchemeAcquireBonds,
-                costOfBonds,
-                bondsFromConnectedParty,
-                areBondsUnregulated,
-                incomeFromBonds,
-                mode,
-                viewOnlyUpdated = false,
-                optYear = request.year,
-                optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion
+        BondsCheckAnswersUtils
+          .summaryData(srn, index, mode)
+          .map { data =>
+            Ok(
+              view(
+                BondsCheckAnswersUtils.viewModel(
+                  data.srn,
+                  data.index,
+                  data.schemeName,
+                  data.nameOfBonds,
+                  data.whyDoesSchemeHoldBonds,
+                  data.whenDidSchemeAcquireBonds,
+                  data.costOfBonds,
+                  data.bondsFromConnectedParty,
+                  data.areBondsUnregulated,
+                  data.incomeFromBonds,
+                  data.mode,
+                  data.viewOnlyUpdated,
+                  data.optYear,
+                  data.optCurrentVersion,
+                  data.optPreviousVersion
+                )
               )
             )
-          )
-        ).merge
+          }
+          .merge
     }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
@@ -157,217 +133,4 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject() (
         )
       )
     }
-}
-
-object UnregulatedOrConnectedBondsHeldCYAController {
-  def viewModel(
-    srn: Srn,
-    index: Int,
-    schemeName: String,
-    nameOfBonds: String,
-    whyDoesSchemeHoldBonds: SchemeHoldBond,
-    whenDidSchemeAcquireBonds: Option[LocalDate],
-    costOfBonds: Money,
-    bondsFromConnectedParty: Option[Boolean],
-    areBondsUnregulated: Boolean,
-    incomeFromBonds: Money,
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = mode.fold(
-        normal = "bonds.checkYourAnswers.title",
-        check = "bonds.checkYourAnswers.change.title",
-        viewOnly = "bonds.checkYourAnswers.viewOnly.title"
-      ),
-      heading = mode.fold(
-        normal = "bonds.checkYourAnswers.heading",
-        check = "bonds.checkYourAnswers.change.heading",
-        viewOnly = Message("bonds.checkYourAnswers.viewOnly.heading", nameOfBonds)
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          index,
-          schemeName,
-          nameOfBonds,
-          whyDoesSchemeHoldBonds,
-          whenDidSchemeAcquireBonds,
-          costOfBonds,
-          bondsFromConnectedParty,
-          areBondsUnregulated,
-          incomeFromBonds,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          }
-        )
-      ),
-      refresh = None,
-      buttonText = mode.fold(
-        normal = "site.saveAndContinue",
-        check = "site.continue",
-        viewOnly = "site.continue"
-      ),
-      onSubmit = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode.isViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "bonds.checkYourAnswers.viewOnly.title",
-            heading = Message("bonds.checkYourAnswers.viewOnly.heading", nameOfBonds),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                // view-only continue button always navigates back to the first list page if paginating
-                routes.UnregulatedOrConnectedBondsHeldCYAController
-                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
-              case _ =>
-                routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
-    )
-
-  private def sections(
-    srn: Srn,
-    index: Int,
-    schemeName: String,
-    nameOfBonds: String,
-    whyDoesSchemeHoldBonds: SchemeHoldBond,
-    whenDidSchemeAcquireBonds: Option[LocalDate],
-    costOfBonds: Money,
-    bondsFromConnectedParty: Option[Boolean],
-    areBondsUnregulated: Boolean,
-    incomeFromBonds: Money,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    List(
-      whyDoesSchemeHoldBonds match {
-        case Acquisition =>
-          CheckYourAnswersSection(
-            None,
-            unconditionalRowsPart1(srn, index, schemeName, nameOfBonds, whyDoesSchemeHoldBonds, mode) ++
-              List(whenDidSchemeAcquireBondsRow(srn, index, schemeName, whenDidSchemeAcquireBonds, mode)) ++
-              unconditionalRowsPart2(srn, index, costOfBonds, mode) ++
-              List(bondsFromConnectedPartyRow(srn, index, bondsFromConnectedParty, mode)) ++
-              unconditionalRowsPart3(srn, index, areBondsUnregulated, incomeFromBonds, mode)
-          )
-        case Contribution =>
-          CheckYourAnswersSection(
-            None,
-            unconditionalRowsPart1(srn, index, schemeName, nameOfBonds, whyDoesSchemeHoldBonds, mode) ++
-              List(whenDidSchemeAcquireBondsRow(srn, index, schemeName, whenDidSchemeAcquireBonds, mode)) ++
-              unconditionalRowsPart2(srn, index, costOfBonds, mode) ++
-              unconditionalRowsPart3(srn, index, areBondsUnregulated, incomeFromBonds, mode)
-          )
-        case Transfer =>
-          CheckYourAnswersSection(
-            None,
-            unconditionalRowsPart1(srn, index, schemeName, nameOfBonds, whyDoesSchemeHoldBonds, mode) ++
-              unconditionalRowsPart2(srn, index, costOfBonds, mode) ++
-              unconditionalRowsPart3(srn, index, areBondsUnregulated, incomeFromBonds, mode)
-          )
-      }
-    )
-
-  private def whenDidSchemeAcquireBondsRow(
-    srn: Srn,
-    index: Int,
-    schemeName: String,
-    whenDidSchemeAcquireBonds: Option[LocalDate],
-    mode: Mode
-  ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(
-      Message("bonds.checkYourAnswers.section.whenDidSchemeAcquireBonds", schemeName),
-      whenDidSchemeAcquireBonds.get.show
-    ).withAction(
-      SummaryAction("site.change", routes.WhenDidSchemeAcquireBondsController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent(("bonds.checkYourAnswers.section.whenDidSchemeAcquireBonds.hidden", schemeName))
-    )
-
-  private def bondsFromConnectedPartyRow(
-    srn: Srn,
-    index: Int,
-    bondsFromConnectedParty: Option[Boolean],
-    mode: Mode
-  ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(
-      Message("bonds.checkYourAnswers.section.bondsFromConnectedParty", bondsFromConnectedParty.show),
-      if (bondsFromConnectedParty.get) "site.yes" else "site.no"
-    ).withAction(
-      SummaryAction("site.change", routes.BondsFromConnectedPartyController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.bondsFromConnectedParty.hidden")
-    )
-
-  private def unconditionalRowsPart1(
-    srn: Srn,
-    index: Int,
-    schemeName: String,
-    nameOfBonds: String,
-    whyDoesSchemeHoldBonds: SchemeHoldBond,
-    mode: Mode
-  ): List[CheckYourAnswersRowViewModel] = List(
-    CheckYourAnswersRowViewModel("bonds.checkYourAnswers.section.nameOfBonds", nameOfBonds.show).withAction(
-      SummaryAction("site.change", routes.NameOfBondsController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.nameOfBonds.hidden")
-    ),
-    CheckYourAnswersRowViewModel(
-      Message("bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds", schemeName),
-      whyDoesSchemeHoldBonds match {
-        case Acquisition => "bonds.checkYourAnswers.acquisition"
-        case Contribution => "bonds.checkYourAnswers.contribution"
-        case Transfer => "bonds.checkYourAnswers.transfer"
-      }
-    ).withAction(
-      SummaryAction("site.change", routes.WhyDoesSchemeHoldBondsController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent(("bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds.hidden", schemeName))
-    )
-  )
-
-  private def unconditionalRowsPart2(
-    srn: Srn,
-    index: Int,
-    costOfBonds: Money,
-    mode: Mode
-  ): List[CheckYourAnswersRowViewModel] = List(
-    CheckYourAnswersRowViewModel("bonds.checkYourAnswers.section.costOfBonds", s"£${costOfBonds.displayAs}")
-      .withAction(
-        SummaryAction("site.change", routes.CostOfBondsController.onSubmit(srn, index, mode).url)
-          .withVisuallyHiddenContent("bonds.checkYourAnswers.section.costOfBonds.hidden")
-      )
-  )
-
-  private def unconditionalRowsPart3(
-    srn: Srn,
-    index: Int,
-    areBondsUnregulated: Boolean,
-    incomeFromBonds: Money,
-    mode: Mode
-  ): List[CheckYourAnswersRowViewModel] = List(
-    CheckYourAnswersRowViewModel(
-      Message("bonds.checkYourAnswers.section.areBondsUnregulated", areBondsUnregulated.show),
-      if (areBondsUnregulated) "site.yes" else "site.no"
-    ).withAction(
-      SummaryAction("site.change", routes.AreBondsUnregulatedController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.areBondsUnregulated.hidden")
-    ),
-    CheckYourAnswersRowViewModel(
-      "bonds.checkYourAnswers.section.incomeFromBonds",
-      s"£${incomeFromBonds.displayAs}"
-    ).withAction(
-      SummaryAction("site.change", routes.IncomeFromBondsController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.incomeFromBonds.hidden")
-    )
-  )
 }

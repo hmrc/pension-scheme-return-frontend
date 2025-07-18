@@ -16,9 +16,9 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsheld._
+import utils.nonsipp.summary.{OtherAssetsCheckAnswersUtils, OtherAssetsViewModelParameters}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -118,8 +118,8 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
       act.like(
         renderView(onPageLoad(mode), filledUserAnswersIndividual) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsCheckAnswersUtils.viewModel(
+              OtherAssetsViewModelParameters(
                 srn,
                 index,
                 schemeName,
@@ -215,8 +215,8 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsCheckAnswersUtils.viewModel(
+              OtherAssetsViewModelParameters(
                 srn,
                 index,
                 schemeName,
@@ -266,8 +266,8 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
       act.like(
         renderView(onPageLoad(NormalMode), filledAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsCheckAnswersUtils.viewModel(
+              OtherAssetsViewModelParameters(
                 srn,
                 index,
                 schemeName,

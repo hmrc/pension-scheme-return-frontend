@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import services.{PsrSubmissionService, SchemeDateService}
 import models.ConditionalYesNo._
+import utils.nonsipp.summary.LoansCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -27,7 +28,6 @@ import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
-import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -134,7 +134,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         act.like(
           renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              viewModel(
+              LoansCheckAnswersUtils.viewModel(
                 srn,
                 index,
                 schemeName,
@@ -233,7 +233,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            LoansCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,
