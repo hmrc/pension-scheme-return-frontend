@@ -288,7 +288,10 @@ trait Mappings extends Formatters with Constraints {
       .verifying(
         verify[String](
           duplicateKey,
-          s => !duplicates.map(_.nino.filterNot(_.isWhitespace)).contains(s.filterNot(_.isWhitespace)),
+          s =>
+            !duplicates
+              .map(_.nino.toUpperCase.filterNot(_.isWhitespace))
+              .contains(s.toUpperCase.filterNot(_.isWhitespace)),
           args*
         )
       )

@@ -586,6 +586,11 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       result.errors must contain(FormError("value", "error.duplicate"))
     }
 
+    "must not bind a duplicate nino with lowercase" in {
+      val result = testForm.bind(Map("value" -> "aB123456c"))
+      result.errors must contain(FormError("value", "error.duplicate"))
+    }
+
     "must not bind a duplicate nino with whitespaces" in {
       val result = testForm.bind(Map("value" -> "AB12 3456C"))
       result.errors must contain(FormError("value", "error.duplicate"))
