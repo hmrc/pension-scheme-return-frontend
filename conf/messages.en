@@ -1980,17 +1980,12 @@ landOrPropertyList.viewOnly.link = View previous version of land or property (op
 landOrPropertyList.viewOnly.none = Did {0} hold any land or property during the period of this return?
 landOrPropertyList.viewOnly.none.value = No
 
-landOrPropertyCheckAndUpdate.title = Check and update the land or property information
-landOrPropertyCheckAndUpdate.heading = Check and update the land or property information
-landOrPropertyCheckAndUpdate.paragraph = You need to add data to this land or property.
-landOrPropertyCheckAndUpdate.table.one = Address
-landOrPropertyCheckAndUpdate.table.two = Why land or property is held
-landOrPropertyCheckAndUpdate.table.three = Total cost of land or property
-landOrPropertyCheckAndUpdate.bullet.paragraph = Missing data could include:
-landOrPropertyCheckAndUpdate.bullet.one = if any part of the land or property is residential
-landOrPropertyCheckAndUpdate.bullet.two = lease details
-landOrPropertyCheckAndUpdate.bullet.three = total income
-landOrPropertyCheckAndUpdate.button = Add missing data
+landOrPropertyCheckAndUpdate.title = Review the land or property information
+landOrPropertyCheckAndUpdate.heading = Review the land or property information
+landOrPropertyCheckAndUpdate.description = You need to check the answers previously added for this land or property and add the incomplete information.
+landOrPropertyCheckAndUpdate.button = Add incomplete information
+landOrPropertyCheckAndUpdate.lessee.heading = Information required for lease details and income from {0}
+landOrPropertyCheckAndUpdate.lessee.connectedParty = Is any lessee a connected party?
 
 landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
