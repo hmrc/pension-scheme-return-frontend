@@ -134,7 +134,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         act.like(
           renderView(onPageLoad(mode), filledAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              LoansCheckAnswersUtils.viewModel(
+              LoansCheckAnswersUtils(mockSchemeDateService).viewModel(
                 srn,
                 index,
                 schemeName,
@@ -233,7 +233,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviour
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            LoansCheckAnswersUtils.viewModel(
+            LoansCheckAnswersUtils(mockSchemeDateService).viewModel(
               srn,
               index,
               schemeName,

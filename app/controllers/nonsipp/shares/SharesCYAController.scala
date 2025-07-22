@@ -83,30 +83,7 @@ class SharesCYAController @Inject() (
             Ok(
               view(
                 SharesCheckAnswersUtils.viewModel(
-                  data.srn,
-                  data.index,
-                  data.schemeName,
-                  data.typeOfShare,
-                  data.holdShares,
-                  data.whenDidSchemeAcquire,
-                  data.companyNameRelatedShares,
-                  data.companySharesCrn,
-                  data.classOfShares,
-                  data.howManyShares,
-                  data.identityType,
-                  data.recipientName,
-                  data.recipientDetails,
-                  data.recipientReasonNoDetails,
-                  data.sharesFromConnectedParty,
-                  data.costOfShares,
-                  data.shareIndependentValue,
-                  data.totalAssetValue,
-                  data.sharesTotalIncome,
-                  data.mode,
-                  data.viewOnlyUpdated,
-                  data.optYear,
-                  data.optCurrentVersion,
-                  data.optPreviousVersion
+                  data
                 )
               )
             )

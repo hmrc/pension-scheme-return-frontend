@@ -19,7 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import play.api.mvc._
 import utils.nonsipp.summary.LoansCheckAnswersUtils
-import utils.IntUtils.{toInt, toRefined5000}
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import navigation.Navigator
 import models._
@@ -79,12 +79,12 @@ class LoansCYAController @Inject() (
     ) {
       Redirect(routes.LoansListController.onPageLoad(srn, 1, mode))
     } else {
-      LoansCheckAnswersUtils
+      LoansCheckAnswersUtils(schemeDateService)
         .summaryData(srn, index, mode)
         .map { data =>
           Ok(
             view(
-              LoansCheckAnswersUtils.viewModel(
+              LoansCheckAnswersUtils(schemeDateService).viewModel(
                 data.srn,
                 data.index,
                 data.schemeName,

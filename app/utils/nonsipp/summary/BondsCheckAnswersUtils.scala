@@ -19,10 +19,13 @@ package utils.nonsipp.summary
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.ListUtils.flip
 import models.SchemeId.Srn
-import utils.IntUtils.toRefined5000
+import utils.IntUtils.toInt
 import cats.implicits.toShow
+import viewmodels.DisplayMessage
 import models.requests.DataRequest
+import config.RefinedTypes.Max5000
 import controllers.PsrControllerHelpers
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import utils.DateTimeUtils.localDateShow
@@ -30,30 +33,56 @@ import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
+import scala.concurrent.Future
+
 import java.time.LocalDate
 
-object BondsCheckAnswersUtils extends PsrControllerHelpers {
+type BondsData = (
+  srn: Srn,
+  index: Int,
+  schemeName: String,
+  nameOfBonds: String,
+  whyDoesSchemeHoldBonds: SchemeHoldBond,
+  whenDidSchemeAcquireBonds: Option[LocalDate],
+  costOfBonds: Money,
+  bondsFromConnectedParty: Option[Boolean],
+  areBondsUnregulated: Boolean,
+  incomeFromBonds: Either[String, Money],
+  mode: Mode,
+  viewOnlyUpdated: Boolean,
+  optYear: Option[String],
+  optCurrentVersion: Option[Int],
+  optPreviousVersion: Option[Int]
+)
 
-  def summaryData(srn: Srn, index: Int, mode: Mode)(using request: DataRequest[AnyContent]): Either[
-    Result,
-    (
-      srn: Srn,
-      index: Int,
-      schemeName: String,
-      nameOfBonds: String,
-      whyDoesSchemeHoldBonds: SchemeHoldBond,
-      whenDidSchemeAcquireBonds: Option[LocalDate],
-      costOfBonds: Money,
-      bondsFromConnectedParty: Option[Boolean],
-      areBondsUnregulated: Boolean,
-      incomeFromBonds: Either[String, Money],
-      mode: Mode,
-      viewOnlyUpdated: Boolean,
-      optYear: Option[String],
-      optCurrentVersion: Option[Int],
-      optPreviousVersion: Option[Int]
-    )
-  ] =
+object BondsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, BondsData] {
+
+  override def heading: Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.bonds.heading"))
+
+  override def subheading(data: BondsData): Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.bonds.subheading", data.nameOfBonds))
+
+  def allSummaryData(srn: Srn, mode: Mode)(using request: DataRequest[AnyContent]): Either[Result, List[BondsData]] =
+    indexes.map(summaryData(srn, _, mode)).flip
+
+  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+    request.userAnswers
+      .map(BondsProgress.all())
+      .filter(_._2.completed)
+      .keys
+      .map(refineStringIndex[Max5000.Refined])
+      .toList
+      .flatten
+
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent]
+  ): Future[Either[Result, BondsData]] =
+    Future.successful(summaryData(srn, index, mode))
+
+  def summaryData(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent]
+  ): Either[Result, BondsData] =
     for {
       nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
       whyDoesSchemeHoldBonds <- request.userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)).getOrRecoverJourney
@@ -90,6 +119,24 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers {
       request.currentVersion,
       request.previousVersion
     )
+
+  def viewModel(data: BondsData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
+    data.srn,
+    data.index,
+    data.schemeName,
+    data.nameOfBonds,
+    data.whyDoesSchemeHoldBonds,
+    data.whenDidSchemeAcquireBonds,
+    data.costOfBonds,
+    data.bondsFromConnectedParty,
+    data.areBondsUnregulated,
+    data.incomeFromBonds,
+    data.mode,
+    data.viewOnlyUpdated,
+    data.optYear,
+    data.optCurrentVersion,
+    data.optPreviousVersion
+  )
 
   def viewModel(
     srn: Srn,

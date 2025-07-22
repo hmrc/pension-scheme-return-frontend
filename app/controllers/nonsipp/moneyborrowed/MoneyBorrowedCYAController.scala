@@ -77,20 +77,7 @@ class MoneyBorrowedCYAController @Inject() (
             Ok(
               view(
                 MoneyBorrowedCheckAnswersUtils.viewModel(
-                  data.srn,
-                  data.index,
-                  data.schemeName,
-                  data.lenderName,
-                  data.lenderConnectedParty,
-                  data.borrowedAmountAndRate,
-                  data.whenBorrowed,
-                  data.schemeAssets,
-                  data.schemeBorrowed,
-                  data.mode,
-                  data.viewOnlyUpdated,
-                  data.optYear,
-                  data.optCurrentVersion,
-                  data.optPreviousVersion
+                  data
                 )
               )
             )

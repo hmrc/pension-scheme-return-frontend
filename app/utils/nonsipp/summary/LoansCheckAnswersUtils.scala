@@ -22,10 +22,11 @@ import models.ConditionalYesNo._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import models.SchemeId.Srn
-import utils.IntUtils.{toInt, toRefined5000}
+import utils.IntUtils.toInt
 import cats.implicits.toShow
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
+import viewmodels.DisplayMessage
 import models.requests.DataRequest
 import config.RefinedTypes.Max5000
 import controllers.PsrControllerHelpers
@@ -34,38 +35,65 @@ import models.{Security, _}
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
+import scala.concurrent.Future
+
 import java.time.LocalDate
 
-object LoansCheckAnswersUtils extends PsrControllerHelpers {
+type LoansData = (
+  srn: Srn,
+  index: Max5000,
+  schemeName: String,
+  receivedLoanType: IdentityType,
+  recipientName: String,
+  recipientDetails: Option[String],
+  recipientReasonNoDetails: Option[String],
+  connectedParty: Either[Boolean, SponsoringOrConnectedParty],
+  datePeriodLoan: (LocalDate, Money, Int),
+  amountOfTheLoan: AmountOfTheLoan,
+  returnEndDate: LocalDate,
+  repaymentInstalments: Boolean,
+  interestOnLoan: InterestOnLoan,
+  arrearsPrevYears: Option[Boolean],
+  outstandingArrearsOnLoan: Option[Money],
+  securityOnLoan: Option[Security],
+  mode: Mode,
+  viewOnlyUpdated: Boolean,
+  optYear: Option[String],
+  optCurrentVersion: Option[Int],
+  optPreviousVersion: Option[Int]
+)
 
-  def summaryData(srn: Srn, index: Int, mode: Mode)(using
-    request: DataRequest[AnyContent],
-    schemeDateService: SchemeDateService
+trait LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
+    extends PsrControllerHelpers
+    with CheckAnswersUtils[Max5000, LoansData] {
+
+  override def heading: Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.loans.heading"))
+
+  override def subheading(data: LoansData): Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.loans.subheading", data.recipientName))
+
+  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+    request.userAnswers
+      .map(LoansProgress.all())
+      .filter(_._2.completed)
+      .keys
+      .map(refineStringIndex[Max5000.Refined])
+      .toList
+      .flatten
+
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent]
+  ): Future[Either[
+    Result,
+    LoansData
+  ]] = Future.successful(summaryData(srn, index, mode))
+
+  def summaryData(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent]
   ): Either[
     Result,
-    (
-      srn: Srn,
-      index: Max5000,
-      schemeName: String,
-      receivedLoanType: IdentityType,
-      recipientName: String,
-      recipientDetails: Option[String],
-      recipientReasonNoDetails: Option[String],
-      connectedParty: Either[Boolean, SponsoringOrConnectedParty],
-      datePeriodLoan: (LocalDate, Money, Int),
-      amountOfTheLoan: AmountOfTheLoan,
-      returnEndDate: LocalDate,
-      repaymentInstalments: Boolean,
-      interestOnLoan: InterestOnLoan,
-      arrearsPrevYears: Option[Boolean],
-      outstandingArrearsOnLoan: Option[Money],
-      securityOnLoan: Option[Security],
-      mode: Mode,
-      viewOnlyUpdated: Boolean,
-      optYear: Option[String],
-      optCurrentVersion: Option[Int],
-      optPreviousVersion: Option[Int]
-    )
+    LoansData
   ] =
     for {
       receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
@@ -143,6 +171,30 @@ object LoansCheckAnswersUtils extends PsrControllerHelpers {
       request.currentVersion,
       request.previousVersion
     )
+
+  def viewModel(data: LoansData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
+    data.srn,
+    data.index,
+    data.schemeName,
+    data.receivedLoanType,
+    data.recipientName,
+    data.recipientDetails,
+    data.recipientReasonNoDetails,
+    data.connectedParty,
+    data.datePeriodLoan,
+    data.amountOfTheLoan,
+    data.returnEndDate,
+    data.repaymentInstalments,
+    data.interestOnLoan,
+    data.arrearsPrevYears,
+    data.outstandingArrearsOnLoan,
+    data.securityOnLoan,
+    data.mode,
+    data.viewOnlyUpdated,
+    data.optYear,
+    data.optCurrentVersion,
+    data.optPreviousVersion
+  )
 
   def viewModel(
     srn: Srn,
@@ -718,4 +770,10 @@ object LoansCheckAnswersUtils extends PsrControllerHelpers {
       )
     )
   }
+}
+
+object LoansCheckAnswersUtils {
+  def apply(schemeDateService: SchemeDateService): LoansCheckAnswersUtils = new LoansCheckAnswersUtils(
+    schemeDateService
+  ) {}
 }

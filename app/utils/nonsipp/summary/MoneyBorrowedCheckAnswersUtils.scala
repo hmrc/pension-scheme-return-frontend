@@ -21,37 +21,62 @@ import play.api.mvc._
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import cats.implicits.toShow
-import pages.nonsipp.moneyborrowed._
 import models.requests.DataRequest
 import config.RefinedTypes.Max5000
 import controllers.PsrControllerHelpers
 import utils.DateTimeUtils.localDateShow
 import models._
+import pages.nonsipp.moneyborrowed._
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
+import scala.concurrent.Future
+
 import java.time.LocalDate
 
-object MoneyBorrowedCheckAnswersUtils extends PsrControllerHelpers {
+type MoneyBorrowedData = (
+  srn: Srn,
+  index: Max5000,
+  schemeName: String,
+  lenderName: String,
+  lenderConnectedParty: Boolean,
+  borrowedAmountAndRate: (Money, Percentage),
+  whenBorrowed: LocalDate,
+  schemeAssets: Money,
+  schemeBorrowed: String,
+  mode: Mode,
+  viewOnlyUpdated: Boolean,
+  optYear: Option[String],
+  optCurrentVersion: Option[Int],
+  optPreviousVersion: Option[Int]
+)
+
+object MoneyBorrowedCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, MoneyBorrowedData] {
+
+  override def heading: Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.moneyBorrowed.heading"))
+
+  override def subheading(data: MoneyBorrowedData): Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.moneyBorrowed.subheading", data.lenderName))
+
+  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+    request.userAnswers
+      .map(MoneyBorrowedProgress.all())
+      .filter(_._2.completed)
+      .keys
+      .map(refineStringIndex[Max5000.Refined])
+      .toList
+      .flatten
+
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+    Result,
+    MoneyBorrowedData
+  ]] = Future.successful(summaryData(srn, index, mode))
 
   def summaryData(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Either[
     Result,
-    (
-      srn: Srn,
-      index: Max5000,
-      schemeName: String,
-      lenderName: String,
-      lenderConnectedParty: Boolean,
-      borrowedAmountAndRate: (Money, Percentage),
-      whenBorrowed: LocalDate,
-      schemeAssets: Money,
-      schemeBorrowed: String,
-      mode: Mode,
-      viewOnlyUpdated: Boolean,
-      optYear: Option[String],
-      optCurrentVersion: Option[Int],
-      optPreviousVersion: Option[Int]
-    )
+    MoneyBorrowedData
   ] =
     for {
 
@@ -81,6 +106,23 @@ object MoneyBorrowedCheckAnswersUtils extends PsrControllerHelpers {
       request.currentVersion,
       request.previousVersion
     )
+
+  def viewModel(data: MoneyBorrowedData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
+    data.srn,
+    data.index,
+    data.schemeName,
+    data.lenderName,
+    data.lenderConnectedParty,
+    data.borrowedAmountAndRate,
+    data.whenBorrowed,
+    data.schemeAssets,
+    data.schemeBorrowed,
+    data.mode,
+    data.viewOnlyUpdated,
+    data.optYear,
+    data.optCurrentVersion,
+    data.optPreviousVersion
+  )
 
   def viewModel(
     srn: Srn,

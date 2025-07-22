@@ -23,10 +23,11 @@ sealed trait SummaryPageEntry
 object SummaryPageEntry {
   case class Section(viewModel: CheckYourAnswersSummaryViewModel) extends SummaryPageEntry
   case class Heading(value: DisplayMessage) extends SummaryPageEntry
+  case class Subheading(value: DisplayMessage) extends SummaryPageEntry
 }
 
 case class CheckYourAnswersSummaryViewModel(
-  heading: DisplayMessage,
+  heading: Option[DisplayMessage],
   sections: List[CheckYourAnswersSection],
   marginBottom: Option[Margin] = Some(Margin.Fixed60Bottom),
   inset: Option[DisplayMessage] = None
@@ -34,4 +35,9 @@ case class CheckYourAnswersSummaryViewModel(
   def withMarginBottom(margin: Margin): CheckYourAnswersSummaryViewModel = copy(marginBottom = Some(margin))
 
   def withInset(inset: Option[DisplayMessage]): CheckYourAnswersSummaryViewModel = copy(inset = inset)
+}
+
+extension (viewModel: CheckYourAnswersViewModel) {
+  def toSummaryViewModel(heading: Option[DisplayMessage] = None): CheckYourAnswersSummaryViewModel =
+    CheckYourAnswersSummaryViewModel(heading, viewModel.sections, viewModel.marginBottom, viewModel.inset)
 }

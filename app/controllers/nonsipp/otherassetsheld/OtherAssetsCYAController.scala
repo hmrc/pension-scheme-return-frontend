@@ -85,11 +85,7 @@ class OtherAssetsCYAController @Inject() (
             Ok(
               view(
                 OtherAssetsCheckAnswersUtils.viewModel(
-                  data.parameters,
-                  data.viewOnlyUpdated,
-                  data.optYear,
-                  data.optCurrentVersion,
-                  data.optPreviousVersion
+                  data
                 )
               )
             )
