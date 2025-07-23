@@ -22,6 +22,7 @@ import utils.ListUtils.ListOps
 import models.SchemeHoldLandProperty._
 import models.SchemeId.Srn
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import pages.nonsipp.common._
 import viewmodels.DisplayMessage
 import models.requests.DataRequest
@@ -34,7 +35,7 @@ import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -84,7 +85,11 @@ object LandOrPropertyCheckAnswersUtils
       .toList
       .flatten
 
-  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[
     Result,
     LandOrPropertyData
   ]] = Future.successful(landOrPropertySummaryData(srn, index, mode))

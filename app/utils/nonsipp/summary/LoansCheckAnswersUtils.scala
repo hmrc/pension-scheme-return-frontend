@@ -24,6 +24,7 @@ import utils.ListUtils.ListOps
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.DisplayMessage
@@ -35,7 +36,7 @@ import models.{Security, _}
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -63,7 +64,7 @@ type LoansData = (
   optPreviousVersion: Option[Int]
 )
 
-trait LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
+class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     extends PsrControllerHelpers
     with CheckAnswersUtils[Max5000, LoansData] {
 
@@ -83,7 +84,9 @@ trait LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
       .flatten
 
   def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
-    request: DataRequest[AnyContent]
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
   ): Future[Either[
     Result,
     LoansData
@@ -775,5 +778,5 @@ trait LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
 object LoansCheckAnswersUtils {
   def apply(schemeDateService: SchemeDateService): LoansCheckAnswersUtils = new LoansCheckAnswersUtils(
     schemeDateService
-  ) {}
+  )
 }

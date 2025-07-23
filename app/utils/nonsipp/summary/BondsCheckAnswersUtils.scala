@@ -23,6 +23,7 @@ import utils.ListUtils.flip
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.DisplayMessage
 import models.requests.DataRequest
 import config.RefinedTypes.Max5000
@@ -33,7 +34,7 @@ import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -76,7 +77,9 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtil
       .flatten
 
   def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
-    request: DataRequest[AnyContent]
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
   ): Future[Either[Result, BondsData]] =
     Future.successful(summaryData(srn, index, mode))
 

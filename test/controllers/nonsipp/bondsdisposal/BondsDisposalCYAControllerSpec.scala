@@ -17,6 +17,8 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.{PsrSubmissionService, SaveService}
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import utils.nonsipp.summary.{BondsDisposalCheckAnswersUtils, BondsDisposalViewModelParameters}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -30,8 +32,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
-import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
-import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
 
 import scala.concurrent.Future
 
@@ -101,8 +101,8 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), soldUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            BondsDisposalCheckAnswersUtils.viewModel(
+              BondsDisposalViewModelParameters(
                 srn,
                 bondIndex,
                 disposalIndex,
@@ -172,8 +172,8 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
         soldUserAnswers
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
-            ViewModelParameters(
+          BondsDisposalCheckAnswersUtils.viewModel(
+            BondsDisposalViewModelParameters(
               srn,
               bondIndex,
               disposalIndex,
@@ -239,8 +239,8 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            BondsDisposalCheckAnswersUtils.viewModel(
+              BondsDisposalViewModelParameters(
                 srn,
                 bondIndex,
                 disposalIndex,

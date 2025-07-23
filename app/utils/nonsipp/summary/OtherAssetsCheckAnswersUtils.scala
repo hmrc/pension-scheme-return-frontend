@@ -23,6 +23,7 @@ import utils.ListUtils.ListOps
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import pages.nonsipp.common._
 import viewmodels.{DisplayMessage, Margin}
 import models.requests.DataRequest
@@ -34,7 +35,7 @@ import models.SchemeHoldAsset._
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -82,7 +83,11 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
       .toList
       .flatten
 
-  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[
     Result,
     OtherAssetsData
   ]] = Future.successful(summaryData(srn, index, mode))

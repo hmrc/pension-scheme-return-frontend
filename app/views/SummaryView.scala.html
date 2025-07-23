@@ -40,7 +40,7 @@
             @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.declaration")).asSecondaryButton().asLink(viewmodel.onSubmit.url))
         </p>
 
-        <p class="govuk-body">@renderMessage("nonsipp.summary.message.declare")</p>
+        <p class="govuk-body" style="margin-bottom: 40px">@renderMessage("nonsipp.summary.message.declare")</p>
 
         @for(vm <- viewmodel.page) {
             @vm match {
