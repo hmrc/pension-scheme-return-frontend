@@ -22,6 +22,7 @@ import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import utils.IntUtils.toInt
 import cats.implicits.toShow
 import pages.nonsipp.common._
+import viewmodels.DisplayMessage
 import models.requests.DataRequest
 import pages.nonsipp.shares._
 import play.api.mvc._
@@ -34,38 +35,61 @@ import models.{SchemeHoldShare, _}
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
+import scala.concurrent.Future
+
 import java.time.LocalDate
 
-object SharesCheckAnswersUtils extends PsrControllerHelpers {
+type SharesData = (
+  srn: Srn,
+  index: Max5000,
+  schemeName: String,
+  typeOfShare: TypeOfShares,
+  holdShares: SchemeHoldShare,
+  whenDidSchemeAcquire: Option[LocalDate],
+  companyNameRelatedShares: String,
+  companySharesCrn: ConditionalYesNo[String, Crn],
+  classOfShares: String,
+  howManyShares: Int,
+  identityType: Option[IdentityType],
+  recipientName: Option[String],
+  recipientDetails: Option[String],
+  recipientReasonNoDetails: Option[String],
+  sharesFromConnectedParty: Option[Boolean],
+  costOfShares: Money,
+  shareIndependentValue: Boolean,
+  totalAssetValue: Option[Money],
+  sharesTotalIncome: Money,
+  mode: Mode,
+  viewOnlyUpdated: Boolean,
+  optYear: Option[String],
+  optCurrentVersion: Option[Int],
+  optPreviousVersion: Option[Int]
+)
+
+object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, SharesData] {
+  override def heading: Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.shares.heading"))
+
+  override def subheading(data: SharesData): Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.shares.subheading", data.companyNameRelatedShares))
+
+  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+    request.userAnswers
+      .map(SharesProgress.all())
+      .filter(_._2.completed)
+      .keys
+      .map(refineStringIndex[Max5000.Refined])
+      .toList
+      .flatten
+
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+    Result,
+    SharesData
+  ]] = Future.successful(summaryData(srn, index, mode))
 
   def summaryData(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Either[
     Result,
-    (
-      srn: Srn,
-      index: Max5000,
-      schemeName: String,
-      typeOfShare: TypeOfShares,
-      holdShares: SchemeHoldShare,
-      whenDidSchemeAcquire: Option[LocalDate],
-      companyNameRelatedShares: String,
-      companySharesCrn: ConditionalYesNo[String, Crn],
-      classOfShares: String,
-      howManyShares: Int,
-      identityType: Option[IdentityType],
-      recipientName: Option[String],
-      recipientDetails: Option[String],
-      recipientReasonNoDetails: Option[String],
-      sharesFromConnectedParty: Option[Boolean],
-      costOfShares: Money,
-      shareIndependentValue: Boolean,
-      totalAssetValue: Option[Money],
-      sharesTotalIncome: Money,
-      mode: Mode,
-      viewOnlyUpdated: Boolean,
-      optYear: Option[String],
-      optCurrentVersion: Option[Int],
-      optPreviousVersion: Option[Int]
-    )
+    SharesData
   ] = {
     for {
       typeOfShare <- requiredPage(TypeOfSharesHeldPage(srn, index))
@@ -170,6 +194,33 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers {
       optPreviousVersion = request.previousVersion,
     )
   }
+
+  def viewModel(data: SharesData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
+    data.srn,
+    data.index,
+    data.schemeName,
+    data.typeOfShare,
+    data.holdShares,
+    data.whenDidSchemeAcquire,
+    data.companyNameRelatedShares,
+    data.companySharesCrn,
+    data.classOfShares,
+    data.howManyShares,
+    data.identityType,
+    data.recipientName,
+    data.recipientDetails,
+    data.recipientReasonNoDetails,
+    data.sharesFromConnectedParty,
+    data.costOfShares,
+    data.shareIndependentValue,
+    data.totalAssetValue,
+    data.sharesTotalIncome,
+    data.mode,
+    data.viewOnlyUpdated,
+    data.optYear,
+    data.optCurrentVersion,
+    data.optPreviousVersion
+  )
 
   def viewModel(
     srn: Srn,

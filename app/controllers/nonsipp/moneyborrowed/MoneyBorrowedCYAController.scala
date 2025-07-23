@@ -17,29 +17,24 @@
 package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
-import viewmodels.implicits._
 import play.api.mvc._
-import utils.IntUtils.{toInt, toRefined5000}
-import cats.implicits.toShow
+import utils.nonsipp.summary.MoneyBorrowedCheckAnswersUtils
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import navigation.Navigator
+import models._
 import models.requests.DataRequest
-import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
 import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import utils.DateTimeUtils.localDateShow
-import models._
 import play.api.i18n._
 import pages.nonsipp.moneyborrowed._
-import viewmodels.DisplayMessage._
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class MoneyBorrowedCYAController @Inject() (
@@ -76,40 +71,18 @@ class MoneyBorrowedCYAController @Inject() (
           controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, mode)
         )
       case _ =>
-        (
-          for {
-
-            lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
-            lenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index)).getOrRecoverJourney
-            borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
-            whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index)).getOrRecoverJourney
-            schemeAssets <- request.userAnswers
-              .get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index))
-              .getOrRecoverJourney
-            schemeBorrowed <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index)).getOrRecoverJourney
-
-            schemeName = request.schemeDetails.schemeName
-          } yield Ok(
-            view(
-              viewModel(
-                srn,
-                index,
-                schemeName,
-                lenderName,
-                lenderConnectedParty,
-                borrowedAmountAndRate,
-                whenBorrowed,
-                schemeAssets,
-                schemeBorrowed,
-                mode,
-                viewOnlyUpdated = false, // flag is not displayed on this tier
-                optYear = request.year,
-                optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion
+        MoneyBorrowedCheckAnswersUtils
+          .summaryData(srn, index, mode)
+          .map { data =>
+            Ok(
+              view(
+                MoneyBorrowedCheckAnswersUtils.viewModel(
+                  data
+                )
               )
             )
-          )
-        ).merge
+          }
+          .merge
     }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
@@ -135,209 +108,5 @@ class MoneyBorrowedCYAController @Inject() (
         )
       )
     }
-
-}
-
-object MoneyBorrowedCYAController {
-  def viewModel(
-    srn: Srn,
-    index: Max5000,
-    schemeName: String,
-    lenderName: String,
-    lenderConnectedParty: Boolean,
-    borrowedAmountAndRate: (Money, Percentage),
-    whenBorrowed: LocalDate,
-    schemeAssets: Money,
-    schemeBorrowed: String,
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = mode
-        .fold(
-          normal = "moneyBorrowedCheckYourAnswers.title",
-          check = "moneyBorrowedCheckYourAnswers.change.title",
-          viewOnly = "moneyBorrowedCheckYourAnswers.viewOnly.title"
-        ),
-      heading = mode.fold(
-        normal = "moneyBorrowedCheckYourAnswers.heading",
-        check = Message(
-          "moneyBorrowedCheckYourAnswers.change.heading",
-          borrowedAmountAndRate._1.displayAs,
-          lenderName
-        ),
-        viewOnly = "moneyBorrowedCheckYourAnswers.viewOnly.heading"
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          index,
-          schemeName,
-          lenderName,
-          lenderConnectedParty,
-          borrowedAmountAndRate,
-          whenBorrowed,
-          schemeAssets,
-          schemeBorrowed,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          }
-        )
-      ),
-      refresh = None,
-      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode.isViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "moneyBorrowedCheckYourAnswers.viewOnly.title",
-            heading =
-              Message("moneyBorrowedCheckYourAnswers.viewOnly.heading", borrowedAmountAndRate._1.displayAs, lenderName),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                // view-only continue button always navigates back to the first list page if paginating
-                controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                  .onSubmit(srn, index, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
-    )
-
-  private def sections(
-    srn: Srn,
-    index: Max5000,
-    schemeName: String,
-    lenderName: String,
-    lenderConnectedParty: Boolean,
-    borrowedAmountAndRate: (Money, Percentage),
-    whenBorrowed: LocalDate,
-    schemeAssets: Money,
-    schemeBorrowed: String,
-    mode: Mode
-  ): List[CheckYourAnswersSection] = {
-    val (borrowedAmount, borrowedInterestRate) = borrowedAmountAndRate
-
-    checkYourAnswerSection(
-      srn,
-      index,
-      schemeName,
-      lenderName,
-      lenderConnectedParty,
-      borrowedAmount,
-      borrowedInterestRate,
-      whenBorrowed,
-      schemeAssets,
-      schemeBorrowed,
-      mode
-    )
-  }
-
-  private def checkYourAnswerSection(
-    srn: Srn,
-    index: Max5000,
-    schemeName: String,
-    lenderName: String,
-    lenderConnectedParty: Boolean,
-    borrowedAmount: Money,
-    borrowedInterestRate: Percentage,
-    whenBorrowed: LocalDate,
-    schemeAssets: Money,
-    schemeBorrowed: String,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel("moneyBorrowedCheckYourAnswers.section.lenderName", lenderName.show)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.moneyborrowed.routes.LenderNameController.onSubmit(srn, index, mode).url
-              ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.lenderName.hidden")
-            ),
-          CheckYourAnswersRowViewModel(
-            Message("moneyBorrowedCheckYourAnswers.section.lenderConnectedParty", lenderName.show),
-            if (lenderConnectedParty) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.moneyborrowed.routes.IsLenderConnectedPartyController
-                .onSubmit(srn, index, mode)
-                .url + "#connected"
-            ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.lenderConnectedParty.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("moneyBorrowedCheckYourAnswers.section.borrowedAmount"),
-            s"£${borrowedAmount.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController
-                .onSubmit(srn, index, mode)
-                .url + "#amount"
-            ).withVisuallyHiddenContent(
-              Message("moneyBorrowedCheckYourAnswers.section.borrowedAmount.hidden")
-            )
-          ),
-          CheckYourAnswersRowViewModel(
-            "moneyBorrowedCheckYourAnswers.section.borrowedRate",
-            s"${borrowedInterestRate.displayAs}%"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onSubmit(srn, index, mode).url
-            ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.borrowedRate.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("moneyBorrowedCheckYourAnswers.section.whenBorrowed", schemeName),
-            whenBorrowed.show
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onSubmit(srn, index, mode).url
-            ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.whenBorrowed.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("moneyBorrowedCheckYourAnswers.section.schemeAssets", schemeName, whenBorrowed.show),
-            s"£${schemeAssets.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.moneyborrowed.routes.ValueOfSchemeAssetsWhenMoneyBorrowedController
-                .onSubmit(srn, index, mode)
-                .url
-            ).withVisuallyHiddenContent(
-              ("moneyBorrowedCheckYourAnswers.section.schemeAssets.hidden", whenBorrowed.show)
-            )
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("moneyBorrowedCheckYourAnswers.section.schemeBorrowed", schemeName),
-            schemeBorrowed.show
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onSubmit(srn, index, mode).url
-            ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden")
-          )
-        )
-      )
-    )
 
 }

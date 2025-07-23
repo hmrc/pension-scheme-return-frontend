@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.models.CheckYourAnswersSummaryViewModel
-@import viewmodels.models.SummaryPageEntry.{Section, Heading}
+@import viewmodels.models.SummaryPageEntry.{Section, Heading, Subheading }
 
 @this(
         layout: templates.Layout,
@@ -36,7 +36,7 @@
         @for(vm <- viewmodel.page) {
             @vm match {
                 case Section(vmSection) => {
-                    <h1 class="govuk-heading-m">@renderMessage(vmSection.heading)</h1>
+                    @vmSection.heading.map(heading => <h1 class="govuk-heading-m">@renderMessage(vmSection.heading)</h1>)
                     @vmSection.sections.map { section =>
                         @section.heading.map(renderMessage)
                         @govukSummaryList(
@@ -58,7 +58,11 @@
                     }
                 }
                 case Heading(heading) => {
-                    <h2 class="govuk-heading-m">@renderMessage(heading)</h2>
+                    <h1 class="govuk-heading-xl">@renderMessage(heading)</h1>
+                }
+
+                case Subheading(subheading) => {
+                    <h1 class="govuk-heading-l">@renderMessage(subheading)</h1>
                 }
             }
         }

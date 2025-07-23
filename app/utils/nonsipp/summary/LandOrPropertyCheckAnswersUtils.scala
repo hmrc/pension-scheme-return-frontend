@@ -23,6 +23,7 @@ import models.SchemeHoldLandProperty._
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import pages.nonsipp.common._
+import viewmodels.DisplayMessage
 import models.requests.DataRequest
 import config.RefinedTypes.Max5000
 import controllers.PsrControllerHelpers
@@ -33,38 +34,64 @@ import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
+import scala.concurrent.Future
+
 import java.time.LocalDate
 
-object LandOrPropertyCheckAnswersUtils extends PsrControllerHelpers {
+type LandOrPropertyData = (
+  srn: Srn,
+  index: Max5000,
+  schemeName: String,
+  landOrPropertyInUk: Boolean,
+  landRegistryTitleNumber: ConditionalYesNo[String, String],
+  holdLandProperty: SchemeHoldLandProperty,
+  landOrPropertyAcquire: Option[LocalDate],
+  landOrPropertyTotalCost: Money,
+  landPropertyIndependentValuation: Option[Boolean],
+  receivedLandType: Option[IdentityType],
+  recipientName: Option[String],
+  recipientDetails: Option[String],
+  recipientReasonNoDetails: Option[String],
+  landOrPropertySellerConnectedParty: Option[Boolean],
+  landOrPropertyResidential: Boolean,
+  landOrPropertyLease: Boolean,
+  landOrPropertyTotalIncome: Money,
+  addressLookUpPage: Address,
+  leaseDetails: Option[(String, Money, LocalDate, Boolean)],
+  mode: Mode,
+  viewOnlyUpdated: Boolean,
+  optYear: Option[String],
+  optCurrentVersion: Option[Int],
+  optPreviousVersion: Option[Int]
+)
+
+object LandOrPropertyCheckAnswersUtils
+    extends PsrControllerHelpers
+    with CheckAnswersUtils[Max5000, LandOrPropertyData] {
+
+  override def heading: Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.landOrProperty.heading"))
+
+  override def subheading(data: LandOrPropertyData): Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.landOrProperty.subheading", data.addressLookUpPage.addressLine1))
+
+  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+    request.userAnswers
+      .map(LandOrPropertyProgress.all())
+      .filter(_._2.completed)
+      .keys
+      .map(refineStringIndex[Max5000.Refined])
+      .toList
+      .flatten
+
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+    Result,
+    LandOrPropertyData
+  ]] = Future.successful(landOrPropertySummaryData(srn, index, mode))
 
   def landOrPropertySummaryData(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Either[
     Result,
-    (
-      srn: Srn,
-      index: Max5000,
-      schemeName: String,
-      landOrPropertyInUk: Boolean,
-      landRegistryTitleNumber: ConditionalYesNo[String, String],
-      holdLandProperty: SchemeHoldLandProperty,
-      landOrPropertyAcquire: Option[LocalDate],
-      landOrPropertyTotalCost: Money,
-      landPropertyIndependentValuation: Option[Boolean],
-      receivedLandType: Option[IdentityType],
-      recipientName: Option[String],
-      recipientDetails: Option[String],
-      recipientReasonNoDetails: Option[String],
-      landOrPropertySellerConnectedParty: Option[Boolean],
-      landOrPropertyResidential: Boolean,
-      landOrPropertyLease: Boolean,
-      landOrPropertyTotalIncome: Money,
-      addressLookUpPage: Address,
-      leaseDetails: Option[(String, Money, LocalDate, Boolean)],
-      mode: Mode,
-      viewOnlyUpdated: Boolean,
-      optYear: Option[String],
-      optCurrentVersion: Option[Int],
-      optPreviousVersion: Option[Int]
-    )
+    LandOrPropertyData
   ] = {
     for {
       landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
@@ -172,6 +199,33 @@ object LandOrPropertyCheckAnswersUtils extends PsrControllerHelpers {
       optPreviousVersion = request.previousVersion
     )
   }
+
+  def viewModel(data: LandOrPropertyData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
+    data.srn,
+    data.index,
+    data.schemeName,
+    data.landOrPropertyInUk,
+    data.landRegistryTitleNumber,
+    data.holdLandProperty,
+    data.landOrPropertyAcquire,
+    data.landOrPropertyTotalCost,
+    data.landPropertyIndependentValuation,
+    data.receivedLandType,
+    data.recipientName,
+    data.recipientDetails,
+    data.recipientReasonNoDetails,
+    data.landOrPropertySellerConnectedParty,
+    data.landOrPropertyResidential,
+    data.landOrPropertyLease,
+    data.landOrPropertyTotalIncome,
+    data.addressLookUpPage,
+    data.leaseDetails,
+    data.mode,
+    data.viewOnlyUpdated,
+    data.optYear,
+    data.optCurrentVersion,
+    data.optPreviousVersion
+  )
 
   def viewModel(
     srn: Srn,

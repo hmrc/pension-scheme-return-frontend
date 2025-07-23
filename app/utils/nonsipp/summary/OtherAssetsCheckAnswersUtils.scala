@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import cats.implicits.toShow
 import pages.nonsipp.common._
-import viewmodels.Margin
+import viewmodels.{DisplayMessage, Margin}
 import models.requests.DataRequest
 import config.RefinedTypes.Max5000
 import controllers.PsrControllerHelpers
@@ -33,6 +33,8 @@ import models._
 import models.SchemeHoldAsset._
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.models._
+
+import scala.concurrent.Future
 
 import java.time.LocalDate
 
@@ -55,17 +57,39 @@ case class OtherAssetsViewModelParameters(
   mode: Mode
 )
 
-object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers {
+type OtherAssetsData = (
+  parameters: OtherAssetsViewModelParameters,
+  viewOnlyUpdated: Boolean,
+  optYear: Option[String],
+  optCurrentVersion: Option[Int],
+  optPreviousVersion: Option[Int]
+)
+
+object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, OtherAssetsData] {
+
+  override def heading: Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.otherAssets.heading"))
+
+  override def subheading(data: OtherAssetsData): Option[DisplayMessage] =
+    Some(Message("nonsipp.summary.otherAssets.subheading", data.parameters.description))
+
+  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+    request.userAnswers
+      .map(OtherAssetsProgress.all())
+      .filter(_._2.completed)
+      .keys
+      .map(refineStringIndex[Max5000.Refined])
+      .toList
+      .flatten
+
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+    Result,
+    OtherAssetsData
+  ]] = Future.successful(summaryData(srn, index, mode))
 
   def summaryData(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Either[
     Result,
-    (
-      parameters: OtherAssetsViewModelParameters,
-      viewOnlyUpdated: Boolean,
-      optYear: Option[String],
-      optCurrentVersion: Option[Int],
-      optPreviousVersion: Option[Int]
-    )
+    OtherAssetsData
   ] = {
     for {
       description <- request.userAnswers
@@ -180,6 +204,14 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers {
       optPreviousVersion = request.previousVersion
     )
   }
+
+  def viewModel(data: OtherAssetsData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
+    data.parameters,
+    data.viewOnlyUpdated,
+    data.optYear,
+    data.optCurrentVersion,
+    data.optPreviousVersion
+  )
 
   def viewModel(
     parameters: OtherAssetsViewModelParameters,

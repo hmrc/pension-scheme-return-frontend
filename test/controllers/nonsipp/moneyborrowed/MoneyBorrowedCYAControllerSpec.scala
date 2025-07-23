@@ -17,6 +17,8 @@
 package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
+import utils.nonsipp.summary.MoneyBorrowedCheckAnswersUtils
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
@@ -27,8 +29,6 @@ import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
-import controllers.{ControllerBaseSpec, ControllerBehaviours}
 
 class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
@@ -93,7 +93,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            MoneyBorrowedCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,
@@ -159,7 +159,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec with ControllerB
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            MoneyBorrowedCheckAnswersUtils.viewModel(
               srn,
               index,
               schemeName,

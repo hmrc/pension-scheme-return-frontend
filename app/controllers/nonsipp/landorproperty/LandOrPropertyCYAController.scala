@@ -84,30 +84,7 @@ class LandOrPropertyCYAController @Inject() (
             Ok(
               view(
                 LandOrPropertyCheckAnswersUtils.viewModel(
-                  data.srn,
-                  data.index,
-                  data.schemeName,
-                  data.landOrPropertyInUk,
-                  data.landRegistryTitleNumber,
-                  data.holdLandProperty,
-                  data.landOrPropertyAcquire,
-                  data.landOrPropertyTotalCost,
-                  data.landPropertyIndependentValuation,
-                  data.receivedLandType,
-                  data.recipientName,
-                  data.recipientDetails,
-                  data.recipientReasonNoDetails,
-                  data.landOrPropertySellerConnectedParty,
-                  data.landOrPropertyResidential,
-                  data.landOrPropertyLease,
-                  data.landOrPropertyTotalIncome,
-                  data.addressLookUpPage,
-                  data.leaseDetails,
-                  data.mode,
-                  data.viewOnlyUpdated,
-                  data.optYear,
-                  data.optCurrentVersion,
-                  data.optPreviousVersion
+                  data
                 )
               )
             )

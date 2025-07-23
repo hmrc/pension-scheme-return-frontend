@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.declaration
 
-import services.{PsrRetrievalService, PsrVersionsService}
+import services.SchemeDateService
 import play.api.mvc._
+import utils.nonsipp.summary._
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import viewmodels.models.SummaryPageEntry.Heading
-import utils.nonsipp._
+import models.NormalMode
 import play.api.i18n._
 import views.html.SummaryView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SummaryPageEntry, _}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
@@ -37,28 +37,34 @@ class PreSubmissionSummaryController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: SummaryView,
-  val psrVersionsService: PsrVersionsService,
-  val psrRetrievalService: PsrRetrievalService
+  val schemeDateService: SchemeDateService
 )(implicit ec: ExecutionContext)
     extends PSRController
-    with I18nSupport
-    with SchemeDetailNavigationUtils {
+    with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    viewModel(srn).map(_.map(vm => Ok(view(vm, request.schemeDetails.schemeName))).merge)
+    val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
+
+    (for {
+      allLandOrPropertyEntries <- LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allBondsEntries <- BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allSharesEntries <- SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allLoansEntries <- loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allOtherAssetsEntries <- OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allMoneyBorrowedEntries <- MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allEntries =
+        allLandOrPropertyEntries ++ allBondsEntries ++ allSharesEntries ++ allLoansEntries ++ allOtherAssetsEntries ++
+          allMoneyBorrowedEntries
+    } yield Ok(view(viewModel(srn, allEntries), ""))).value.map(_.merge)
   }
 
   def viewModel(
-    srn: Srn
-  ): Future[Either[Result, FormPageViewModel[List[SummaryPageEntry]]]] =
-    Future.successful(
-      Right(
-        FormPageViewModel[List[SummaryPageEntry]](
-          Message("Test"),
-          Message("Test"),
-          List(Heading(Message(srn.value))),
-          controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-        )
-      )
-    )
+    srn: Srn,
+    entries: List[SummaryPageEntry]
+  ): FormPageViewModel[List[SummaryPageEntry]] = FormPageViewModel[List[SummaryPageEntry]](
+    Message("nonsipp.summary.title"),
+    Message("nonsipp.summary.heading"),
+    entries,
+    routes.PsaDeclarationController.onPageLoad(srn)
+  )
 }

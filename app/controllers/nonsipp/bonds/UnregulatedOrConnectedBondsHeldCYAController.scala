@@ -79,21 +79,7 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject() (
             Ok(
               view(
                 BondsCheckAnswersUtils.viewModel(
-                  data.srn,
-                  data.index,
-                  data.schemeName,
-                  data.nameOfBonds,
-                  data.whyDoesSchemeHoldBonds,
-                  data.whenDidSchemeAcquireBonds,
-                  data.costOfBonds,
-                  data.bondsFromConnectedParty,
-                  data.areBondsUnregulated,
-                  data.incomeFromBonds,
-                  data.mode,
-                  data.viewOnlyUpdated,
-                  data.optYear,
-                  data.optCurrentVersion,
-                  data.optPreviousVersion
+                  data
                 )
               )
             )
