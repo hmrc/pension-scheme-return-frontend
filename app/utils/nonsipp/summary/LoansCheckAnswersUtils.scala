@@ -50,12 +50,12 @@ type LoansData = (
   recipientReasonNoDetails: Option[String],
   connectedParty: Either[Boolean, SponsoringOrConnectedParty],
   datePeriodLoan: (LocalDate, Money, Int),
-  amountOfTheLoan: AmountOfTheLoan,
+  amountOfTheLoan: Either[String, AmountOfTheLoan],
   returnEndDate: LocalDate,
   repaymentInstalments: Boolean,
-  interestOnLoan: InterestOnLoan,
-  arrearsPrevYears: Option[Boolean],
-  outstandingArrearsOnLoan: Option[Money],
+  interestOnLoan: Either[String, InterestOnLoan],
+  arrearsPrevYears: Either[String, Boolean],
+  outstandingArrearsOnLoan: Either[String, Option[Money]],
   securityOnLoan: Option[Security],
   mode: Mode,
   viewOnlyUpdated: Boolean,
@@ -136,15 +136,15 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
           Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
         }
       datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-      amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
+      amountOfTheLoan = request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrIncomplete
       returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
       repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
-      interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
-      arrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
-      outstandingArrearsOnLoan <- request.userAnswers
+      interestOnLoan = request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrIncomplete
+      arrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index)).getOrIncomplete
+      outstandingArrearsOnLoan = request.userAnswers
         .get(OutstandingArrearsOnLoanPage(srn, index))
         .map(_.value.toOption)
-        .getOrRecoverJourney
+        .getOrIncomplete
       securityOnLoan <- request.userAnswers
         .get(SecurityGivenForLoanPage(srn, index))
         .map(_.value.toOption)
@@ -209,12 +209,12 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     recipientReasonNoDetails: Option[String],
     connectedParty: Either[Boolean, SponsoringOrConnectedParty],
     datePeriodLoan: (LocalDate, Money, Int),
-    amountOfTheLoan: AmountOfTheLoan,
+    amountOfTheLoan: Either[String, AmountOfTheLoan],
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
-    interestOnLoan: InterestOnLoan,
-    arrearsPrevYears: Option[Boolean],
-    outstandingArrearsOnLoan: Option[Money],
+    interestOnLoan: Either[String, InterestOnLoan],
+    arrearsPrevYears: Either[String, Boolean],
+    outstandingArrearsOnLoan: Either[String, Option[Money]],
     securityOnLoan: Option[Security],
     mode: Mode,
     viewOnlyUpdated: Boolean,
@@ -231,8 +231,14 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
       ),
       heading = mode.fold(
         normal = "loanCheckYourAnswers.normal.heading",
-        check = Message("loanCheckYourAnswers.change.heading", amountOfTheLoan.loanAmount.displayAs, recipientName),
-        viewOnly = Message("loanCheckYourAnswers.viewOnly.heading", amountOfTheLoan.loanAmount.displayAs, recipientName)
+        check = amountOfTheLoan match {
+          case Right(loan) => Message("loanCheckYourAnswers.change.heading", loan.loanAmount.displayAs, recipientName)
+          case Left(_) => Message("loansCheckAndUpdate.heading")
+        },
+        viewOnly = amountOfTheLoan match {
+          case Right(loan) => Message("loanCheckYourAnswers.viewOnly.heading", loan.loanAmount.displayAs, recipientName)
+          case Left(_) => Message("loansCheckAndUpdate.heading")
+        }
       ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -269,8 +275,12 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
             link = None,
             submittedText = Some(Message("")),
             title = "loanCheckYourAnswers.viewOnly.title",
-            heading =
-              Message("loanCheckYourAnswers.viewOnly.heading", amountOfTheLoan.loanAmount.displayAs, recipientName),
+            amountOfTheLoan match {
+              case Right(loan) =>
+                Message("loanCheckYourAnswers.viewOnly.heading", loan.loanAmount.displayAs, recipientName)
+              case Left(_) =>
+                Message("loansCheckAndUpdate.heading")
+            },
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
@@ -297,18 +307,28 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     recipientReasonNoDetails: Option[String],
     connectedParty: Either[Boolean, SponsoringOrConnectedParty],
     datePeriodLoan: (LocalDate, Money, Int),
-    amountOfTheLoan: AmountOfTheLoan,
+    amountOfTheLoan: Either[String, AmountOfTheLoan],
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
-    interestOnLoan: InterestOnLoan,
-    arrearsPrevYears: Option[Boolean],
-    outstandingArrearsOnLoan: Option[Money],
+    interestOnLoan: Either[String, InterestOnLoan],
+    arrearsPrevYears: Either[String, Boolean],
+    outstandingArrearsOnLoan: Either[String, Option[Money]],
     securityOnLoan: Option[Security],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val (loanDate, assetsValue, loanPeriod) = datePeriodLoan
-    val (totalLoan, repayments, outstanding) = amountOfTheLoan.asTuple
-    val (interestPayable, interestRate, interestPayments) = interestOnLoan.asTuple
+    val (totalLoan, repayments, outstanding) = amountOfTheLoan match {
+      case Right(loan) => loan.asTuple
+      case Left(_) => (Money.zero, None, None)
+    }
+    val repaymentsEither = repayments.toRight("Incomplete")
+    val outstandingEither = outstanding.toRight("Incomplete")
+
+    val (interestPayable, interestRate, interestPayments) = interestOnLoan match {
+      case Right(interestOnLoan) => interestOnLoan.asTuple
+      case Left(_) => (Money.zero, Percentage(0), None)
+    }
+    val interestPaymentsEither: Either[String, Option[Money]] = Right(interestPayments)
 
     recipientSection(
       srn,
@@ -320,10 +340,33 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
       connectedParty,
       mode
     ) ++ loanPeriodSection(srn, index, schemeName, loanDate, assetsValue, loanPeriod, mode) ++
-      loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode) ++
-      loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode) ++
+      loanAmountSection(
+        srn,
+        index,
+        totalLoan,
+        repaymentsEither,
+        outstandingEither,
+        returnEndDate,
+        repaymentInstalments,
+        mode
+      ) ++
+      loanInterestSection(
+        srn,
+        index,
+        interestPayable,
+        interestRate,
+        interestPaymentsEither,
+        mode
+      ) ++
       loanSecuritySection(srn, index, securityOnLoan, mode) ++
-      loanOutstandingSection(srn, index, arrearsPrevYears, outstandingArrearsOnLoan, returnEndDate, mode)
+      loanOutstandingSection(
+        srn,
+        index,
+        arrearsPrevYears,
+        outstandingArrearsOnLoan,
+        returnEndDate,
+        mode
+      )
 
   }
 
@@ -586,19 +629,36 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     srn: Srn,
     index: Max5000,
     totalLoan: Money,
-    repayments: Option[Money],
-    outstanding: Option[Money],
+    repayments: Either[String, Money],
+    outstanding: Either[String, Money],
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     mode: Mode
   ): List[CheckYourAnswersSection] = {
+
     val repaymentsInstalmentsValue = if (repaymentInstalments) "site.yes" else "site.no"
-    val optCapRepaymentCYString = if (repayments.isDefined) s"£${repayments.get.displayAs}" else ""
-    val optAmountOutstandingString = if (outstanding.isDefined) s"£${outstanding.get.displayAs}" else ""
+
+    val optCapRepaymentCYString = repayments match {
+      case Right(value) => s"£${value.displayAs}"
+      case Left(value) => s"$value"
+    }
+
+    val optAmountOutstandingString = outstanding match {
+      case Right(value) => s"£${value.displayAs}"
+      case Left(value) => s"$value"
+    }
+
+    val isDataIncomplete = repayments.isLeft || outstanding.isLeft
+
+    val header = if (isDataIncomplete) {
+      Some(Heading2.medium("loansCheckAndUpdate.isPrePop.section3.heading"))
+    } else {
+      Some(Heading2.medium("loanCheckYourAnswers.section3.heading"))
+    }
 
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("loanCheckYourAnswers.section3.heading")),
+        header,
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section3.loanAmount.total", s"£${totalLoan.displayAs}")
             .withAction(
@@ -654,14 +714,26 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     index: Max5000,
     interestPayable: Money,
     interestRate: Percentage,
-    interestPayments: Option[Money],
+    interestPayments: Either[String, Option[Money]],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
-    val optIntReceivedCYString = if (interestPayments.isDefined) s"£${interestPayments.get.displayAs}" else ""
+
+    val isDataIncomplete = interestPayments.isLeft || interestPayments.exists(_.isEmpty)
+    val header = if (isDataIncomplete) {
+      Some(Heading2.medium("loansCheckAndUpdate.isPrePop.section4.heading"))
+    } else {
+      Some(Heading2.medium("loanCheckYourAnswers.section4.heading"))
+    }
+
+    val interestPaymentsDisplay: String = interestPayments match {
+      case Left(_) => "Incomplete"
+      case Right(Some(money)) => s"£${money.displayAs}"
+      case Right(None) => "Incomplete"
+    }
 
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("loanCheckYourAnswers.section4.heading")),
+        header,
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payable", s"£${interestPayable.displayAs}")
             .withAction(
@@ -681,15 +753,17 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
                   .url + "#rate"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
             ),
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", optIntReceivedCYString)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
-                  .onPageLoad(srn, index, mode)
-                  .url + "#payments"
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
-            )
+          CheckYourAnswersRowViewModel(
+            "loanCheckYourAnswers.section4.payments",
+            interestPaymentsDisplay
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
+                .onPageLoad(srn, index, mode)
+                .url + "#payments"
+            ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
+          )
         )
       )
     )
@@ -733,20 +807,58 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
   private def loanOutstandingSection(
     srn: Srn,
     index: Max5000,
-    arrearsPrevYears: Option[Boolean],
-    outstandingArrearsOnLoan: Option[Money],
+    arrearsPrevYears: Either[String, Boolean],
+    outstandingArrearsOnLoan: Either[String, Option[Money]],
     returnEndDate: LocalDate,
     mode: Mode
   ): List[CheckYourAnswersSection] = {
-    val outstandingMessage = arrearsPrevYears match {
-      case Some(true) => "site.yes"
-      case Some(false) => "site.no"
-      case None => ""
+
+    val isDataIncomplete =
+      arrearsPrevYears.isLeft ||
+        (arrearsPrevYears == Right(true) && (outstandingArrearsOnLoan.isLeft || outstandingArrearsOnLoan.exists(
+          _.isEmpty
+        )))
+
+    val header = if (isDataIncomplete) {
+      Some(Heading2.medium("loansCheckAndUpdate.isPrePop.section6.heading"))
+    } else {
+      Some(Heading2.medium("loanCheckYourAnswers.section6.heading"))
     }
+
+    val outstandingMessage = arrearsPrevYears match {
+      case Right(true) => "site.yes"
+      case Right(false) => "site.no"
+      case Left(value) => s"$value"
+    }
+
+    val maybeOutstandingArrearsRow: Option[CheckYourAnswersRowViewModel] =
+      (arrearsPrevYears, outstandingArrearsOnLoan) match {
+        case (Right(true), Right(maybeMoney)) =>
+          val valueText = maybeMoney match {
+            case Some(value) => s"£${value.displayAs}"
+            case None => "Incomplete"
+          }
+
+          Some(
+            CheckYourAnswersRowViewModel(
+              "loanCheckYourAnswers.section6.arrears.yes",
+              valueText
+            ).withAction(
+              SummaryAction(
+                "site.change",
+                controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
+                  .onPageLoad(srn, index, mode)
+                  .url + "#details"
+              ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.yes.hidden")
+            )
+          )
+
+        case _ => None
+      }
 
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("loanCheckYourAnswers.section6.heading")),
+        header,
         List(
           CheckYourAnswersRowViewModel(
             Message("loanCheckYourAnswers.section6.arrears", returnEndDate.show),
@@ -757,19 +869,11 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
               controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
                 .onPageLoad(srn, index, mode)
                 .url
-            ).withVisuallyHiddenContent(("loanCheckYourAnswers.section6.arrears.hidden", returnEndDate.show))
-          )
-        ) :?+ outstandingArrearsOnLoan.map { value =>
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section6.arrears.yes", s"£${value.displayAs}")
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
-                  .onPageLoad(srn, index, mode)
-                  .url + "#details"
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.yes.hidden")
+            ).withVisuallyHiddenContent(
+              Message("loanCheckYourAnswers.section6.arrears.hidden", returnEndDate.show)
             )
-        }
+          )
+        ) ++ maybeOutstandingArrearsRow.toList
       )
     )
   }

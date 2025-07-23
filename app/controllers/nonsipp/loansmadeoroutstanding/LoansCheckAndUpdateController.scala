@@ -16,58 +16,51 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SchemeDateService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import cats.implicits.toShow
+import utils.nonsipp.summary.LoansCheckAnswersUtils
+import utils.IntUtils.toInt
+import utils.IntUtils.given
 import controllers.actions.IdentifyAndRequireData
-import pages.nonsipp.common.OtherRecipientDetailsPage
-import pages.nonsipp.loansmadeoroutstanding._
+import models.NormalMode
+import play.api.i18n.MessagesApi
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import views.html.ContentTablePageView
+import views.html.PrePopCheckYourAnswersView
 import models.SchemeId.Srn
-import utils.IntUtils.{toInt, toRefined5000}
-import controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController._
-import utils.DateTimeUtils.localDateShow
-import models.{IdentitySubject, Money, NormalMode}
-import play.api.i18n.MessagesApi
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
-import viewmodels.models.{ContentTablePageViewModel, FormPageViewModel}
-
-import java.time.LocalDate
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{CheckYourAnswersSection, CheckYourAnswersViewModel, FormPageViewModel}
 
 class LoansCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentTablePageView
+  schemeDateService: SchemeDateService,
+  view: PrePopCheckYourAnswersView
 ) extends PSRController {
-
   def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    (
-      for {
-        recipientName <- List(
-          request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-          request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-          request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-          request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
-        ).flatten.headOption.getOrRecoverJourney
-        datePeriodDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-        amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            recipientName,
-            datePeriodDetails._1,
-            amountOfTheLoan.loanAmount
+    LoansCheckAnswersUtils(schemeDateService)
+      .summaryData(srn, index, NormalMode)
+      .map { data =>
+        val sections = LoansCheckAnswersUtils(schemeDateService)
+          .viewModel(
+            data
+          )
+          .page
+          .sections
+        Ok(
+          view(
+            LoansCheckAndUpdateController.viewModel(
+              data.srn,
+              data.index,
+              sections
+            )
           )
         )
-      )
-    ).merge
+      }
+      .merge
   }
 
   def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
@@ -80,39 +73,18 @@ object LoansCheckAndUpdateController {
   def viewModel(
     srn: Srn,
     index: Max5000,
-    recipientName: String,
-    dateOfTheLoan: LocalDate,
-    amountOfTheLoan: Money
-  ): FormPageViewModel[ContentTablePageViewModel] = {
-
-    val rows: List[(DisplayMessage, DisplayMessage)] = List(
-      Message("loansCheckAndUpdate.table.one") -> Message(recipientName),
-      Message("loansCheckAndUpdate.table.two") -> Message(dateOfTheLoan.show),
-      Message("loansCheckAndUpdate.table.three") -> Message(amountOfTheLoan.displayAs)
-    )
-
-    FormPageViewModel(
+    sections: List[CheckYourAnswersSection]
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel[CheckYourAnswersViewModel](
       mode = NormalMode,
       title = "loansCheckAndUpdate.title",
       heading = "loansCheckAndUpdate.heading",
-      description = None,
-      page = ContentTablePageViewModel(
-        inset = None,
-        beforeTable = Some(ParagraphMessage("loansCheckAndUpdate.paragraph")),
-        afterTable = Some(
-          ParagraphMessage("loansCheckAndUpdate.bullet.paragraph") ++ ListMessage
-            .Bullet(
-              "loansCheckAndUpdate.bullet.one",
-              "loansCheckAndUpdate.bullet.two"
-            )
-        ),
-        rows = rows
-      ),
+      description = Some("loansCheckAndUpdate.description"),
+      page = CheckYourAnswersViewModel(sections),
       refresh = None,
       buttonText = "loansCheckAndUpdate.button",
       details = None,
       onSubmit = routes.LoansCheckAndUpdateController.onSubmit(srn, index),
       optViewOnlyDetails = None
     )
-  }
 }
