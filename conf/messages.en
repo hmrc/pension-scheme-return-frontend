@@ -3552,19 +3552,11 @@ otherAssets.viewOnly.heading = Details of asset
 otherAssets.change.title = Change details for asset
 otherAssets.change.heading = Change details for asset
 
-otherAssetsCheckAndUpdate.title = Check and update the other assets information
-otherAssetsCheckAndUpdate.heading = Check and update the other assets information
-otherAssetsCheckAndUpdate.paragraph = You need to add data to this other asset.
-otherAssetsCheckAndUpdate.table.one = Description of asset
-otherAssetsCheckAndUpdate.table.two = Why the asset is held
-otherAssetsCheckAndUpdate.table.three = Total cost of asset
-otherAssetsCheckAndUpdate.bullet.paragraph = Missing data could include:
-otherAssetsCheckAndUpdate.bullet.one = total income from other asset
-otherAssetsCheckAndUpdate.bullet.two = who asset was acquired from
-otherAssetsCheckAndUpdate.button = Add missing data
-otherAssetsCheckAndUpdate.Acquisition = Acquisition
-otherAssetsCheckAndUpdate.Contribution = Contribution
-otherAssetsCheckAndUpdate.Transfer = Transfer
+otherAssetsCheckAndUpdate.title = Review other asset information
+otherAssetsCheckAndUpdate.heading = Review other asset information
+otherAssetsCheckAndUpdate.description = You need to check the answers previously added for this asset and add the incomplete information.
+otherAssetsCheckAndUpdate.button = Add incomplete information
+otherAssetsCheckAndUpdate.section1.heading = Information required for details of the transaction
 
 bondsDisposal.whenWereBondsSold.title = When were these bonds sold?
 bondsDisposal.whenWereBondsSold.heading = When were these bonds sold?
