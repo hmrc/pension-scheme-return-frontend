@@ -44,7 +44,7 @@ case class OtherAssetsViewModelParameters(
   index: Max5000,
   schemeName: String,
   description: String,
-  isTangibleMoveableProperty: Boolean,
+  isTangibleMoveableProperty: Either[String, Boolean],
   whyHeld: SchemeHoldAsset,
   acquisitionOrContributionDate: Option[LocalDate],
   sellerIdentityType: Option[IdentityType],
@@ -54,7 +54,7 @@ case class OtherAssetsViewModelParameters(
   isSellerConnectedParty: Option[Boolean],
   totalCost: Money,
   isIndependentValuation: Option[Boolean],
-  totalIncome: Money,
+  totalIncome: Either[String, Money],
   mode: Mode
 )
 
@@ -101,9 +101,9 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
         .get(WhatIsOtherAssetPage(srn, index))
         .getOrRecoverJourney
 
-      isTangibleMoveableProperty <- request.userAnswers
+      isTangibleMoveableProperty = request.userAnswers
         .get(IsAssetTangibleMoveablePropertyPage(srn, index))
-        .getOrRecoverJourney
+        .getOrIncomplete
 
       whyHeld <- request.userAnswers
         .get(WhyDoesSchemeHoldAssetsPage(srn, index))
@@ -179,9 +179,9 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
           .get
       )
 
-      totalIncome <- request.userAnswers
+      totalIncome = request.userAnswers
         .get(IncomeFromAssetPage(srn, index))
-        .getOrRecoverJourney
+        .getOrIncomplete
 
       schemeName = request.schemeDetails.schemeName
     } yield (
@@ -308,12 +308,12 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
     index: Max5000,
     schemeName: String,
     description: String,
-    isTangibleMoveableProperty: Boolean,
+    isTangibleMoveableProperty: Either[String, Boolean],
     whyHeld: SchemeHoldAsset,
     acquisitionOrContributionDate: Option[LocalDate],
     totalCost: Money,
     isIndependentValuation: Option[Boolean],
-    totalIncome: Money
+    totalIncome: Either[String, Money]
   ): List[CheckYourAnswersSection] = {
 
     val whyHeldString = whyHeld match {
@@ -324,7 +324,11 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
 
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("otherAssets.cya.section1.heading")),
+        if (isTangibleMoveableProperty.isLeft || totalIncome.isLeft) {
+          Some(Heading2.medium("otherAssetsCheckAndUpdate.section1.heading"))
+        } else {
+          Some(Heading2.medium("otherAssets.cya.section1.heading"))
+        },
         List(
           CheckYourAnswersRowViewModel(
             Message("otherAssets.cya.section1.baseRow1.key"),
@@ -339,7 +343,10 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
           ),
           CheckYourAnswersRowViewModel(
             Message("otherAssets.cya.section1.baseRow2.key"),
-            if (isTangibleMoveableProperty) "site.yes" else "site.no"
+            isTangibleMoveableProperty match {
+              case Left(value) => s"$value"
+              case Right(value) => if (value) "site.yes" else "site.no"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
@@ -399,7 +406,10 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
           ) :+
           CheckYourAnswersRowViewModel(
             Message("otherAssets.cya.section1.baseRow5.key"),
-            s"£${totalIncome.displayAs}"
+            totalIncome match {
+              case Left(value) => s"$value"
+              case Right(value) => s"£${value.displayAs}"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
