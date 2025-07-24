@@ -320,10 +320,12 @@ trait LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     }
     val repaymentsEither = repayments.toRight("Incomplete")
     val outstandingEither = outstanding.toRight("Incomplete")
-    val (interestPayable, interestRate, interestPaymentsOpt) = interestOnLoan match {
-      case Right(iol) => iol.asTuple
+
+    val (interestPayable, interestRate, interestPayments) = interestOnLoan match {
+      case Right(interestOnLoan) => interestOnLoan.asTuple
       case Left(_) => (Money.zero, Percentage(0), None)
     }
+    val interestPaymentsEither: Either[String, Option[Money]] = Right(interestPayments)
 
     recipientSection(
       srn,
@@ -350,7 +352,7 @@ trait LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
         index,
         interestPayable,
         interestRate,
-        Right(interestPaymentsOpt),
+        interestPaymentsEither,
         mode
       ) ++
       loanSecuritySection(srn, index, securityOnLoan, mode) ++
