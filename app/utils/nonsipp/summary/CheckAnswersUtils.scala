@@ -19,6 +19,7 @@ package utils.nonsipp.summary
 import play.api.mvc.{AnyContent, Result}
 import utils.ListUtils.flip
 import viewmodels.models.SummaryPageEntry.{Heading, Section, Subheading}
+import uk.gov.hmrc.http.HeaderCarrier
 import models.Mode
 import viewmodels.DisplayMessage
 import viewmodels.models._
@@ -30,7 +31,17 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait CheckAnswersUtils[I, D] {
 
-  def summaryDataAsync(srn: Srn, index: I, mode: Mode)(using DataRequest[AnyContent]): Future[Either[Result, D]]
+  def summaryDataAsync(srn: Srn, index: I, mode: Mode)(using
+    DataRequest[AnyContent],
+    HeaderCarrier,
+    ExecutionContext
+  ): Future[Either[Result, D]]
+
+  def summaryDataAsyncT(srn: Srn, index: I, mode: Mode)(using
+    DataRequest[AnyContent],
+    HeaderCarrier,
+    ExecutionContext
+  ): EitherT[Future, Result, D] = EitherT(summaryDataAsync(srn, index, mode))
 
   def indexes(using request: DataRequest[AnyContent]): List[I]
 
@@ -38,13 +49,15 @@ trait CheckAnswersUtils[I, D] {
 
   def allSummaryData(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent],
-    executionContext: ExecutionContext
+    executionContext: ExecutionContext,
+    hc: HeaderCarrier
   ): Future[Either[Result, List[D]]] =
     indexes.map(i => summaryDataAsync(srn, i, mode)).flip
 
   def allSummaryDataT(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent],
-    executionContext: ExecutionContext
+    executionContext: ExecutionContext,
+    hc: HeaderCarrier
   ): EitherT[Future, Result, List[D]] = EitherT(allSummaryData(srn, mode))
 
   def heading: Option[DisplayMessage] = None
@@ -52,7 +65,8 @@ trait CheckAnswersUtils[I, D] {
 
   def allSectionEntriesT(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent],
-    executionContext: ExecutionContext
+    executionContext: ExecutionContext,
+    hc: HeaderCarrier
   ): EitherT[Future, Result, List[SummaryPageEntry]] = allSummaryDataT(srn, mode).map { data =>
     heading.map(Heading(_)).toList ++
       data.flatMap { x =>

@@ -152,6 +152,10 @@ trait PsrControllerHelpers extends Results {
   implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
     def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).min).merge)
   }
+
+  implicit class FutureOps[A](f: Future[A]) {
+    def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
+  }
 }
 
 abstract class PSRController
@@ -192,10 +196,6 @@ abstract class PSRController
 
   implicit class FutureEitherOps[A](f: Future[Either[A, A]])(implicit ec: ExecutionContext) {
     def merge: Future[A] = f.map(_.merge)
-  }
-
-  implicit class FutureOps[A](f: Future[A]) {
-    def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
   }
 
   implicit class ListIndexOps[A](l: List[A]) {

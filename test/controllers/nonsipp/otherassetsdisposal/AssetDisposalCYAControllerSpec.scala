@@ -19,17 +19,17 @@ package controllers.nonsipp.otherassetsdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
+import utils.nonsipp.summary.{OtherAssetsDisposalCheckAnswersUtils, OtherAssetsDisposalViewModelParameters}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
+import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import pages.nonsipp.FbVersionPage
-import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 
 import scala.concurrent.Future
 
@@ -130,8 +130,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), userAnswersSoldPartnership) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -159,8 +159,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), userAnswersSoldIndividual) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -188,8 +188,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), userAnswersSoldCompany) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -217,8 +217,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), userAnswersSoldOther) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -246,8 +246,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), userAnswersTransferred) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -275,8 +275,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       act.like(
         renderView(onPageLoad(mode), userAnswersOther) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -364,8 +364,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec with ControllerB
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            OtherAssetsDisposalCheckAnswersUtils.viewModel(
+              OtherAssetsDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,

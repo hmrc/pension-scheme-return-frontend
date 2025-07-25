@@ -19,7 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.shares._
 import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
-import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
+import utils.nonsipp.summary.{SharesDisposalCheckAnswersUtils, SharesDisposalViewModelParameters}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -183,8 +183,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
         act.like(
           renderView(onPageLoad(mode), soldAnswers) { implicit app => implicit request =>
             injected[CheckYourAnswersView].apply(
-              viewModel(
-                ViewModelParameters(
+              SharesDisposalCheckAnswersUtils.viewModel(
+                SharesDisposalViewModelParameters(
                   srn,
                   shareIndex,
                   disposalIndex,
@@ -224,8 +224,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         renderView(onPageLoad(mode), redeemedUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            SharesDisposalCheckAnswersUtils.viewModel(
+              SharesDisposalViewModelParameters(
                 srn,
                 shareIndex,
                 disposalIndex,
@@ -264,8 +264,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         renderView(onPageLoad(mode), transferredUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            SharesDisposalCheckAnswersUtils.viewModel(
+              SharesDisposalViewModelParameters(
                 srn,
                 shareIndex,
                 disposalIndex,
@@ -304,8 +304,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
       act.like(
         renderView(onPageLoad(mode), otherUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            SharesDisposalCheckAnswersUtils.viewModel(
+              SharesDisposalViewModelParameters(
                 srn,
                 shareIndex,
                 disposalIndex,
@@ -380,8 +380,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
         soldToIndividualUserAnswers
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
-            ViewModelParameters(
+          SharesDisposalCheckAnswersUtils.viewModel(
+            SharesDisposalViewModelParameters(
               srn,
               shareIndex,
               disposalIndex,
@@ -466,8 +466,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec with Controller
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            SharesDisposalCheckAnswersUtils.viewModel(
+              SharesDisposalViewModelParameters(
                 srn,
                 shareIndex,
                 disposalIndex,
