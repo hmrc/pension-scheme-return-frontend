@@ -46,27 +46,7 @@ class LoansCheckAndUpdateController @Inject() (
       .map { data =>
         val sections = LoansCheckAnswersUtils(schemeDateService)
           .viewModel(
-            data.srn,
-            data.index,
-            data.schemeName,
-            data.receivedLoanType,
-            data.recipientName,
-            data.recipientDetails,
-            data.recipientReasonNoDetails,
-            data.connectedParty,
-            data.datePeriodLoan,
-            data.amountOfTheLoan,
-            data.returnEndDate,
-            data.repaymentInstalments,
-            data.interestOnLoan,
-            data.arrearsPrevYears,
-            data.outstandingArrearsOnLoan,
-            data.securityOnLoan,
-            data.mode,
-            data.viewOnlyUpdated,
-            data.optYear,
-            data.optCurrentVersion,
-            data.optPreviousVersion
+            data
           )
           .page
           .sections
