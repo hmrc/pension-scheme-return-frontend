@@ -124,7 +124,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
                 index,
                 schemeName,
                 description = otherAssetDescription,
-                isTangibleMoveableProperty = true,
+                isTangibleMoveableProperty = Right(true),
                 whyHeld = SchemeHoldAsset.Acquisition,
                 acquisitionOrContributionDate = Some(localDate),
                 sellerIdentityType = Some(IdentityType.Individual),
@@ -134,7 +134,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
                 isSellerConnectedParty = Some(true),
                 totalCost = money,
                 isIndependentValuation = Some(true),
-                totalIncome = money,
+                totalIncome = Right(money),
                 mode = mode
               ),
               viewOnlyUpdated = true
@@ -221,7 +221,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
                 index,
                 schemeName,
                 description = otherAssetDescription,
-                isTangibleMoveableProperty = true,
+                isTangibleMoveableProperty = Right(true),
                 whyHeld = SchemeHoldAsset.Acquisition,
                 acquisitionOrContributionDate = Some(localDate),
                 sellerIdentityType = Some(IdentityType.Individual),
@@ -231,7 +231,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
                 isSellerConnectedParty = Some(true),
                 totalCost = money,
                 isIndependentValuation = Some(true),
-                totalIncome = money,
+                totalIncome = Right(money),
                 mode = ViewOnlyMode
               ),
               viewOnlyUpdated = false,
@@ -272,7 +272,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
                 index,
                 schemeName,
                 description = otherAssetDescription,
-                isTangibleMoveableProperty = true,
+                isTangibleMoveableProperty = Right(true),
                 whyHeld = SchemeHoldAsset.Acquisition,
                 acquisitionOrContributionDate = Some(localDate),
                 sellerIdentityType = Some(identityType),
@@ -282,7 +282,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
                 isSellerConnectedParty = Some(true),
                 totalCost = money,
                 isIndependentValuation = Some(true),
-                totalIncome = money,
+                totalIncome = Right(money),
                 mode = NormalMode
               ),
               viewOnlyUpdated = true

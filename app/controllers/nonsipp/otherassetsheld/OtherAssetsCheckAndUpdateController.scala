@@ -16,49 +16,48 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import com.google.inject.Inject
+import utils.nonsipp.summary.OtherAssetsCheckAnswersUtils
 import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.otherassetsheld.OtherAssetsCheckAndUpdateController._
-import pages.nonsipp.otherassetsheld.{CostOfOtherAssetPage, WhatIsOtherAssetPage, WhyDoesSchemeHoldAssetsPage}
-import com.google.inject.Inject
+import models.NormalMode
+import play.api.i18n.MessagesApi
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import views.html.ContentTablePageView
+import views.html.PrePopCheckYourAnswersView
 import models.SchemeId.Srn
-import models.{Money, NormalMode, SchemeHoldAsset}
-import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
-import play.api.i18n.MessagesApi
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
-import viewmodels.models.{ContentTablePageViewModel, FormPageViewModel}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{CheckYourAnswersSection, CheckYourAnswersViewModel, FormPageViewModel}
 
 class OtherAssetsCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentTablePageView
+  view: PrePopCheckYourAnswersView
 ) extends PSRController {
 
   def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    (
-      for {
-        descriptionOfAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRecoverJourney
-        whyAssetIsHeld <- request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)).getOrRecoverJourney
-        totalCostOfAsset <- request.userAnswers.get(CostOfOtherAssetPage(srn, index)).getOrRecoverJourney
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            descriptionOfAsset,
-            whyAssetIsHeld,
-            totalCostOfAsset
+    OtherAssetsCheckAnswersUtils
+      .summaryData(srn, index, NormalMode)
+      .map { data =>
+        val sections = OtherAssetsCheckAnswersUtils
+          .viewModel(
+            data
+          )
+          .page
+          .sections
+        Ok(
+          view(
+            OtherAssetsCheckAndUpdateController.viewModel(
+              data.parameters.srn,
+              data.parameters.index,
+              sections
+            )
           )
         )
-      )
-    ).merge
+      }
+      .merge
   }
 
   def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
@@ -71,45 +70,18 @@ object OtherAssetsCheckAndUpdateController {
   def viewModel(
     srn: Srn,
     index: Max5000,
-    descriptionOfAsset: String,
-    whyAssetIsHeld: SchemeHoldAsset,
-    totalCostOfAsset: Money
-  ): FormPageViewModel[ContentTablePageViewModel] = {
-
-    val whyAssetIsHeldString = whyAssetIsHeld match {
-      case Acquisition => "otherAssetsCheckAndUpdate.Acquisition"
-      case Contribution => "otherAssetsCheckAndUpdate.Contribution"
-      case Transfer => "otherAssetsCheckAndUpdate.Transfer"
-    }
-
-    val rows: List[(DisplayMessage, DisplayMessage)] = List(
-      Message("otherAssetsCheckAndUpdate.table.one") -> Message(descriptionOfAsset),
-      Message("otherAssetsCheckAndUpdate.table.two") -> Message(whyAssetIsHeldString),
-      Message("otherAssetsCheckAndUpdate.table.three") -> Message(totalCostOfAsset.displayAs)
-    )
-
-    FormPageViewModel(
+    sections: List[CheckYourAnswersSection]
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel[CheckYourAnswersViewModel](
       mode = NormalMode,
       title = Message("otherAssetsCheckAndUpdate.title"),
       heading = Message("otherAssetsCheckAndUpdate.heading"),
-      description = None,
-      page = ContentTablePageViewModel(
-        inset = None,
-        beforeTable = Some(ParagraphMessage("otherAssetsCheckAndUpdate.paragraph")),
-        afterTable = Some(
-          ParagraphMessage("otherAssetsCheckAndUpdate.bullet.paragraph") ++ ListMessage
-            .Bullet(
-              Message("otherAssetsCheckAndUpdate.bullet.one"),
-              Message("otherAssetsCheckAndUpdate.bullet.two")
-            )
-        ),
-        rows = rows
-      ),
+      description = Some(Message("otherAssetsCheckAndUpdate.description")),
+      page = CheckYourAnswersViewModel(sections),
       refresh = None,
       buttonText = Message("otherAssetsCheckAndUpdate.button"),
       details = None,
       onSubmit = routes.OtherAssetsCheckAndUpdateController.onSubmit(srn, index),
       optViewOnlyDetails = None
     )
-  }
 }
