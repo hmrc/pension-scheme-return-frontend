@@ -16,63 +16,125 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
 import models.ConditionalYesNo._
 import play.api.mvc.Call
 import models.IdentityType.Individual
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
-import views.html.ContentTablePageView
-import utils.IntUtils.toInt
-import models.{ConditionalYesNo, NormalMode, Security}
+import play.api.inject.bind
+import views.html.PrePopCheckYourAnswersView
+import config.Constants.incomplete
+import models._
 import pages.nonsipp.common.IdentityTypePage
+import controllers.nonsipp.loansmadeoroutstanding.{routes => loansRoutes}
+import utils.nonsipp.summary.LoansCheckAnswersUtils
 import pages.nonsipp.loansmadeoroutstanding._
 import models.IdentitySubject.LoanRecipient
 
 class LoansCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-  private val conditionalYesSecurity: ConditionalYes[Security] = ConditionalYesNo.yes(security)
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
-  private def onPageLoad: Call = routes.LoansCheckAndUpdateController.onPageLoad(srn, index1of5000)
-  private def onSubmit: Call = routes.LoansCheckAndUpdateController.onSubmit(srn, index1of5000)
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[SchemeDateService].toInstance(mockSchemeDateService)
+  )
+
+  private def onPageLoad: Call = loansRoutes.LoansCheckAndUpdateController.onPageLoad(srn, index1of5000.value)
+  private def onSubmit: Call = loansRoutes.LoansCheckAndUpdateController.onSubmit(srn, index1of5000.value)
 
   private val prePopUserAnswers = defaultUserAnswers
+    .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
     .unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, index1of5000), recipientName)
-    .unsafeSet(IndividualRecipientNinoPage(srn, index1of5000), conditionalYesNoNino)
     .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index1of5000), true)
     .unsafeSet(DatePeriodLoanPage(srn, index1of5000), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), partialAmountOfTheLoan)
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
-    .unsafeSet(InterestOnLoanPage(srn, index1of5000), partialInterestOnLoan)
-    .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), conditionalYesSecurity)
+    .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))
+
+  private val completedUserAnswers = prePopUserAnswers
+    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), amountOfTheLoan)
+    .unsafeSet(InterestOnLoanPage(srn, index1of5000), interestOnLoan)
+    .unsafeSet(ArrearsPrevYears(srn, index1of5000), false)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Money](money))
 
   "LoansCheckAndUpdateController" - {
 
     act.like(
       renderView(onPageLoad, prePopUserAnswers) { implicit app => implicit request =>
-        injected[ContentTablePageView].apply(
-          LoansCheckAndUpdateController.viewModel(
-            srn = srn,
-            index = index1of5000,
-            recipientName = recipientName,
-            dateOfTheLoan = localDate,
-            amountOfTheLoan = money
+        injected[PrePopCheckYourAnswersView].apply(
+          controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController.viewModel(
+            srn,
+            index1of5000,
+            LoansCheckAnswersUtils(mockSchemeDateService)
+              .viewModel(
+                srn,
+                index1of5000,
+                schemeName,
+                Individual,
+                recipientName,
+                None,
+                None,
+                Left(true),
+                (localDate, money, loanPeriod),
+                Left(incomplete),
+                dateRange.to,
+                repaymentInstalments = true,
+                Left(incomplete),
+                Left(incomplete),
+                Left(incomplete),
+                Some(security),
+                NormalMode,
+                viewOnlyUpdated = true
+              )
+              .page
+              .sections
           )
         )
-      }.withName(s"render correct view")
+      }.before(MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange))))
+        .withName("render correct view when prePopulation data missing")
     )
 
     act.like(
-      redirectToPage(onSubmit, routes.AmountOfTheLoanController.onPageLoad(srn, index1of5000, NormalMode))
+      renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
+        injected[PrePopCheckYourAnswersView].apply(
+          controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController.viewModel(
+            srn,
+            index1of5000,
+            LoansCheckAnswersUtils(mockSchemeDateService)
+              .viewModel(
+                srn,
+                index1of5000,
+                schemeName,
+                Individual,
+                recipientName,
+                None,
+                None,
+                Left(true),
+                (localDate, money, loanPeriod),
+                Right(amountOfTheLoan),
+                dateRange.to,
+                repaymentInstalments = true,
+                Right(interestOnLoan),
+                Right(false),
+                Right(Some(money)),
+                Some(security),
+                NormalMode,
+                viewOnlyUpdated = true
+              )
+              .page
+              .sections
+          )
+        )
+      }.before(MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange))))
+        .withName(s"render correct view when data complete")
     )
 
     act.like(
-      journeyRecoveryPage(onPageLoad)
-        .updateName("onPageLoad" + _)
+      redirectToPage(onSubmit, loansRoutes.AmountOfTheLoanController.onPageLoad(srn, index1of5000.value, NormalMode))
     )
 
-    act.like(
-      journeyRecoveryPage(onSubmit)
-        .updateName("onSubmit" + _)
-    )
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }
