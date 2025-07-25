@@ -19,49 +19,69 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.nonsipp.summary.LandOrPropertyCheckAnswersUtils
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
+import models._
+import play.api.i18n.MessagesApi
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import views.html.ContentTablePageView
+import views.html.PrePopCheckYourAnswersView
 import models.SchemeId.Srn
-import utils.IntUtils.{toInt, toRefined5000}
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyChosenAddressPage,
-  LandOrPropertyTotalCostPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
-import models._
-import controllers.nonsipp.landorproperty.LandOrPropertyCheckAndUpdateController._
-import play.api.i18n.MessagesApi
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 class LandOrPropertyCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentTablePageView
+  view: PrePopCheckYourAnswersView
 ) extends PSRController {
 
   def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    (
-      for {
-        address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney
-        whyLandIsHeld <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index)).getOrRecoverJourney
-        totalCost <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).getOrRecoverJourney
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            address,
-            whyLandIsHeld,
-            totalCost
+    LandOrPropertyCheckAnswersUtils
+      .landOrPropertySummaryData(srn, index, NormalMode)
+      .map { data =>
+        val sections = LandOrPropertyCheckAnswersUtils
+          .viewModel(
+            data.srn,
+            data.index,
+            data.schemeName,
+            data.landOrPropertyInUk,
+            data.landRegistryTitleNumber,
+            data.holdLandProperty,
+            data.landOrPropertyAcquire,
+            data.landOrPropertyTotalCost,
+            data.landPropertyIndependentValuation,
+            data.receivedLandType,
+            data.recipientName,
+            data.recipientDetails,
+            data.recipientReasonNoDetails,
+            data.landOrPropertySellerConnectedParty,
+            data.landOrPropertyResidential,
+            data.landOrPropertyLease,
+            data.landOrPropertyTotalIncome,
+            data.addressLookUpPage,
+            data.leaseDetails,
+            data.mode,
+            data.viewOnlyUpdated,
+            data.optYear,
+            data.optCurrentVersion,
+            data.optPreviousVersion
+          )
+          .page
+          .sections
+        Ok(
+          view(
+            LandOrPropertyCheckAndUpdateController.viewModel(
+              data.srn,
+              data.index,
+              sections
+            )
           )
         )
-      )
-    ).merge
+      }
+      .merge
   }
 
   def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
@@ -74,40 +94,18 @@ object LandOrPropertyCheckAndUpdateController {
   def viewModel(
     srn: Srn,
     index: Max5000,
-    address: Address,
-    whyLandIsHeld: SchemeHoldLandProperty,
-    totalCost: Money
-  ): FormPageViewModel[ContentTablePageViewModel] = {
-
-    val rows: List[(DisplayMessage, DisplayMessage)] = List(
-      Message("landOrPropertyCheckAndUpdate.table.one") -> Message(address.addressLine1),
-      Message("landOrPropertyCheckAndUpdate.table.two") -> Message(whyLandIsHeld.name),
-      Message("landOrPropertyCheckAndUpdate.table.three") -> Message(totalCost.displayAs)
-    )
-
-    FormPageViewModel(
+    sections: List[CheckYourAnswersSection]
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel[CheckYourAnswersViewModel](
       mode = NormalMode,
       title = "landOrPropertyCheckAndUpdate.title",
       heading = "landOrPropertyCheckAndUpdate.heading",
-      description = None,
-      page = ContentTablePageViewModel(
-        inset = None,
-        beforeTable = Some(ParagraphMessage("landOrPropertyCheckAndUpdate.paragraph")),
-        afterTable = Some(
-          ParagraphMessage("landOrPropertyCheckAndUpdate.bullet.paragraph") ++ ListMessage
-            .Bullet(
-              "landOrPropertyCheckAndUpdate.bullet.one",
-              "landOrPropertyCheckAndUpdate.bullet.two",
-              "landOrPropertyCheckAndUpdate.bullet.three"
-            )
-        ),
-        rows = rows
-      ),
+      description = Some("landOrPropertyCheckAndUpdate.description"),
+      page = CheckYourAnswersViewModel(sections),
       refresh = None,
       buttonText = "landOrPropertyCheckAndUpdate.button",
       details = None,
       onSubmit = routes.LandOrPropertyCheckAndUpdateController.onSubmit(srn, index),
       optViewOnlyDetails = None
     )
-  }
 }
