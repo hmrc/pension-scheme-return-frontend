@@ -61,8 +61,7 @@ class ErrorHandler @Inject() (
       ex
     )
 
-  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
-    logError(request, exception)
+  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] =
     exception match {
       case PsrLockedException(srn: Srn) =>
         Future.successful(
@@ -71,6 +70,7 @@ class ErrorHandler @Inject() (
           )
         )
       case GetPsrException(_, continueUrl, answersSavedDisplayVersion) =>
+        logError(request, exception)
         Future.successful(
           Redirect(
             controllers.routes.JourneyRecoveryController
@@ -81,6 +81,7 @@ class ErrorHandler @Inject() (
           )
         )
       case PostPsrException(_, continueUrl) =>
+        logError(request, exception)
         Future.successful(
           Redirect(
             controllers.routes.JourneyRecoveryController
@@ -91,7 +92,8 @@ class ErrorHandler @Inject() (
           )
         )
 
-      case _ => super.onServerError(request, exception)
+      case _ =>
+        logError(request, exception)
+        super.onServerError(request, exception)
     }
-  }
 }
