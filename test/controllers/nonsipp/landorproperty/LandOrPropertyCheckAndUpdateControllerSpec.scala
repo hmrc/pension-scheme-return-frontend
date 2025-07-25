@@ -16,17 +16,16 @@
 
 package controllers.nonsipp.landorproperty
 
-import views.html.ContentTablePageView
-import models.NormalMode
+import utils.nonsipp.summary.LandOrPropertyCheckAnswersUtils
+import views.html.PrePopCheckYourAnswersView
+import config.Constants.incomplete
+import models.{IdentitySubject, _}
+import pages.nonsipp.common.IdentityTypePage
 import eu.timepit.refined.api.Refined
 import config.RefinedTypes.OneTo5000
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import utils.IntUtils.given
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyChosenAddressPage,
-  LandOrPropertyTotalCostPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
+import pages.nonsipp.landorproperty._
 
 class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
@@ -37,25 +36,106 @@ class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec with
 
   private val schemeHoldLandProperty = schemeHoldLandPropertyGen.sample.value
 
-  private val completedUserAnswers = defaultUserAnswers
+  private val prePodDataMissingUserAnswers = defaultUserAnswers
+    .unsafeSet(LandPropertyInUKPage(srn, index), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.no("reason"))
     .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), schemeHoldLandProperty)
+    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), localDate)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index), money)
+    .unsafeSet(LandPropertyIndependentValuationPage(srn, index), false)
+    .unsafeSet(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller), IdentityType.Individual)
+    .unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), recipientName)
+    .unsafeSet(IndividualSellerNiPage(srn, index), ConditionalYesNo.no("reason"))
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index), false)
+
+  private val completedUserAnswers = prePodDataMissingUserAnswers
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index), true)
+    .unsafeSet(IsLandPropertyLeasedPage(srn, index), true)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
+    .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index), ("Lessee Name", money, localDate))
+    .unsafeSet(IsLesseeConnectedPartyPage(srn, index), false)
 
   "LandOrPropertyCheckAndUpdateController" - {
 
     act.like(
-      renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
-        injected[ContentTablePageView].apply(
+      renderView(onPageLoad, prePodDataMissingUserAnswers) { implicit app => implicit request =>
+        injected[PrePopCheckYourAnswersView].apply(
           LandOrPropertyCheckAndUpdateController.viewModel(
             srn = srn,
             index = index,
-            address = address,
-            whyLandIsHeld = schemeHoldLandProperty,
-            totalCost = money
+            sections = LandOrPropertyCheckAnswersUtils
+              .viewModel(
+                srn,
+                index,
+                schemeName,
+                true,
+                ConditionalYesNo.no("reason"),
+                schemeHoldLandProperty,
+                Some(localDate),
+                money,
+                Some(false),
+                Some(IdentityType.Individual),
+                Some(recipientName),
+                None,
+                Some("reason"),
+                Some(false),
+                Left(incomplete),
+                Left(incomplete),
+                Left(incomplete),
+                address,
+                None,
+                NormalMode,
+                true,
+                None,
+                None,
+                None
+              )
+              .page
+              .sections
           )
         )
-      }.withName(s"render correct view")
+      }.withName(s"render correct view when prePopulation data missing")
+    )
+
+    act.like(
+      renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
+        injected[PrePopCheckYourAnswersView].apply(
+          LandOrPropertyCheckAndUpdateController.viewModel(
+            srn = srn,
+            index = index,
+            sections = LandOrPropertyCheckAnswersUtils
+              .viewModel(
+                srn,
+                index,
+                schemeName,
+                true,
+                ConditionalYesNo.no("reason"),
+                schemeHoldLandProperty,
+                Some(localDate),
+                money,
+                Some(false),
+                Some(IdentityType.Individual),
+                Some(recipientName),
+                None,
+                Some("reason"),
+                Some(false),
+                Right(true),
+                Right(true),
+                Right(money),
+                address,
+                Some((Right("Lessee Name"), Right(money), Right(localDate), Right(false))),
+                NormalMode,
+                true,
+                None,
+                None,
+                None
+              )
+              .page
+              .sections
+          )
+        )
+      }.withName(s"render correct view when data complete")
     )
 
     act.like(
