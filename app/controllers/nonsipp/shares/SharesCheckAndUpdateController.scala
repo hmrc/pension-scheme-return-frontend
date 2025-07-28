@@ -16,49 +16,48 @@
 
 package controllers.nonsipp.shares
 
-import controllers.nonsipp.shares.SharesCheckAndUpdateController._
 import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
+import utils.nonsipp.summary.SharesCheckAnswersUtils
+import controllers.PSRController
 import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import models._
-import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
-import play.api.mvc._
-import config.RefinedTypes.Max5000
-import controllers.PSRController
-import views.html.ContentTablePageView
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ListMessage, Message, ParagraphMessage}
+import views.html.PrePopCheckYourAnswersView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 class SharesCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentTablePageView
+  view: PrePopCheckYourAnswersView
 ) extends PSRController {
 
   def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    (
-      for {
-        typeOfShares <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney
-        classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index)).getOrRecoverJourney
-        costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index)).getOrRecoverJourney
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            typeOfShares,
-            classOfShares,
-            costOfShares
+    SharesCheckAnswersUtils
+      .summaryData(srn, index, NormalMode)
+      .map { data =>
+        val sections = SharesCheckAnswersUtils
+          .viewModel(
+            data
+          )
+          .page
+          .sections
+        Ok(
+          view(
+            SharesCheckAndUpdateController.viewModel(
+              data.srn,
+              data.index,
+              sections
+            )
           )
         )
-      )
-    ).merge
+      }
+      .merge
   }
 
   def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
@@ -70,47 +69,19 @@ object SharesCheckAndUpdateController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
-    typeOfShares: TypeOfShares,
-    classOfShares: String,
-    costOfShares: Money
-  ): FormPageViewModel[ContentTablePageViewModel] = {
-
-    val typeOfSharesName = typeOfShares match {
-      case SponsoringEmployer => "sharesCheckAndUpdate.SponsoringEmployer"
-      case Unquoted => "sharesCheckAndUpdate.Unquoted"
-      case ConnectedParty => "sharesCheckAndUpdate.ConnectedParty"
-    }
-
-    val rows: List[(DisplayMessage, DisplayMessage)] = List(
-      Message("sharesCheckAndUpdate.table.one") -> Message(typeOfSharesName),
-      Message("sharesCheckAndUpdate.table.two") -> Message(classOfShares),
-      Message("sharesCheckAndUpdate.table.three") -> Message(costOfShares.displayAs)
-    )
-
-    FormPageViewModel(
+    index: Int,
+    sections: List[CheckYourAnswersSection]
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel[CheckYourAnswersViewModel](
       mode = NormalMode,
       title = "sharesCheckAndUpdate.title",
       heading = "sharesCheckAndUpdate.heading",
-      description = None,
-      page = ContentTablePageViewModel(
-        inset = None,
-        beforeTable = Some(ParagraphMessage("sharesCheckAndUpdate.paragraph")),
-        afterTable = Some(
-          ParagraphMessage("sharesCheckAndUpdate.bullet.paragraph") ++ ListMessage
-            .Bullet(
-              "sharesCheckAndUpdate.bullet.one",
-              "sharesCheckAndUpdate.bullet.two",
-              "sharesCheckAndUpdate.bullet.three"
-            )
-        ),
-        rows = rows
-      ),
+      description = Some("sharesCheckAndUpdate.description"),
+      page = CheckYourAnswersViewModel(sections),
       refresh = None,
       buttonText = "sharesCheckAndUpdate.button",
       details = None,
       onSubmit = routes.SharesCheckAndUpdateController.onSubmit(srn, index),
       optViewOnlyDetails = None
     )
-  }
 }
