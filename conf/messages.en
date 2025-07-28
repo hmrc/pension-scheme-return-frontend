@@ -1624,6 +1624,7 @@ loanCheckYourAnswers.section2.assetsValue.hidden = value of scheme’s assets wh
 loanCheckYourAnswers.section2.loanPeriod = Total term of loan
 loanCheckYourAnswers.section2.loanPeriod.hidden = term of loan in months
 loanCheckYourAnswers.section3.heading = Amount of the loan and payments
+loansCheckAndUpdate.isPrePop.section3.heading = Information required for amount of the loan and payments
 loanCheckYourAnswers.section3.loanAmount.total = Total amount of loan
 loanCheckYourAnswers.section3.loanAmount.total.hidden = total amount of loan
 loanCheckYourAnswers.section3.loanAmount.repayments = Capital repayments received in the period of this return
@@ -1633,6 +1634,7 @@ loanCheckYourAnswers.section3.loanAmount.outstanding.hidden = amount of loan out
 loanCheckYourAnswers.section3.loanAmount.instalments = Are the loan repayments in equal annual instalments?
 loanCheckYourAnswers.section3.loanAmount.instalments.hidden = if the loan repayments are in equal annual instalments
 loanCheckYourAnswers.section4.heading = Interest on the loan
+loansCheckAndUpdate.isPrePop.section4.heading = Information required for interest on the loan
 loanCheckYourAnswers.section4.payable = Interest payable for term of loan
 loanCheckYourAnswers.section4.payable.hidden = interest payable for term of loan
 loanCheckYourAnswers.section4.rate = Interest rate
@@ -1645,6 +1647,7 @@ loanCheckYourAnswers.section5.security.hidden = if security has been given for t
 loanCheckYourAnswers.section5.security.yes = Details of the security
 loanCheckYourAnswers.section5.security.yes.hidden = details of the security
 loanCheckYourAnswers.section6.heading = Arrears
+loansCheckAndUpdate.isPrePop.section6.heading = Information required for arrears
 loanCheckYourAnswers.section6.arrears = Are there any outstanding arrears on this loan on {0}?
 loanCheckYourAnswers.section6.arrears.hidden = if there are any outstanding arrears on this loan on {0}
 loanCheckYourAnswers.section6.arrears.yes = What is the amount of the arrears?
@@ -1655,6 +1658,8 @@ loanCheckYourAnswers.change.heading = Change details for loan of £{0} to {1}
 
 loanCheckYourAnswers.viewOnly.title = Loan
 loanCheckYourAnswers.viewOnly.heading = Loan of £{0} to {1}
+
+landOrPropertyCheckAndUpdate.lessee.heading =
 
 outstandingArrearsOnLoan.title = Are there any outstanding arrears on this loan?
 outstandingArrearsOnLoan.heading = Are there any outstanding arrears on this loan on {0}?
@@ -1709,16 +1714,10 @@ removeLoan.title = Are you sure you want to remove this loan?
 removeLoan.heading = Are you sure you want to remove the loan of £{0} to {1}?
 removeLoan.error.required = Select yes if you are sure you want to remove this loan
 
-loansCheckAndUpdate.title = Check and update the loans information
-loansCheckAndUpdate.heading = Check and update the loans information
-loansCheckAndUpdate.paragraph = You need to add data to this loan.
-loansCheckAndUpdate.table.one = Recipient’s name
-loansCheckAndUpdate.table.two = Date of the loan
-loansCheckAndUpdate.table.three = Total loan amount
-loansCheckAndUpdate.bullet.paragraph = Missing data could include:
-loansCheckAndUpdate.bullet.one = Capital Repayment details
-loansCheckAndUpdate.bullet.two = any outstanding arrears details
-loansCheckAndUpdate.button = Add missing data
+loansCheckAndUpdate.title = Review the loan information
+loansCheckAndUpdate.heading = Review the loan information
+loansCheckAndUpdate.description = You need to check the answers previously added for this loan and add the incomplete information.
+loansCheckAndUpdate.button = Add incomplete information
 
 financialDetailsCheckYourAnswersController.title = Check your answers: financial details
 financialDetailsCheckYourAnswersController.heading = Check your answers: financial details
