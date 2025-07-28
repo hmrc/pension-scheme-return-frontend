@@ -17,6 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
+import utils.nonsipp.summary.{TransfersInCYA, TransfersInCheckAnswersUtils}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -25,11 +26,10 @@ import pages.nonsipp.receivetransfer._
 import pages.nonsipp.FbVersionPage
 import models.{NormalMode, PensionSchemeType, ViewOnlyMode}
 import viewmodels.models.SectionCompleted
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import controllers.nonsipp.receivetransfer.TransfersInCYAController._
-import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
@@ -94,7 +94,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
-        viewModel(
+        TransfersInCheckAnswersUtils.viewModel(
           srn,
           memberDetails.fullName,
           index,
@@ -132,7 +132,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec with ControllerBeh
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            TransfersInCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,
