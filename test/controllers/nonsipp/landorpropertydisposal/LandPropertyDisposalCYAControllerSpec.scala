@@ -17,10 +17,10 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import services.PsrSubmissionService
+import utils.nonsipp.summary.{LandOrPropertyDisposalCheckAnswersUtils, LandOrPropertyDisposalViewModelParameters}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.FbVersionPage
 import models._
@@ -128,8 +128,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       act.like(
         renderView(onPageLoad(mode), userAnswersPartnershipBuyer) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -159,8 +159,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       act.like(
         renderView(onPageLoad(mode), userAnswersIndividualBuyer) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -190,8 +190,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       act.like(
         renderView(onPageLoad(mode), userAnswersCompanyBuyer) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -221,8 +221,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       act.like(
         renderView(onPageLoad(mode), userAnswersOtherBuyer) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -252,8 +252,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       act.like(
         renderView(onPageLoad(mode), userAnswersTransferred) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -283,8 +283,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       act.like(
         renderView(onPageLoad(mode), userAnswersOtherDisposalType) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,
@@ -358,8 +358,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec with Cont
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
+            LandOrPropertyDisposalCheckAnswersUtils.viewModel(
+              LandOrPropertyDisposalViewModelParameters(
                 srn,
                 assetIndex,
                 disposalIndex,

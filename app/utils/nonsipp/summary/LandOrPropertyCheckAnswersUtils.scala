@@ -22,6 +22,7 @@ import utils.ListUtils.ListOps
 import models.SchemeHoldLandProperty._
 import models.SchemeId.Srn
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import pages.nonsipp.common._
 import viewmodels.DisplayMessage
 import models.requests.DataRequest
@@ -34,7 +35,7 @@ import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -53,11 +54,13 @@ type LandOrPropertyData = (
   recipientDetails: Option[String],
   recipientReasonNoDetails: Option[String],
   landOrPropertySellerConnectedParty: Option[Boolean],
-  landOrPropertyResidential: Boolean,
-  landOrPropertyLease: Boolean,
-  landOrPropertyTotalIncome: Money,
+  landOrPropertyResidential: Either[String, Boolean],
+  landOrPropertyLease: Either[String, Boolean],
+  landOrPropertyTotalIncome: Either[String, Money],
   addressLookUpPage: Address,
-  leaseDetails: Option[(String, Money, LocalDate, Boolean)],
+  leaseDetails: Option[
+    (Either[String, String], Either[String, Money], Either[String, LocalDate], Either[String, Boolean])
+  ],
   mode: Mode,
   viewOnlyUpdated: Boolean,
   optYear: Option[String],
@@ -84,7 +87,11 @@ object LandOrPropertyCheckAnswersUtils
       .toList
       .flatten
 
-  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[
     Result,
     LandOrPropertyData
   ]] = Future.successful(landOrPropertySummaryData(srn, index, mode))
@@ -155,21 +162,25 @@ object LandOrPropertyCheckAnswersUtils
         ).flatten.headOption
       )
 
-      landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
-      landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
-      landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
+      landOrPropertyResidential = request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index)).getOrIncomplete
+      landOrPropertyLease = request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrIncomplete
+      landOrPropertyTotalIncome = request.userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).getOrIncomplete
 
-      leaseDetails = Option.when(landOrPropertyLease) {
-        val landOrPropertyLeaseDetailsPage =
-          request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
-        val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+      leaseDetails = landOrPropertyLease match {
+        case Right(isLeased) =>
+          Option.when(isLeased) {
+            val landOrPropertyLeaseDetailsPage =
+              request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).getOrIncomplete
+            val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).getOrIncomplete
 
-        Tuple4(
-          landOrPropertyLeaseDetailsPage._1,
-          landOrPropertyLeaseDetailsPage._2,
-          landOrPropertyLeaseDetailsPage._3,
-          leaseConnectedParty
-        )
+            Tuple4(
+              landOrPropertyLeaseDetailsPage.map(_._1),
+              landOrPropertyLeaseDetailsPage.map(_._2),
+              landOrPropertyLeaseDetailsPage.map(_._3),
+              leaseConnectedParty
+            )
+          }
+        case Left(_) => None
       }
       schemeName = request.schemeDetails.schemeName
     } yield (
@@ -242,11 +253,13 @@ object LandOrPropertyCheckAnswersUtils
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
     landOrPropertySellerConnectedParty: Option[Boolean],
-    landOrPropertyResidential: Boolean,
-    landOrPropertyLease: Boolean,
-    landOrPropertyTotalIncome: Money,
+    landOrPropertyResidential: Either[String, Boolean],
+    landOrPropertyLease: Either[String, Boolean],
+    landOrPropertyTotalIncome: Either[String, Money],
     addressLookUpPage: Address,
-    leaseDetails: Option[(String, Money, LocalDate, Boolean)],
+    leaseDetails: Option[
+      (Either[String, String], Either[String, Money], Either[String, LocalDate], Either[String, Boolean])
+    ],
     mode: Mode,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -335,10 +348,12 @@ object LandOrPropertyCheckAnswersUtils
     recipientReasonNoDetails: Option[String],
     landOrPropertySellerConnectedParty: Option[Boolean],
     landPropertyIndependentValuation: Option[Boolean],
-    leaseDetails: Option[(String, Money, LocalDate, Boolean)],
-    landOrPropertyResidential: Boolean,
-    landOrPropertyLease: Boolean,
-    landOrPropertyTotalIncome: Money,
+    leaseDetails: Option[
+      (Either[String, String], Either[String, Money], Either[String, LocalDate], Either[String, Boolean])
+    ],
+    landOrPropertyResidential: Either[String, Boolean],
+    landOrPropertyLease: Either[String, Boolean],
+    landOrPropertyTotalIncome: Either[String, Money],
     addressLookUpPage: Address,
     mode: Mode
   ): List[CheckYourAnswersSection] =
@@ -752,19 +767,26 @@ object LandOrPropertyCheckAnswersUtils
   private def leaseDetailsAndIncome(
     srn: Srn,
     index: Max5000,
-    landOrPropertyResidential: Boolean,
-    landOrPropertyLease: Boolean,
-    landOrPropertyTotalIncome: Money,
+    landOrPropertyResidential: Either[String, Boolean],
+    landOrPropertyLease: Either[String, Boolean],
+    landOrPropertyTotalIncome: Either[String, Money],
     address: String,
     mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
+        if (landOrPropertyResidential.isLeft || landOrPropertyLease.isLeft || landOrPropertyTotalIncome.isLeft) {
+          Some(Heading2.medium(("landOrPropertyCheckAndUpdate.lessee.heading", address)))
+        } else {
+          Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address)))
+        },
         List(
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section4.residential", address),
-            if (landOrPropertyResidential) "site.yes" else "site.no"
+            landOrPropertyResidential match {
+              case Left(value) => s"$value"
+              case Right(value) => if (value) "site.yes" else "site.no"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
@@ -775,7 +797,10 @@ object LandOrPropertyCheckAnswersUtils
           ),
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section4.propertyLease", address),
-            if (landOrPropertyLease) "site.yes" else "site.no"
+            landOrPropertyLease match {
+              case Left(value) => s"$value"
+              case Right(value) => if (value) "site.yes" else "site.no"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
@@ -784,7 +809,10 @@ object LandOrPropertyCheckAnswersUtils
           ),
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
-            s"£${landOrPropertyTotalIncome.displayAs}"
+            landOrPropertyTotalIncome match {
+              case Left(value) => s"$value"
+              case Right(value) => s"£${value.displayAs}"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
@@ -800,10 +828,10 @@ object LandOrPropertyCheckAnswersUtils
   private def leaseDetailsSection(
     srn: Srn,
     index: Max5000,
-    leaseName: String,
-    leaseValue: Money,
-    leaseDate: LocalDate,
-    leaseConnectedParty: Boolean,
+    leaseName: Either[String, String],
+    leaseValue: Either[String, Money],
+    leaseDate: Either[String, LocalDate],
+    leaseConnectedParty: Either[String, Boolean],
     mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
@@ -811,8 +839,11 @@ object LandOrPropertyCheckAnswersUtils
         Some(Heading2.medium("landOrPropertyCYA.section5.heading")),
         List(
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.leaseName", leaseName.show),
-            s"${leaseName.show}"
+            Message("landOrPropertyCYA.section5.leaseName"),
+            leaseName match {
+              case Left(value) => s"$value"
+              case Right(value) => s"$value"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
@@ -822,8 +853,11 @@ object LandOrPropertyCheckAnswersUtils
             ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseName.hidden")
           ),
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.leaseValue", leaseValue.displayAs),
-            s"£${leaseValue.displayAs}"
+            Message("landOrPropertyCYA.section5.leaseValue"),
+            leaseValue match {
+              case Left(value) => s"$value"
+              case Right(value) => s"£${value.displayAs}"
+            }
           ).withAction(
             SummaryAction(
               "site.change",
@@ -832,18 +866,30 @@ object LandOrPropertyCheckAnswersUtils
                 .url + "#leaseValue"
             ).withVisuallyHiddenContent("landOrPropertyCYA.section5.assetsValue.hidden")
           ),
-          CheckYourAnswersRowViewModel("landOrPropertyCYA.section5.leaseDate", leaseDate.show)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
-                  .onPageLoad(srn, index, mode)
-                  .url
-              ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseDate.hidden")
-            ),
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.connectedParty", leaseName.show),
-            if (leaseConnectedParty) "site.yes" else "site.no"
+            Message("landOrPropertyCYA.section5.leaseDate"),
+            leaseDate match {
+              case Left(value) => s"$value"
+              case Right(value) => value.show
+            }
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
+                .onPageLoad(srn, index, mode)
+                .url
+            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseDate.hidden")
+          ),
+          CheckYourAnswersRowViewModel(
+            if (leaseConnectedParty.isLeft) {
+              Message("landOrPropertyCheckAndUpdate.lessee.connectedParty")
+            } else {
+              Message("landOrPropertyCYA.section5.connectedParty", leaseName.show)
+            },
+            leaseConnectedParty match {
+              case Left(value) => s"$value"
+              case Right(value) => if (value) "site.yes" else "site.no"
+            }
           ).withAction(
             SummaryAction(
               "site.change",

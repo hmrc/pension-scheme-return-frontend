@@ -21,6 +21,7 @@ import play.api.mvc._
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import models.requests.DataRequest
 import config.RefinedTypes.Max5000
 import controllers.PsrControllerHelpers
@@ -31,7 +32,7 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -69,7 +70,11 @@ object MoneyBorrowedCheckAnswersUtils extends PsrControllerHelpers with CheckAns
       .toList
       .flatten
 
-  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[
     Result,
     MoneyBorrowedData
   ]] = Future.successful(summaryData(srn, index, mode))

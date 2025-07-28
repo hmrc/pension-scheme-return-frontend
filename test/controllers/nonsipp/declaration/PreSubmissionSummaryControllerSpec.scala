@@ -169,6 +169,12 @@ class PreSubmissionSummaryControllerSpec
         content should include("<h1 class=\"govuk-heading-xl\">Loans</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Other assets</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Money borrowed</h1>")
+
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of land or property</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of bonds</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of shares</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of other assets</h1>")
+
       }
     }
   }

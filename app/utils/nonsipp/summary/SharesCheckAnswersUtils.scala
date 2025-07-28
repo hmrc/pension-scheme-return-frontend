@@ -21,6 +21,7 @@ import utils.ListUtils.ListOps
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import utils.IntUtils.toInt
 import cats.implicits.toShow
+import uk.gov.hmrc.http.HeaderCarrier
 import pages.nonsipp.common._
 import viewmodels.DisplayMessage
 import models.requests.DataRequest
@@ -35,7 +36,7 @@ import models.{SchemeHoldShare, _}
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -82,7 +83,11 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
       .toList
       .flatten
 
-  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using request: DataRequest[AnyContent]): Future[Either[
+  def summaryDataAsync(srn: Srn, index: Max5000, mode: Mode)(using
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[
     Result,
     SharesData
   ]] = Future.successful(summaryData(srn, index, mode))

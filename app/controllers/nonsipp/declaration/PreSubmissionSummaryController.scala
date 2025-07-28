@@ -16,15 +16,18 @@
 
 package controllers.nonsipp.declaration
 
-import services.SchemeDateService
+import services.{SaveService, SchemeDateService}
+import viewmodels.implicits._
 import play.api.mvc._
 import utils.nonsipp.summary._
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import models.NormalMode
 import play.api.i18n._
 import views.html.SummaryView
 import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{DateRange, NormalMode}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SummaryPageEntry, _}
 
@@ -37,25 +40,37 @@ class PreSubmissionSummaryController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: SummaryView,
-  val schemeDateService: SchemeDateService
+  val schemeDateService: SchemeDateService,
+  val saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    val landOrPropertyDisposalCheckAnswersUtils = LandOrPropertyDisposalCheckAnswersUtils(saveService)
     val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
+
+    val schemeDate = schemeDateService
+      .taxYearOrAccountingPeriods(srn)
+      .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
+      .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
 
     (for {
       allLandOrPropertyEntries <- LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allLandOrPropertyDisposalEntries <- landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
       allBondsEntries <- BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allBondsDisposalEntries <- BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
       allSharesEntries <- SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allSharesDisposalEntries <- SharesDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
       allLoansEntries <- loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
       allOtherAssetsEntries <- OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      allOtherAssetDisposalEntries <- OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
       allMoneyBorrowedEntries <- MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
       allEntries =
-        allLandOrPropertyEntries ++ allBondsEntries ++ allSharesEntries ++ allLoansEntries ++ allOtherAssetsEntries ++
-          allMoneyBorrowedEntries
-    } yield Ok(view(viewModel(srn, allEntries), ""))).value.map(_.merge)
+        allLandOrPropertyEntries ++ allLandOrPropertyDisposalEntries ++ allBondsEntries ++ allBondsDisposalEntries ++
+          allSharesEntries ++ allSharesDisposalEntries ++ allLoansEntries ++ allOtherAssetsEntries ++
+          allOtherAssetDisposalEntries ++ allMoneyBorrowedEntries
+    } yield Ok(view(viewModel(srn, allEntries), schemeDate))).value.map(_.merge)
   }
 
   def viewModel(
