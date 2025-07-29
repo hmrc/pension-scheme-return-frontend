@@ -60,7 +60,7 @@ type TransfersOutData = (
 
 object TransfersOutCheckAnswersUtils extends CheckAnswersUtils[Max300, TransfersOutData] with PsrControllerHelpers {
 
-  override def indexes(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
+  override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
     .map(MemberTransferOutProgress.all())
     .filter((_, progressMap) => progressMap.exists((_, status) => status.completed))
     .keys

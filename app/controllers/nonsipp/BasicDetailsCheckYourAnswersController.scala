@@ -17,37 +17,28 @@
 package controllers.nonsipp
 
 import services._
+import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import play.api.mvc._
-import _root_.config.RefinedTypes.Max3
-import utils.ListUtils.ListOps
+import utils.nonsipp.summary.BasicDetailsCheckAnswersUtils
 import controllers.{nonsipp, PSRController}
 import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
-import cats.implicits.{toShow, toTraverseOps}
+import cats.implicits.toTraverseOps
 import controllers.actions._
-import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import _root_.config.Constants._
 import utils.nonsipp.SchemeDetailNavigationUtils
+import models._
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
-import viewmodels.implicits._
-import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
-import cats.data.{EitherT, NonEmptyList}
+import cats.data.EitherT
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp._
 import navigation.Navigator
-import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
-import models._
-import play.api.i18n._
-import viewmodels.Margin
-import viewmodels.DisplayMessage._
-import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class BasicDetailsCheckYourAnswersController @Inject() (
@@ -84,7 +75,8 @@ class BasicDetailsCheckYourAnswersController @Inject() (
     request: DataRequest[AnyContent]
   ): Future[Result] = {
     val journeyByPassedF =
-      if (isUserAnswersAlreadySubmittedAndNotModified(srn)) isJourneyBypassed(srn) else Future.successful(Right(false))
+      if (BasicDetailsCheckAnswersUtils.isUserAnswersAlreadySubmittedAndNotModified(srn)) isJourneyBypassed(srn)
+      else Future.successful(Right(false))
     journeyByPassedF.map(eitherJourneyNavigationResultOrRecovery =>
       schemeDateService.taxYearOrAccountingPeriods(srn) match {
         case Some(periods) =>
@@ -101,7 +93,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
               val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
               val result = Ok(
                 view(
-                  viewModel(
+                  BasicDetailsCheckAnswersUtils.viewModel(
                     srn,
                     mode,
                     schemeMemberNumbers,
@@ -213,270 +205,4 @@ class BasicDetailsCheckYourAnswersController @Inject() (
     howManyDeferredMembers = schemeMemberNumbers.noOfDeferredMembers,
     howManyPensionerMembers = schemeMemberNumbers.noOfPensionerMembers
   )
-}
-
-object BasicDetailsCheckYourAnswersController {
-  def viewModel(
-    srn: Srn,
-    mode: Mode,
-    schemeMemberNumbers: SchemeMemberNumbers,
-    activeBankAccount: Boolean,
-    whyNoBankAccount: Option[String],
-    whichTaxYearPage: Option[DateRange],
-    taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
-    schemeAdminName: String,
-    schemeDetails: SchemeDetails,
-    pensionSchemeId: PensionSchemeId,
-    isPSP: Boolean,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    journeyByPassed: Boolean,
-    showBackLink: Boolean = true
-  )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = "basicDetailsCheckYourAnswersController.schemeDetails.normal.title",
-      heading = "basicDetailsCheckYourAnswersController.schemeDetails.normal.heading",
-      description = Some(ParagraphMessage("basicDetailsCheckYourAnswers.paragraph")),
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          },
-          activeBankAccount,
-          whyNoBankAccount,
-          whichTaxYearPage,
-          taxYearOrAccountingPeriods,
-          schemeMemberNumbers,
-          schemeAdminName,
-          schemeDetails,
-          pensionSchemeId,
-          isPSP
-        )
-      ).withMarginBottom(Margin.Fixed60Bottom),
-      refresh = None,
-      buttonText = if (journeyByPassed) {
-        "site.view.submission.confirmation"
-      } else {
-        "site.saveAndContinue"
-      },
-      onSubmit = if (journeyByPassed) {
-        controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
-      } else {
-        routes.BasicDetailsCheckYourAnswersController.onSubmit(srn)
-      },
-      showBackLink = showBackLink,
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if currentVersion > 1 && previousVersion > 0 =>
-                Some(
-                  LinkMessage(
-                    "basicDetailsCheckYourAnswersController.viewOnly.link",
-                    controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-                      .onPreviousViewOnly(
-                        srn,
-                        year,
-                        currentVersion,
-                        previousVersion
-                      )
-                      .url
-                  )
-                )
-              case _ => None
-            },
-            submittedText =
-              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-            title = "basicDetailsCheckYourAnswersController.viewOnly.title",
-            heading = "basicDetailsCheckYourAnswersController.viewOnly.heading",
-            buttonText = if (journeyByPassed) {
-              "site.view.submission.confirmation"
-            } else {
-              "site.return.to.tasklist"
-            },
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-                  .onSubmit(srn)
-            },
-            showBackLink = showBackLink
-          )
-        )
-      } else {
-        None
-      }
-    )
-
-  private def sections(
-    srn: Srn,
-    mode: Mode,
-    activeBankAccount: Boolean,
-    whyNoBankAccount: Option[String],
-    whichTaxYearPage: Option[DateRange],
-    taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
-    schemeMemberNumbers: SchemeMemberNumbers,
-    schemeAdminName: String,
-    schemeDetails: SchemeDetails,
-    pensionSchemeId: PensionSchemeId,
-    isPSP: Boolean
-  )(implicit
-    messages: Messages
-  ): List[CheckYourAnswersSection] = List(
-    CheckYourAnswersSection(
-      Some(Heading2.medium("basicDetailsCheckYourAnswersController.schemeDetails.heading")),
-      List(
-        CheckYourAnswersRowViewModel(
-          "basicDetailsCheckYourAnswersController.schemeDetails.schemeName",
-          schemeDetails.schemeName
-        ).withOneHalfWidth(),
-        CheckYourAnswersRowViewModel(
-          "basicDetailsCheckYourAnswersController.schemeDetails.pstr",
-          schemeDetails.pstr
-        ).withOneHalfWidth(),
-        CheckYourAnswersRowViewModel(
-          if (isPSP) {
-            "basicDetailsCheckYourAnswersController.schemeDetails.schemePractitionerName"
-          } else {
-            "basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName"
-          },
-          schemeAdminName
-        ).withOneHalfWidth(),
-        CheckYourAnswersRowViewModel(
-          if (isPSP) {
-            "basicDetailsCheckYourAnswersController.schemeDetails.practitionerId"
-          } else {
-            "basicDetailsCheckYourAnswersController.schemeDetails.adminId"
-          },
-          pensionSchemeId.value
-        ).withOneHalfWidth()
-      ) ++
-        (taxYearOrAccountingPeriods match {
-          case Left(taxYear) =>
-            List(
-              CheckYourAnswersRowViewModel(
-                "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
-                taxYear.show
-              ).withChangeAction(
-                controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
-                hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
-              ).withOneHalfWidth()
-            )
-          case Right(accountingPeriods) =>
-            List(
-              CheckYourAnswersRowViewModel(
-                "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
-                whichTaxYearPage.get.show
-              ).withChangeAction(
-                controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
-                hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
-              ).withOneHalfWidth()
-            ) ++
-              List(
-                CheckYourAnswersRowViewModel(
-                  Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod"),
-                  accountingPeriods.map(_._1.show).toList.mkString("\n")
-                ).withChangeAction(
-                  controllers.nonsipp.accountingperiod.routes.AccountingPeriodListController
-                    .onPageLoad(srn, CheckMode)
-                    .url,
-                  hidden = "basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden"
-                ).withOneHalfWidth()
-              )
-        })
-        :+ CheckYourAnswersRowViewModel(
-          Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"),
-          if (activeBankAccount: Boolean) "site.yes" else "site.no"
-        ).withChangeAction(
-          controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, CheckMode).url,
-          hidden = "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden"
-        ).withOneHalfWidth()
-        :?+ whyNoBankAccount.map(reason =>
-          CheckYourAnswersRowViewModel(
-            Message("basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount"),
-            reason
-          ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode).url,
-            hidden = "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount.hidden"
-          ).withOneHalfWidth()
-        )
-    ),
-    CheckYourAnswersSection(
-      Some(Heading2.medium("basicDetailsCheckYourAnswersController.memberDetails.heading")),
-      List(
-        CheckYourAnswersRowViewModel(
-          Message(
-            "basicDetailsCheckYourAnswersController.memberDetails.activeMembers",
-            schemeDetails.schemeName,
-            taxEndDate(taxYearOrAccountingPeriods).show
-          ),
-          schemeMemberNumbers.noOfActiveMembers.toString
-        ).withChangeAction(
-          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
-            .onPageLoad(srn, mode)
-            .url + "#activeMembers",
-          hidden = Message(
-            "basicDetailsCheckYourAnswersController.memberDetails.activeMembers.hidden",
-            taxEndDate(taxYearOrAccountingPeriods).show
-          )
-        ).withOneHalfWidth(),
-        CheckYourAnswersRowViewModel(
-          Message(
-            "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers",
-            schemeDetails.schemeName,
-            taxEndDate(taxYearOrAccountingPeriods).show
-          ),
-          schemeMemberNumbers.noOfDeferredMembers.toString
-        ).withChangeAction(
-          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
-            .onPageLoad(srn, mode)
-            .url + "#deferredMembers",
-          hidden = Message(
-            "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden",
-            taxEndDate(taxYearOrAccountingPeriods).show
-          )
-        ).withOneHalfWidth(),
-        CheckYourAnswersRowViewModel(
-          Message(
-            "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers",
-            schemeDetails.schemeName,
-            taxEndDate(taxYearOrAccountingPeriods).show
-          ),
-          schemeMemberNumbers.noOfPensionerMembers.toString
-        ).withChangeAction(
-          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
-            .onPageLoad(srn, mode)
-            .url + "#pensionerMembers",
-          hidden = Message(
-            "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden",
-            taxEndDate(taxYearOrAccountingPeriods).show
-          )
-        ).withOneHalfWidth()
-      )
-    )
-  )
-
-  private def isUserAnswersAlreadySubmittedAndNotModified(
-    srn: Srn
-  )(implicit request: DataRequest[AnyContent]): Boolean = {
-    val isAlreadySubmitted: Boolean = request.userAnswers.get(FbStatus(srn)).exists(_.isSubmitted)
-    val isPureAnswerStayUnchanged: Boolean = request.pureUserAnswers.fold(false)(_.data == request.userAnswers.data)
-    isAlreadySubmitted && isPureAnswerStayUnchanged
-  }
-
-  private def taxEndDate(taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]]): LocalDate =
-    taxYearOrAccountingPeriods match {
-      case Left(taxYear) => taxYear.to
-      case Right(periods) => periods.toList.maxBy(_._1.to)._1.to
-    }
 }

@@ -19,10 +19,10 @@ package controllers.nonsipp
 import play.api.test.FakeRequest
 import services._
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
+import utils.nonsipp.summary.BasicDetailsCheckAnswersUtils
 import play.api.inject.bind
 import utils.IntUtils.given
 import cats.implicits.toShow
-import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import pages.nonsipp._
 import models.backend.responses.PsrVersionsResponse
 import org.mockito.stubbing.OngoingStubbing
@@ -105,7 +105,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
     act.like(
       renderView(onPageLoad, currentTaxYearUserAnswersWithFewMembers) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
+          BasicDetailsCheckAnswersUtils.viewModel(
             srn,
             NormalMode,
             memberNumbersUnderThreshold,
@@ -142,7 +142,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
         currentTaxYearWithFewMembersAlreadySubmittedUserAnswer
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
+          BasicDetailsCheckAnswersUtils.viewModel(
             srn,
             CheckMode,
             memberNumbersUnderThreshold,
@@ -179,7 +179,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
         currentTaxYearWithManyMembersAlreadySubmittedUserAnswer
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
+          BasicDetailsCheckAnswersUtils.viewModel(
             srn,
             CheckMode,
             memberNumbersOverThreshold,
@@ -514,7 +514,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            BasicDetailsCheckAnswersUtils.viewModel(
               srn,
               ViewOnlyMode,
               memberNumbersUnderThreshold,
@@ -544,7 +544,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            BasicDetailsCheckAnswersUtils.viewModel(
               srn,
               ViewOnlyMode,
               memberNumbersOverThreshold,
@@ -580,7 +580,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
         optPreviousAnswers = None
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
+          BasicDetailsCheckAnswersUtils.viewModel(
             srn,
             ViewOnlyMode,
             memberNumbersOverThreshold,
@@ -726,21 +726,22 @@ class BasicDetailsCheckYourAnswersControllerSpec
     schemeDetails: SchemeDetails = defaultSchemeDetails,
     pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value,
     journeyByPassed: Boolean = false
-  )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
-    srn,
-    mode,
-    schemeMemberNumbers,
-    activeBankAccount,
-    whyNoBankAccount,
-    whichTaxYearPage,
-    taxYearOrAccountingPeriods,
-    schemeAdminName,
-    schemeDetails,
-    pensionSchemeId,
-    pensionSchemeId.isPSP,
-    viewOnlyUpdated = false,
-    journeyByPassed = journeyByPassed
-  )
+  )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
+    BasicDetailsCheckAnswersUtils.viewModel(
+      srn,
+      mode,
+      schemeMemberNumbers,
+      activeBankAccount,
+      whyNoBankAccount,
+      whichTaxYearPage,
+      taxYearOrAccountingPeriods,
+      schemeAdminName,
+      schemeDetails,
+      pensionSchemeId,
+      pensionSchemeId.isPSP,
+      viewOnlyUpdated = false,
+      journeyByPassed = journeyByPassed
+    )
 
   private def mockTaxYear(
     taxYear: DateRange

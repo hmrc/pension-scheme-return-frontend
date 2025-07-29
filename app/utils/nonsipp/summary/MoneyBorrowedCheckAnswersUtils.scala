@@ -61,7 +61,7 @@ object MoneyBorrowedCheckAnswersUtils extends PsrControllerHelpers with CheckAns
   override def subheading(data: MoneyBorrowedData): Option[DisplayMessage] =
     Some(Message("nonsipp.summary.moneyBorrowed.subheading", data.lenderName))
 
-  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max5000] =
     request.userAnswers
       .map(MoneyBorrowedProgress.all())
       .filter(_._2.completed)

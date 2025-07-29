@@ -122,7 +122,7 @@ object TransfersInCheckAnswersUtils extends CheckAnswersUtils[Max300, TransfersI
       request.previousVersion
     )
 
-  override def indexes(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
+  override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
     .map(ReceiveTransferProgress.all())
     .filter { case (_, status) => status.exists(_._2.completed) }
     .keys

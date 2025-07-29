@@ -206,7 +206,7 @@ class LandOrPropertyDisposalCheckAnswersUtils(saveService: SaveService)
     )).value
   }
 
-  override def indexes(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
+  override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
     request.userAnswers
       .map(LandOrPropertyDisposalProgress.all())
       .flatMap { case (lpIndex, disposals) =>

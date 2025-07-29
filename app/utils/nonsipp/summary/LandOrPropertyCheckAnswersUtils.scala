@@ -78,7 +78,7 @@ object LandOrPropertyCheckAnswersUtils
   override def subheading(data: LandOrPropertyData): Option[DisplayMessage] =
     Some(Message("nonsipp.summary.landOrProperty.subheading", data.addressLookUpPage.addressLine1))
 
-  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max5000] =
     request.userAnswers
       .map(LandOrPropertyProgress.all())
       .filter(_._2.completed)

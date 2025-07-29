@@ -18,23 +18,21 @@ package controllers.nonsipp.membercontributions
 
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
+import pages.nonsipp.membercontributions.{MemberContributionsCYAPage, TotalMemberContributionPage}
 import play.api.mvc._
 import org.slf4j.LoggerFactory
-import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
-import utils.IntUtils.{toInt, toRefined300}
+import utils.nonsipp.summary.MemberContributionsCheckAnswersUtils
+import utils.IntUtils.toRefined300
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
-import viewmodels.implicits._
-import pages.nonsipp.membercontributions.{MemberContributionsCYAPage, TotalMemberContributionPage}
 import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -84,7 +82,7 @@ class MemberContributionsCYAController @Inject() (
         request.userAnswers.get(TotalMemberContributionPage(srn, index)).getOrRecoverJourney { contribution =>
           Ok(
             view(
-              viewModel(
+              MemberContributionsCheckAnswersUtils.viewModel(
                 srn,
                 memberDetails.fullName,
                 index,
@@ -131,105 +129,4 @@ class MemberContributionsCYAController @Inject() (
         )
       )
     }
-}
-
-object MemberContributionsCYAController {
-  def viewModel(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    contributions: Money,
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = mode
-        .fold(
-          normal = "memberContributionCYA.title",
-          check = "memberContributionCYA.change.title",
-          viewOnly = "memberContributionCYA.viewOnly.title"
-        ),
-      heading = mode.fold(
-        normal = "memberContributionCYA.heading",
-        check = Message(
-          "memberContributionCYA.change.heading",
-          memberName
-        ),
-        viewOnly = "memberContributionCYA.viewOnly.heading"
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          memberName,
-          index,
-          contributions,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          }
-        )
-      ),
-      refresh = None,
-      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-        .onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "memberContributionCYA.viewOnly.title",
-            heading = Message("memberContributionCYA.viewOnly.heading", memberName),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                  .onSubmit(srn, index, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
-    )
-
-  private def sections(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    contributions: Money,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("memberContributionCYA.section.memberName.header"),
-            Message(memberName)
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("memberContributionCYA.section.memberName", memberName),
-            Message("memberContributionCYA.section.amount", contributions.displayAs)
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                .onSubmit(srn, index, mode)
-                .url
-            ).withVisuallyHiddenContent(Message("memberContributionCYA.section.hide", memberName))
-          )
-        )
-      )
-    )
-
 }

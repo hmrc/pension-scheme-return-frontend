@@ -74,7 +74,7 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
   override def subheading(data: LoansData): Option[DisplayMessage] =
     Some(Message("nonsipp.summary.loans.subheading", data.recipientName))
 
-  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max5000] =
     request.userAnswers
       .map(LoansProgress.all())
       .filter(_._2.completed)
