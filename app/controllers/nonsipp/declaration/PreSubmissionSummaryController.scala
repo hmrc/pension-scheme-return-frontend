@@ -56,21 +56,43 @@ class PreSubmissionSummaryController @Inject() (
       .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
 
     List(
+      // scheme details
       BasicDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
-      MemberContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      FinancialDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+
+      // members
+      MemberDetailsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // member payments
       EmployerContributionsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      UnallocatedContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      MemberContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
       TransfersInCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
       TransfersOutCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      PclsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      MemberPaymentsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      MemberSurrenderedBenefitsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // loans
+      loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // shares
       SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
       SharesDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // land or property
+      LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // bonds
+      BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // other assets
+      TotalValueQuotedSharesCheckAnswersUtils.sectionEntries(srn, NormalMode),
       OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
     ).sequence
       .map(_.flatten)
       .map(entries => Ok(view(viewModel(srn, entries), schemeDate)))

@@ -17,8 +17,8 @@
 package controllers.nonsipp.totalvaluequotedshares
 
 import services.{PsrSubmissionService, SchemeDateService}
+import utils.nonsipp.summary.TotalValueQuotedSharesCheckAnswersUtils
 import play.api.inject.bind
-import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage, WhichTaxYearPage}
 import org.mockito.stubbing.OngoingStubbing
 import models._
@@ -76,7 +76,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
 
     act.like(renderView(onPageLoad, userAnswersWithTaxYear) { implicit app => implicit request =>
       injected[CYAWithRemove].apply(
-        viewModel(
+        TotalValueQuotedSharesCheckAnswersUtils.viewModel(
           srn,
           totalCost = Some(money),
           Left(dateRange),
@@ -131,7 +131,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           optPreviousAnswers = Some(previousUserAnswers)
         ) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            TotalValueQuotedSharesCheckAnswersUtils.viewModel(
               srn,
               Some(money),
               Left(dateRange),
@@ -152,7 +152,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           optPreviousAnswers = Some(previousUserAnswers)
         ) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            TotalValueQuotedSharesCheckAnswersUtils.viewModel(
               srn,
               Some(Money.zero),
               Left(dateRange),
@@ -173,7 +173,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           optPreviousAnswers = Some(previousUserAnswers)
         ) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            TotalValueQuotedSharesCheckAnswersUtils.viewModel(
               srn,
               totalCost = None,
               Left(dateRange),
@@ -197,7 +197,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           optPreviousAnswers = Some(previousUserAnswers)
         ) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            TotalValueQuotedSharesCheckAnswersUtils.viewModel(
               srn,
               Some(otherMoney),
               Left(dateRange),
@@ -228,7 +228,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec with Co
           optPreviousAnswers = Some(previousUserAnswers)
         ) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            TotalValueQuotedSharesCheckAnswersUtils.viewModel(
               srn,
               totalCost = Some(money),
               Left(dateRange),

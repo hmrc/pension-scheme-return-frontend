@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberdetails
 
 import services.PsrSubmissionService
-import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
+import utils.nonsipp.summary.MemberDetailsCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -96,7 +96,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
         renderView(onPageLoad(mode), userAnswersWithNino)(implicit app =>
           implicit request =>
             injected[CheckYourAnswersView].apply(
-              viewModel(
+              MemberDetailsCheckAnswersUtils.viewModel(
                 index,
                 srn,
                 mode,
@@ -114,7 +114,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
         renderView(onPageLoad(mode), userAnswersWithoutNino)(implicit app =>
           implicit request =>
             injected[CheckYourAnswersView].apply(
-              viewModel(
+              MemberDetailsCheckAnswersUtils.viewModel(
                 index,
                 srn,
                 mode,
@@ -264,7 +264,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
     "viewModel" - {
 
       def buildViewModel(mode: Mode) =
-        viewModel(
+        MemberDetailsCheckAnswersUtils.viewModel(
           index,
           srn,
           mode,
@@ -298,7 +298,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
 
       "contain all rows if has nino is true and nino is present" in {
         val vm =
-          viewModel(
+          MemberDetailsCheckAnswersUtils.viewModel(
             index,
             srn,
             NormalMode,
@@ -313,7 +313,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
 
       "contain all rows if has nino is false and no nino reason is present" in {
         val vm =
-          viewModel(
+          MemberDetailsCheckAnswersUtils.viewModel(
             index,
             srn,
             NormalMode,
@@ -347,7 +347,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec with C
         optPreviousAnswers = Some(previousUserAnswers)
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
+          MemberDetailsCheckAnswersUtils.viewModel(
             index,
             srn,
             ViewOnlyMode,
