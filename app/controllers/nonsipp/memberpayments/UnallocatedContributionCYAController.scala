@@ -17,29 +17,24 @@
 package controllers.nonsipp.memberpayments
 
 import services.PsrSubmissionService
-import viewmodels.implicits._
 import play.api.mvc._
+import utils.nonsipp.summary.UnallocatedContributionsCheckAnswersUtils
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import controllers.nonsipp.routes
 import controllers.actions.IdentifyAndRequireData
+import models._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import pages.nonsipp.memberpayments.{UnallocatedContributionCYAPage, UnallocatedEmployerAmountPage}
 import models.requests.DataRequest
 import views.html.CYAWithRemove
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
-import utils.DateTimeUtils.localDateTimeShow
-import models._
-import pages.nonsipp.memberpayments.{UnallocatedContributionCYAPage, UnallocatedEmployerAmountPage}
-import viewmodels.DisplayMessage._
-import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class UnallocatedContributionCYAController @Inject() (
@@ -73,7 +68,7 @@ class UnallocatedContributionCYAController @Inject() (
   ): Result =
     Ok(
       view(
-        UnallocatedContributionCYAController.viewModel(
+        UnallocatedContributionsCheckAnswersUtils.viewModel(
           srn,
           request.schemeDetails.schemeName,
           request.userAnswers.get(UnallocatedEmployerAmountPage(srn)),
@@ -127,129 +122,4 @@ class UnallocatedContributionCYAController @Inject() (
       onPageLoadCommon(srn, ViewOnlyMode, showBackLink)
     }
 
-}
-
-object UnallocatedContributionCYAController {
-  def viewModel(
-    srn: Srn,
-    schemeName: String,
-    unallocatedAmount: Option[Money],
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    showBackLink: Boolean = true
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = mode
-        .fold(
-          normal = "unallocatedEmployerCYA.title",
-          check = "unallocatedEmployerCYA.change.title",
-          viewOnly = "unallocatedEmployerCYA.viewOnly.title"
-        ),
-      heading = mode.fold(
-        normal = "unallocatedEmployerCYA.heading",
-        check = Message(
-          "unallocatedEmployerCYA.change.heading",
-          schemeName
-        ),
-        viewOnly = "unallocatedEmployerCYA.viewOnly.heading"
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          schemeName,
-          unallocatedAmount,
-          mode
-        )
-      ),
-      refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
-      onSubmit = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-        .onSubmit(srn, mode),
-      optViewOnlyDetails = Option.when(mode == ViewOnlyMode)(
-        ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if currentVersion > 1 && previousVersion > 0 =>
-              Some(
-                LinkMessage(
-                  "unallocatedEmployerCYA.viewOnly.link",
-                  controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-                    .onPreviousViewOnly(
-                      srn,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
-              )
-            case _ => None
-          },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-          title = "unallocatedEmployerCYA.viewOnly.title",
-          heading = "unallocatedEmployerCYA.viewOnly.heading",
-          buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-              controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-            case _ =>
-              controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-                .onSubmit(srn, mode)
-          }
-        )
-      ),
-      showBackLink = showBackLink
-    )
-
-  private def sections(
-    srn: Srn,
-    schemeName: String,
-    unallocatedAmount: Option[Money],
-    mode: Mode
-  ): List[CheckYourAnswersSection] = {
-    val rows = (unallocatedAmount, mode) match {
-      case (None, ViewOnlyMode) =>
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("unallocatedEmployerCYA.section.view.none", schemeName),
-            Message("site.no")
-          )
-        )
-      case (Some(amount), mode) =>
-        val newMode = mode match {
-          case ViewOnlyMode => NormalMode
-          case _ => mode
-        }
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("unallocatedEmployerCYA.section.schemeName", schemeName),
-            Message("unallocatedEmployerCYA.section.amount", amount.displayAs)
-          ).with2Actions(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-                .onSubmit(srn, newMode)
-                .url
-            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName)),
-            SummaryAction(
-              "site.remove",
-              controllers.nonsipp.memberpayments.routes.RemoveUnallocatedAmountController.onSubmit(srn, newMode).url
-            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName))
-          )
-        )
-      case _ => Nil
-    }
-
-    List(CheckYourAnswersSection(heading = None, rows))
-  }
 }

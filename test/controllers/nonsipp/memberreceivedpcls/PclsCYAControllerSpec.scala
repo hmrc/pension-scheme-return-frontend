@@ -18,7 +18,9 @@ package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import utils.nonsipp.summary.PclsCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
@@ -27,8 +29,6 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import play.api.inject.bind
-import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
 
 class PclsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
@@ -73,7 +73,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
-        viewModel(
+        PclsCheckAnswersUtils.viewModel(
           srn,
           memberDetails.fullName,
           index,
@@ -109,7 +109,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            PclsCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,

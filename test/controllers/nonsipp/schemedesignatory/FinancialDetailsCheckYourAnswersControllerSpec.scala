@@ -19,11 +19,11 @@ package controllers.nonsipp.schemedesignatory
 import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.schemedesignatory._
+import utils.nonsipp.summary.FinancialDetailsCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage, WhichTaxYearPage}
-import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import org.mockito.stubbing.OngoingStubbing
 import models._
 import org.mockito.ArgumentMatchers.any
@@ -79,7 +79,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
-        viewModel(
+        FinancialDetailsCheckAnswersUtils.viewModel(
           srn,
           NormalMode,
           howMuchCashPage = Some(moneyInPeriod),
@@ -146,7 +146,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            FinancialDetailsCheckAnswersUtils.viewModel(
               srn,
               ViewOnlyMode,
               howMuchCashPage = None,
@@ -172,7 +172,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            FinancialDetailsCheckAnswersUtils.viewModel(
               srn,
               ViewOnlyMode,
               howMuchCashPage = None,

@@ -17,18 +17,17 @@
 package controllers.nonsipp.memberdetails
 
 import services.{PsrSubmissionService, SaveService}
-import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
 import models.ManualOrUpload.Manual
-import utils.IntUtils.{toInt, toRefined300}
-import cats.implicits.{toShow, toTraverseOps}
+import utils.nonsipp.summary.MemberDetailsCheckAnswersUtils
+import utils.IntUtils.toRefined300
+import cats.implicits.toTraverseOps
 import controllers.actions._
+import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
-import viewmodels.implicits._
-import utils.MessageUtils.booleanToMessage
 import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.CheckYourAnswersView
@@ -36,10 +35,7 @@ import models.SchemeId.Srn
 import uk.gov.hmrc.domain.Nino
 import play.api.Logger
 import navigation.Navigator
-import utils.DateTimeUtils.localDateShow
-import models._
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -96,7 +92,7 @@ class SchemeMemberDetailsAnswersController @Inject() (
             maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
           } yield Ok(
             view(
-              viewModel(
+              MemberDetailsCheckAnswersUtils.viewModel(
                 index,
                 srn,
                 mode,
@@ -171,135 +167,4 @@ class SchemeMemberDetailsAnswersController @Inject() (
     }
 }
 
-object SchemeMemberDetailsAnswersController {
-
-  private def rows(
-    index: Max300,
-    srn: Srn,
-    memberDetails: NameDOB,
-    hasNINO: Boolean,
-    maybeNino: Option[Nino],
-    maybeNoNinoReason: Option[String]
-  ): List[CheckYourAnswersRowViewModel] =
-    List(
-      CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
-        .withAction(
-          SummaryAction(
-            "site.change",
-            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#firstName"
-          ).withVisuallyHiddenContent("memberDetails.firstName")
-        ),
-      CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
-        .withAction(
-          SummaryAction(
-            "site.change",
-            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#lastName"
-          ).withVisuallyHiddenContent("memberDetails.lastName")
-        ),
-      CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
-        .withAction(
-          SummaryAction(
-            "site.change",
-            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#dateOfBirth"
-          ).withVisuallyHiddenContent("memberDetails.dateOfBirth")
-        ),
-      CheckYourAnswersRowViewModel(
-        Message("nationalInsuranceNumber.heading", memberDetails.fullName),
-        booleanToMessage(hasNINO)
-      ).withAction(
-        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode).url)
-          .withVisuallyHiddenContent(("memberDetailsCYA.nationalInsuranceNumber.hidden", memberDetails.fullName))
-      )
-    ) ++
-      ninoRow(maybeNino, memberDetails.fullName, srn, index) ++
-      noNinoReasonRow(maybeNoNinoReason, memberDetails.fullName, srn, index)
-
-  private def ninoRow(
-    maybeNino: Option[Nino],
-    memberName: String,
-    srn: Srn,
-    index: Max300
-  ): List[CheckYourAnswersRowViewModel] =
-    maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(nino =>
-      List(
-        CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
-          .withAction(
-            SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
-              .withVisuallyHiddenContent(("memberDetailsCYA.nino.hidden", memberName))
-          )
-      )
-    )
-
-  private def noNinoReasonRow(
-    maybeNoNinoReason: Option[String],
-    memberName: String,
-    srn: Srn,
-    index: Max300
-  ): List[CheckYourAnswersRowViewModel] =
-    maybeNoNinoReason.fold(List.empty[CheckYourAnswersRowViewModel])(noNinoReason =>
-      List(
-        CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
-          .withAction(
-            SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
-              .withVisuallyHiddenContent(("memberDetailsCYA.noNINO.hidden", memberName))
-          )
-      )
-    )
-
-  def viewModel(
-    index: Max300,
-    srn: Srn,
-    mode: Mode,
-    memberDetails: NameDOB,
-    hasNINO: Boolean,
-    maybeNino: Option[Nino],
-    maybeNoNinoReason: Option[String],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel(
-      mode = mode,
-      title = mode.fold(
-        normal = "checkYourAnswers.title",
-        check = "changeMemberDetails.title",
-        viewOnly = "memberDetailsCYA.viewOnly.title"
-      ),
-      heading = mode.fold(
-        normal = "checkYourAnswers.heading",
-        check = Message("changeMemberDetails.heading", memberDetails.fullName),
-        viewOnly = Message("memberDetailsCYA.viewOnly.title", memberDetails.fullName)
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel.singleSection(
-        rows(index, srn, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
-      ),
-      refresh = None,
-      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "memberDetailsCYA.viewOnly.title",
-            heading = Message("memberDetailsCYA.viewOnly.heading", memberDetails.fullName),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                // view-only continue button always navigates back to the first list page if paginating
-                routes.SchemeMemberDetailsAnswersController
-                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
-              case _ =>
-                routes.SchemeMemberDetailsAnswersController
-                  .onSubmit(srn, index, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
-    )
-}
+object SchemeMemberDetailsAnswersController {}
