@@ -74,7 +74,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
   override def subheading(data: SharesData): Option[DisplayMessage] =
     Some(Message("nonsipp.summary.shares.subheading", data.companyNameRelatedShares))
 
-  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max5000] =
     request.userAnswers
       .map(SharesProgress.all())
       .filter(_._2.completed)

@@ -18,7 +18,9 @@ package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import utils.nonsipp.summary.MemberContributionsCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
+import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
@@ -28,8 +30,6 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
-import play.api.inject.bind
-import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 
 class MemberContributionsCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
@@ -75,7 +75,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec with Contr
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            MemberContributionsCYAController.viewModel(
+            MemberContributionsCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,
@@ -124,7 +124,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec with Contr
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            MemberContributionsCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,

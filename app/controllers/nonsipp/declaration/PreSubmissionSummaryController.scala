@@ -49,13 +49,15 @@ class PreSubmissionSummaryController @Inject() (
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val landOrPropertyDisposalCheckAnswersUtils = LandOrPropertyDisposalCheckAnswersUtils(saveService)
     val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
-
+    given SchemeDateService = schemeDateService
     val schemeDate = schemeDateService
       .taxYearOrAccountingPeriods(srn)
       .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
       .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
 
     List(
+      BasicDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      MemberContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
       EmployerContributionsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
       TransfersInCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
       TransfersOutCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),

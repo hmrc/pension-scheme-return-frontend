@@ -72,7 +72,7 @@ object EmployerContributionsCheckAnswersUtils
     ec: ExecutionContext
   ): Future[Either[Result, EmployerContributionsData]] = Future.successful(summaryData(srn, index, 1, mode))
 
-  override def indexes(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
+  override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
     .map(EmployerContributionsProgress.all())
     .filter { case (_, status) => status.exists(_._2.completed) }
     .keys
