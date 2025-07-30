@@ -59,7 +59,7 @@ type SharesData = (
   costOfShares: Money,
   shareIndependentValue: Boolean,
   totalAssetValue: Option[Money],
-  sharesTotalIncome: Money,
+  sharesTotalIncome: Either[String, Money],
   mode: Mode,
   viewOnlyUpdated: Boolean,
   optYear: Option[String],
@@ -169,7 +169,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
         request.userAnswers.get(TotalAssetValuePage(srn, index)).get
       )
 
-      sharesTotalIncome <- requiredPage(SharesTotalIncomePage(srn, index))
+      sharesTotalIncome = request.userAnswers.get(SharesTotalIncomePage(srn, index)).getOrIncomplete
 
       schemeName = request.schemeDetails.schemeName
     } yield (
@@ -246,7 +246,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
     costOfShares: Money,
     shareIndependentValue: Boolean,
     totalAssetValue: Option[Money],
-    sharesTotalIncome: Money,
+    sharesTotalIncome: Either[String, Money],
     mode: Mode,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -339,7 +339,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
     costOfShares: Money,
     shareIndependentValue: Boolean,
     totalAssetValue: Option[Money],
-    sharesTotalIncome: Money,
+    sharesTotalIncome: Either[String, Money],
     mode: Mode
   ): List[CheckYourAnswersSection] =
     holdShares match {
@@ -857,12 +857,24 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
     costOfShares: Money,
     shareIndependentValue: Boolean,
     totalAssetValue: Option[Money],
-    sharesTotalIncome: Money,
+    sharesTotalIncome: Either[String, Money],
     mode: Mode
   ): List[CheckYourAnswersSection] =
+
+    val sharesTotalIncomeCYA = sharesTotalIncome match {
+      case Right(value) => s"£${value.displayAs}"
+      case Left(value) => s"$value"
+    }
+
+    val header = if (sharesTotalIncome.isLeft) {
+      Some(Heading2.medium("sharesCheckAndUpdate.isPrePop.section4.heading", companyNameRelatedShares))
+    } else {
+      Some(Heading2.medium(("sharesCYA.section4.heading", companyNameRelatedShares)))
+    }
+
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium(("sharesCYA.section4.heading", companyNameRelatedShares))),
+        header,
         List(
           CheckYourAnswersRowViewModel(
             Message("sharesCYA.section4.costOfShares"),
@@ -899,7 +911,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
           )
         } :+ CheckYourAnswersRowViewModel(
           Message("sharesCYA.section4.sharesTotalIncome"),
-          s"£${sharesTotalIncome.displayAs}"
+          sharesTotalIncomeCYA
         ).withAction(
           SummaryAction(
             "site.change",

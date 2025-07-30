@@ -172,7 +172,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               costOfShares = money,
               shareIndependentValue = true,
               totalAssetValue = None,
-              sharesTotalIncome = money,
+              sharesTotalIncome = Right(money),
               mode = mode,
               viewOnlyUpdated = true
             )
@@ -209,7 +209,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
                 costOfShares = money,
                 shareIndependentValue = true,
                 totalAssetValue = Some(money),
-                sharesTotalIncome = money,
+                sharesTotalIncome = Right(money),
                 mode = mode,
                 viewOnlyUpdated = true
               )
@@ -241,7 +241,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               costOfShares = money,
               shareIndependentValue = false,
               totalAssetValue = None,
-              sharesTotalIncome = money,
+              sharesTotalIncome = Right(money),
               mode = mode,
               viewOnlyUpdated = true
             )
@@ -314,7 +314,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec with ControllerBehaviou
               costOfShares = money,
               shareIndependentValue = true,
               totalAssetValue = None,
-              sharesTotalIncome = money,
+              sharesTotalIncome = Right(money),
               ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
