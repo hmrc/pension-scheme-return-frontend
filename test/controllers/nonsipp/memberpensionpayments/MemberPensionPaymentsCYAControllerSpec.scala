@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
-import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
+import utils.nonsipp.summary.MemberPaymentsCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -77,7 +77,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec with Con
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            MemberPensionPaymentsCYAController.viewModel(
+            MemberPaymentsCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,
@@ -126,7 +126,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec with Con
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            MemberPaymentsCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,

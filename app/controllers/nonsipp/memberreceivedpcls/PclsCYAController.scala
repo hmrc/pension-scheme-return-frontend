@@ -18,22 +18,20 @@ package controllers.nonsipp.memberreceivedpcls
 
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
+import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
 import play.api.mvc._
-import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
-import utils.IntUtils.{toInt, toRefined300}
+import utils.nonsipp.summary.PclsCheckAnswersUtils
+import utils.IntUtils.toRefined300
 import controllers.actions._
 import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
-import viewmodels.implicits._
-import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
 import config.RefinedTypes._
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -77,7 +75,7 @@ class PclsCYAController @Inject() (
           .getOrRecoverJourney
       } yield Ok(
         view(
-          viewModel(
+          PclsCheckAnswersUtils.viewModel(
             srn,
             memberDetails.fullName,
             index,
@@ -123,111 +121,4 @@ class PclsCYAController @Inject() (
       )
     }
 
-}
-
-object PclsCYAController {
-  def viewModel(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    amounts: PensionCommencementLumpSum,
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = mode.fold(
-        normal = "pclsCYA.normal.title",
-        check = Message("pclsCYA.change.title.check", memberName),
-        viewOnly = "pclsCYA.viewOnly.title"
-      ),
-      heading = mode.fold(
-        normal = "pclsCYA.normal.heading",
-        check = Message("pclsCYA.heading.check", memberName),
-        viewOnly = "pclsCYA.viewOnly.heading"
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections = rows(
-          srn,
-          memberName,
-          index,
-          amounts,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          }
-        )
-      ),
-      refresh = None,
-      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "pclsCYA.viewOnly.title",
-            heading = Message("pclsCYA.viewOnly.heading", memberName),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                // view-only continue button always navigates back to the first list page if paginating
-                controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                  .onSubmit(srn, index, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
-    )
-
-  private def rows(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    amounts: PensionCommencementLumpSum,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("pclsCYA.rows.membersName"),
-            Message(memberName)
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("pclsCYA.rows.amount.received", memberName),
-            Message("£" + amounts.lumpSumAmount.displayAs)
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                .onPageLoad(srn, index, CheckMode)
-                .url + "#received"
-            ).withVisuallyHiddenContent(Message("pclsCYA.rows.amount.received.hidden", memberName))
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("pclsCYA.rows.amount.relevant", memberName),
-            Message("£" + amounts.designatedPensionAmount.displayAs)
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                .onPageLoad(srn, index, mode)
-                .url + "#relevant"
-            ).withVisuallyHiddenContent(Message("pclsCYA.rows.amount.relevant.hidden", memberName))
-          )
-        )
-      )
-    )
 }

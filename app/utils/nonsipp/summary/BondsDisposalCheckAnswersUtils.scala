@@ -74,7 +74,7 @@ object BondsDisposalCheckAnswersUtils
   override def subheading(data: BondsDisposalData): Option[DisplayMessage] =
     Some(Message("nonsipp.summary.bonds.disposals.subheading", data.parameters.bondsName))
 
-  override def indexes(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
+  override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
     request.userAnswers
       .map(BondsDisposalProgress.all())
       .flatMap { case (bIndex, disposals) =>

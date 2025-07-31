@@ -65,9 +65,9 @@ object BondsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtil
     Some(Message("nonsipp.summary.bonds.subheading", data.nameOfBonds))
 
   def allSummaryData(srn: Srn, mode: Mode)(using request: DataRequest[AnyContent]): Either[Result, List[BondsData]] =
-    indexes.map(summaryData(srn, _, mode)).flip
+    indexes(srn).map(summaryData(srn, _, mode)).flip
 
-  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max5000] =
     request.userAnswers
       .map(BondsProgress.all())
       .filter(_._2.completed)

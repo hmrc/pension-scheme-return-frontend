@@ -17,6 +17,8 @@
 package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
+import utils.nonsipp.summary.{TransfersOutCYA, TransfersOutCheckAnswersUtils}
+import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import utils.IntUtils.given
@@ -28,8 +30,6 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import controllers.{ControllerBaseSpec, ControllerBehaviours}
-import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 
 import scala.concurrent.Future
 
@@ -90,7 +90,14 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec with ControllerBe
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
-        viewModel(srn, memberDetails.fullName, index, journeys, NormalMode, viewOnlyUpdated = true)
+        TransfersOutCheckAnswersUtils.viewModel(
+          srn,
+          memberDetails.fullName,
+          index,
+          journeys,
+          NormalMode,
+          viewOnlyUpdated = true
+        )
       )
     })
 
@@ -119,7 +126,7 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec with ControllerBe
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            TransfersOutCheckAnswersUtils.viewModel(
               srn,
               memberDetails.fullName,
               index,

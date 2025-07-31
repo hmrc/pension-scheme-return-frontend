@@ -74,7 +74,7 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
   override def subheading(data: OtherAssetsData): Option[DisplayMessage] =
     Some(Message("nonsipp.summary.otherAssets.subheading", data.parameters.description))
 
-  def indexes(using request: DataRequest[AnyContent]): List[Max5000] =
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max5000] =
     request.userAnswers
       .map(OtherAssetsProgress.all())
       .filter(_._2.completed)

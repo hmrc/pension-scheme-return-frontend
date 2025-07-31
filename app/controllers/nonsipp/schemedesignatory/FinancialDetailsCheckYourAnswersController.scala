@@ -18,31 +18,23 @@ package controllers.nonsipp.schemedesignatory
 
 import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.schemedesignatory._
-import viewmodels.implicits._
 import play.api.mvc._
-import utils.ListUtils.ListOps
+import utils.nonsipp.summary.FinancialDetailsCheckAnswersUtils
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getFinancialDetailsCompletedOrUpdated
+import controllers.nonsipp.routes
 import controllers.actions._
-import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
+import models._
 import viewmodels.models.TaskListStatus.Updated
+import play.api.i18n._
 import models.requests.DataRequest
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
-import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
-import models._
-import play.api.i18n._
-import viewmodels.Margin
-import viewmodels.DisplayMessage._
-import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class FinancialDetailsCheckYourAnswersController @Inject() (
@@ -83,7 +75,7 @@ class FinancialDetailsCheckYourAnswersController @Inject() (
         val feesCommissionsWagesSalariesPage = request.userAnswers.get(FeesCommissionsWagesSalariesPage(srn, mode))
         Ok(
           view(
-            viewModel(
+            FinancialDetailsCheckAnswersUtils.viewModel(
               srn,
               mode,
               howMuchCashPage,
@@ -137,175 +129,4 @@ class FinancialDetailsCheckYourAnswersController @Inject() (
       onPageLoadCommon(srn, ViewOnlyMode, showBackLink)
     }
 
-}
-
-object FinancialDetailsCheckYourAnswersController {
-  def viewModel(
-    srn: Srn,
-    mode: Mode,
-    howMuchCashPage: Option[MoneyInPeriod],
-    valueOfAssetsPage: Option[MoneyInPeriod],
-    feesCommissionsWagesSalariesPage: Option[Money],
-    schemeDates: DateRange,
-    schemeDetails: SchemeDetails,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    showBackLink: Boolean = true
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = "financialDetailsCheckYourAnswersController.title",
-      heading = "financialDetailsCheckYourAnswersController.heading",
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          howMuchCashPage,
-          valueOfAssetsPage,
-          feesCommissionsWagesSalariesPage,
-          schemeDates,
-          schemeDetails
-        )
-      ).withMarginBottom(Margin.Fixed60Bottom),
-      refresh = None,
-      buttonText = "site.saveAndContinue",
-      onSubmit =
-        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode),
-      optViewOnlyDetails = Option.when(mode == ViewOnlyMode)(
-        ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if currentVersion > 1 && previousVersion > 0 =>
-              Some(
-                LinkMessage(
-                  "financialDetailsCheckYourAnswersController.viewOnly.link",
-                  controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                    .onPreviousViewOnly(
-                      srn,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
-              )
-            case _ => None
-          },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-          title = "financialDetailsCheckYourAnswersController.viewOnly.title",
-          heading = "financialDetailsCheckYourAnswersController.viewOnly.heading",
-          buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-              controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-            case _ =>
-              controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                .onSubmit(srn, mode)
-          }
-        )
-      ),
-      showBackLink = showBackLink
-    )
-
-  private def sections(
-    srn: Srn,
-    howMuchCashPage: Option[MoneyInPeriod],
-    valueOfAssetsPage: Option[MoneyInPeriod],
-    feesCommissionsWagesSalariesPage: Option[Money],
-    schemeDates: DateRange,
-    schemeDetails: SchemeDetails
-  ): List[CheckYourAnswersSection] = List(
-    CheckYourAnswersSection(
-      None,
-      List() :?+ howMuchCashPage.map(howMuchCash =>
-        CheckYourAnswersRowViewModel(
-          Message(
-            "financialDetailsCheckYourAnswersController.totalCashInStartDate",
-            schemeDetails.schemeName,
-            schemeDates.from.show
-          ),
-          "£" + howMuchCash.moneyAtStart.displayAs
-        ).withChangeAction(
-          controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
-            .onPageLoad(srn, CheckMode)
-            .url + "#taxStartDate",
-          hidden = Message(
-            "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden",
-            schemeDates.from.show
-          )
-        ).withOneHalfWidth()
-      ) :?+
-        howMuchCashPage.map(howMuchCash =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "financialDetailsCheckYourAnswersController.totalCashInEndDate",
-              schemeDetails.schemeName,
-              schemeDates.to.show
-            ),
-            "£" + howMuchCash.moneyAtEnd.displayAs
-          ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
-              .onPageLoad(srn, CheckMode)
-              .url + "#taxEndDate",
-            hidden = Message(
-              "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden",
-              schemeDates.to.show
-            )
-          ).withOneHalfWidth()
-        ) :?+
-        valueOfAssetsPage.map(valueOfAssets =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate",
-              schemeDates.from.show
-            ),
-            "£" + valueOfAssets.moneyAtStart.displayAs
-          ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
-              .onPageLoad(srn, CheckMode)
-              .url + "#taxStartDate",
-            hidden = Message(
-              "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden",
-              schemeDates.from.show
-            )
-          ).withOneHalfWidth()
-        ) :?+
-        valueOfAssetsPage.map(valueOfAssets =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate",
-              schemeDates.to.show
-            ),
-            "£" + valueOfAssets.moneyAtEnd.displayAs
-          ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
-              .onPageLoad(srn, CheckMode)
-              .url + "#taxEndDate",
-            hidden = Message(
-              "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden",
-              schemeDates.to.show
-            )
-          ).withOneHalfWidth()
-        ) :?+
-        feesCommissionsWagesSalariesPage.map(feesCommissionsWagesSalaries =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary"
-            ),
-            "£" + feesCommissionsWagesSalaries.displayAs
-          ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
-              .onPageLoad(srn, CheckMode)
-              .url,
-            hidden = "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden"
-          ).withOneHalfWidth()
-        )
-    )
-  )
 }
