@@ -67,8 +67,12 @@ class SchemeMembersListController @Inject() (
 
   private val logger: Logger = Logger(classOf[SchemeMembersListController])
 
-  private def form(manualOrUpload: ManualOrUpload, maxNumberReached: Boolean): Form[Boolean] =
-    SchemeMembersListController.form(formProvider, manualOrUpload, maxNumberReached)
+  private def form(
+    manualOrUpload: ManualOrUpload,
+    maxNumberReached: Boolean,
+    prePopNotChecked: Boolean
+  ): Form[Boolean] =
+    SchemeMembersListController.form(formProvider, manualOrUpload, maxNumberReached, prePopNotChecked)
 
   def onPageLoadViewOnly(
     srn: Srn,
@@ -109,6 +113,9 @@ class SchemeMembersListController @Inject() (
       .intersect(membersDetails.keySet)
       .map(k => k -> membersDetails(k))
       .toMap
+    val prePopNotYetChecked = isPrePopulation && request.userAnswers
+      .get(MembersDetailsChecked(srn))
+      .contains(false)
     if (membersDetails.isEmpty) {
       logger.error(s"no members found")
       Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
@@ -121,7 +128,7 @@ class SchemeMembersListController @Inject() (
         .map { filteredMembers =>
           Ok(
             view(
-              form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
+              form(manualOrUpload, filteredMembers.size >= maxSchemeMembers, prePopNotYetChecked),
               viewModel(
                 srn,
                 page,
@@ -145,9 +152,7 @@ class SchemeMembersListController @Inject() (
                 optPreviousVersion = request.previousVersion,
                 compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
                 showBackLink = showBackLink,
-                prePopNotChecked = isPrePopulation && request.userAnswers
-                  .get(MembersDetailsChecked(srn))
-                  .contains(false)
+                prePopNotChecked = prePopNotYetChecked
               )
             )
           )
@@ -160,8 +165,10 @@ class SchemeMembersListController @Inject() (
     identifyAndRequireData(srn).async { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       val lengthOfMembersDetails = membersDetails.size
-
-      form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers)
+      val prePopNotYetChecked = isPrePopulation && request.userAnswers
+        .get(MembersDetailsChecked(srn))
+        .contains(false)
+      form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers, prePopNotYetChecked)
         .bindFromRequest()
         .fold(
           formWithErrors =>
@@ -182,7 +189,8 @@ class SchemeMembersListController @Inject() (
                       viewOnlyUpdated = false,
                       None,
                       None,
-                      None
+                      None,
+                      prePopNotChecked = prePopNotYetChecked
                     )
                   )
                 )
@@ -236,10 +244,14 @@ object SchemeMembersListController {
   def form(
     formProvider: YesNoPageFormProvider,
     manualOrUpload: ManualOrUpload,
-    maxNumberReached: Boolean = false
+    maxNumberReached: Boolean = false,
+    prePopNotChecked: Boolean = false
   ): Form[Boolean] = formProvider(
     manualOrUpload.fold(
-      manual = if (maxNumberReached) "membersUploaded.error.required" else "schemeMembersList.error.required",
+      manual =
+        if (prePopNotChecked) "schemeMembersList.error.required.prepop"
+        else if (maxNumberReached) "membersUploaded.error.required"
+        else "schemeMembersList.error.required",
       upload = "membersUploaded.error.required"
     )
   )
