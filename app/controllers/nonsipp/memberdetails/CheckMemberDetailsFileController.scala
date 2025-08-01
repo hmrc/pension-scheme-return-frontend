@@ -195,7 +195,7 @@ class CheckMemberDetailsFileController @Inject() (
     duration
   )
 
-  private def auditDownload(srn: Srn, responseStatus: Int, duration: Long)(implicit
+  private def auditDownload(srn: Srn, responseStatus: Int, startTime: Long)(implicit
     request: DataRequest[?]
   ): Unit =
     schemeDateService
@@ -204,7 +204,8 @@ class CheckMemberDetailsFileController @Inject() (
       .getOrRecoverJourney
       .flatMap(taxYear =>
         loggedInUserNameOrRedirect.map(userName =>
-          auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration, userName))
+          auditService
+            .sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, System.currentTimeMillis - startTime, userName))
         )
       )
 
