@@ -146,6 +146,7 @@ object PartnershipRecipientUtrController {
         yes = YesNoViewModel
           .Conditional(
             Message(s"${subject.key}.partnershipRecipientUtr.yes.conditional", partnershipRecipientName),
+            Some(Message(s"${subject.key}.partnershipRecipientUtr.yes.conditional.hint")),
             FieldType.Input
           ),
         no = YesNoViewModel

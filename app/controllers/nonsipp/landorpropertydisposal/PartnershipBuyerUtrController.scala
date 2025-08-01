@@ -132,7 +132,11 @@ object PartnershipBuyerUtrController {
       Message("partnershipBuyerUtr.heading", partnershipName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("partnershipBuyerUtr.yes.conditional", partnershipName), FieldType.Input),
+          .Conditional(
+            Message("partnershipBuyerUtr.yes.conditional", partnershipName),
+            Some(Message("partnershipBuyerUtr.yes.conditional.hint")),
+            FieldType.Input
+          ),
         no = YesNoViewModel
           .Conditional(Message("partnershipBuyerUtr.no.conditional", partnershipName), FieldType.Textarea)
       ),

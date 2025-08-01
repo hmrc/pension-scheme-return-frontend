@@ -133,6 +133,7 @@ object PartnershipBuyerUtrController {
         yes = YesNoViewModel
           .Conditional(
             Message("otherAssetsDisposal.partnershipBuyerUtr.yes.conditional", partnershipName),
+            Some(Message("otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.hint")),
             FieldType.Input
           ),
         no = YesNoViewModel

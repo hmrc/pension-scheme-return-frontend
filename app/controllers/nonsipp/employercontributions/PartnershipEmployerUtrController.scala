@@ -123,7 +123,11 @@ object PartnershipEmployerUtrController {
       Message("partnershipEmployerUtr.heading", employerName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("partnershipEmployerUtr.yes.conditional", employerName), FieldType.Input),
+          .Conditional(
+            Message("partnershipEmployerUtr.yes.conditional", employerName),
+            Some(Message("partnershipEmployerUtr.yes.conditional.hint")),
+            FieldType.Input
+          ),
         no = YesNoViewModel
           .Conditional(Message("partnershipEmployerUtr.no.conditional", employerName), FieldType.Textarea)
       ),
