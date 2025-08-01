@@ -71,6 +71,9 @@ type OtherAssetDisposalData = (
 object OtherAssetsDisposalCheckAnswersUtils
     extends CheckAnswersUtils[(Max5000, Max50), OtherAssetDisposalData]
     with PsrControllerHelpers {
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(OtherAssetsDisposalPage(srn)).contains(true)
+
   override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
     request.userAnswers
       .map(OtherAssetsDisposalProgress.all())

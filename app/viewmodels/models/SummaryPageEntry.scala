@@ -22,6 +22,7 @@ sealed trait SummaryPageEntry
 
 object SummaryPageEntry {
   case class Section(viewModel: CheckYourAnswersSummaryViewModel) extends SummaryPageEntry
+  case class MessageLine(value: DisplayMessage) extends SummaryPageEntry
   case class Heading(value: DisplayMessage) extends SummaryPageEntry
   case class Subheading(value: DisplayMessage) extends SummaryPageEntry
 }

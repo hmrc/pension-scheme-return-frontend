@@ -68,6 +68,9 @@ type OtherAssetsData = (
 
 object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, OtherAssetsData] {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(OtherAssetsHeldPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] =
     Some(Message("nonsipp.summary.otherAssets.heading"))
 

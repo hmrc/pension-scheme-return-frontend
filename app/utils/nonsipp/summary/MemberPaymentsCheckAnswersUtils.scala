@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import uk.gov.hmrc.http.HeaderCarrier
 import models._
 import viewmodels.DisplayMessage
@@ -46,6 +46,9 @@ type MemberPaymentsData = (
 )
 
 object MemberPaymentsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberPaymentsData] with PsrControllerHelpers {
+
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(PensionPaymentsReceivedPage(srn)).contains(true)
 
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.memberPayments.heading"))
 

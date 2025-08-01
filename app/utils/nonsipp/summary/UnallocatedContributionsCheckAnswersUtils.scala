@@ -20,7 +20,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits.toShow
-import viewmodels.models.SummaryPageEntry.{Heading, Section}
+import viewmodels.models.SummaryPageEntry.{Heading, MessageLine, Section}
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
@@ -28,7 +28,7 @@ import cats.data.EitherT
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateTimeShow
 import models._
-import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -74,12 +74,19 @@ object UnallocatedContributionsCheckAnswersUtils {
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
       showBackLink = showBackLink
     ).page.toSummaryViewModel()
+
+    val body: SummaryPageEntry =
+      if (request.userAnswers.get(UnallocatedEmployerContributionsPage(srn)).contains(true)) {
+        Section(vm)
+      } else {
+        MessageLine(Message("nonsipp.summary.message.noneRecorded"))
+      }
     EitherT(
       Future.successful(
         Right(
           List(
             Heading(Message("nonsipp.summary.unallocatedContributions.heading")),
-            Section(vm)
+            body
           )
         )
       )

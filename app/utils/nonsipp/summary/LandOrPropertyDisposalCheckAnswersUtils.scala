@@ -74,6 +74,8 @@ case class LandOrPropertyDisposalViewModelParameters(
 class LandOrPropertyDisposalCheckAnswersUtils(saveService: SaveService)
     extends PsrControllerHelpers
     with CheckAnswersUtils[(Max5000, Max50), LandOrPropertyDisposalData] {
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(true)
 
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.landOrProperty.disposals.heading"))
 

@@ -61,6 +61,9 @@ object EmployerContributionsCheckAnswersUtils
     extends CheckAnswersUtils[Max300, EmployerContributionsData]
     with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(EmployerContributionsPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.employerContributions.heading"))
 
   override def subheading(data: EmployerContributionsData): Option[DisplayMessage] =

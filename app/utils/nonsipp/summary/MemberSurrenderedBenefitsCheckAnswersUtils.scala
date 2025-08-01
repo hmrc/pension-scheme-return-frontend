@@ -55,6 +55,9 @@ object MemberSurrenderedBenefitsCheckAnswersUtils
     extends CheckAnswersUtils[Max300, SurrenderedBenefitsData]
     with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(SurrenderedBenefitsPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.memberSurrenderedBenefits.heading"))
 
   override def subheading(data: SurrenderedBenefitsData): Option[DisplayMessage] = Some(

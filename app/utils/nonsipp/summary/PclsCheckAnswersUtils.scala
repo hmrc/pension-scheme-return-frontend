@@ -25,7 +25,7 @@ import models._
 import viewmodels.DisplayMessage
 import models.requests.DataRequest
 import viewmodels.implicits._
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import config.RefinedTypes._
 import controllers.PsrControllerHelpers
 import viewmodels.DisplayMessage.Message
@@ -46,6 +46,9 @@ type PclsData = (
 )
 
 object PclsCheckAnswersUtils extends CheckAnswersUtils[Max300, PclsData] with PsrControllerHelpers {
+
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(PensionCommencementLumpSumPage(srn)).contains(true)
 
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.pcls.heading"))
 

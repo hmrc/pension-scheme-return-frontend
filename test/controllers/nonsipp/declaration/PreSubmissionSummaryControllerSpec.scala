@@ -189,20 +189,43 @@ class PreSubmissionSummaryControllerSpec
 
         val content = contentAsString(result)
 
+        // scheme details
         content should include("<h1 class=\"govuk-heading-xl\">Basic details</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Financial details</h1>")
+
+        // members
+        content should include("<h1 class=\"govuk-heading-xl\">Member details</h1>")
+
+        // member payments
+        content should include("<h1 class=\"govuk-heading-xl\">Employer contributions</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Unallocated contributions</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Member contributions</h1>")
-        content should include("<h1 class=\"govuk-heading-xl\">Land or property</h1>")
-        content should include("<h1 class=\"govuk-heading-xl\">Bonds</h1>")
-        content should include("<h1 class=\"govuk-heading-xl\">Shares</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Transfers in</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Transfers out</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">PCLS</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Pension payments</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Surrendered benefits</h1>")
+
+        // loans
         content should include("<h1 class=\"govuk-heading-xl\">Loans</h1>")
-        content should include("<h1 class=\"govuk-heading-xl\">Other assets</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Money borrowed</h1>")
 
-        content should include("<h1 class=\"govuk-heading-xl\">Disposal of land or property</h1>")
-        content should include("<h1 class=\"govuk-heading-xl\">Disposal of bonds</h1>")
+        // shares
+        content should include("<h1 class=\"govuk-heading-xl\">Shares</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Disposal of shares</h1>")
-        content should include("<h1 class=\"govuk-heading-xl\">Disposal of other assets</h1>")
 
+        // land or property
+        content should include("<h1 class=\"govuk-heading-xl\">Land or property</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of land or property</h1>")
+
+        // bonds
+        content should include("<h1 class=\"govuk-heading-xl\">Bonds</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of bonds</h1>")
+
+        // other assets
+        content should include("<h1 class=\"govuk-heading-xl\">Total value of quoted shares</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Other assets</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Disposal of other assets</h1>")
       }
     }
   }
