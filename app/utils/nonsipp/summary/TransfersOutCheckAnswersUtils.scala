@@ -60,12 +60,16 @@ type TransfersOutData = (
 
 object TransfersOutCheckAnswersUtils extends CheckAnswersUtils[Max300, TransfersOutData] with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(SchemeTransferOutPage(srn)).contains(true)
+
   override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[Max300] = request.userAnswers
     .map(MemberTransferOutProgress.all())
     .filter((_, progressMap) => progressMap.exists((_, status) => status.completed))
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.transfersOut.heading"))
 

@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.models.CheckYourAnswersSummaryViewModel
-@import viewmodels.models.SummaryPageEntry.{Section, Heading, Subheading }
+@import viewmodels.models.SummaryPageEntry.{Section, Heading, Subheading, MessageLine}
 
 @this(
         layout: templates.Layout,
@@ -44,8 +44,19 @@
 
         @for(vm <- viewmodel.page) {
             @vm match {
+                case Heading(heading) => {
+                    <h2 class="govuk-heading-xl">@renderMessage(heading)</h2>
+                }
+
+                case Subheading(subheading) => {
+                    <h2 class="govuk-heading-l">@renderMessage(subheading)</h2>
+                }
+
+                case MessageLine(message) => {
+                    <p class="govuk-body">@renderMessage(message)</p>
+                }
                 case Section(vmSection) => {
-                    @vmSection.heading.map(_ => <h1 class="govuk-heading-m">@renderMessage(heading)</h1>)
+                    @vmSection.heading.map(_ => <h2 class="govuk-heading-m">@renderMessage(heading)</h2>)
                     @vmSection.sections.map { section =>
                         @section.heading.map(renderMessage)
                         @govukSummaryList(
@@ -65,13 +76,6 @@
                     @vmSection.inset.map { inset =>
                         @govukInsetText(InsetTextViewModel(renderMessage(inset)))
                     }
-                }
-                case Heading(heading) => {
-                    <h1 class="govuk-heading-xl">@renderMessage(heading)</h1>
-                }
-
-                case Subheading(subheading) => {
-                    <h1 class="govuk-heading-l">@renderMessage(subheading)</h1>
                 }
             }
         }

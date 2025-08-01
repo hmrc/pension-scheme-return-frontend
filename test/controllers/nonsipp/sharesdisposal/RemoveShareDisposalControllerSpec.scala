@@ -47,10 +47,6 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec with Controll
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
     .unsafeSet(HowWereSharesDisposedPage(srn, index, disposalIndex), HowSharesDisposed.Redeemed)
 
-  private val userAnswersRelatedShares = defaultUserAnswers
-    .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-    .unsafeSet(HowWereSharesDisposedPage(srn, index, disposalIndex), methodOfDisposal)
-
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )

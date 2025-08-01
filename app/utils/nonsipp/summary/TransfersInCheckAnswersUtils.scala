@@ -62,6 +62,9 @@ case class TransfersInCYA(
 
 object TransfersInCheckAnswersUtils extends CheckAnswersUtils[Max300, TransfersInData] with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(DidSchemeReceiveTransferPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.transfersIn.heading"))
 
   override def subheading(data: TransfersInData): Option[DisplayMessage] = Some(
@@ -128,6 +131,7 @@ object TransfersInCheckAnswersUtils extends CheckAnswersUtils[Max300, TransfersI
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   override def viewModel(data: TransfersInData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     data.srn,

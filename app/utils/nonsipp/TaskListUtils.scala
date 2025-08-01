@@ -66,10 +66,9 @@ object TaskListUtils {
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.declaration"
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      (isLinkActive, showViewDeclarationLink) match {
-        case (true, true) =>
+    val declarationLink: List[InlineMessage] = (isLinkActive, showViewDeclarationLink) match {
+      case (true, true) =>
+        List(
           LinkMessage(
             s"$prefix.view",
             controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
@@ -80,25 +79,53 @@ object TaskListUtils {
               )
               .url
           )
-        case (true, false) =>
-          val psaOrPspDeclarationUrl =
-            if (isPsp) {
-              controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
-            } else {
-              controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url
-            }
+        )
+      case (true, false) =>
+        val psaOrPspDeclarationUrl =
+          if (isPsp) {
+            controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
+          } else {
+            controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url
+          }
+        List(
           LinkMessage(
             s"$prefix.complete",
             psaOrPspDeclarationUrl
+          ),
+          LinkMessage(
+            s"$prefix.summary",
+            controllers.nonsipp.declaration.routes.PreSubmissionSummaryController.onPageLoad(srn).url
           )
-        case (false, _) =>
-          Message(s"$prefix.incomplete")
-      },
+        )
+      case (false, _) =>
+        List(Message(s"$prefix.incomplete"))
+    }
+
+    TaskListSectionViewModel(
+      s"$prefix.title",
+      declarationLink,
       LinkMessage(
         Message(s"$prefix.saveandreturn", schemeName),
         controllers.routes.OverviewController.onPageLoad(srn).url
       )
     )
+  }
+
+  def isDeclarationReady(
+    srn: Srn,
+    schemeName: String,
+    userAnswers: UserAnswers,
+    pensionSchemeId: PensionSchemeId,
+    isPrePop: Boolean
+  ): Boolean = {
+    val sectionListWithoutDeclaration =
+      getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId, isPrePop)
+
+    val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(
+      sectionListWithoutDeclaration
+    )
+
+    numSectionsTotal == numSectionsReadyForSubmission
   }
 
   def getSectionList(

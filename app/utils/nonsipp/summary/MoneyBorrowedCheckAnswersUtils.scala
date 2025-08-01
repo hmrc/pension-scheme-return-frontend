@@ -55,6 +55,9 @@ type MoneyBorrowedData = (
 
 object MoneyBorrowedCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, MoneyBorrowedData] {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(MoneyBorrowedPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] =
     Some(Message("nonsipp.summary.moneyBorrowed.heading"))
 

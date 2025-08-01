@@ -17,11 +17,11 @@
 package utils.nonsipp.summary
 
 import services.SchemeDateService
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import cats.implicits.toShow
-import viewmodels.models.SummaryPageEntry.{Heading, Section}
+import viewmodels.models.SummaryPageEntry.{Heading, MessageLine, Section}
 import models.requests.DataRequest
 import config.RefinedTypes.Max3
 import controllers.PsrControllerHelpers
@@ -61,9 +61,13 @@ object TotalValueQuotedSharesCheckAnswersUtils extends PsrControllerHelpers {
             viewOnlyViewModel,
             showBackLink = showBackLink
           )
+          isRecorded = request.userAnswers.get(QuotedSharesManagedFundsHeldPage(srn)).contains(true)
+          body =
+            if (isRecorded) Section(vm.page.toSummaryViewModel())
+            else MessageLine(Message("nonsipp.summary.message.noneRecorded"))
         } yield List(
           Heading(Message("nonsipp.summary.quotedShares.heading")),
-          Section(vm.page.toSummaryViewModel())
+          body
         )
       )
     )

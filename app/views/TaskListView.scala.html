@@ -63,7 +63,7 @@
         </h2>
         <ul class="govuk-task-list">
             @section.items.fold(
-                msg => item(renderMessage(msg)),
+                msgs => msgs.map(msg => item(renderMessage(msg))),
                 items => taskListItems(items, index)
             )
             @section.postActionLink.map { link =>

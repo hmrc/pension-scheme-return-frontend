@@ -290,7 +290,7 @@ trait ViewModelGenerators extends BasicGenerators {
 
     for {
       sectionTitle <- nonEmptyMessage
-      items <- Gen.either(nonEmptyInlineMessage, itemsGen)
+      items <- Gen.either(nonEmptyInlineMessageList, itemsGen)
       postActionLink <- Gen.option(nonEmptyLinkMessage)
     } yield TaskListSectionViewModel(sectionTitle, items, postActionLink)
   }

@@ -25,7 +25,7 @@ import models._
 import viewmodels.DisplayMessage
 import models.requests.DataRequest
 import viewmodels.implicits._
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import config.RefinedTypes._
 import controllers.PsrControllerHelpers
 import viewmodels.DisplayMessage.Message
@@ -47,6 +47,9 @@ type PclsData = (
 
 object PclsCheckAnswersUtils extends CheckAnswersUtils[Max300, PclsData] with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(PensionCommencementLumpSumPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.pcls.heading"))
 
   override def subheading(data: PclsData): Option[DisplayMessage] = Some(
@@ -61,9 +64,7 @@ object PclsCheckAnswersUtils extends CheckAnswersUtils[Max300, PclsData] with Ps
     Future.successful(summaryData(srn, index, mode))
 
   def summaryData(srn: Srn, index: Max300, mode: Mode)(using
-    request: DataRequest[AnyContent],
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    request: DataRequest[AnyContent]
   ): Either[Result, PclsData] = for {
     memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
     amounts <- request.userAnswers
@@ -86,6 +87,7 @@ object PclsCheckAnswersUtils extends CheckAnswersUtils[Max300, PclsData] with Ps
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   override def viewModel(data: PclsData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     data.srn,

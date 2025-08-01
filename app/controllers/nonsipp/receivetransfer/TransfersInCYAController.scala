@@ -72,8 +72,7 @@ class TransfersInCYAController @Inject() (
       .map { data =>
         data.journeys match {
           case Nil => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case journeys =>
-            Ok(view(TransfersInCheckAnswersUtils.viewModel(data)))
+          case _ => Ok(view(TransfersInCheckAnswersUtils.viewModel(data)))
         }
       }
       .merge

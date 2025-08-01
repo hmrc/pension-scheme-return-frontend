@@ -28,7 +28,7 @@ case class TaskListItemViewModel(
 
 case class TaskListSectionViewModel(
   title: Message,
-  items: Either[InlineMessage, NonEmptyList[TaskListItemViewModel]],
+  items: Either[List[InlineMessage], NonEmptyList[TaskListItemViewModel]],
   postActionLink: Option[LinkMessage]
 )
 
@@ -44,6 +44,13 @@ object TaskListSectionViewModel {
   def apply(
     title: Message,
     item: InlineMessage,
+    postActionLink: LinkMessage
+  ): TaskListSectionViewModel =
+    TaskListSectionViewModel(title, Left(List(item)), Some(postActionLink))
+
+  def apply(
+    title: Message,
+    item: List[InlineMessage],
     postActionLink: LinkMessage
   ): TaskListSectionViewModel =
     TaskListSectionViewModel(title, Left(item), Some(postActionLink))

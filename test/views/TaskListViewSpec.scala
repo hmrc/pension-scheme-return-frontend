@@ -82,7 +82,7 @@ class TaskListViewSpec extends ViewSpec with ViewBehaviours with TestValues {
         forAll(viewModelGen) { viewmodel =>
           val expected =
             viewmodel.page.sections.toList
-              .flatMap(_.items.fold(List(_), _ => Nil))
+              .flatMap(_.items.fold(identity, _ => Nil))
               .flatMap(allMessages)
               .map(_.key)
 
