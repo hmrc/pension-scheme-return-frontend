@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.nonsipp.summary._
 import controllers.PSRController
-import cats.implicits.toShow
+import cats.implicits.{toShow, _}
 import controllers.actions.IdentifyAndRequireData
 import play.api.i18n._
 import views.html.SummaryView
@@ -49,28 +49,55 @@ class PreSubmissionSummaryController @Inject() (
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val landOrPropertyDisposalCheckAnswersUtils = LandOrPropertyDisposalCheckAnswersUtils(saveService)
     val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
-
+    given SchemeDateService = schemeDateService
     val schemeDate = schemeDateService
       .taxYearOrAccountingPeriods(srn)
       .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
       .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
 
-    (for {
-      allLandOrPropertyEntries <- LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allLandOrPropertyDisposalEntries <- landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allBondsEntries <- BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allBondsDisposalEntries <- BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allSharesEntries <- SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allSharesDisposalEntries <- SharesDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allLoansEntries <- loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allOtherAssetsEntries <- OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allOtherAssetDisposalEntries <- OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allMoneyBorrowedEntries <- MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-      allEntries =
-        allLandOrPropertyEntries ++ allLandOrPropertyDisposalEntries ++ allBondsEntries ++ allBondsDisposalEntries ++
-          allSharesEntries ++ allSharesDisposalEntries ++ allLoansEntries ++ allOtherAssetsEntries ++
-          allOtherAssetDisposalEntries ++ allMoneyBorrowedEntries
-    } yield Ok(view(viewModel(srn, allEntries), schemeDate))).value.map(_.merge)
+    List(
+      // scheme details
+      BasicDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      FinancialDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+
+      // members
+      MemberDetailsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // member payments
+      EmployerContributionsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      UnallocatedContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      MemberContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      TransfersInCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      TransfersOutCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      PclsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      MemberPaymentsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      MemberSurrenderedBenefitsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // loans
+      loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // shares
+      SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      SharesDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // land or property
+      LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // bonds
+      BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+      // other assets
+      TotalValueQuotedSharesCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+    ).sequence
+      .map(_.flatten)
+      .map(entries => Ok(view(viewModel(srn, entries), schemeDate)))
+      .value
+      .map(_.merge)
   }
 
   def viewModel(

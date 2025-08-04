@@ -19,7 +19,7 @@ package controllers.nonsipp.memberpayments
 import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SchemeDateService}
 import play.api.mvc.Call
-import controllers.nonsipp.memberpayments.UnallocatedContributionCYAController._
+import utils.nonsipp.summary.UnallocatedContributionsCheckAnswersUtils
 import play.api.inject.bind
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import org.mockito.stubbing.OngoingStubbing
@@ -83,7 +83,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec with C
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            UnallocatedContributionCYAController.viewModel(
+            UnallocatedContributionsCheckAnswersUtils.viewModel(
               srn,
               schemeName,
               Some(money),
@@ -165,7 +165,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec with C
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            UnallocatedContributionsCheckAnswersUtils.viewModel(
               srn,
               schemeName,
               Some(money),
@@ -188,7 +188,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec with C
         optPreviousAnswers = Some(previousUserAnswers)
       ) { implicit app => implicit request =>
         injected[CYAWithRemove].apply(
-          viewModel(
+          UnallocatedContributionsCheckAnswersUtils.viewModel(
             srn,
             schemeName,
             unallocatedAmount = None,
@@ -211,7 +211,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec with C
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[CYAWithRemove].apply(
-            viewModel(
+            UnallocatedContributionsCheckAnswersUtils.viewModel(
               srn,
               schemeName,
               Some(money),

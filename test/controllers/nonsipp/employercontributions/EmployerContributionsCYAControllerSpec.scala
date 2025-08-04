@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.employercontributions
 
+import utils.nonsipp.summary.{EmployerCYA, EmployerContributionsCheckAnswersUtils}
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
+import views.html.CheckYourAnswersView
 import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import models._
@@ -28,8 +30,6 @@ import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
-import views.html.CheckYourAnswersView
 
 import scala.concurrent.Future
 
@@ -122,7 +122,15 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
       ).foreach { (answers, CYAs) =>
         act.like(renderView(onPageLoad(mode), answers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(srn, memberDetails.fullName, index, page, CYAs, mode, viewOnlyUpdated = true)
+            EmployerContributionsCheckAnswersUtils.viewModel(
+              srn,
+              memberDetails.fullName,
+              index,
+              page,
+              CYAs,
+              mode,
+              viewOnlyUpdated = true
+            )
           )
         }.withName(s"render correct ${mode.toString} view for $CYAs"))
       }
@@ -181,7 +189,7 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec with Con
         optPreviousAnswers = Some(previousUserAnswers)
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          EmployerContributionsCYAController.viewModel(
+          EmployerContributionsCheckAnswersUtils.viewModel(
             srn,
             memberDetails.fullName,
             index,

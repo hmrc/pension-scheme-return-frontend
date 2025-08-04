@@ -18,10 +18,9 @@ package controllers.nonsipp.memberpensionpayments
 
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
-import viewmodels.implicits._
 import play.api.mvc._
-import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
-import utils.IntUtils.{toInt, toRefined300}
+import utils.nonsipp.summary.MemberPaymentsCheckAnswersUtils
+import utils.IntUtils.toRefined300
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -34,7 +33,6 @@ import controllers.actions.IdentifyAndRequireData
 import play.api.Logger
 import navigation.Navigator
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,7 +80,7 @@ class MemberPensionPaymentsCYAController @Inject() (
         pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).getOrRecoverJourney
       } yield Ok(
         view(
-          viewModel(
+          MemberPaymentsCheckAnswersUtils.viewModel(
             srn,
             memberDetails.fullName,
             index,
@@ -133,105 +131,4 @@ class MemberPensionPaymentsCYAController @Inject() (
         )
       )
     }
-}
-
-object MemberPensionPaymentsCYAController {
-  def viewModel(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    pensionPayments: Money,
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
-    FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
-      title = mode.fold(
-        normal = "memberPensionPaymentsCYA.title",
-        check = "memberPensionPaymentsCYA.change.title",
-        viewOnly = "memberPensionPaymentsCYA.viewOnly.title"
-      ),
-      heading = mode.fold(
-        normal = "memberPensionPaymentsCYA.heading",
-        check = Message(
-          "memberPensionPaymentsCYA.change.heading",
-          memberName
-        ),
-        viewOnly = Message("memberPensionPaymentsCYA.viewOnly.heading", memberName)
-      ),
-      description = None,
-      page = CheckYourAnswersViewModel(
-        sections(
-          srn,
-          memberName,
-          index,
-          pensionPayments,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          }
-        )
-      ),
-      refresh = None,
-      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-        .onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "memberPensionPaymentsCYA.viewOnly.title",
-            heading = Message("memberPensionPaymentsCYA.viewOnly.heading", memberName),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                // view-only continue button always navigates back to the first list page if paginating
-                controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                  .onSubmit(srn, index, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
-    )
-
-  private def sections(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    pensionPayments: Money,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("memberPensionPaymentsCYA.section.memberName.header"),
-            Message(memberName)
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("memberPensionPaymentsCYA.section.memberName", memberName),
-            Message("memberPensionPaymentsCYA.section.amount", pensionPayments.displayAs)
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
-                .onSubmit(srn, index, mode)
-                .url
-            ).withVisuallyHiddenContent(Message("memberPensionPaymentsCYA.section.hide", memberName))
-          )
-        )
-      )
-    )
-
 }

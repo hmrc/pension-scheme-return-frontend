@@ -18,27 +18,32 @@ package controllers.nonsipp.declaration
 
 import play.api.test.FakeRequest
 import services._
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, SchemeDesignatoryRecordVersionPage}
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
 import play.api.inject.bind
 import pages.nonsipp.landorproperty._
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage}
 import models._
 import pages.nonsipp.common._
-import pages.nonsipp.moneyborrowed._
 import viewmodels.models._
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
-import pages.nonsipp.FbVersionPage
+import viewmodels.models.MemberState.New
+import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
+import pages.nonsipp._
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.loansmadeoroutstanding._
 import org.scalatest.matchers.should.Matchers.should
+import pages.nonsipp.moneyborrowed._
+import pages.nonsipp.declaration.PensionSchemeDeclarationPage
 
 class PreSubmissionSummaryControllerSpec
     extends ControllerBaseSpec
@@ -52,6 +57,27 @@ class PreSubmissionSummaryControllerSpec
     defaultUserAnswers
       .unsafeSet(FbVersionPage(srn), version)
       .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
+
+      // basic details
+      .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)
+      .unsafeSet(CheckReturnDatesPage(srn), true)
+      .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), currentReturnTaxYear)
+      .unsafeSet(AccountingPeriodRecordVersionPage(srn), recordVersion)
+      .unsafeSet(ActiveBankAccountPage(srn), true)
+      .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+      .unsafeSet(SchemeDesignatoryRecordVersionPage(srn), recordVersion)
+      .unsafeSet(FbVersionPage(srn), recordVersion)
+      .unsafeSet(FbStatus(srn), Submitted)
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), currentReturnTaxYearSubmissionDate)
+      .unsafeSet(PensionSchemeDeclarationPage(srn), declarationData)
+      .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
+      .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
+      .unsafeSet(MemberStatus(srn, index1of300), New)
+      .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
+
+      // member contributions
+      .unsafeSet(TotalMemberContributionPage(srn, index1of300), money)
 
       // land or property
       .unsafeSet(LandPropertyInUKPage(srn, index), true)
@@ -163,6 +189,8 @@ class PreSubmissionSummaryControllerSpec
 
         val content = contentAsString(result)
 
+        content should include("<h1 class=\"govuk-heading-xl\">Basic details</h1>")
+        content should include("<h1 class=\"govuk-heading-xl\">Member contributions</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Land or property</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Bonds</h1>")
         content should include("<h1 class=\"govuk-heading-xl\">Shares</h1>")

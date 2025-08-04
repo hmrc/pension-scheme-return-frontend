@@ -71,7 +71,7 @@ type OtherAssetDisposalData = (
 object OtherAssetsDisposalCheckAnswersUtils
     extends CheckAnswersUtils[(Max5000, Max50), OtherAssetDisposalData]
     with PsrControllerHelpers {
-  override def indexes(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
+  override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
     request.userAnswers
       .map(OtherAssetsDisposalProgress.all())
       .flatMap { case (index, disposals) =>

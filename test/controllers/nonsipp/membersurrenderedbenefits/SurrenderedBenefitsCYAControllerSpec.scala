@@ -17,6 +17,7 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.PsrSubmissionService
+import utils.nonsipp.summary.MemberSurrenderedBenefitsCheckAnswersUtils
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -24,7 +25,6 @@ import utils.IntUtils.given
 import pages.nonsipp.FbVersionPage
 import pages.nonsipp.membersurrenderedbenefits._
 import models._
-import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
@@ -80,7 +80,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with Contr
       act.like(
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            viewModel(
+            MemberSurrenderedBenefitsCheckAnswersUtils.viewModel(
               srn,
               memberIndex,
               memberDetails.fullName,
@@ -133,7 +133,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec with Contr
         optPreviousAnswers = Some(previousUserAnswers)
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
-          viewModel(
+          MemberSurrenderedBenefitsCheckAnswersUtils.viewModel(
             srn,
             memberIndex,
             memberDetails.fullName,

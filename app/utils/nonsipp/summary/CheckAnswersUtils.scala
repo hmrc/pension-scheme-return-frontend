@@ -43,7 +43,7 @@ trait CheckAnswersUtils[I, D] {
     ExecutionContext
   ): EitherT[Future, Result, D] = EitherT(summaryDataAsync(srn, index, mode))
 
-  def indexes(using request: DataRequest[AnyContent]): List[I]
+  def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[I]
 
   def viewModel(data: D): FormPageViewModel[CheckYourAnswersViewModel]
 
@@ -52,7 +52,7 @@ trait CheckAnswersUtils[I, D] {
     executionContext: ExecutionContext,
     hc: HeaderCarrier
   ): Future[Either[Result, List[D]]] =
-    indexes.map(i => summaryDataAsync(srn, i, mode)).flip
+    indexes(srn).map(i => summaryDataAsync(srn, i, mode)).flip
 
   def allSummaryDataT(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent],
