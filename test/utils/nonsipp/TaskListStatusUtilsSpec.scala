@@ -915,6 +915,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(EmployerContributionsCompleted(srn, index1of300, index1of50), SectionCompleted)
+          .unsafeSet(EmployerContributionsProgress(srn, index1of300, index1of50), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "contributions"), listPageUrl)
       }
@@ -1026,6 +1027,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
           .unsafeSet(TransfersInSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
+          .unsafeSet(ReceiveTransferProgress(srn, index1of300, index1of5), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getTransferInStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "transfers"), listPageUrl)
       }
@@ -1078,6 +1080,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SchemeTransferOutPage(srn), true)
           .unsafeSet(TransfersOutSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
+          .unsafeSet(MemberTransferOutProgress(srn, index1of300, index1of5), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getTransferOutStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "transfers"), selectMember)
       }
@@ -1131,6 +1134,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SurrenderedBenefitsPage(srn), true)
           .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index1of300), SectionCompleted)
+          .unsafeSet(MemberSurrenderedBenefitsProgress(srn, index1of300), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "surrenders"), selectMember)
       }
