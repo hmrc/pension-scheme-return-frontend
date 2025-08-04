@@ -419,7 +419,7 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
       receivedLoanType match {
         case IdentityType.Individual =>
           (
-            Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName),
+            Message("loanCheckYourAnswers.section1.recipientDetails.nino"),
             controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController
               .onPageLoad(srn, index, mode)
               .url,
@@ -457,7 +457,7 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLoanType match {
       case IdentityType.Individual =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.noNinoReason", recipientName) ->
+        Message("loanCheckYourAnswers.section1.recipientDetails.noNinoReason") ->
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController
             .onPageLoad(srn, index, mode)
             .url
@@ -488,7 +488,7 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
       case Left(value) =>
         if (value) {
           (
-            Message("loanCheckYourAnswers.section1.isIndividualRecipient.yes", recipientName),
+            Message("loanCheckYourAnswers.section1.isIndividualRecipient.yes"),
             "Yes",
             "",
             controllers.nonsipp.loansmadeoroutstanding.routes.IsIndividualRecipientConnectedPartyController
@@ -497,7 +497,7 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
           )
         } else {
           (
-            Message("loanCheckYourAnswers.section1.isIndividualRecipient.no", recipientName),
+            Message("loanCheckYourAnswers.section1.isIndividualRecipient.no"),
             "No",
             "",
             controllers.nonsipp.loansmadeoroutstanding.routes.IsIndividualRecipientConnectedPartyController
