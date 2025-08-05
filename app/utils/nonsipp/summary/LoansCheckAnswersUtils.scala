@@ -548,7 +548,7 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
                   .url
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section1.whoReceivedLoan.hidden")
             ),
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section1.recipientName", "")
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section1.recipientName", recipientName)
             .withAction(
               SummaryAction("site.change", recipientNameUrl)
                 .withVisuallyHiddenContent("loanCheckYourAnswers.section1.recipientName.hidden")
