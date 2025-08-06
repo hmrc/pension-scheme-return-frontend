@@ -18,14 +18,15 @@ package utils.nonsipp.summary
 
 import play.api.mvc.{AnyContent, Result}
 import utils.ListUtils.flip
-import viewmodels.models.SummaryPageEntry.{Heading, Section, Subheading}
+import viewmodels.models.SummaryPageEntry._
 import uk.gov.hmrc.http.HeaderCarrier
 import models.Mode
 import viewmodels.DisplayMessage
-import viewmodels.models._
 import models.requests.DataRequest
 import cats.data.EitherT
 import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -63,15 +64,18 @@ trait CheckAnswersUtils[I, D] {
   def heading: Option[DisplayMessage] = None
   def subheading(data: D): Option[DisplayMessage] = None
 
+  def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean = true
+
   def allSectionEntriesT(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent],
     executionContext: ExecutionContext,
     hc: HeaderCarrier
   ): EitherT[Future, Result, List[SummaryPageEntry]] = allSummaryDataT(srn, mode).map { data =>
-    heading.map(Heading(_)).toList ++
+    val body: List[SummaryPageEntry] = if (isReported(srn)) {
       data.flatMap { x =>
-        subheading(x).map(Subheading(_)).toList ++
-          List(Section(viewModel(x).page.toSummaryViewModel(None)))
+        subheading(x).map(Subheading(_)).toList ++ List(Section(viewModel(x).page.toSummaryViewModel(None)))
       }
+    } else { List(MessageLine(Message("nonsipp.summary.message.noneRecorded"))) }
+    heading.map(Heading(_)).toList ++ body
   }
 }

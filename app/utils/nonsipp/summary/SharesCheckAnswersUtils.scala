@@ -68,6 +68,10 @@ type SharesData = (
 )
 
 object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUtils[Max5000, SharesData] {
+
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(DidSchemeHoldAnySharesPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] =
     Some(Message("nonsipp.summary.shares.heading"))
 

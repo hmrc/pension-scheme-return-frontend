@@ -79,6 +79,8 @@ type ShareDisposalData = (
 object SharesDisposalCheckAnswersUtils
     extends CheckAnswersUtils[(Max5000, Max50), ShareDisposalData]
     with PsrControllerHelpers {
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(SharesDisposalPage(srn)).contains(true)
 
   override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
     request.userAnswers

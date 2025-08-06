@@ -72,6 +72,9 @@ object LandOrPropertyCheckAnswersUtils
     extends PsrControllerHelpers
     with CheckAnswersUtils[Max5000, LandOrPropertyData] {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(LandOrPropertyHeldPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] =
     Some(Message("nonsipp.summary.landOrProperty.heading"))
 

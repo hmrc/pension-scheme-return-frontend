@@ -66,9 +66,7 @@ object MemberDetailsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberDe
     Future.successful(summaryData(srn, index, mode).getOrRecoverJourney)
 
   def summaryData(srn: Srn, index: Max300, mode: Mode)(using
-    request: DataRequest[AnyContent],
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    request: DataRequest[AnyContent]
   ): Option[MemberDeteilsData] =
     for {
       memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
@@ -94,6 +92,7 @@ object MemberDetailsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberDe
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   override def viewModel(data: MemberDeteilsData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     data.index,

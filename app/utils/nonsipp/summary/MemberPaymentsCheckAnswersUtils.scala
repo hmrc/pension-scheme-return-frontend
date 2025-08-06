@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import models.SchemeId.Srn
 import utils.IntUtils.toInt
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import uk.gov.hmrc.http.HeaderCarrier
 import models._
 import viewmodels.DisplayMessage
@@ -47,6 +47,9 @@ type MemberPaymentsData = (
 
 object MemberPaymentsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberPaymentsData] with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(PensionPaymentsReceivedPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.memberPayments.heading"))
 
   override def subheading(data: MemberPaymentsData): Option[DisplayMessage] = Some(
@@ -60,9 +63,7 @@ object MemberPaymentsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberP
   ): Future[Either[Result, MemberPaymentsData]] = Future.successful(summaryData(srn, index, mode))
 
   def summaryData(srn: Srn, index: Max300, mode: Mode)(using
-    request: DataRequest[AnyContent],
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    request: DataRequest[AnyContent]
   ): Either[Result, MemberPaymentsData] = for {
     memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
     pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).getOrRecoverJourney
@@ -83,6 +84,7 @@ object MemberPaymentsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberP
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   override def viewModel(data: MemberPaymentsData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     data.srn,

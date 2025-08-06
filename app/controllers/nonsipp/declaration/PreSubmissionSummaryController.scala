@@ -23,6 +23,8 @@ import utils.nonsipp.summary._
 import controllers.PSRController
 import cats.implicits.{toShow, _}
 import controllers.actions.IdentifyAndRequireData
+import play.api.Logger
+import utils.nonsipp.TaskListUtils
 import play.api.i18n._
 import views.html.SummaryView
 import models.SchemeId.Srn
@@ -31,7 +33,7 @@ import models.{DateRange, NormalMode}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SummaryPageEntry, _}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
@@ -46,67 +48,91 @@ class PreSubmissionSummaryController @Inject() (
     extends PSRController
     with I18nSupport {
 
+  val logger = Logger(getClass)
+
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val landOrPropertyDisposalCheckAnswersUtils = LandOrPropertyDisposalCheckAnswersUtils(saveService)
-    val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
-    given SchemeDateService = schemeDateService
-    val schemeDate = schemeDateService
-      .taxYearOrAccountingPeriods(srn)
-      .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
-      .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
+    if (
+      !TaskListUtils.isDeclarationReady(
+        srn,
+        request.schemeDetails.schemeName,
+        request.userAnswers,
+        request.pensionSchemeId,
+        isPrePopulation
+      )
+    ) {
+      logger.warn("Cannot render summary page for return, data is incomplete")
+      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    } else {
 
-    List(
-      // scheme details
-      BasicDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
-      FinancialDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+      val landOrPropertyDisposalCheckAnswersUtils = LandOrPropertyDisposalCheckAnswersUtils(saveService)
+      val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
 
-      // members
-      MemberDetailsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      given SchemeDateService = schemeDateService
 
-      // member payments
-      EmployerContributionsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      UnallocatedContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
-      MemberContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
-      TransfersInCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      TransfersOutCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      PclsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      MemberPaymentsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      MemberSurrenderedBenefitsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      val schemeDate = schemeDateService
+        .taxYearOrAccountingPeriods(srn)
+        .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
+        .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
 
-      // loans
-      loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      val declarationLink = if (request.pensionSchemeId.isPSP) {
+        routes.PspDeclarationController.onPageLoad(srn)
+      } else {
+        routes.PsaDeclarationController.onPageLoad(srn)
+      }
 
-      // shares
-      SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      SharesDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+      List(
+        // scheme details
+        BasicDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+        FinancialDetailsCheckAnswersUtils.sectionEntries(srn, NormalMode),
 
-      // land or property
-      LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        // members
+        MemberDetailsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
 
-      // bonds
-      BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        // member payments
+        EmployerContributionsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        UnallocatedContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+        MemberContributionsCheckAnswersUtils.sectionEntries(srn, NormalMode),
+        TransfersInCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        TransfersOutCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        PclsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        MemberPaymentsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        MemberSurrenderedBenefitsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
 
-      // other assets
-      TotalValueQuotedSharesCheckAnswersUtils.sectionEntries(srn, NormalMode),
-      OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
-      OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
-    ).sequence
-      .map(_.flatten)
-      .map(entries => Ok(view(viewModel(srn, entries), schemeDate)))
-      .value
-      .map(_.merge)
+        // loans
+        loansCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        MoneyBorrowedCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+        // shares
+        SharesCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        SharesDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+        // land or property
+        LandOrPropertyCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        landOrPropertyDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+        // bonds
+        BondsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        BondsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+
+        // other assets
+        TotalValueQuotedSharesCheckAnswersUtils.sectionEntries(srn, NormalMode),
+        OtherAssetsCheckAnswersUtils.allSectionEntriesT(srn, NormalMode),
+        OtherAssetsDisposalCheckAnswersUtils.allSectionEntriesT(srn, NormalMode)
+      ).sequence
+        .map(_.flatten)
+        .map(entries => Ok(view(viewModel(entries, declarationLink), schemeDate)))
+        .value
+        .map(_.merge)
+    }
   }
 
   def viewModel(
-    srn: Srn,
-    entries: List[SummaryPageEntry]
+    entries: List[SummaryPageEntry],
+    declarationLink: Call
   ): FormPageViewModel[List[SummaryPageEntry]] = FormPageViewModel[List[SummaryPageEntry]](
     Message("nonsipp.summary.title"),
     Message("nonsipp.summary.heading"),
     entries,
-    routes.PsaDeclarationController.onPageLoad(srn)
+    declarationLink
   )
 }

@@ -68,6 +68,9 @@ class LoansCheckAnswersUtils(schemeDateService: SchemeDateService)
     extends PsrControllerHelpers
     with CheckAnswersUtils[Max5000, LoansData] {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] =
     Some(Message("nonsipp.summary.loans.heading"))
 

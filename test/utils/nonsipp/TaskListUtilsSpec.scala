@@ -145,7 +145,7 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
         message =>
-          message.asInstanceOf[LinkMessage].url mustBe controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
+          message.head.asInstanceOf[LinkMessage].url mustBe controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
             .onPageLoad(
               srn,
               dateRange.from.toString,
@@ -170,7 +170,7 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
         message =>
-          message
+          message.head
             .asInstanceOf[LinkMessage]
             .url mustBe controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url,
         _ => fail("Expected link is missing")
@@ -191,7 +191,7 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
         message =>
-          message
+          message.head
             .asInstanceOf[LinkMessage]
             .url mustBe controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url,
         _ => fail("Expected link is missing")
@@ -212,7 +212,7 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
       )
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
-        message => message.asInstanceOf[DisplayMessage] mustBe Message("nonsipp.tasklist.declaration.incomplete"),
+        message => message.head.asInstanceOf[DisplayMessage] mustBe Message("nonsipp.tasklist.declaration.incomplete"),
         _ => fail("Expected link is missing")
       )
     }
@@ -231,7 +231,7 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
         message =>
-          message
+          message.head
             .asInstanceOf[LinkMessage]
             .url mustBe controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url,
         _ => fail("Expected link is missing")

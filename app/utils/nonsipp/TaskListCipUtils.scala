@@ -43,31 +43,32 @@ object TaskListCipUtils {
           )(using Lang.defaultLang),
           level1.items.fold(
             fa =>
-              if (fa.isInstanceOf[LinkMessage]) {
-                ListTaskListLevel2(
-                  List(
-                    TaskListLevel2(
-                      messagesApi(
-                        getCipLabel(fa.asInstanceOf[LinkMessage].content.key)
-                      )(using Lang.defaultLang()),
-                      "Enabled"
+              fa.headOption match
+                case Some(linkMessage: LinkMessage) =>
+                  ListTaskListLevel2(
+                    List(
+                      TaskListLevel2(
+                        messagesApi(
+                          getCipLabel(linkMessage.content.key)
+                        )(using Lang.defaultLang()),
+                        "Enabled"
+                      )
                     )
                   )
-                )
-              } else if (fa.isInstanceOf[Message]) {
-                ListTaskListLevel2(
-                  List(
-                    TaskListLevel2(
-                      messagesApi(
-                        getCipLabel(fa.asInstanceOf[Message].key)
-                      )(using Lang.defaultLang()),
-                      "Disabled"
+                case Some(message: Message) =>
+                  ListTaskListLevel2(
+                    List(
+                      TaskListLevel2(
+                        messagesApi(
+                          getCipLabel(message.key)
+                        )(using Lang.defaultLang()),
+                        "Disabled"
+                      )
                     )
                   )
-                )
-              } else {
-                ListTaskListLevel2(List(TaskListLevel2(fa.toString, ""))) // fallback
-              },
+                case _ =>
+                  ListTaskListLevel2(List(TaskListLevel2(fa.toString, "")))
+            , // fallback,
             level2 =>
               ListTaskListLevel2(
                 level2.toList

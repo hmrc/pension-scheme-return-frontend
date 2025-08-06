@@ -55,6 +55,9 @@ object MemberSurrenderedBenefitsCheckAnswersUtils
     extends CheckAnswersUtils[Max300, SurrenderedBenefitsData]
     with PsrControllerHelpers {
 
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(SurrenderedBenefitsPage(srn)).contains(true)
+
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.memberSurrenderedBenefits.heading"))
 
   override def subheading(data: SurrenderedBenefitsData): Option[DisplayMessage] = Some(
@@ -69,9 +72,7 @@ object MemberSurrenderedBenefitsCheckAnswersUtils
     Future.successful(summaryData(srn, index, mode))
 
   def summaryData(srn: Srn, index: Max300, mode: Mode)(using
-    request: DataRequest[AnyContent],
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    request: DataRequest[AnyContent]
   ): Either[Result, SurrenderedBenefitsData] = for {
     memberDetails <- request.userAnswers
       .get(MemberDetailsPage(srn, index))
@@ -104,6 +105,7 @@ object MemberSurrenderedBenefitsCheckAnswersUtils
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   override def viewModel(data: SurrenderedBenefitsData): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     data.srn,

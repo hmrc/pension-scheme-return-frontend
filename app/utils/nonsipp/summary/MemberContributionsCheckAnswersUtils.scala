@@ -20,11 +20,15 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.mvc._
 import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import viewmodels.models.SummaryPageEntry.{Heading, Section, Subheading}
+import viewmodels.models.SummaryPageEntry._
 import models._
 import models.requests.DataRequest
 import viewmodels.implicits._
-import pages.nonsipp.membercontributions.{AllTotalMemberContributionPages, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{
+  AllTotalMemberContributionPages,
+  MemberContributionsPage,
+  TotalMemberContributionPage
+}
 import config.RefinedTypes.Max300
 import controllers.PsrControllerHelpers
 import cats.data.EitherT
@@ -53,12 +57,14 @@ object MemberContributionsCheckAnswersUtils extends PsrControllerHelpers {
     .keys
     .toList
     .flatMap(refineStringIndex[Max300.Refined])
+    .sortBy(i => request.userAnswers.get(MemberDetailsPage(srn, i)).map { case NameDOB(_, lastName, _) => lastName })
 
   def sectionEntries(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent]
   ): EitherT[Future, Result, List[SummaryPageEntry]] =
     EitherT(Future.successful(for {
       datas <- indexes(srn).map(summaryData(srn, _, mode)).sequence
+      isReported = request.userAnswers.get(MemberContributionsPage(srn)).contains(true)
       heading = Heading(Message("nonsipp.summary.memberContributions.heading"))
       sections = datas.flatMap { data =>
         val vm = viewModel(data)
@@ -66,7 +72,8 @@ object MemberContributionsCheckAnswersUtils extends PsrControllerHelpers {
 
         List(subheading, Section(vm.page.toSummaryViewModel()))
       }
-    } yield List(heading) ++ sections))
+      body = if (isReported) sections else List(MessageLine(Message("nonsipp.summary.message.noneRecorded")))
+    } yield List(heading) ++ body))
 
   def summaryData(srn: Srn, index: Max300, mode: Mode)(using
     request: DataRequest[AnyContent]

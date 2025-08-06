@@ -68,6 +68,8 @@ type BondsDisposalData = (
 object BondsDisposalCheckAnswersUtils
     extends CheckAnswersUtils[(Max5000, Max50), BondsDisposalData]
     with PsrControllerHelpers {
+  override def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean =
+    request.userAnswers.get(BondsDisposalPage(srn)).contains(true)
 
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.bonds.disposals.heading"))
 
