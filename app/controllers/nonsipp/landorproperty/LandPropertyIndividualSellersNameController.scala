@@ -25,14 +25,14 @@ import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
 import play.api.data.Form
-import views.html.TextInputView
+import views.html.TextAreaView
 import models.SchemeId.Srn
 import utils.IntUtils.{toInt, toRefined5000}
 import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,7 +45,7 @@ class LandPropertyIndividualSellersNameController @Inject() (
   saveService: SaveService,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TextInputView
+  view: TextAreaView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -84,17 +84,19 @@ class LandPropertyIndividualSellersNameController @Inject() (
 }
 
 object LandPropertyIndividualSellersNameController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.name(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.multipleNames(
     "landPropertyIndividualSellersName.error.required",
     "landPropertyIndividualSellersName.error.tooLong",
     "landPropertyIndividualSellersName.error.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       Message("landPropertyIndividualSellersName.title"),
       Message("landPropertyIndividualSellersName.heading"),
-      TextInputViewModel(true),
+      TextAreaViewModel(
+        hint = Some(Message("landPropertyIndividualSellersName.hint"))
+      ),
       routes.LandPropertyIndividualSellersNameController.onSubmit(srn, index, mode)
     )
 }

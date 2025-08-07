@@ -113,12 +113,12 @@ object IndividualSellerNiController {
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "individualSellerNi.title",
-      Message("individualSellerNi.heading", individualName),
+      Message("individualSellerNi.heading"),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("individualSellerNi.yes.conditional", individualName), FieldType.Input),
+          .Conditional(Message("individualSellerNi.yes.conditional"), FieldType.Input),
         no = YesNoViewModel
-          .Conditional(Message("individualSellerNi.no.conditional", individualName), FieldType.Textarea)
+          .Conditional(Message("individualSellerNi.no.conditional"), FieldType.Textarea)
       ).withHint("individualSellerNi.hint"),
       routes.IndividualSellerNiController.onSubmit(srn, index, mode)
     )
