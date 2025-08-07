@@ -42,9 +42,9 @@
         </h1>
 
         <p>
-            @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.print")).asLink("#print"))
+            @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.print")).asLink("#print").hideForPrint())
             &nbsp;
-            @if(preSubmission) { @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.declaration")).asSecondaryButton().asLink(viewmodel.onSubmit.url)) }
+            @if(preSubmission) { @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.declaration")).asSecondaryButton().asLink(viewmodel.onSubmit.url).hideForPrint()) }
         </p>
 
         @if(!preSubmission && submittedDate.isDefined) {

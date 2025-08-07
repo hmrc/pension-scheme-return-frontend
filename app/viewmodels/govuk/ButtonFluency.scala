@@ -73,5 +73,8 @@ trait ButtonFluency {
 
     def asWarningButton(): Button =
       withCssClass("govuk-button--warning")
+
+    def hideForPrint(): Button =
+      withCssClass("no-print")
   }
 }
