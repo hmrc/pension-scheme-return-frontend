@@ -59,7 +59,7 @@ import pages.nonsipp.bondsdisposal._
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.models._
 
-class PreSubmissionSummaryControllerSpec
+class SummaryControllerSpec
     extends ControllerBaseSpec
     with ControllerBehaviours
     with BeforeAndAfterEach
@@ -355,7 +355,7 @@ class PreSubmissionSummaryControllerSpec
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
 
-  lazy val onPageLoad = routes.PreSubmissionSummaryController.onPageLoad(srn)
+  lazy val onPageLoad = routes.SummaryController.onPageLoadPreSubmission(srn)
 
   override protected def beforeEach(): Unit = {
     reset(mockSchemeDateService)

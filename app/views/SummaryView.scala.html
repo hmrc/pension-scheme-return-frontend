@@ -16,6 +16,7 @@
 
 @import viewmodels.models.CheckYourAnswersSummaryViewModel
 @import viewmodels.models.SummaryPageEntry.{Section, Heading, Subheading, MessageLine}
+@import java.time.LocalDate
 
 @this(
         layout: templates.Layout,
@@ -24,7 +25,7 @@
         govukButton: GovukButton,
 )
 
-    @(viewmodel: FormPageViewModel[List[SummaryPageEntry]], schemeDate: Option[DisplayMessage])(implicit request: Request[?], messages: Messages)
+    @(viewmodel: FormPageViewModel[List[SummaryPageEntry]], schemeDate: Option[DisplayMessage], preSubmission: Boolean, submittedDate: Option[DisplayMessage])(implicit request: Request[?], messages: Messages)
 
     @layout(pageTitle = titleNoForm( if (viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = viewmodel.showBackLink) {
 
@@ -32,15 +33,25 @@
             <span class="govuk-caption-xl">@renderMessage(schemeDate.get)</span>
         }
 
-        <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)<strong class="govuk-tag govuk-tag--red govuk-!-margin-left-3" style="white-space: nowrap; max-width: none;">Not submitted</strong></h1>
+        <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)
+            @if(preSubmission) {
+                <strong class="govuk-tag govuk-tag--red govuk-!-margin-left-3" style="white-space: nowrap; max-width: none;">@renderMessage("nonsipp.summary.tag.notSubmitted")</strong>
+            } else {
+                <strong class="govuk-tag govuk-tag--green govuk-!-margin-left-3" style="white-space: nowrap; max-width: none;">@renderMessage("nonsipp.summary.tag.submitted")</strong>
+            }
+        </h1>
 
         <p>
             @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.print")).asLink("#print"))
             &nbsp;
-            @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.declaration")).asSecondaryButton().asLink(viewmodel.onSubmit.url))
+            @if(preSubmission) { @govukButton(ButtonViewModel(renderMessage("nonsipp.summary.button.declaration")).asSecondaryButton().asLink(viewmodel.onSubmit.url)) }
         </p>
 
-        <p class="govuk-body" style="margin-bottom: 40px">@renderMessage("nonsipp.summary.message.declare")</p>
+        @if(!preSubmission && submittedDate.isDefined) {
+            <p class="govuk-body" style="margin-bottom: 40px">@renderMessage(submittedDate.get)</p>
+        } else {
+            <p class="govuk-body" style="margin-bottom: 40px">@renderMessage("nonsipp.summary.message.declare")</p>
+        }
 
         @for(vm <- viewmodel.page) {
             @vm match {
