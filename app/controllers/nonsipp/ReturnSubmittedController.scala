@@ -58,14 +58,22 @@ class ReturnSubmittedController @Inject() (
       val dashboardUrl = dashboardUtils.dashboardUrl(request.pensionSchemeId.isPSP, srn)
       (request.session.get(RETURN_PERIODS), request.session.get(SUBMISSION_DATE))
         .mapN { (returnPeriods, submissionDate) =>
+          val returnPeriodsParsed = Json.parse(returnPeriods).as[NonEmptyList[DateRange]]
+          val summaryUrl = controllers.nonsipp.declaration.routes.SummaryController
+            .onPageLoad(
+              srn,
+              returnPeriodsParsed.head.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            )
+            .url
           Ok(
             view(
               viewModel(
                 request.schemeDetails.schemeName,
                 request.minimalDetails.email,
-                Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
+                returnPeriodsParsed,
                 LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
-                dashboardUrl
+                dashboardUrl,
+                summaryUrl
               )
             )
           ).addingToSession((SUBMISSION_VIEWED_FLAG, String.valueOf(true)))
@@ -83,7 +91,8 @@ object ReturnSubmittedController {
     email: String,
     returnPeriods: NonEmptyList[DateRange],
     submissionDate: LocalDateTime,
-    managePensionSchemeDashboardUrl: String
+    managePensionSchemeDashboardUrl: String,
+    summaryUrl: String
   ): SubmissionViewModel =
     SubmissionViewModel(
       "returnSubmitted.title",
@@ -97,6 +106,7 @@ object ReturnSubmittedController {
         submissionDate.show,
         submissionDate.format(DateRange.readableTimeFormat).toLowerCase()
       ),
+      summaryUrl = Some(summaryUrl),
       whatHappensNextContent = ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
         ParagraphMessage(
           "returnSubmitted.whatHappensNext.paragraph2",

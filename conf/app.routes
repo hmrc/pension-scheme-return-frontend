@@ -87,8 +87,8 @@ GET         /:srn/member-details/:index                                         
 POST        /:srn/member-details/:index                                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Int, mode: Mode = NormalMode)
 
 GET         /:srn/pre-submission-summary                                                                       controllers.nonsipp.declaration.SummaryController.onPageLoadPreSubmission(srn: Srn)
-GET         /:srn/post-submission-summary                                                                      controllers.nonsipp.declaration.SummaryController.onPageLoadPostSubmissionFromSession(srn: Srn)
-GET         /:srn/post-submission-summary/:startDate                                                           controllers.nonsipp.declaration.SummaryController.onPageLoadPostSubmission(srn: Srn, startDate: String)
+GET         /:srn/post-submission-summary                                                                      controllers.nonsipp.declaration.SummaryController.onPageLoadPostSubmission(srn: Srn)
+GET         /:srn/summary/:startDate                                                                           controllers.nonsipp.declaration.SummaryController.onPageLoad(srn: Srn, startDate: String)
 
 GET         /:srn/psa-declaration                                                                              controllers.nonsipp.declaration.PsaDeclarationController.onPageLoad(srn: Srn)
 GET         /:srn/submit-psa-declaration                                                                       controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)

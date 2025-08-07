@@ -27,5 +27,6 @@ case class SubmissionViewModel(
   scheme: DisplayMessage,
   periodOfReturn: DisplayMessage,
   dateSubmitted: DisplayMessage,
+  summaryUrl: Option[String] = None,
   whatHappensNextContent: DisplayMessage
 )
