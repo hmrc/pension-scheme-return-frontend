@@ -34,6 +34,7 @@ import viewmodels.DisplayMessage._
 import viewmodels.models._
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object TaskListUtils {
 
@@ -78,6 +79,10 @@ object TaskListUtils {
                 version.getOrElse(defaultFbVersion.toInt)
               )
               .url
+          ),
+          LinkMessage(
+            s"$prefix.postSubmissionSummary",
+            controllers.nonsipp.declaration.routes.SummaryController.onPageLoadPostSubmissionFromSession(srn).url
           )
         )
       case (true, false) =>
@@ -93,8 +98,8 @@ object TaskListUtils {
             psaOrPspDeclarationUrl
           ),
           LinkMessage(
-            s"$prefix.summary",
-            controllers.nonsipp.declaration.routes.PreSubmissionSummaryController.onPageLoad(srn).url
+            s"$prefix.preSubmissionSummary",
+            controllers.nonsipp.declaration.routes.SummaryController.onPageLoadPreSubmission(srn).url
           )
         )
       case (false, _) =>
