@@ -29,8 +29,9 @@ import pages.nonsipp.shares.IndividualNameOfSharesSellerPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import views.html.TextInputView
+import views.html.TextAreaView
 import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
 import controllers.nonsipp.shares.IndividualNameOfSharesSellerController._
 import viewmodels.models._
 
@@ -45,7 +46,7 @@ class IndividualNameOfSharesSellerController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TextInputView
+  view: TextAreaView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -76,17 +77,19 @@ class IndividualNameOfSharesSellerController @Inject() (
 }
 
 object IndividualNameOfSharesSellerController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.multipleNames(
     "individualNameOfSharesSeller.error.required",
     "individualNameOfSharesSeller.error.tooLong",
     "error.textarea.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       "individualNameOfSharesSeller.title",
       "individualNameOfSharesSeller.heading",
-      TextInputViewModel(),
+      TextAreaViewModel(
+        hint = Some(Message("individualNameOfSharesSeller.hint"))
+      ),
       routes.IndividualNameOfSharesSellerController.onSubmit(srn, index, mode)
     )
 }

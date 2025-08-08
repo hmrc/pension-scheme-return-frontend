@@ -193,7 +193,7 @@ object SharesFromConnectedPartyController {
         Message("sharesFromConnectedParty.acquisitionTitle"),
         Message("sharesFromConnectedParty.acquisitionHeading"),
         YesNoPageViewModel(
-          legend = Some(Message("sharesFromConnectedParty.acquisitionHeading", individualName))
+          legend = Some(Message("sharesFromConnectedParty.acquisitionLabel", individualName))
         ),
         onSubmit = controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, mode)
       ).withDescription(

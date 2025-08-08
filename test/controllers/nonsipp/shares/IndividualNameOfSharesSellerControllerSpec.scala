@@ -18,7 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.IndividualNameOfSharesSellerPage
 import controllers.{ControllerBaseSpec, ControllerBehaviours}
-import views.html.TextInputView
+import views.html.TextAreaView
 import utils.IntUtils.given
 import forms.TextFormProvider
 import models.NormalMode
@@ -37,20 +37,32 @@ class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec with
   "IndividualNameOfSharesSellerController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
+      injected[TextAreaView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, IndividualNameOfSharesSellerPage(srn, index), "test") {
       implicit app => implicit request =>
-        injected[TextInputView]
+        injected[TextAreaView]
           .apply(form(injected[TextFormProvider]).fill("test"), viewModel(srn, index, NormalMode))
     })
+
+    act.like(renderPrePopView(onPageLoad, IndividualNameOfSharesSellerPage(srn, index), recipientMultipleNames) {
+      implicit app => implicit request =>
+        injected[TextAreaView]
+          .apply(form(injected[TextFormProvider]).fill(recipientMultipleNames), viewModel(srn, index, NormalMode))
+    }.withName("render pre-pop view with multiple seller names"))
 
     act.like(redirectNextPage(onSubmit, "value" -> "test"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "test"))
+
+    act.like(
+      saveAndContinue(onSubmit, "value" -> recipientMultipleNames).withName(
+        "save and continue with multiple seller names"
+      )
+    )
 
     act.like(invalidForm(onSubmit))
 
