@@ -176,7 +176,7 @@ trait BasicGenerators extends EitherValues {
     } yield LinkMessage(message, url)
 
   val nonEmptyInlineMessage: Gen[InlineMessage] = Gen.oneOf(nonEmptyMessage, nonEmptyLinkMessage)
-  val nonEmptyInlineMessageList: Gen[List[InlineMessage]] = Gen.listOf(nonEmptyInlineMessage)
+  val nonEmptyInlineMessageList: Gen[List[InlineMessage]] = Gen.listOfN(2, nonEmptyInlineMessage)
 
   val nonEmptyParagraphMessage: Gen[ParagraphMessage] = nonEmptyListOf(nonEmptyInlineMessage).map(ParagraphMessage(_))
   val nonEmptyHeading2Message: Gen[Heading2] = nonEmptyInlineMessage.map(Heading2(_))

@@ -60,6 +60,9 @@
                 ))))
     </div>
 
+    @if(viewModel.summaryUrl.isDefined) {
+        <p class="govuk-body">@messages("returnSubmitted.summaryLink.prefix") <a href="@viewModel.summaryUrl">@messages("returnSubmitted.summaryLink.linkText")</a></p>
+    }
     <h2 class="govuk-heading-m">@messages("site.whatHappensNext")</h2>
 
     <div id="what-happens-next-content">

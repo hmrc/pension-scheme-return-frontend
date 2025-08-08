@@ -90,7 +90,7 @@ trait ModelGenerators extends BasicGenerators {
       status <- schemeStatusGen
       schemeType <- nonEmptyString
       authorisingPsa <- Gen.option(nonEmptyString)
-      establishers <- Gen.listOf(establisherGen)
+      establishers <- Gen.listOfN(5, establisherGen)
     } yield SchemeDetails(name, pstr, status, schemeType, authorisingPsa, establishers)
 
   val srnGen: Gen[Srn] =

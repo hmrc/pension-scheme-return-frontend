@@ -96,6 +96,7 @@ trait ViewModelGenerators extends BasicGenerators {
       periodOfReturn <- nonEmptyMessage
       dateSubmitted <- nonEmptyMessage
       whatHappensNextContent <- nonEmptyMessage
+      summaryUrl <- Gen.option(nonEmptyString)
     } yield SubmissionViewModel(
       title,
       panelHeading,
@@ -104,6 +105,7 @@ trait ViewModelGenerators extends BasicGenerators {
       scheme,
       periodOfReturn,
       dateSubmitted,
+      summaryUrl,
       whatHappensNextContent
     )
 

@@ -1090,6 +1090,8 @@ returnSubmitted.whatHappensNext.paragraph3 = You can
 returnSubmitted.whatHappensNext.list1 = return to the
 returnSubmitted.whatHappensNext.list1.link = Managing Pension Schemes dashboard for {0}
 returnSubmitted.whatHappensNext.list2 = print this page
+returnSubmitted.summaryLink.prefix = You can
+returnSubmitted.summaryLink.linkText = view a summary of your answers for this pension scheme return.
 
 unallocatedEmployerContributions.title = Were any unallocated employer contributions received by the scheme during the period of this return?
 unallocatedEmployerContributions.heading = Were any unallocated employer contributions received by {0} during the period of this return?

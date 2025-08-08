@@ -34,7 +34,6 @@ import viewmodels.DisplayMessage._
 import viewmodels.models._
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 object TaskListUtils {
 
@@ -82,7 +81,7 @@ object TaskListUtils {
           ),
           LinkMessage(
             s"$prefix.postSubmissionSummary",
-            controllers.nonsipp.declaration.routes.SummaryController.onPageLoadPostSubmissionFromSession(srn).url
+            controllers.nonsipp.declaration.routes.SummaryController.onPageLoadPostSubmission(srn).url
           )
         )
       case (true, false) =>
