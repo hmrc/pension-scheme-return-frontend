@@ -706,10 +706,10 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
   ): List[CheckYourAnswersSection] = {
 
     val sharesType = identityType match {
-      case IdentityType.Individual => "landOrPropertySeller.identityType.pageContent"
-      case IdentityType.UKCompany => "landOrPropertySeller.identityType.pageContent1"
-      case IdentityType.UKPartnership => "landOrPropertySeller.identityType.pageContent2"
-      case IdentityType.Other => "landOrPropertySeller.identityType.pageContent3"
+      case IdentityType.Individual => "sharesSellers.section3.identityType.pageContent"
+      case IdentityType.UKCompany => "sharesSellers.section3.identityType.pageContent1"
+      case IdentityType.UKPartnership => "sharesSellers.section3.identityType.pageContent2"
+      case IdentityType.Other => "sharesSellers.section3.identityType.pageContent3"
     }
 
     val recipientNameUrl = identityType match {
@@ -734,7 +734,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
       identityType match {
         case IdentityType.Individual =>
           (
-            Message("sharesCYA.section3.recipientDetails.nino", recipientName),
+            Message("sharesCYA.section3.recipientDetails.nino"),
             controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, mode).url,
             "sharesCYA.section3.recipientDetails.nino.hidden",
             "sharesCYA.section3.recipientDetails.noNinoReason.hidden"
@@ -770,7 +770,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = identityType match {
       case IdentityType.Individual =>
-        Message("sharesCYA.section3.recipientDetails.noNinoReason", recipientName) ->
+        Message("sharesCYA.section3.recipientDetails.noNinoReason") ->
           controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, mode).url
       case IdentityType.UKCompany =>
         Message("sharesCYA.section3.recipientDetails.noCrnReason", recipientName) ->
@@ -826,7 +826,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
             case SchemeHoldShare.Acquisition =>
               Some(
                 CheckYourAnswersRowViewModel(
-                  Message("sharesCYA.section3.sharesFromConnectedParty", recipientName),
+                  Message("sharesCYA.section3.sharesFromConnectedParty"),
                   if (connectedParty) "site.yes" else "site.no"
                 ).withAction(
                   SummaryAction(
@@ -837,7 +837,7 @@ object SharesCheckAnswersUtils extends PsrControllerHelpers with CheckAnswersUti
                   ).withVisuallyHiddenContent(
                     Message(
                       "sharesCYA.section3.sharesFromConnectedParty.hidden",
-                      recipientName,
+                      "",
                       if (connectedParty) "site.yes" else "site.no"
                     )
                   )
