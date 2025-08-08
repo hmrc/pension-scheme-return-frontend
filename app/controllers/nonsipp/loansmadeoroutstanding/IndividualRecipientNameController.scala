@@ -27,13 +27,13 @@ import forms.TextFormProvider
 import models.Mode
 import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
 import play.api.data.Form
-import views.html.TextInputView
+import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,7 +46,7 @@ class IndividualRecipientNameController @Inject() (
   saveService: SaveService,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TextInputView
+  view: TextAreaView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -84,17 +84,19 @@ class IndividualRecipientNameController @Inject() (
 }
 
 object IndividualRecipientNameController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.name(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.multipleNames(
     "individualRecipientName.error.required",
     "individualRecipientName.error.length",
     "individualRecipientName.error.invalid.characters"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       Message("individualRecipientName.title"),
       Message("individualRecipientName.heading"),
-      TextInputViewModel(true),
+      TextAreaViewModel(
+        hint = Some(Message("individualRecipientName.hint"))
+      ),
       routes.IndividualRecipientNameController.onSubmit(srn, index, mode)
     )
 }
