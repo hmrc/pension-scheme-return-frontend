@@ -158,6 +158,7 @@ trait TestValues extends OptionValues {
   val crn: Crn = crnGen.sample.get
   val noCrnReason: String = "no crn reason"
   val recipientName = "testRecipientName"
+  val recipientMultipleNames = "testRecipientName, testRecipientNames"
   val employerName = "testEmployerName"
   val individualRecipientName: String = "individual " + recipientName
   val companyRecipientName: String = "company " + recipientName
