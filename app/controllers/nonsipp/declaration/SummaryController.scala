@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.declaration
 
-import services.*
-import viewmodels.implicits.*
-import play.api.mvc.*
-import utils.nonsipp.summary.*
+import services._
+import viewmodels.implicits._
+import play.api.mvc._
+import utils.nonsipp.summary._
 import controllers.PSRController
-import cats.implicits.{toShow, *}
+import cats.implicits.{toShow, _}
 import controllers.actions.IdentifyAndRequireData
-import play.api.i18n.*
 import models.requests.DataRequest
 import cats.data.EitherT
 import views.html.SummaryView
 import models.SchemeId.Srn
-import pages.nonsipp.CompilationOrSubmissionDatePage
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbStatus}
 import play.api.Logger
 import utils.nonsipp.TaskListUtils
-import models.backend.responses.ReportStatus.SubmittedAndSuccessfullyProcessed
+import models.backend.responses.ReportStatus
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, NormalMode}
+import play.api.i18n._
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{SummaryPageEntry, *}
+import viewmodels.models.{SummaryPageEntry, _}
 
 import scala.concurrent.{ExecutionContext, Future}
+
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -57,13 +58,17 @@ class SummaryController @Inject() (
     with I18nSupport {
 
   val logger = Logger(getClass)
+  def declarationLink(srn: Srn)(using request: DataRequest[AnyContent]) = if (request.pensionSchemeId.isPSP) {
+    routes.PspDeclarationController.onPageLoad(srn)
+  } else {
+    routes.PsaDeclarationController.onPageLoad(srn)
+  }
 
   def entries(srn: Srn)(using
     request: DataRequest[AnyContent],
     ec: ExecutionContext,
     hc: HeaderCarrier
   ): EitherT[Future, Result, List[SummaryPageEntry]] = {
-
     val landOrPropertyDisposalCheckAnswersUtils = LandOrPropertyDisposalCheckAnswersUtils(saveService)
     val loansCheckAnswersUtils = LoansCheckAnswersUtils(schemeDateService)
 
@@ -116,9 +121,10 @@ class SummaryController @Inject() (
     .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
     .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
 
-  def onPageLoadPostSubmissionFromSession(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-
+  def onPageLoadPostSubmission(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    if (!request.userAnswers.get(FbStatus(srn)).exists(_.isSubmitted)) {
+      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    } else {
       val lastSubmittedDateTime = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)).map { dateTime =>
         Message(
           "nonsipp.summary.message.submittedOn",
@@ -128,39 +134,39 @@ class SummaryController @Inject() (
       }
 
       entries(srn)
-        .map(entries => Ok(view(postSubmissionViewModel(entries), schemeDate(srn), false, lastSubmittedDateTime)))
+        .map(entries =>
+          Ok(view(viewModel(entries, declarationLink(srn)), schemeDate(srn), false, lastSubmittedDateTime))
+        )
         .value
         .map(_.merge)
+    }
   }
 
-  def onPageLoadPostSubmission(srn: Srn, startDate: String): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, startDate: String): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       (for {
         versions <- EitherT.right[Result](
           psrVersionsService
             .getVersions(request.schemeDetails.pstr, startDate, srn)
         )
-        submittedVersions = versions
-          .filter(_.reportStatus == SubmittedAndSuccessfullyProcessed)
-        lastSubmitted = submittedVersions
-          .maxByOption(_.compilationOrSubmissionDate)
-          .getOrElse(versions.maxBy(_.compilationOrSubmissionDate))
-        lastSubmittedDateTime = lastSubmitted.compilationOrSubmissionDate
+        lastVersion = versions.maxBy(_.reportVersion)
+        lastVersionDateTime = lastVersion.compilationOrSubmissionDate
         schemeDate = schemeDateService
           .taxYearOrAccountingPeriods(srn)
           .map(_.map(x => DateRange(x.head._1.from, x.reverse.head._1.to)).merge)
           .map(x => Message("nonsipp.summary.caption", x.from.show, x.to.show))
-        submittedDate = lastSubmittedDateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
-        submittedTime = lastSubmittedDateTime.format(DateTimeFormatter.ofPattern("h:mma"))
+        date = lastVersionDateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+        time = lastVersionDateTime.format(DateTimeFormatter.ofPattern("h:mma"))
 
         submittedAnswers <- EitherT.right[Result](
           psrRetrievalService.getAndTransformStandardPsrDetails(
             None,
             Some(startDate),
-            Some("%03d".format(lastSubmitted.reportVersion)),
+            Some("%03d".format(lastVersion.reportVersion)),
             controllers.routes.OverviewController.onPageLoad(request.srn)
           )
         )
+        isSubmitted = lastVersion.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
 
         entries <- entries(srn)(using
           request.copy(
@@ -169,10 +175,10 @@ class SummaryController @Inject() (
         )
       } yield Ok(
         view(
-          postSubmissionViewModel(entries),
+          viewModel(entries, declarationLink(srn)),
           schemeDate,
-          false,
-          Some(Message("nonsipp.summary.message.submittedOn", submittedDate, submittedTime))
+          !isSubmitted,
+          Option.when(isSubmitted)(Message("nonsipp.summary.message.submittedOn", date, time))
         )
       )).value
         .map(_.merge)
@@ -192,20 +198,14 @@ class SummaryController @Inject() (
       Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     } else {
 
-      val declarationLink = if (request.pensionSchemeId.isPSP) {
-        routes.PspDeclarationController.onPageLoad(srn)
-      } else {
-        routes.PsaDeclarationController.onPageLoad(srn)
-      }
-
       entries(srn)
-        .map(entries => Ok(view(preSubmissionViewModel(entries, declarationLink), schemeDate(srn), true, None)))
+        .map(entries => Ok(view(viewModel(entries, declarationLink(srn)), schemeDate(srn), true, None)))
         .value
         .map(_.merge)
     }
   }
 
-  private def preSubmissionViewModel(
+  private def viewModel(
     entries: List[SummaryPageEntry],
     declarationLink: Call
   ): FormPageViewModel[List[SummaryPageEntry]] = FormPageViewModel[List[SummaryPageEntry]](
@@ -213,14 +213,5 @@ class SummaryController @Inject() (
     Message("nonsipp.summary.heading"),
     entries,
     declarationLink
-  )
-
-  private def postSubmissionViewModel(
-    entries: List[SummaryPageEntry]
-  ): FormPageViewModel[List[SummaryPageEntry]] = FormPageViewModel[List[SummaryPageEntry]](
-    Message("nonsipp.summary.title"),
-    Message("nonsipp.summary.heading"),
-    entries,
-    Call("GET", "#")
   )
 }
