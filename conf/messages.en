@@ -2323,14 +2323,16 @@ whatYouWillNeedMoneyBorrowed.list5 = when the scheme borrowed this money
 whatYouWillNeedMoneyBorrowed.list6 = the value of the scheme’s assets on the date the money was borrowed
 whatYouWillNeedMoneyBorrowed.list7 = why the scheme borrowed this money
 
-lenderName.title = What is the name of the lender?
-lenderName.heading = What is the name of the lender?
+lenderName.title = What is the lender’s name or names?
+lenderName.heading = What is the lender’s name or names?
+lenderName.hint = If there are multiple lenders, separate each name with commas. Do not use ampersands or separate lines.
 lenderName.error.required = Enter the name of the lender
 lenderName.error.tooLong = Lender’s name must be 160 characters or fewer
+lenderName.error.textarea.invalid = Lender’s name or names must only include letters a to z, hyphens, spaces or apostrophes, and be separated by commas. Do not use ampersands or new lines.
 
-isLenderConnectedParty.title = Is the lender a connected party?
+isLenderConnectedParty.title = Connected party
 isLenderConnectedParty.heading = Connected party
-isLenderConnectedParty.label = Is {0} a connected party?
+isLenderConnectedParty.label = Is any lender a connected party?
 isLenderConnectedParty.error.required = Select yes if the lender is a connected party
 isLenderConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
 isLenderConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative. For example, a parent, sibling, child or grandchild.
@@ -2354,8 +2356,8 @@ moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.required = Enter the tota
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric = Total amount of money borrowed must be an amount of money, like 123 or 123.45
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh = Total amount of money borrowed must be 999999999.99 or less
 
-moneyBorrowed.WhenBorrowed.title = When did the scheme borrow this money from the lender?
-moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{2} from {1}?
+moneyBorrowed.WhenBorrowed.title = When did the scheme borrow this money?
+moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{2}?
 moneyBorrowed.WhenBorrowed.hint = For example, 27 6 2024
 moneyBorrowed.WhenBorrowed.error.required.all = Enter the date the scheme borrowed this money
 moneyBorrowed.WhenBorrowed.error.required.day = Date the scheme borrowed this money must include a day
@@ -2367,8 +2369,8 @@ moneyBorrowed.WhenBorrowed.error.invalid.characters = Date must only include dig
 moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money must be the same as or before {0}
 moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be the same as or after {0}
 
-moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money from the lender?
-moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2} from {1}?
+moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money?
+moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2}?
 moneyBorrowed.WhyBorrowed.error.required = Enter the reason why the scheme borrowed this money
 moneyBorrowed.WhyBorrowed.error.length = The reason the scheme borrowed this money must be 160 characters or fewer
 
@@ -2381,10 +2383,10 @@ valueOfSchemeAssetsWhenMoneyBorrowed.error.tooSmall = Total value of the scheme�
 
 moneyBorrowedCheckYourAnswers.title = Check your answers: money borrowed
 moneyBorrowedCheckYourAnswers.heading = Check your answers: money borrowed
-moneyBorrowedCheckYourAnswers.section.lenderName =  Name of lender
-moneyBorrowedCheckYourAnswers.section.lenderName.hidden = the name of the lender
-moneyBorrowedCheckYourAnswers.section.lenderConnectedParty = Is {0} a connected party?
-moneyBorrowedCheckYourAnswers.section.lenderConnectedParty.hidden = if the lender is a connected party
+moneyBorrowedCheckYourAnswers.section.lenderName =  Name of lender or lenders
+moneyBorrowedCheckYourAnswers.section.lenderName.hidden = the name of the lender or lenders
+moneyBorrowedCheckYourAnswers.section.lenderConnectedParty = Is any lender a connected party?
+moneyBorrowedCheckYourAnswers.section.lenderConnectedParty.hidden = if any lender is a connected party
 moneyBorrowedCheckYourAnswers.section.borrowedAmount = Total amount of money borrowed
 moneyBorrowedCheckYourAnswers.section.borrowedAmount.hidden = total amount of money borrowed
 moneyBorrowedCheckYourAnswers.section.borrowedRate = Interest rate
@@ -2400,7 +2402,7 @@ moneyBorrowedCheckYourAnswers.viewOnly.title = Money borrowed
 moneyBorrowedCheckYourAnswers.viewOnly.heading = £{0} borrowed from {1}
 
 moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
-moneyBorrowedCheckYourAnswers.change.heading = Change details for £{0} borrowed from {1}
+moneyBorrowedCheckYourAnswers.change.heading = Change details for £{0} borrowed
 
 whatYouWillNeedEmployerContributions.title = Employer contributions for members of {0}
 whatYouWillNeedEmployerContributions.heading = Employer contributions for members of {0}

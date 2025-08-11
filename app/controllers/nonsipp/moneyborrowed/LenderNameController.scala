@@ -27,11 +27,12 @@ import models.Mode
 import play.api.data.Form
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import views.html.TextInputView
+import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
 import pages.nonsipp.moneyborrowed.LenderNamePage
 import utils.FunctionKUtils._
+import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +46,7 @@ class LenderNameController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TextInputView
+  view: TextAreaView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -84,21 +85,23 @@ class LenderNameController @Inject() (
 }
 
 object LenderNameController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.multipleNames(
     "lenderName.error.required",
     "lenderName.error.tooLong",
-    "error.textarea.invalid"
+    "lenderName.error.textarea.invalid"
   )
 
   def viewModel(
     srn: Srn,
     index: Max5000,
     mode: Mode
-  ): FormPageViewModel[TextInputViewModel] =
+  ): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       "lenderName.title",
       "lenderName.heading",
-      TextInputViewModel(isFixedLength = true),
+      TextAreaViewModel(
+        hint = Some(Message("lenderName.hint"))
+      ),
       routes.LenderNameController.onSubmit(srn, index, mode)
     )
 }
