@@ -518,7 +518,11 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
           )
         ) :?+ sellerDetails.map(details =>
           CheckYourAnswersRowViewModel(
-            Message("otherAssets.cya.section2.conditionalRow1.details.key", sellerName, sellerDetailsType),
+            if (sellerIdentityType == IdentityType.Individual) {
+              sellerDetailsType
+            } else {
+              Message("otherAssets.cya.section2.conditionalRow1.details.key", sellerName, sellerDetailsType)
+            },
             details
           ).withAction(
             SummaryAction("site.change", sellerDetailsUrl)
@@ -528,7 +532,7 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
           )
         ) :?+ sellerReasonNoDetails.map(reasonNoDetails =>
           CheckYourAnswersRowViewModel(
-            Message("otherAssets.cya.section2.conditionalRow1.noDetails.key", sellerName, sellerDetailsType),
+            Message("otherAssets.cya.section2.conditionalRow1.noDetails.key", sellerDetailsType),
             reasonNoDetails
           ).withAction(
             SummaryAction("site.change", sellerDetailsUrl)
@@ -536,7 +540,7 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
           )
         ) :+
           CheckYourAnswersRowViewModel(
-            Message("otherAssets.cya.section2.baseRow3.key", sellerName),
+            Message("otherAssets.cya.section2.baseRow3.key"),
             if (isSellerConnectedParty) "site.yes" else "site.no"
           ).withAction(
             SummaryAction(
@@ -544,7 +548,7 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
                 .onPageLoad(srn, index, CheckMode)
                 .url
-            ).withVisuallyHiddenContent(Message("otherAssets.cya.section2.baseRow3.hidden", sellerName))
+            ).withVisuallyHiddenContent(Message("otherAssets.cya.section2.baseRow3.hidden"))
           )
       )
     )
