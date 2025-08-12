@@ -30,7 +30,7 @@ import controllers.PSRController
 import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhySchemeBorrowedMoneyPage}
+import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, WhySchemeBorrowedMoneyPage}
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
@@ -55,63 +55,56 @@ class WhySchemeBorrowedMoneyController @Inject() (
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-          val preparedForm =
-            request.userAnswers.fillForm(WhySchemeBorrowedMoneyPage(srn, index), form)
-          Ok(
-            view(
-              preparedForm,
-              WhySchemeBorrowedMoneyController
-                .viewModel(
-                  srn,
-                  index,
-                  mode,
-                  request.schemeDetails.schemeName,
-                  amountBorrowed._1.displayAs,
-                  lenderName
-                )
-            )
+      request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+        val preparedForm =
+          request.userAnswers.fillForm(WhySchemeBorrowedMoneyPage(srn, index), form)
+        Ok(
+          view(
+            preparedForm,
+            WhySchemeBorrowedMoneyController
+              .viewModel(
+                srn,
+                index,
+                mode,
+                request.schemeDetails.schemeName,
+                amountBorrowed._1.displayAs
+              )
           )
-        }
-
+        )
       }
   }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      WhySchemeBorrowedMoneyController.viewModel(
-                        srn,
-                        index,
-                        mode,
-                        request.schemeDetails.schemeName,
-                        amountBorrowed._1.displayAs,
-                        lenderName
-                      )
+      request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    WhySchemeBorrowedMoneyController.viewModel(
+                      srn,
+                      index,
+                      mode,
+                      request.schemeDetails.schemeName,
+                      amountBorrowed._1.displayAs
                     )
                   )
-                ),
-              value =>
-                for {
-                  updatedAnswers <- request.userAnswers.set(WhySchemeBorrowedMoneyPage(srn, index), value).mapK[Future]
-                  nextPage = navigator.nextPage(WhySchemeBorrowedMoneyPage(srn, index), mode, updatedAnswers)
-                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-                  _ <- saveService.save(updatedProgressAnswers)
-                } yield Redirect(
-                  nextPage
                 )
-            )
-        }
+              ),
+            value =>
+              for {
+                updatedAnswers <- request.userAnswers.set(WhySchemeBorrowedMoneyPage(srn, index), value).mapK[Future]
+                nextPage = navigator.nextPage(WhySchemeBorrowedMoneyPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(
+                nextPage
+              )
+          )
       }
 
   }
@@ -129,12 +122,11 @@ object WhySchemeBorrowedMoneyController {
     index: Max5000,
     mode: Mode,
     schemeName: String,
-    amountBorrowed: String,
-    lenderName: String
+    amountBorrowed: String
   ): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       "moneyBorrowed.WhyBorrowed.title",
-      Message("moneyBorrowed.WhyBorrowed.heading", schemeName, lenderName, amountBorrowed),
+      Message("moneyBorrowed.WhyBorrowed.heading", schemeName, amountBorrowed),
       TextAreaViewModel(),
       controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onSubmit(srn, index, mode)
     )

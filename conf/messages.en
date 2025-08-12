@@ -2357,7 +2357,7 @@ moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric = Total amount
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh = Total amount of money borrowed must be 999999999.99 or less
 
 moneyBorrowed.WhenBorrowed.title = When did the scheme borrow this money?
-moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{2}?
+moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{1}?
 moneyBorrowed.WhenBorrowed.hint = For example, 27 6 2024
 moneyBorrowed.WhenBorrowed.error.required.all = Enter the date the scheme borrowed this money
 moneyBorrowed.WhenBorrowed.error.required.day = Date the scheme borrowed this money must include a day
@@ -2370,7 +2370,7 @@ moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money mu
 moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be the same as or after {0}
 
 moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money?
-moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2}?
+moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{1}?
 moneyBorrowed.WhyBorrowed.error.required = Enter the reason why the scheme borrowed this money
 moneyBorrowed.WhyBorrowed.error.length = The reason the scheme borrowed this money must be 160 characters or fewer
 
