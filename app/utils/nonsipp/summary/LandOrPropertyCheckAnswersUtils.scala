@@ -622,7 +622,7 @@ object LandOrPropertyCheckAnswersUtils
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLandType match {
       case IdentityType.Individual =>
-        Message("landOrPropertyCYA.section3.recipientDetails.noNinoReason", recipientName) ->
+        Message("landOrPropertyCYA.section3.recipientDetails.noNinoReason") ->
           controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, mode).url
       case IdentityType.UKCompany =>
         Message("landOrPropertyCYA.section3.recipientDetails.noCrnReason", recipientName) ->
@@ -887,7 +887,7 @@ object LandOrPropertyCheckAnswersUtils
             if (leaseConnectedParty.isLeft) {
               Message("landOrPropertyCheckAndUpdate.lessee.connectedParty")
             } else {
-              Message("landOrPropertyCYA.section5.connectedParty", leaseName.show)
+              Message("landOrPropertyCYA.section5.connectedParty")
             },
             leaseConnectedParty match {
               case Left(value) => s"$value"
@@ -899,7 +899,7 @@ object LandOrPropertyCheckAnswersUtils
               controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController
                 .onPageLoad(srn, index, mode)
                 .url
-            ).withVisuallyHiddenContent(("landOrPropertyCYA.section5.leaseConnected.hidden", leaseName.show))
+            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseConnected.hidden")
           )
         )
       )
