@@ -31,7 +31,7 @@ import viewmodels.models._
 import play.api.data.Form
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import views.html.TextInputView
+import views.html.TextAreaView
 import models.SchemeId.Srn
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +45,7 @@ class IndividualNameOfOtherAssetSellerController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TextInputView
+  view: TextAreaView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -76,17 +76,17 @@ class IndividualNameOfOtherAssetSellerController @Inject() (
 }
 
 object IndividualNameOfOtherAssetSellerController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.multipleNames(
     "otherAssets.individualNameOfOtherAssetSeller.error.required",
     "otherAssets.individualNameOfOtherAssetSeller.error.tooLong",
-    "error.textarea.invalid"
+    "otherAssets.individualNameOfOtherAssetSeller.error.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       "otherAssets.individualNameOfOtherAssetSeller.title",
       "otherAssets.individualNameOfOtherAssetSeller.heading",
-      TextInputViewModel(),
+      TextAreaViewModel(),
       routes.IndividualNameOfOtherAssetSellerController.onSubmit(srn, index, mode)
     )
 }

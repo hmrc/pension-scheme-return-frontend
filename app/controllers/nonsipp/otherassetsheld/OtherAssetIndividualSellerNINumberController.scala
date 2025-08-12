@@ -126,12 +126,12 @@ object OtherAssetIndividualSellerNINumberController {
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
           .Conditional(
-            Message("otherAssets.otherAssetIndividualSellerNINumber.yes.conditional", individualName),
+            Message("otherAssets.otherAssetIndividualSellerNINumber.yes.conditional"),
             FieldType.Input
           ),
         no = YesNoViewModel
           .Conditional(
-            Message("otherAssets.otherAssetIndividualSellerNINumber.no.conditional", individualName),
+            Message("otherAssets.otherAssetIndividualSellerNINumber.no.conditional"),
             FieldType.Textarea
           )
       ).withHint("otherAssets.otherAssetIndividualSellerNINumber.hint"),
