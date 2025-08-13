@@ -40,7 +40,7 @@ class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec with Contr
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       injected[TextAreaView].apply(
         form(injected[TextFormProvider]),
-        viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
+        viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs)
       )
     })
 
@@ -48,7 +48,7 @@ class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec with Contr
       implicit app => implicit request =>
         injected[TextAreaView].apply(
           form(injected[TextFormProvider]).fill("test text"),
-          viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
+          viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs)
         )
     })
 

@@ -31,7 +31,7 @@ import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhenBorrowedPage}
+import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, WhenBorrowedPage}
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
@@ -64,25 +64,22 @@ class WhenBorrowedController @Inject() (
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-            val preparedForm =
-              request.userAnswers.fillForm(WhenBorrowedPage(srn, index), form(date.to, request))
-            Ok(
-              view(
-                preparedForm,
-                WhenBorrowedController
-                  .viewModel(
-                    srn,
-                    index,
-                    mode,
-                    request.schemeDetails.schemeName,
-                    amountBorrowed._1.displayAs,
-                    lenderName
-                  )
-              )
+        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+          val preparedForm =
+            request.userAnswers.fillForm(WhenBorrowedPage(srn, index), form(date.to, request))
+          Ok(
+            view(
+              preparedForm,
+              WhenBorrowedController
+                .viewModel(
+                  srn,
+                  index,
+                  mode,
+                  request.schemeDetails.schemeName,
+                  amountBorrowed._1.displayAs
+                )
             )
-          }
+          )
         }
       }
   }
@@ -90,38 +87,35 @@ class WhenBorrowedController @Inject() (
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-            form(date.to, request)
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        WhenBorrowedController.viewModel(
-                          srn,
-                          index,
-                          mode,
-                          request.schemeDetails.schemeName,
-                          amountBorrowed._1.displayAs,
-                          lenderName
-                        )
+        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+          form(date.to, request)
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      WhenBorrowedController.viewModel(
+                        srn,
+                        index,
+                        mode,
+                        request.schemeDetails.schemeName,
+                        amountBorrowed._1.displayAs
                       )
                     )
-                  ),
-                value =>
-                  for {
-                    updatedAnswers <- request.userAnswers.set(WhenBorrowedPage(srn, index), value).mapK[Future]
-                    nextPage = navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
-                    updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-                    _ <- saveService.save(updatedProgressAnswers)
-                  } yield Redirect(
-                    nextPage
                   )
-              )
-          }
+                ),
+              value =>
+                for {
+                  updatedAnswers <- request.userAnswers.set(WhenBorrowedPage(srn, index), value).mapK[Future]
+                  nextPage = navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                  _ <- saveService.save(updatedProgressAnswers)
+                } yield Redirect(
+                  nextPage
+                )
+            )
         }
       }
   }
@@ -163,15 +157,14 @@ object WhenBorrowedController {
     index: Max5000,
     mode: Mode,
     schemeName: String,
-    amountBorrowed: String,
-    lenderName: String
+    amountBorrowed: String
   ): FormPageViewModel[DatePageViewModel] =
     FormPageViewModel(
       "moneyBorrowed.WhenBorrowed.title",
-      Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed),
+      Message("moneyBorrowed.WhenBorrowed.heading", schemeName, amountBorrowed),
       DatePageViewModel(
         None,
-        Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed),
+        Message("moneyBorrowed.WhenBorrowed.heading", schemeName, amountBorrowed),
         Some("moneyBorrowed.WhenBorrowed.hint")
       ),
       controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onSubmit(srn, index, mode)

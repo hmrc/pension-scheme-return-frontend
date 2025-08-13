@@ -77,7 +77,7 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehav
       injected[DatePageView]
         .apply(
           WhenBorrowedController.form(injected[DatePageFormProvider])(date, createMessages(using app)),
-          viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
+          viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
@@ -89,7 +89,7 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec with ControllerBehav
               WhenBorrowedController
                 .form(injected[DatePageFormProvider])(date, createMessages(using app))
                 .fill(date),
-              viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
+              viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs)
             )
       }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
