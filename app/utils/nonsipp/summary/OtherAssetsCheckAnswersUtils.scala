@@ -519,7 +519,11 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
         ) :?+ sellerDetails.map(details =>
           CheckYourAnswersRowViewModel(
             if (sellerIdentityType == IdentityType.Individual) {
-              sellerDetailsType
+              Message(
+                "otherAssets.cya.section2.conditionalRow1.details.key",
+                "otherAssets.cya.seller",
+                sellerDetailsType
+              )
             } else {
               Message("otherAssets.cya.section2.conditionalRow1.details.key", sellerName, sellerDetailsType)
             },

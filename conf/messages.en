@@ -3456,6 +3456,7 @@ otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired th
 
 otherAssets.individualNameOfOtherAssetSeller.title = What is the seller’s name or names?
 otherAssets.individualNameOfOtherAssetSeller.heading = What is the seller’s name or names?
+otherAssets.individualNameOfOtherAssetSeller.hint = If there are multiple sellers, separate each name with commas. Do not use ampersands or separate lines.
 otherAssets.individualNameOfOtherAssetSeller.error.required =  Enter the seller’s name or names
 otherAssets.individualNameOfOtherAssetSeller.error.tooLong = Seller’s name must be 160 characters or fewer
 otherAssets.individualNameOfOtherAssetSeller.error.invalid = Seller’s name or names must only include letters a to z, hyphens, spaces or apostrophes, and be separated by commas. Do not use ampersands or new lines
@@ -3581,7 +3582,8 @@ otherAssets.cya.section2.conditionalRow1.noDetails.key = Reason you cannot provi
 otherAssets.cya.section2.conditionalRow1.noDetails.hidden = reason you cannot provide seller’s {0}
 otherAssets.cya.section2.baseRow3.key = Is any seller a connected party?
 otherAssets.cya.section2.baseRow3.hidden = if any seller is a connected party
-otherAssets.cya.nino = Seller’s National Insurance number
+otherAssets.cya.seller = Seller
+otherAssets.cya.nino = National Insurance number
 otherAssets.cya.crn = Company Registration Number (CRN)
 otherAssets.cya.utr = Unique Taxpayer Reference (UTR)
 otherAssets.cya.details = details

@@ -30,7 +30,7 @@ import forms.mappings.errors.InputFormErrors
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
 import utils.IntUtils.{toInt, toRefined5000}
-import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
+import pages.nonsipp.landorproperty.IndividualSellerNiPage
 import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -58,10 +58,8 @@ class IndividualSellerNiController @Inject() (
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).sync { individualName =>
-        val preparedForm = request.userAnswers.fillForm(IndividualSellerNiPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
-      }
+      val preparedForm = request.userAnswers.fillForm(IndividualSellerNiPage(srn, index), form)
+      Ok(view(preparedForm, viewModel(srn, index, mode)))
     }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
@@ -69,10 +67,7 @@ class IndividualSellerNiController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).async { individualName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
-            },
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value =>
             for {
               updatedAnswers <- Future
@@ -108,7 +103,6 @@ object IndividualSellerNiController {
   def viewModel(
     srn: Srn,
     index: Max5000,
-    individualName: String,
     mode: Mode
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](

@@ -27,12 +27,13 @@ import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
-import viewmodels.models._
 import play.api.data.Form
 import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.TextAreaView
 import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -86,7 +87,9 @@ object IndividualNameOfOtherAssetSellerController {
     FormPageViewModel(
       "otherAssets.individualNameOfOtherAssetSeller.title",
       "otherAssets.individualNameOfOtherAssetSeller.heading",
-      TextAreaViewModel(),
+      TextAreaViewModel(
+        hint = Some(Message("otherAssets.individualNameOfOtherAssetSeller.hint"))
+      ),
       routes.IndividualNameOfOtherAssetSellerController.onSubmit(srn, index, mode)
     )
 }
