@@ -64,7 +64,7 @@
                 }
 
                 case MessageLine(message) => {
-                    <p class="govuk-body">@renderMessage(message)</p>
+                    <p class="govuk-body govuk-!-margin-bottom-8" style="font-size: 1.5rem;">@renderMessage(message)</p>
                 }
                 case Section(vmSection) => {
                     @vmSection.heading.map(_ => <h2 class="govuk-heading-m">@renderMessage(heading)</h2>)

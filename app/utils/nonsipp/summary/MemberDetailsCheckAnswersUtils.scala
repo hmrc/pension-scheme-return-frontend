@@ -52,7 +52,11 @@ type MemberDeteilsData = (
 
 object MemberDetailsCheckAnswersUtils extends CheckAnswersUtils[Max300, MemberDeteilsData] with PsrControllerHelpers {
 
-  override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.memberDetails.heading"))
+  override def heading: Option[DisplayMessage] = None
+  override def heading(allData: List[MemberDeteilsData]): Option[DisplayMessage] = Some(
+    if (allData.length == 1) Message("nonsipp.summary.memberDetails.single.heading")
+    else Message("nonsipp.summary.memberDetails.heading", allData.length)
+  )
 
   override def subheading(data: MemberDeteilsData): Option[DisplayMessage] = Some(
     Message("nonsipp.summary.memberDetails.subheading", data.memberDetails.fullName)

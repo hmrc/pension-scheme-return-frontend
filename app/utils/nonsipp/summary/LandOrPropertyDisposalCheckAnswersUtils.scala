@@ -80,7 +80,13 @@ class LandOrPropertyDisposalCheckAnswersUtils(saveService: SaveService)
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.landOrProperty.disposals.heading"))
 
   override def subheading(data: LandOrPropertyDisposalData): Option[DisplayMessage] =
-    Some(Message("nonsipp.summary.landOrProperty.disposals.subheading", data.parameters.addressLookUpPage.addressLine1))
+    Some(
+      Message(
+        "nonsipp.summary.landOrProperty.disposals.subheading",
+        data.parameters.disposalIndex.value,
+        data.parameters.addressLookUpPage.addressLine1
+      )
+    )
 
   override def summaryDataAsync(srn: Srn, index: (Max5000, Max50), mode: Mode)(using
     request: DataRequest[AnyContent],
@@ -218,6 +224,7 @@ class LandOrPropertyDisposalCheckAnswersUtils(saveService: SaveService)
       }
       .keys
       .toList
+      .sortBy((i, di) => s"$i $di")
       .flatMap((lpi, di) =>
         for {
           refinedLpi <- refineStringIndex[Max5000.Refined](lpi)

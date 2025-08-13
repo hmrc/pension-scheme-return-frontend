@@ -61,7 +61,7 @@
     </div>
 
     @if(viewModel.summaryUrl.isDefined) {
-        <p class="govuk-body">@messages("returnSubmitted.summaryLink.prefix") <a href="@viewModel.summaryUrl">@messages("returnSubmitted.summaryLink.linkText")</a></p>
+        <p class="govuk-body">@messages("returnSubmitted.summaryLink.prefix") <a class="govuk-link" href="@viewModel.summaryUrl">@messages("returnSubmitted.summaryLink.linkText")</a></p>
     }
     <h2 class="govuk-heading-m">@messages("site.whatHappensNext")</h2>
 

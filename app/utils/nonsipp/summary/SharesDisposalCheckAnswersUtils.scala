@@ -92,6 +92,7 @@ object SharesDisposalCheckAnswersUtils
       }
       .keys
       .toList
+      .sortBy((i, di) => s"$i $di")
       .flatMap((i, di) =>
         for {
           refinedI <- refineStringIndex[Max5000.Refined](i)
@@ -102,7 +103,13 @@ object SharesDisposalCheckAnswersUtils
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.shares.disposals.heading"))
 
   override def subheading(data: ShareDisposalData): Option[DisplayMessage] =
-    Some(Message("nonsipp.summary.shares.disposals.subheading", data.parameters.companyName))
+    Some(
+      Message(
+        "nonsipp.summary.shares.disposals.subheading",
+        data.parameters.disposalIndex.value,
+        data.parameters.companyName
+      )
+    )
 
   override def summaryDataAsync(srn: Srn, index: (Max5000, Max50), mode: Mode)(using
     request: DataRequest[AnyContent],

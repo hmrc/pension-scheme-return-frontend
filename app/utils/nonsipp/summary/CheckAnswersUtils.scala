@@ -62,6 +62,7 @@ trait CheckAnswersUtils[I, D] {
   ): EitherT[Future, Result, List[D]] = EitherT(allSummaryData(srn, mode))
 
   def heading: Option[DisplayMessage] = None
+  def heading(allData: List[D]): Option[DisplayMessage] = None
   def subheading(data: D): Option[DisplayMessage] = None
 
   def isReported(srn: Srn)(using request: DataRequest[AnyContent]): Boolean = true
@@ -76,6 +77,6 @@ trait CheckAnswersUtils[I, D] {
         subheading(x).map(Subheading(_)).toList ++ List(Section(viewModel(x).page.toSummaryViewModel(None)))
       }
     } else { List(MessageLine(Message("nonsipp.summary.message.noneRecorded"))) }
-    heading.map(Heading(_)).toList ++ body
+    heading(data).orElse(heading).map(Heading(_)).toList ++ body
   }
 }
