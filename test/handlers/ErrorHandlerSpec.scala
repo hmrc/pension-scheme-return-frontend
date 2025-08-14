@@ -22,7 +22,7 @@ import play.api.mvc._
 import play.twirl.api.Html
 import controllers.ControllerBaseSpec
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-import play.api.mvc.request.{RemoteConnection, RequestTarget}
+import play.api.mvc.request.{RemoteConnection, RequestAttrKey, RequestTarget}
 import models.AnswersSavedDisplayVersion
 import play.api.libs.typedmap.TypedMap
 
@@ -87,5 +87,5 @@ class FakeRequestHeader extends RequestHeader {
 
   override def connection: RemoteConnection = RemoteConnection("", secure = true, None)
 
-  override def attrs: TypedMap = TypedMap()
+  override def attrs: TypedMap = TypedMap(RequestAttrKey.Id -> 123)
 }
