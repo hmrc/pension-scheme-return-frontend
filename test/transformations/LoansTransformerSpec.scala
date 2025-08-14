@@ -666,7 +666,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         loans(
           companyRecipientName,
           RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
-          sponsoringEmployer = true
+          connectedPartyStatus = false
         )
       )
       result.fold(
@@ -683,7 +683,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           )
           userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe None
           userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, 1)) mustBe Some(
-            SponsoringOrConnectedParty.Sponsoring
+            SponsoringOrConnectedParty.Neither
           )
         }
       )
@@ -696,7 +696,12 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None))
+        loans(
+          companyRecipientName,
+          RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None),
+          sponsoringEmployer = false,
+          connectedPartyStatus = true
+        )
       )
       result.fold(
         ex => fail(ex.getMessage),
@@ -971,7 +976,8 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       amountOfTheLoan: AmountOfTheLoan = amountOfTheLoan,
       interestOnLoan: InterestOnLoan = interestOnLoan,
       optArrearsPrevYears: Option[Boolean] = Some(true),
-      optOutstandingArrearsOnLoan: Option[Double] = Some(money.value)
+      optOutstandingArrearsOnLoan: Option[Double] = Some(money.value),
+      connectedPartyStatus: Boolean = true
     ): Loans =
       Loans(
         recordVersion = Some("001"),
@@ -981,7 +987,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             prePopulated = None,
             recipientIdentityType = recipientIdentityType,
             loanRecipientName = name,
-            connectedPartyStatus = true,
+            connectedPartyStatus = connectedPartyStatus,
             optRecipientSponsoringEmployer = if (sponsoringEmployer) Some("Yes") else None,
             datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
             loanAmountDetails = LoanAmountDetails(

@@ -339,9 +339,12 @@ class LoansTransformer @Inject() extends Transformer {
             val sponsoring = loanTransactions(index.value - 1).optRecipientSponsoringEmployer
             val connected = loanTransactions(index.value - 1).connectedPartyStatus
             (sponsoring, connected) match {
-              case (Some(_), _) => SponsoringOrConnectedParty.Sponsoring
               case (None, true) => SponsoringOrConnectedParty.ConnectedParty
               case (None, false) => SponsoringOrConnectedParty.Neither
+              case (Some(SponsoringOrConnectedParty.Sponsoring.name), _) => SponsoringOrConnectedParty.Sponsoring
+              case (Some(SponsoringOrConnectedParty.ConnectedParty.name), _) =>
+                SponsoringOrConnectedParty.ConnectedParty
+              case (Some(_), _) => SponsoringOrConnectedParty.Neither
             }
           }
         )
