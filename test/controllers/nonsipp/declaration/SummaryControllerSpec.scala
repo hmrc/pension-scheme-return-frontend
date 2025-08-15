@@ -388,7 +388,7 @@ class SummaryControllerSpec
         content should include("<h2 class=\"govuk-heading-xl\">Financial details</h2>")
 
         // members
-        content should include("<h2 class=\"govuk-heading-xl\">Member details</h2>")
+        content should include("<h2 class=\"govuk-heading-xl\">1 Member</h2>")
 
         // member payments
         content should include("<h2 class=\"govuk-heading-xl\">Employer contributions</h2>")

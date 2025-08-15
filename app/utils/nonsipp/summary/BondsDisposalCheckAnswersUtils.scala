@@ -74,7 +74,13 @@ object BondsDisposalCheckAnswersUtils
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.bonds.disposals.heading"))
 
   override def subheading(data: BondsDisposalData): Option[DisplayMessage] =
-    Some(Message("nonsipp.summary.bonds.disposals.subheading", data.parameters.bondsName))
+    Some(
+      Message(
+        "nonsipp.summary.bonds.disposals.subheading",
+        data.parameters.disposalIndex.value,
+        data.parameters.bondsName
+      )
+    )
 
   override def indexes(srn: Srn)(using request: DataRequest[AnyContent]): List[(Max5000, Max50)] =
     request.userAnswers
@@ -86,6 +92,7 @@ object BondsDisposalCheckAnswersUtils
       }
       .keys
       .toList
+      .sortBy((i, di) => s"$i $di")
       .flatMap((bi, di) =>
         for {
           refinedBi <- refineStringIndex[Max5000.Refined](bi)

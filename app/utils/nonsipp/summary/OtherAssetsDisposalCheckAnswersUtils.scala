@@ -84,6 +84,7 @@ object OtherAssetsDisposalCheckAnswersUtils
       }
       .keys
       .toList
+      .sortBy((i, di) => s"$i $di")
       .flatMap((i, di) =>
         for {
           refinedI <- refineStringIndex[Max5000.Refined](i)
@@ -94,7 +95,13 @@ object OtherAssetsDisposalCheckAnswersUtils
   override def heading: Option[DisplayMessage] = Some(Message("nonsipp.summary.otherAssets.disposals.heading"))
 
   override def subheading(data: OtherAssetDisposalData): Option[DisplayMessage] =
-    Some(Message("nonsipp.summary.otherAssets.disposals.subheading", data.parameters.whatIsOtherAsset))
+    Some(
+      Message(
+        "nonsipp.summary.otherAssets.disposals.subheading",
+        data.parameters.disposalIndex.value,
+        data.parameters.whatIsOtherAsset
+      )
+    )
 
   override def viewModel(data: OtherAssetDisposalData) = OtherAssetsDisposalCheckAnswersUtils.viewModel(
     data.parameters,
