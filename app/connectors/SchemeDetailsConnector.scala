@@ -25,7 +25,6 @@ import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import models.{SchemeDetails, SchemeId}
 import uk.gov.hmrc.http.client.HttpClientV2
-import utils.FutureUtils.FutureOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,10 +52,9 @@ class SchemeDetailsConnectorImpl @Inject() (appConfig: FrontendAppConfig, http: 
       )
       .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[Option[SchemeDetails]]
-      .tapError { t =>
-        Future.successful(
-          logger.warn(s"Failed to fetch scheme details $schemeId for psa with message ${t.getMessage}")
-        )
+      .recoverWith { t =>
+        logger.warn(s"Failed to fetch scheme details $schemeId for psa with message ${t.getMessage}", t)
+        Future.failed(t) // preserve the original failure
       }
 
   // API 1444 (Get scheme details)
@@ -74,10 +72,9 @@ class SchemeDetailsConnectorImpl @Inject() (appConfig: FrontendAppConfig, http: 
       )
       .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[Option[SchemeDetails]]
-      .tapError { t =>
-        Future.successful(
-          logger.warn(s"Failed to fetch scheme details $schemeId for psp with message ${t.getMessage}")
-        )
+      .recoverWith { t =>
+        logger.warn(s"Failed to fetch scheme details $schemeId for psp with message ${t.getMessage}", t)
+        Future.failed(t)
       }
 
 }
