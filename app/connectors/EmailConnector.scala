@@ -19,11 +19,11 @@ package connectors
 import utils.WithName
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import com.google.inject.Inject
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import uk.gov.hmrc.crypto._
 import config.FrontendAppConfig
 import models.SendEmailRequest
 import uk.gov.hmrc.http.client.HttpClientV2
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.libs.ws.JsonBodyWritables.given
 import play.api.libs.json.Json
 import play.api.http.Status._
@@ -45,8 +45,10 @@ case object EmailNotSent extends WithName("EmailNotSent") with EmailStatus
 class EmailConnector @Inject() (
   appConfig: FrontendAppConfig,
   http: HttpClientV2,
-  crypto: ApplicationCrypto
+  config: Configuration
 ) {
+  private lazy val jsonCrypto: Encrypter & Decrypter =
+    SymmetricCryptoFactory.aesCryptoFromConfig(baseConfigKey = "queryParameter.encryption", config.underlying)
 
   private val logger = Logger(classOf[EmailConnector])
 
@@ -78,7 +80,7 @@ class EmailConnector @Inject() (
 
   private def encrypt(value: String): String =
     URLEncoder.encode(
-      crypto.QueryParameterCrypto.encrypt(PlainText(value)).value,
+      jsonCrypto.encrypt(PlainText(value)).value,
       StandardCharsets.UTF_8.toString
     )
 
