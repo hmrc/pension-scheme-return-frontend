@@ -18,6 +18,7 @@ package repositories
 
 import org.mongodb.scala.model.Updates.{combine, set}
 import uk.gov.hmrc.mongo.MongoComponent
+import models.UploadSuccess.uploadFormat
 import models.SchemeId.asSrn
 import uk.gov.hmrc.mongo.play.json.Codecs._
 import play.api.libs.json._
@@ -182,8 +183,6 @@ object UploadRepository {
 
   private implicit val referenceFormat: Format[Reference] =
     stringFormat[Reference](Reference(_), _.reference)
-
-  implicit val uploadFormat: OFormat[Upload] = Json.format[Upload]
 
   private def stringFormat[A](to: String => A, from: A => String): Format[A] =
     Format[A](Reads.StringReads.map(to), Writes.StringWrites.contramap(from))
