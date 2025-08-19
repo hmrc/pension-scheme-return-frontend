@@ -87,6 +87,7 @@ case class UploadSuccess(memberDetails: List[UploadMemberDetails]) extends Uploa
 
 object UploadSuccess {
   implicit val uploadSuccessFormat: OFormat[UploadSuccess] = Json.format[UploadSuccess]
+  implicit val uploadFormat: OFormat[Upload] = Json.format[Upload]
 }
 
 // UploadError should not extend Upload as the nested inheritance causes issues with the play Json macros
