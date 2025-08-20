@@ -31,7 +31,7 @@ import viewmodels.implicits._
 import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import views.html.PsaIdInputView
 import models.SchemeId.Srn
-import pages.nonsipp.FbVersionPage
+import pages.nonsipp.{FbVersionPage, WhichTaxYearPage}
 import navigation.Navigator
 import utils.nonsipp.SchemeDetailNavigationUtils
 import forms.TextFormProvider
@@ -165,6 +165,18 @@ class PspDeclarationController @Inject() (
                   .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
                   .addingToSession(
                     (SUBMISSION_DATE, schemeDateService.submissionDateAsString(now))
+                  )
+                  .addingToSession(
+                    (
+                      TAX_YEAR,
+                      request.userAnswers.get(WhichTaxYearPage(srn)).map(_.from.getYear.toString).getOrElse("")
+                    )
+                  )
+                  .addingToSession(
+                    (
+                      IS_JOURNEY_BYPASSED,
+                      bypassed.toString
+                    )
                   )
             )
       }

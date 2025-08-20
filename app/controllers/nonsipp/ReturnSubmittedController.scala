@@ -20,7 +20,7 @@ import utils.DashboardUtils
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import cats.implicits.{catsSyntaxTuple2Semigroupal, toShow}
-import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE, SUBMISSION_VIEWED_FLAG}
+import config.Constants._
 import controllers.actions._
 import play.api.libs.json.Json
 import models.requests.psr.MinimalRequiredSubmission.nonEmptyListFormat
@@ -59,12 +59,20 @@ class ReturnSubmittedController @Inject() (
       (request.session.get(RETURN_PERIODS), request.session.get(SUBMISSION_DATE))
         .mapN { (returnPeriods, submissionDate) =>
           val returnPeriodsParsed = Json.parse(returnPeriods).as[NonEmptyList[DateRange]]
-          val summaryUrl = controllers.nonsipp.declaration.routes.SummaryController
-            .onPageLoad(
-              srn,
-              returnPeriodsParsed.head.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            )
-            .url
+          val summaryUrl = (request.session.get(TAX_YEAR), request.session.get(IS_JOURNEY_BYPASSED))
+            .flatMapN { (taxYear, isOver99Members) =>
+              if (isOver99Members == "true") { None }
+              else {
+                Some(
+                  controllers.nonsipp.declaration.routes.SummaryController
+                    .onPageLoad(
+                      srn,
+                      s"$taxYear-04-06"
+                    )
+                    .url
+                )
+              }
+            }
           Ok(
             view(
               viewModel(
@@ -92,7 +100,7 @@ object ReturnSubmittedController {
     returnPeriods: NonEmptyList[DateRange],
     submissionDate: LocalDateTime,
     managePensionSchemeDashboardUrl: String,
-    summaryUrl: String
+    summaryUrl: Option[String]
   ): SubmissionViewModel =
     SubmissionViewModel(
       "returnSubmitted.title",
@@ -106,7 +114,7 @@ object ReturnSubmittedController {
         submissionDate.show,
         submissionDate.format(DateRange.readableTimeFormat).toLowerCase()
       ),
-      summaryUrl = Some(summaryUrl),
+      summaryUrl = summaryUrl,
       whatHappensNextContent = ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
         ParagraphMessage(
           "returnSubmitted.whatHappensNext.paragraph2",

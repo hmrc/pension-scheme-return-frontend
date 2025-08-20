@@ -42,6 +42,8 @@ object Constants {
   val VERSION = "version"
   val FB_NUMBER = "fbNumber"
 
+  val IS_JOURNEY_BYPASSED = "isJourneyBypassed"
+
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"
 

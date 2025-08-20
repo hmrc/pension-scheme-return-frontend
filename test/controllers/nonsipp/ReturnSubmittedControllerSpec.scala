@@ -39,9 +39,7 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec with ControllerBe
   private val returnPeriod3 = dateRangeGen.sample.value
   private val submissionDateTime = localDateTimeGen.sample.value
 
-  private val startDate = returnPeriod1.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
   private val mpsDashboardUrl = "http://localhost:8204/manage-pension-schemes/pension-scheme-summary/" + srn.value
-  private val summaryUrl = controllers.nonsipp.declaration.routes.SummaryController.onPageLoad(srn, startDate).url
 
   "ReturnSubmittedController" - {
 
@@ -107,6 +105,6 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec with ControllerBe
       returnPeriods,
       submissionDate,
       mpsDashboardUrl,
-      summaryUrl
+      None
     )
 }

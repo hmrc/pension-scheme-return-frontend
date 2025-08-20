@@ -149,7 +149,14 @@ class SummaryController @Inject() (
           psrVersionsService
             .getVersions(request.schemeDetails.pstr, startDate, srn)
         )
-        lastVersion = versions.maxBy(_.reportVersion)
+        lastVersion <- EitherT.fromEither(
+          versions.maxByOption(_.reportVersion).toRight {
+            logger.warn(
+              s"Failed to get versions in order to render the summary page: No versions for this SRN. tax year: $startDate"
+            )
+            Redirect(controllers.routes.OverviewController.onPageLoad(srn))
+          }
+        )
         lastVersionDateTime = lastVersion.compilationOrSubmissionDate
         schemeDate = schemeDateService
           .taxYearOrAccountingPeriods(srn)
