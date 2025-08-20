@@ -156,6 +156,13 @@ object TaskListUtils {
       case (false, _, _) =>
         // no submission link is shown, no need to distinguish
         (false, None)
+      case (_, None, Some(pure))
+          if pure.get(FbStatus(srn)).exists(_.isSubmitted) && pure.get(FbVersionPage(srn)).contains("001") =>
+        // only one submitted version
+        (
+          userAnswersUnchangedAllSections(userAnswers, pure),
+          Some(pure.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt)
+        )
       case (_, None, _) =>
         // there is no "history"
         (false, None)
