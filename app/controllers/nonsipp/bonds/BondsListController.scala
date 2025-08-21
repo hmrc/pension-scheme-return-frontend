@@ -426,11 +426,14 @@ object BondsListController {
 
     val paragraph = Option.when(bondsSize < maxBondsTransactions) {
       if (bondsToCheck.nonEmpty) {
-        ParagraphMessage("bondsList.description.prepop.check")
+        ParagraphMessage("bondsList.description.prepop.check") ++
+          ParagraphMessage("bondsList.description.disposal")
       } else if (isPrePop) {
-        ParagraphMessage("bondsList.description.prepop")
+        ParagraphMessage("bondsList.description.prepop") ++
+          ParagraphMessage("bondsList.description.disposal")
       } else {
-        ParagraphMessage("bondsList.description")
+        ParagraphMessage("bondsList.description") ++
+          ParagraphMessage("bondsList.description.disposal")
       }
     }
 
