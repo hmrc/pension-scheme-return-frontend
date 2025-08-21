@@ -155,6 +155,54 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
         _ => fail("Expected link is missing")
       )
     }
+
+    "should return view declaration submitted link if navigated from view and change and there is no previous version and pure version is submitted" in {
+      val sectionList = getSectionList(
+        srn,
+        schemeName,
+        previousUA,
+        psaIdGen.sample.value,
+        None,
+        Some(previousUA),
+        dateRange.from,
+        isPrePop = false
+      )
+      sectionList.size mustBe 9
+      sectionList.reverse.head.items.fold(
+        message =>
+          message.head.asInstanceOf[LinkMessage].url mustBe controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
+            .onPageLoad(
+              srn,
+              dateRange.from.toString,
+              1
+            )
+            .url,
+        _ => fail("Expected link is missing")
+      )
+    }
+
+    "should return view declaration submitted link if navigated from view and change and there is no previous version " +
+      "and pure version is submitted and there are changes to the user answers" in {
+        val sectionList = getSectionList(
+          srn,
+          schemeName,
+          previousUA.unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), Money(123)),
+          psaIdGen.sample.value,
+          None,
+          Some(previousUA),
+          dateRange.from,
+          isPrePop = false
+        )
+        sectionList.size mustBe 9
+        sectionList.reverse.head.items.fold(
+          message =>
+            message.head
+              .asInstanceOf[LinkMessage]
+              .url mustBe controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url,
+          _ => fail("Expected link is missing")
+        )
+      }
+
     "should return submit declaration link for psa if there were changes in current user answers" in {
       val sectionList = getSectionList(
         srn,
