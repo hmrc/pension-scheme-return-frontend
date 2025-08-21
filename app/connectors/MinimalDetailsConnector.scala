@@ -23,7 +23,6 @@ import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import play.api.Logging
 import models.MinimalDetails
 import uk.gov.hmrc.http.client.HttpClientV2
-import utils.FutureUtils.FutureOps
 import play.api.http.Status.{FORBIDDEN, NOT_FOUND}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
@@ -51,9 +50,11 @@ class MinimalDetailsConnector @Inject() (appConfig: FrontendAppConfig, http: Htt
         case e @ WithStatusCode(FORBIDDEN) if e.message.contains(Constants.delimitedPSA) =>
           Left(DelimitedAdmin)
       }
-      .tapError(_ =>
-        Future.successful(logger.warn(s"Failed to fetch minimal details for loggedInAsPsa and $loggedInAsPsa"))
-      )
+      .recoverWith { t =>
+        logger.warn(s"Failed to fetch minimal details for loggedInAsPsa=$loggedInAsPsa", t)
+        Future.failed(t)
+      }
+
 }
 
 sealed trait MinimalDetailsError
