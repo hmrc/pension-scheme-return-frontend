@@ -17,7 +17,6 @@
 package controllers.nonsipp.declaration
 
 import services._
-import models.audit.PSRSubmissionEmailAuditEvent
 import utils.DateTimeUtils
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -60,7 +59,6 @@ class PspDeclarationController @Inject() (
   view: PsaIdInputView,
   emailConnector: EmailConnector,
   config: FrontendAppConfig,
-  auditService: AuditService,
   val psrVersionsService: PsrVersionsService,
   val psrRetrievalService: PsrRetrievalService
 )(implicit ec: ExecutionContext)
@@ -216,23 +214,6 @@ class PspDeclarationController @Inject() (
         taxYear = taxYear.toYearFormat,
         userName = name
       )
-      .map { emailStatus =>
-        auditService.sendEvent(
-          PSRSubmissionEmailAuditEvent(
-            schemeName = request.schemeDetails.schemeName,
-            name,
-            psaOrPspId = request.pensionSchemeId.value,
-            schemeTaxReference = request.schemeDetails.pstr,
-            affinityGroup = if (request.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-            credentialRole = PSP,
-            taxYear = taxYear,
-            email,
-            reportVersion,
-            emailStatus
-          )
-        )
-        emailStatus
-      }
   }
 }
 

@@ -17,17 +17,14 @@
 package controllers.nonsipp.declaration
 
 import services._
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import connectors.EmailConnector
 import controllers.{ControllerBaseSpec, ControllerBehaviours, TestUserAnswers}
 import play.api.inject.bind
 import views.html.ContentPageView
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import models.audit.PSRSubmissionEmailAuditEvent
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
@@ -52,14 +49,12 @@ class PsaDeclarationControllerSpec
   private implicit val mockEmailConnector: EmailConnector = mock[EmailConnector]
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
-  private val mockAuditService = mock[AuditService]
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   private val templateId = "pods_pension_scheme_return_submitted"
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    reset(mockAuditService)
     reset(mockEmailConnector)
     reset(mockSchemeDateService)
     reset(mockPsrVersionsService)
@@ -69,7 +64,6 @@ class PsaDeclarationControllerSpec
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService),
-    bind[AuditService].toInstance(mockAuditService),
     bind[SchemeDateService].toInstance(mockSchemeDateService),
     bind[EmailConnector].toInstance(mockEmailConnector),
     bind[PsrVersionsService].toInstance(mockPsrVersionsService),
@@ -82,8 +76,6 @@ class PsaDeclarationControllerSpec
 
     lazy val onPageLoad = routes.PsaDeclarationController.onPageLoad(srn)
     lazy val onSubmit = routes.PsaDeclarationController.onSubmit(srn)
-    lazy val emailAuditEventCaptor: ArgumentCaptor[PSRSubmissionEmailAuditEvent] =
-      ArgumentCaptor.forClass(classOf[PSRSubmissionEmailAuditEvent])
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[ContentPageView]
@@ -99,8 +91,6 @@ class PsaDeclarationControllerSpec
           when(mockSchemeDateService.returnPeriodsAsJsonString(any())(using any())).thenReturn("")
           when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
           when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
-          when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(using any(), any()))
-            .thenReturn(Future.successful(AuditResult.Success))
           MockPsrSubmissionService.submitPsrDetails()
           MockEmailConnector.sendEmail(email, templateId)
         }
@@ -108,8 +98,6 @@ class PsaDeclarationControllerSpec
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           verify(mockEmailConnector, times(1))
             .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(using any(), any())
-          verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
-          emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
         }
         .withName("agree and continue should submit PSR details, send email and audit ")
     )
@@ -126,8 +114,6 @@ class PsaDeclarationControllerSpec
         when(mockSchemeDateService.returnPeriodsAsJsonString(any())(using any())).thenReturn("")
         when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
         when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
-        when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(using any(), any()))
-          .thenReturn(Future.successful(AuditResult.Success))
         when(
           mockPsrRetrievalService
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
@@ -142,8 +128,6 @@ class PsaDeclarationControllerSpec
         verify(mockPsrSubmissionService, times(1)).submitPsrDetailsBypassed(any(), any())(using any(), any(), any())
         verify(mockEmailConnector, times(1))
           .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(using any(), any())
-        verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
-        emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
       }.withName(
         "when there are no members in the previous returns, agree and continue should submit PSR details bypassed, send email and audit "
       )
@@ -161,8 +145,6 @@ class PsaDeclarationControllerSpec
         when(mockSchemeDateService.returnPeriodsAsJsonString(any())(using any())).thenReturn("")
         when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
         when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
-        when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(using any(), any()))
-          .thenReturn(Future.successful(AuditResult.Success))
         when(
           mockPsrRetrievalService
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
@@ -177,8 +159,6 @@ class PsaDeclarationControllerSpec
         verify(mockPsrSubmissionService, never).submitPsrDetailsBypassed(any(), any())(using any(), any(), any())
         verify(mockEmailConnector, times(1))
           .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(using any(), any())
-        verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
-        emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
       }.withName(
         "when there are members in the previous returns, agree and continue should submit PSR details, send email and audit "
       )
