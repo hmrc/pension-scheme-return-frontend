@@ -22,7 +22,6 @@ import models.cache.SessionData
 import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
-import utils.FutureUtils.FutureOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +35,8 @@ class SessionDataCacheConnector @Inject() (config: FrontendAppConfig, http: Http
     http
       .get(url"$url")
       .execute[Option[SessionData]]
-      .tapError(t => Future.successful(logger.warn(s"Failed to fetch $cacheId with message ${t.getMessage}")))
-
+      .recoverWith { t =>
+        logger.warn(s"Failed to fetch $cacheId with message ${t.getMessage}")
+        Future.failed(t)
+      }
 }
