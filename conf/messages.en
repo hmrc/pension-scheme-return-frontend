@@ -1107,10 +1107,16 @@ uploadMemberDetails.list3 = their National Insurance number, in the format QQ123
 uploadMemberDetails.error.required = Select a file
 uploadMemberDetails.error.size = The selected file must be smaller than {0}
 
-howToUpload.title = Download template file
-howToUpload.heading = Download template file
+howToUpload.title = Download the members template file
+howToUpload.heading = Download members template file
+howToUpload.paragraph.one = You need to use the .csv template provided to add details of members. Each row of the file corresponds to members in the scheme.
+howToUpload.heading.two = Supporting information
+howToUpload.paragraph.two = In the template there is guidance in row 2 to support you to complete the file successfully. It includes required formats and examples. Enter your data from row 3 onwards.
+howToUpload.heading.three = Download the file
 howToUpload.linkMessage = Download the template .csv file
-howToUpload.linkMessage1 = and use this to enter the information. Do not change or delete the header row (row 1) or the guidance text row (row 2), or change the order of the columns in the template file.
+howToUpload.linkMessage1 = and enter all the required information.
+howToUpload.paragraph.three = Do not change or delete the header row (row 1) or guidance text row (row 2), or change the order of the columns in the template file.
+howToUpload.paragraph.four = Uploading a file will overwrite any members’ data you have previously added for this scheme.
 
 checkMemberDetailsFile.title = Check your member details file
 checkMemberDetailsFile.heading = Check your member details file
