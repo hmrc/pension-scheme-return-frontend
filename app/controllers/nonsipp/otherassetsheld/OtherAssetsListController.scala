@@ -370,10 +370,12 @@ object OtherAssetsListController {
 
     val paragraph = Option.when(otherAssetsSize < Constants.otherAssetsPageSize) {
       if (otherAssetsToCheck.nonEmpty) {
-        ParagraphMessage("otherAssets.list.description.prepop", "otherAssets.list.description") ++
+        ParagraphMessage("otherAssets.list.description.prepop", "otherAssets.list.description1") ++
+          ParagraphMessage("otherAssets.list.description2") ++
           ParagraphMessage("otherAssets.list.description.disposal")
       } else {
-        ParagraphMessage("otherAssets.list.description") ++
+        ParagraphMessage("otherAssets.list.description1") ++
+          ParagraphMessage("otherAssets.list.description2") ++
           ParagraphMessage("otherAssets.list.description.disposal")
       }
     }
