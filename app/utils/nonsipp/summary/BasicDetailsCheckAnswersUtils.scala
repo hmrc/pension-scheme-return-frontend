@@ -79,7 +79,7 @@ object BasicDetailsCheckAnswersUtils extends PsrControllerHelpers {
     summaryDataT(srn, mode).map { data =>
       List(
         Heading(Message("nonsipp.summary.basicDetails.heading")),
-        Section(viewModel(data).page.toSummaryViewModel(None))
+        Section(viewModel(data).page.toSummaryViewModel(), true)
       )
     }
 

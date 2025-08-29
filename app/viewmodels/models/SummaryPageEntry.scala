@@ -17,11 +17,12 @@
 package viewmodels.models
 
 import viewmodels.{DisplayMessage, Margin}
+import viewmodels.DisplayMessage.Heading2
 
 sealed trait SummaryPageEntry
 
 object SummaryPageEntry {
-  case class Section(viewModel: CheckYourAnswersSummaryViewModel) extends SummaryPageEntry
+  case class Section(viewModel: CheckYourAnswersSummaryViewModel, useH3: Boolean = false) extends SummaryPageEntry
   case class MessageLine(value: DisplayMessage) extends SummaryPageEntry
   case class Heading(value: DisplayMessage) extends SummaryPageEntry
   case class Subheading(value: DisplayMessage) extends SummaryPageEntry
@@ -40,5 +41,15 @@ case class CheckYourAnswersSummaryViewModel(
 
 extension (viewModel: CheckYourAnswersViewModel) {
   def toSummaryViewModel(heading: Option[DisplayMessage] = None): CheckYourAnswersSummaryViewModel =
-    CheckYourAnswersSummaryViewModel(heading, viewModel.sections, viewModel.marginBottom, viewModel.inset)
+    CheckYourAnswersSummaryViewModel(
+      heading,
+      viewModel.sections.map(section =>
+        section.copy(heading = section.heading match {
+          case Some(Heading2(content, _)) => Some(content)
+          case message => message
+        })
+      ),
+      viewModel.marginBottom,
+      viewModel.inset
+    )
 }
