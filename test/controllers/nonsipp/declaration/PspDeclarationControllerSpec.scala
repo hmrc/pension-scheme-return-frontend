@@ -82,7 +82,7 @@ class PspDeclarationControllerSpec
 
     act.like(renderView(onPageLoad, isPsa = false) { implicit app => implicit request =>
       injected[PsaIdInputView]
-        .apply(form(injected[TextFormProvider], Some(psaId.value)), viewModel)
+        .apply(form(injected[TextFormProvider], Some(psaId.value)), viewModel, schemeName)
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

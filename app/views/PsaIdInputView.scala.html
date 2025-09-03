@@ -24,9 +24,11 @@
         govukInput: GovukInput
 )
 
-@(form: Form[?], viewmodel: FormPageViewModel[TextInputViewModel])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], viewmodel: FormPageViewModel[TextInputViewModel], schemeName: String)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
+
+    <span class="govuk-caption-xl">@schemeName</span>
 
   @formHelper(action = viewmodel.onSubmit) {
 

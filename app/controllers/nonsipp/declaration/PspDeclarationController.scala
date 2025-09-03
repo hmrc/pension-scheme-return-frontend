@@ -91,7 +91,8 @@ class PspDeclarationController @Inject() (
                             request.pensionSchemeId,
                             isPrePopulation
                           )
-                        )
+                        ),
+                      request.schemeDetails.schemeName
                     )
                   )
               )
@@ -126,7 +127,8 @@ class PspDeclarationController @Inject() (
                   BadRequest(
                     view(
                       formWithErrors,
-                      PspDeclarationController.viewModel(srn, hasNumberOfMembersChangedToOver99)
+                      PspDeclarationController.viewModel(srn, hasNumberOfMembersChangedToOver99),
+                      request.schemeDetails.schemeName
                     )
                   )
                 ),

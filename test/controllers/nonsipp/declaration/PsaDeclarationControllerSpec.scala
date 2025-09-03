@@ -79,7 +79,7 @@ class PsaDeclarationControllerSpec
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[ContentPageView]
-      view(viewModel)
+      view(viewModel, Some(schemeName))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
