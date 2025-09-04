@@ -56,7 +56,7 @@ trait SoftDelete extends PSRController {
    *   - during GET from ETMP in the member transformer (new members are identified)
    *
    *   - Only remove completed flags when the member is soft deleted
-   *   - Return None when something has gone wrong - todo: change to type that can store the error for logging
+   *   - Return None when something has gone wrong
    *   - When hard deleting members after moving them to the soft delete group, the function checks to see if any
    *     section journeys still exist (e.g. employer contributions). If they don't, delete that sections completed flag.
    *   - For the member payments section, the function checks to see if the initial section page has been completed:

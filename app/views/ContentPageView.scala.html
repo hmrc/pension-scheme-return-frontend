@@ -21,11 +21,12 @@
     govukButton: GovukButton
 )
 
-@(viewmodel: FormPageViewModel[ContentPageViewModel])(implicit request: Request[?], messages: Messages)
+@(viewmodel: FormPageViewModel[ContentPageViewModel], schemeName: Option[String] = None)(implicit request: Request[?], messages: Messages)
 
 @if(viewmodel.page.isStartButton) {
 
   @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false, breadcrumbs = viewmodel.breadcrumbs) {
+
 
     @if(viewmodel.page.isLargeHeading) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
@@ -44,6 +45,10 @@
 
 } else {
   @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
+
+    @if(schemeName.isDefined) {
+        <span class="govuk-caption-xl">@schemeName</span>
+    }
 
     @if(viewmodel.page.isLargeHeading) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>

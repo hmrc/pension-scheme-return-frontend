@@ -85,7 +85,8 @@ class PsaDeclarationController @Inject() (
                             request.pensionSchemeId,
                             isPrePopulation
                           )
-                        )
+                        ),
+                      Some(request.schemeDetails.schemeName)
                     )
                   )
               )
