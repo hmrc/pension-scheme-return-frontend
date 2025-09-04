@@ -1064,7 +1064,7 @@ surrenderedBenefits.change.heading = Change details of surrendered benefits for 
 
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Other assets held
-otherAssetsHeld.paragraph = Other assets does not include loans, shares held in a sponsoring employer, unquoted shares, quoted shares, third party managed funds, unregulated bonds, bonds and shares acquired from a connected party, and land or property.
+otherAssetsHeld.paragraph = Other assets does not include loans, shares held in a sponsoring employer, unquoted shares, quoted shares, third party managed funds, regulated bonds, unregulated bonds, bonds and shares acquired from a connected party, and land or property.
 otherAssetsHeld.paragraph1 = If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 otherAssetsHeld.legend = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
