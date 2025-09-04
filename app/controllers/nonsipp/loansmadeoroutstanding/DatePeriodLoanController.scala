@@ -164,7 +164,7 @@ object DatePeriodLoanController {
     TripleQuestion(
       form,
       QuestionField.date("datePeriodLoan.field1", Some("datePeriodLoan.hint")),
-      QuestionField.currency(Message("datePeriodLoan.field2", schemeName)),
+      QuestionField.currency(Message("datePeriodLoan.field2", schemeName), Some("datePeriodLoan.field2.hint")),
       QuestionField.numeric("datePeriodLoan.field3", hint = Some("datePeriodLoan.field3.hint"))
     ),
     details = None,
