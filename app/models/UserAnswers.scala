@@ -167,7 +167,7 @@ final case class UserAnswers(
       case None => Try(this)
     }
 
-  def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
+  private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)

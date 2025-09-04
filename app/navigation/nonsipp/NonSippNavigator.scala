@@ -33,7 +33,7 @@ import javax.inject.Inject
 @Singleton
 class NonSippNavigator @Inject() () extends Navigator {
 
-  val nonSippNavigator: JourneyNavigator = new JourneyNavigator {
+  private val nonSippNavigator: JourneyNavigator = new JourneyNavigator {
     override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
       case WhichTaxYearPage(srn) => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)

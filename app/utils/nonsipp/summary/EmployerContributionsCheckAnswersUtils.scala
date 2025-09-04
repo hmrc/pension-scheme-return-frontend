@@ -138,7 +138,7 @@ object EmployerContributionsCheckAnswersUtils
       .sequence
       .getOrRecoverJourney
 
-  def buildCYA(srn: Srn, index: Max300, secondaryIndex: Max50)(implicit
+  private def buildCYA(srn: Srn, index: Max300, secondaryIndex: Max50)(implicit
     request: DataRequest[?]
   ): Either[Result, EmployerCYA] =
     for {
@@ -461,7 +461,7 @@ object EmployerContributionsCheckAnswersUtils
     }
   }
 
-  def businessTypeMessageKey(identityType: IdentityType): String = identityType match {
+  private def businessTypeMessageKey(identityType: IdentityType): String = identityType match {
     case IdentityType.Individual => "identityType.individual"
     case IdentityType.UKCompany => "identityType.company"
     case IdentityType.UKPartnership => "identityType.partnership"

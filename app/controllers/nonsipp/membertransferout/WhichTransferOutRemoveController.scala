@@ -141,7 +141,7 @@ object WhichTransferOutRemoveController {
           Message("transferOut.whichTransferOutRemove.radio.label", receivingSchemeName, value.show)
         )
       )
-    }.toList
+    }
 
   def viewModel(
     srn: Srn,

@@ -22,7 +22,7 @@ import models.UserAnswers
 
 trait JourneyNavigator {
 
-  val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+  private val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
 
   implicit class OptionOps[A](opt: Option[A]) {
     def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)

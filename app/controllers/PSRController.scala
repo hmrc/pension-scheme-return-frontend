@@ -59,7 +59,7 @@ import java.time.format.DateTimeFormatter
 
 trait PsrControllerHelpers extends Results {
 
-  def requiredPageLogger: Logger = Logger("RequiredPage")
+  private def requiredPageLogger: Logger = Logger("RequiredPage")
 
   def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[?]): Either[Result, A] =
     request.userAnswers.get(page) match {

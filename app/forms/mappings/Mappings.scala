@@ -33,7 +33,11 @@ trait Mappings extends Formatters with Constraints {
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
     of(using stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
 
-  def textWithKey(key: String, errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
+  private def textWithKey(
+    key: String,
+    errorKey: String,
+    args: Seq[Any]
+  ): Mapping[String] =
     FieldMapping[String](key = key)(using stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
 
   def conditional[A](
@@ -42,7 +46,7 @@ trait Mappings extends Formatters with Constraints {
   )(implicit ev: GenericFormMapper[String, A]): FieldMapping[Option[A]] =
     of(using conditionalFormatter[A](l, prePopKey))
 
-  def optionalText(): Mapping[String] =
+  private def optionalText(): Mapping[String] =
     of(using optionalStringFormatter()).transform[String](_.trim, _.trim)
 
   def int(
@@ -181,7 +185,7 @@ trait Mappings extends Formatters with Constraints {
       }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args*))
 
-  def validatedOptionalText(
+  private def validatedOptionalText(
     regexChecks: List[(Regex, String)],
     maxLength: Int,
     maxLengthErrorKey: String,
@@ -325,7 +329,7 @@ trait Mappings extends Formatters with Constraints {
       )
       .transform[String](_.filterNot(_.isWhitespace).toUpperCase, _.filterNot(_.isWhitespace).toUpperCase)
 
-  def nonRequiredPostCode(
+  private def nonRequiredPostCode(
     regexChecks: List[(Regex, String)],
     maxLength: Int,
     maxLengthErrorKey: String,

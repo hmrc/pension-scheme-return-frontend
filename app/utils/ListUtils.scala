@@ -38,7 +38,7 @@ object ListUtils {
       go(list, step)
     }
 
-    def maybeAppend(maybeElem: Option[A]): List[A] =
+    private def maybeAppend(maybeElem: Option[A]): List[A] =
       maybeElem.fold(list)(elem => list :+ elem)
 
     def :?+(maybeElem: Option[A]): List[A] = maybeAppend(maybeElem)

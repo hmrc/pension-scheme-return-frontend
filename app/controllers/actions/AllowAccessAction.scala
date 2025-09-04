@@ -96,12 +96,12 @@ class AllowAccessAction(
       _ => minimalDetailsConnector.fetch(loggedInAsPsa = false)
     )
 
-  object HasRlsFlag {
+  private object HasRlsFlag {
     def unapply(minimalDetails: MinimalDetails): Option[MinimalDetails] =
       if (minimalDetails.rlsFlag) Some(minimalDetails) else None
   }
 
-  object HasDeceasedFlag {
+  private object HasDeceasedFlag {
     def unapply(minimalDetails: MinimalDetails): Option[MinimalDetails] =
       if (minimalDetails.deceasedFlag) Some(minimalDetails) else None
   }

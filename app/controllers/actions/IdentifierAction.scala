@@ -88,14 +88,14 @@ class IdentifierActionImpl @Inject() (
 
   override def parser: BodyParser[AnyContent] = playBodyParsers.default
 
-  object IsPSA {
+  private object IsPSA {
     def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] =
       enrolments.enrolments
         .find(_.key == Constants.psaEnrolmentKey)
         .flatMap(_.getIdentifier(Constants.psaIdKey))
   }
 
-  object IsPSP {
+  private object IsPSP {
     def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] =
       enrolments.enrolments
         .find(_.key == Constants.pspEnrolmentKey)
