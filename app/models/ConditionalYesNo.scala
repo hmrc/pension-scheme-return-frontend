@@ -45,7 +45,12 @@ object ConditionalYesNo {
         )
       )
 
-  implicit def format[No: Reads: Writes, Yes: Reads: Writes]: Format[ConditionalYesNo[No, Yes]] = Format(reads, writes)
+  implicit def format[No, Yes](using
+    readsNo: Reads[No],
+    writesNo: Writes[No],
+    readsYes: Reads[Yes],
+    writesYes: Writes[Yes]
+  ): Format[ConditionalYesNo[No, Yes]] = Format(reads, writes)
 
   implicit def transform[No, Yes]: Transform[Either[No, Yes], ConditionalYesNo[No, Yes]] =
     Transform.instance[Either[No, Yes], ConditionalYesNo[No, Yes]](ConditionalYesNo(_), _.value)

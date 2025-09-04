@@ -362,7 +362,9 @@ abstract class PSRController
 
     def remove(pages: List[Removable[?]]): Try[UserAnswers] = userAnswers.flatMap(_.removeOnlyMultiplePages(pages))
 
-    def softRemove[A: Reads: Writes](page: Gettable[A] & Settable[A] & Removable[A]): Try[UserAnswers] =
+    def softRemove[A](
+      page: Gettable[A] & Settable[A] & Removable[A]
+    )(using reads: Reads[A], writes: Writes[A]): Try[UserAnswers] =
       userAnswers.flatMap(_.softRemove(page))
 
     def removeWhen(bool: Boolean)(page: Removable[?]*): Try[UserAnswers] =

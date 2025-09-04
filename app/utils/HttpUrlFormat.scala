@@ -20,7 +20,7 @@ import play.api.libs.json._
 
 import scala.util.Try
 
-import java.net.URL
+import java.net.{URI, URL}
 
 object HttpUrlFormat {
 
@@ -32,7 +32,7 @@ object HttpUrlFormat {
         case _ => invalidUrlError
       }
 
-    private def parseUrl(s: String): Option[URL] = Try(new URL(s)).toOption
+    private def parseUrl(s: String): Option[URL] = Try(new URI(s).toURL).toOption
 
     private def invalidUrlError: JsError =
       JsError(Seq(JsPath() -> Seq(JsonValidationError("error.expected.url"))))
