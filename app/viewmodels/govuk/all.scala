@@ -1,0 +1,42 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package viewmodels.govuk
+
+import viewmodels.ImplicitConversions
+
+object all
+    extends ImplicitConversions
+    with BackLinkFluency
+    with ButtonFluency
+    with CheckboxFluency
+    with DateFluency
+    with ErrorSummaryFluency
+    with FieldsetFluency
+    with HintFluency
+    with InputFluency
+    with InsetTextFluency
+    with LabelFluency
+    with RadiosFluency
+    with SummaryListFluency
+    with TagFluency
+    with TableFluency
+    with ListWithActionsFluency
+    with CharacterCountFluency
+    with PaginationFluency
+    with PanelFluency
+    with DetailsFluency
+    with FileUploadFluency
