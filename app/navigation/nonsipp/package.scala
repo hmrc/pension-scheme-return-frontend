@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package navigation
+package navigation.nonsipp
 
 import eu.timepit.refined.refineV
 import eu.timepit.refined.api.{Refined, Validate}
 
-package object nonsipp {
-
-  // Given a list of indexes, this function will check for the next open index to start a new journey
-  // Will return None if the resulting index is out of bounds of the supplied refined type
-  def findNextOpenIndex[A](list: List[Int])(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] = {
-    val sortedList = list.sorted
-    if (sortedList.isEmpty || sortedList.head != 0) {
-      refineV[A](1).toOption
-    } else {
-      LazyList.from(0).find(index => !sortedList.contains(index)).flatMap(i => refineV[A](i + 1).toOption)
-    }
+// Given a list of indexes, this function will check for the next open index to start a new journey
+// Will return None if the resulting index is out of bounds of the supplied refined type
+def findNextOpenIndex[A](list: List[Int])(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] = {
+  val sortedList = list.sorted
+  if (sortedList.isEmpty || sortedList.head != 0) {
+    refineV[A](1).toOption
+  } else {
+    LazyList.from(0).find(index => !sortedList.contains(index)).flatMap(i => refineV[A](i + 1).toOption)
   }
 }

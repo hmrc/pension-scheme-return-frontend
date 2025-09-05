@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.memberreceivedpcls
 
-import play.api.libs.json._
+import play.api.libs.json.{__, JsPath}
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrProperty: JsPath = assets \ "landOrProperty"
-    val landOrPropertyProgress: JsPath = __ \ "landOrPropertyProgress"
-    val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
-  }
+object Paths {
+  val membersPayments: JsPath = __ \ "membersPayments"
+  val memberDetails: JsPath = membersPayments \ "memberDetails"
 }

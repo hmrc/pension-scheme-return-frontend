@@ -516,7 +516,7 @@ object SharesNavigator extends JourneyNavigator {
 
     }
 
-  def atLeastOneShareSellerComplete(srn: Srn, index: Max5000, userAnswers: UserAnswers): Boolean = {
+  private def atLeastOneShareSellerComplete(srn: Srn, index: Max5000, userAnswers: UserAnswers): Boolean = {
     val individualCompleted = userAnswers.get(IndividualNameOfSharesSellerPage(srn, index)).nonEmpty &&
       userAnswers.get(SharesIndividualSellerNINumberPage(srn, index)).nonEmpty
 

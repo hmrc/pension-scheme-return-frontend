@@ -65,7 +65,7 @@ type BasicDetailsData = (
 
 object BasicDetailsCheckAnswersUtils extends PsrControllerHelpers {
 
-  def summaryDataT(srn: Srn, mode: Mode)(using
+  private def summaryDataT(srn: Srn, mode: Mode)(using
     request: DataRequest[AnyContent],
     schemeDateService: SchemeDateService
   ): EitherT[Future, Result, BasicDetailsData] = EitherT(Future.successful(summaryData(srn, mode)))

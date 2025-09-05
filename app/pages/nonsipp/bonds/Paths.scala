@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.bonds
 
 import play.api.libs.json.{__, JsPath}
 
-package object schemedesignatory {
-  object Paths {
-    val schemeDesignatory: JsPath = __ \ "schemeDesignatory"
-  }
+object Paths {
+  val assets: JsPath = __ \ "assets"
+  val bonds: JsPath = assets \ "bonds"
+  val bondsProgress: JsPath = bonds \ "bondsProgress"
+  val bondTransactions: JsPath = bonds \ "bondTransactions"
 }

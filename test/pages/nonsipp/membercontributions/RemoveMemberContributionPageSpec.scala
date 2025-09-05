@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membercontributions;
+package pages.nonsipp.membercontributions
 
 import utils.IntUtils.given
-import pages.behaviours.PageBehaviours;
+import pages.behaviours.PageBehaviours
 
 class RemoveMemberContributionPageSpec extends PageBehaviours {
 

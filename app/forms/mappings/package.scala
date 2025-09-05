@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package forms
+package forms.mappings
 
-package object mappings {
-
-  type Regex = String
-}
+type Regex = String

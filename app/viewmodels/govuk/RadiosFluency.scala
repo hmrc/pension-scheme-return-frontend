@@ -188,7 +188,7 @@ trait RadiosFluency {
             value = Some("true"),
             content = yes.message.fold[Content](Text(messages("site.yes")))(msg => HtmlContent(msg)),
             checked = fieldYes.errors.nonEmpty || (field.value.contains("true") && fieldYes.value
-              .exists(s => !s.isEmpty)),
+              .exists(s => s.nonEmpty)),
             conditionalHtml = yes match {
               case YesNoViewModel.Conditional(_, _, conditionalMessage, fieldType) =>
                 Some(whenYes(conditionalMessage, fieldType))
@@ -200,7 +200,7 @@ trait RadiosFluency {
             value = Some("false"),
             content = no.message.fold[Content](Text(messages("site.no")))(msg => HtmlContent(msg)),
             checked = fieldNo.errors.nonEmpty || (field.value.contains("false") && fieldNo.value
-              .exists(s => !s.isEmpty)),
+              .exists(s => s.nonEmpty)),
             conditionalHtml = no match {
               case YesNoViewModel.Conditional(_, _, conditionalMessage, fieldType) =>
                 Some(whenNo(conditionalMessage, fieldType))

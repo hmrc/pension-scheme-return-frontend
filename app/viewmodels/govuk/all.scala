@@ -14,19 +14,29 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails
+package viewmodels.govuk
 
-import models.SchemeId.Srn
-import pages.behaviours.PageBehaviours
+import viewmodels.ImplicitConversions
 
-class RemoveMemberDetailsPageSpec extends PageBehaviours {
-
-  val srn: Srn = srnGen.sample.value
-
-  "RemoveMemberDetailsPage" - {
-
-    RemoveMemberDetailsPage(srn).toString mustBe "removeMemberDetailsPage"
-
-  }
-
-}
+object all
+    extends ImplicitConversions
+    with BackLinkFluency
+    with ButtonFluency
+    with CheckboxFluency
+    with DateFluency
+    with ErrorSummaryFluency
+    with FieldsetFluency
+    with HintFluency
+    with InputFluency
+    with InsetTextFluency
+    with LabelFluency
+    with RadiosFluency
+    with SummaryListFluency
+    with TagFluency
+    with TableFluency
+    with ListWithActionsFluency
+    with CharacterCountFluency
+    with PaginationFluency
+    with PanelFluency
+    with DetailsFluency
+    with FileUploadFluency

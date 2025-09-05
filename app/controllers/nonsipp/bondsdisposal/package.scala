@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.bondsdisposal
 
 import play.api.mvc.Call
 import config.RefinedTypes.{Max50, Max5000}
@@ -26,39 +26,36 @@ import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object bondsdisposal {
+implicit class CallOps(call: Call) {
 
-  implicit class CallOps(call: Call) {
+  val isCyaPage: Boolean = {
+    val pattern =
+      s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)?-bond-disposal\\/(?!.*\\/\\d+\\/\\d+$$).*"
 
-    val isCyaPage: Boolean = {
-      val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)?-bond-disposal\\/(?!.*\\/\\d+\\/\\d+$$).*"
-
-      call.url.matches(pattern)
-    }
+    call.url.matches(pattern)
   }
-
-  def saveProgress(
-    srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
-    userAnswers: UserAnswers,
-    nextPage: Call,
-    alwaysCompleted: Boolean = false
-  ): Future[UserAnswers] =
-    if (nextPage.isCyaPage) {
-      userAnswers
-        .set(
-          BondsDisposalProgress(srn, index, disposalIndex),
-          SectionJourneyStatus.Completed
-        )
-        .mapK[Future]
-    } else {
-      userAnswers
-        .set(
-          BondsDisposalProgress(srn, index, disposalIndex),
-          if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
-        )
-        .mapK[Future]
-    }
 }
+
+def saveProgress(
+  srn: Srn,
+  index: Max5000,
+  disposalIndex: Max50,
+  userAnswers: UserAnswers,
+  nextPage: Call,
+  alwaysCompleted: Boolean = false
+): Future[UserAnswers] =
+  if (nextPage.isCyaPage) {
+    userAnswers
+      .set(
+        BondsDisposalProgress(srn, index, disposalIndex),
+        SectionJourneyStatus.Completed
+      )
+      .mapK[Future]
+  } else {
+    userAnswers
+      .set(
+        BondsDisposalProgress(srn, index, disposalIndex),
+        if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
+      )
+      .mapK[Future]
+  }

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.bonds
+
 import pages.nonsipp.bonds.BondsProgress
 import play.api.mvc.Call
 import config.RefinedTypes.Max5000
@@ -25,38 +26,35 @@ import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object bonds {
+implicit class CallOps(call: Call) {
 
-  implicit class CallOps(call: Call) {
+  val isCyaPage: Boolean = {
+    val pattern =
+      s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-)?check-answers-bonds(?!.*\\/\\d+\\/\\d+$$).*"
 
-    val isCyaPage: Boolean = {
-      val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-)?check-answers-bonds(?!.*\\/\\d+\\/\\d+$$).*"
-
-      call.url.matches(pattern)
-    }
+    call.url.matches(pattern)
   }
-
-  def saveProgress(
-    srn: Srn,
-    index: Max5000,
-    userAnswers: UserAnswers,
-    nextPage: Call,
-    alwaysCompleted: Boolean = false
-  ): Future[UserAnswers] =
-    if (nextPage.isCyaPage) {
-      userAnswers
-        .set(
-          BondsProgress(srn, index),
-          SectionJourneyStatus.Completed
-        )
-        .mapK[Future]
-    } else {
-      userAnswers
-        .set(
-          BondsProgress(srn, index),
-          if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
-        )
-        .mapK[Future]
-    }
 }
+
+def saveProgress(
+  srn: Srn,
+  index: Max5000,
+  userAnswers: UserAnswers,
+  nextPage: Call,
+  alwaysCompleted: Boolean = false
+): Future[UserAnswers] =
+  if (nextPage.isCyaPage) {
+    userAnswers
+      .set(
+        BondsProgress(srn, index),
+        SectionJourneyStatus.Completed
+      )
+      .mapK[Future]
+  } else {
+    userAnswers
+      .set(
+        BondsProgress(srn, index),
+        if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
+      )
+      .mapK[Future]
+  }

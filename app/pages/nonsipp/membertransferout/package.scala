@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membertransferout
 
 import pages.QuestionPage
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
 
-package object membertransferout {
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
-  }
-
-  def transferOutPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[?]] = List(
-    ReceivingSchemeNamePage(srn, index, secondaryIndex),
-    ReceivingSchemeTypePage(srn, index, secondaryIndex),
-    ReportAnotherTransferOutPage(srn, index, secondaryIndex),
-    TransfersOutSectionCompleted(srn, index, secondaryIndex),
-    WhenWasTransferMadePage(srn, index, secondaryIndex),
-    MemberTransferOutProgress(srn, index, secondaryIndex)
-  )
+object Paths {
+  val membersPayments: JsPath = __ \ "membersPayments"
+  val memberDetails: JsPath = membersPayments \ "memberDetails"
+  val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
 }
+
+def transferOutPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[?]] = List(
+  ReceivingSchemeNamePage(srn, index, secondaryIndex),
+  ReceivingSchemeTypePage(srn, index, secondaryIndex),
+  ReportAnotherTransferOutPage(srn, index, secondaryIndex),
+  TransfersOutSectionCompleted(srn, index, secondaryIndex),
+  WhenWasTransferMadePage(srn, index, secondaryIndex),
+  MemberTransferOutProgress(srn, index, secondaryIndex)
+)

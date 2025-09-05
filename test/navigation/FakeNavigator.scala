@@ -26,9 +26,9 @@ class FakeNavigator(desiredRoute: Call) extends Navigator {
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit req: DataRequest[?]): Call =
     desiredRoute
 
-  override def journeys: List[JourneyNavigator] = ???
+  override def journeys: List[JourneyNavigator] = List.empty
 
-  override def defaultNormalMode: Call = ???
+  override def defaultNormalMode: Call = desiredRoute
 
-  override def defaultCheckMode: Call = ???
+  override def defaultCheckMode: Call = desiredRoute
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.EmployerContributionsProgress
 import play.api.mvc.Call
@@ -26,39 +26,36 @@ import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object employercontributions {
+implicit class CallOps(call: Call) {
 
-  implicit class CallOps(call: Call) {
+  val isCyaPage: Boolean = {
+    val pattern =
+      s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)-employer-contributions\\/(?!.*\\/\\d+\\/\\d+$$).*"
 
-    val isCyaPage: Boolean = {
-      val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)-employer-contributions\\/(?!.*\\/\\d+\\/\\d+$$).*"
-
-      call.url.matches(pattern)
-    }
+    call.url.matches(pattern)
   }
-
-  def saveProgress(
-    srn: Srn,
-    index: Max300,
-    secondaryIndex: Max50,
-    userAnswers: UserAnswers,
-    nextPage: Call,
-    alwaysCompleted: Boolean = false
-  ): Future[UserAnswers] =
-    if (nextPage.isCyaPage) {
-      userAnswers
-        .set(
-          EmployerContributionsProgress(srn, index, secondaryIndex),
-          SectionJourneyStatus.Completed
-        )
-        .mapK[Future]
-    } else {
-      userAnswers
-        .set(
-          EmployerContributionsProgress(srn, index, secondaryIndex),
-          if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
-        )
-        .mapK[Future]
-    }
 }
+
+def saveProgress(
+  srn: Srn,
+  index: Max300,
+  secondaryIndex: Max50,
+  userAnswers: UserAnswers,
+  nextPage: Call,
+  alwaysCompleted: Boolean = false
+): Future[UserAnswers] =
+  if (nextPage.isCyaPage) {
+    userAnswers
+      .set(
+        EmployerContributionsProgress(srn, index, secondaryIndex),
+        SectionJourneyStatus.Completed
+      )
+      .mapK[Future]
+  } else {
+    userAnswers
+      .set(
+        EmployerContributionsProgress(srn, index, secondaryIndex),
+        if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
+      )
+      .mapK[Future]
+  }

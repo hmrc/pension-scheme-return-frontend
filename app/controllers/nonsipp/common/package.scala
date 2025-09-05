@@ -14,35 +14,33 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.common
 
 import play.api.mvc.Call
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
+import controllers.nonsipp._
 import models.{IdentitySubject, UserAnswers}
 
 import scala.concurrent.Future
 
-package object common {
+def saveProgress(
+  srn: Srn,
+  index: Max5000,
+  userAnswers: UserAnswers,
+  nextPage: Call,
+  subject: IdentitySubject,
+  alwaysCompleted: Boolean = false
+): Future[UserAnswers] =
+  subject match {
+    case IdentitySubject.OtherAssetSeller =>
+      otherassetsheld.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
+    case IdentitySubject.LoanRecipient =>
+      loansmadeoroutstanding.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
+    case IdentitySubject.LandOrPropertySeller =>
+      landorproperty.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
+    case IdentitySubject.SharesSeller =>
+      shares.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
 
-  def saveProgress(
-    srn: Srn,
-    index: Max5000,
-    userAnswers: UserAnswers,
-    nextPage: Call,
-    subject: IdentitySubject,
-    alwaysCompleted: Boolean = false
-  ): Future[UserAnswers] =
-    subject match {
-      case IdentitySubject.OtherAssetSeller =>
-        otherassetsheld.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
-      case IdentitySubject.LoanRecipient =>
-        loansmadeoroutstanding.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
-      case IdentitySubject.LandOrPropertySeller =>
-        landorproperty.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
-      case IdentitySubject.SharesSeller =>
-        shares.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
-
-      case _ => Future.successful(userAnswers)
-    }
-}
+    case _ => Future.successful(userAnswers)
+  }

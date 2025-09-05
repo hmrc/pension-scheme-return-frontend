@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.schemedesignatory
 
 import play.api.libs.json.{__, JsPath}
 
-package object landorpropertydisposal {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrProperty: JsPath = assets \ "landOrProperty"
-    val landOrPropertyDisposalProgress: JsPath = __ \ "landOrPropertyDisposalProgress"
-    val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
-    val disposalPropertyTransaction: JsPath = landOrPropertyTransactions \ "disposedPropertyTransaction"
-  }
+object Paths {
+  val schemeDesignatory: JsPath = __ \ "schemeDesignatory"
 }

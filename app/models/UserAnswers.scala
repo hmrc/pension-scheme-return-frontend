@@ -119,6 +119,7 @@ final case class UserAnswers(
   /**
    * Removes multiple pages without cleanup
    * @param pages
+   *   Pages to remove
    * @return
    */
   def removeOnly(pages: List[Removable[?]]): Try[UserAnswers] =
@@ -128,6 +129,7 @@ final case class UserAnswers(
    * Removes multiple pages with cleanup. For each page calls cleanup and then removes the page.
    *
    * @param pages
+   *   Pages to remove
    * @return
    */
   def remove(pages: List[Removable[?]]): Try[UserAnswers] =
@@ -167,7 +169,7 @@ final case class UserAnswers(
       case None => Try(this)
     }
 
-  def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
+  private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
@@ -194,7 +196,9 @@ final case class UserAnswers(
    *   - When soft deleting pages, the cleanup function is not called to stop accidentally hard deleting associated
    *     pages as cleanup pages use remove rather than softRemove.
    */
-  def softRemove[A: Reads: Writes](page: Gettable[A] & Settable[A] & Removable[A]): Try[UserAnswers] =
+  def softRemove[A](
+    page: Gettable[A] & Settable[A] & Removable[A]
+  )(using reads: Reads[A], writes: Writes[A]): Try[UserAnswers] =
     get(page).fold(Try(this)) { value =>
       for {
         updated <- set(SoftRemovable.path ++ page.path, Json.toJson(value))
@@ -226,7 +230,8 @@ object UserAnswers {
 
   def remove[A](page: Removable[A]): UserAnswers => Try[UserAnswers] = _.remove(page)
 
-  def softRemove[A: Reads: Writes](page: SoftRemovable[A]): UserAnswers => Try[UserAnswers] = _.softRemove(page)
+  def softRemove[A](page: SoftRemovable[A])(using reads: Reads[A], writes: Writes[A]): UserAnswers => Try[UserAnswers] =
+    _.softRemove(page)
 
   case class SensitiveJsObject(override val decryptedValue: JsObject) extends Sensitive[JsObject]
 

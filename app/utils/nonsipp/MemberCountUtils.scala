@@ -31,8 +31,11 @@ object MemberCountUtils {
    * was less than 99 members
    *
    * @param userAnswers
+   *   User answers
    * @param srn
+   *   Scheme reference number
    * @param pensionSchemeId
+   *   Pension scheme id
    * @return
    *   true if total active and deferred member number > 99 AND some other data input is present that is normally
    *   accessible from the task list

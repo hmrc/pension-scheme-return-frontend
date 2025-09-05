@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.memberpayments
 
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberreceivedpcls._
 import play.api.libs.json.{__, JsPath}
 
-package object memberpayments {
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-  }
+object Paths {
+  val membersPayments: JsPath = __ \ "membersPayments"
+}
 
-  object Omitted {
-    // List of UserAnswer keys to omit during comparison with other UserAnswer member payments sections
-    val membersPayments: List[String] = List(
-      PensionSchemeMembersPage.key,
-      SafeToHardDelete.key,
-      MemberStatus.key,
-      MemberPaymentsRecordVersionPage.key,
-      MemberDetailsCompletedPage.key,
-      PclsMemberListPage.key,
-      MemberPaymentsRecordVersionPage.key
-    )
-  }
+object Omitted {
+  // List of UserAnswer keys to omit during comparison with other UserAnswer member payments sections
+  val membersPayments: List[String] = List(
+    PensionSchemeMembersPage.key,
+    SafeToHardDelete.key,
+    MemberStatus.key,
+    MemberPaymentsRecordVersionPage.key,
+    MemberDetailsCompletedPage.key,
+    PclsMemberListPage.key,
+    MemberPaymentsRecordVersionPage.key
+  )
 }

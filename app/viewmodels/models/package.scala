@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.models
 
-package object models {
-  type SectionCompleted = SectionCompleted.type
-  type Flag = Flag.type
-}
+type SectionCompleted = SectionCompleted.type
+type Flag = Flag.type

@@ -136,7 +136,7 @@ object WhichTransferInRemoveController {
           Message("whichTransferInRemove.radio.label", total.displayAs, transferringSchemeName)
         )
       )
-    }.toList
+    }
 
   def viewModel(
     srn: Srn,

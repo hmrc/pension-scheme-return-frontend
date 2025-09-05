@@ -51,12 +51,15 @@ private[mappings] class DateRangeFormatter(
 
   private val logger = Logger(getClass)
 
-  val startDateFormatter = new LocalDateFormatter(startDateErrors)
-  val endDateFormatter = new LocalDateFormatter(endDateErrors)
+  private val startDateFormatter = new LocalDateFormatter(startDateErrors)
+  private val endDateFormatter = new LocalDateFormatter(endDateErrors)
 
   private def verifyValidRange(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
-    if (range.from.isBefore(range.to)) Right(range)
-    else Left(List(FormError(s"$key.endDate", invalidRangeError, List(range.from.show, range.to.show))))
+    if (range.from.isBefore(range.to)) {
+      Right(range)
+    } else {
+      Left(List(FormError(s"$key.endDate", invalidRangeError, List(range.from.show, range.to.show))))
+    }
 
   // Checks that the provided date is within the allowedRange DateRange
   private def verifyRangeBounds(

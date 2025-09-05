@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.loansmadeoroutstanding
 
-import play.api.libs.json.{__, JsPath}
+import play.api.libs.json._
 
-package object employercontributions {
-
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberEmpContribution: JsPath = memberDetails \ "memberEmpContribution"
-  }
+object Paths {
+  val loans: JsPath = __ \ "loans"
+  val loansProgress: JsPath = __ \ "loansProgress"
+  val loanTransactions: JsPath = loans \ "loanTransactions"
 }

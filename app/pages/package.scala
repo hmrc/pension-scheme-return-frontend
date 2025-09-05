@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package object pages {
-  type IndexedQuestionPage[A] = QuestionPage[Map[String, A]]
-}
+package pages
+
+type IndexedQuestionPage[A] = QuestionPage[Map[String, A]]

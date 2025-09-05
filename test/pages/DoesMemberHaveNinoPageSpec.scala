@@ -18,6 +18,7 @@ package pages
 
 import play.api.libs.json.Writes._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, NoNINOPage}
+import models.SchemeId.Srn
 import utils.IntUtils.given
 import uk.gov.hmrc.domain.Nino
 import models.UserAnswers
@@ -25,7 +26,7 @@ import pages.behaviours.PageBehaviours
 
 class DoesMemberHaveNinoPageSpec extends PageBehaviours {
 
-  val srn = srnGen.sample.value
+  val srn: Srn = srnGen.sample.value
 
   "DoesMemberHaveNinoPage" - {
 

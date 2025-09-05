@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.shares
 
 import pages.QuestionPage
 import config.RefinedTypes.Max5000
@@ -23,43 +23,40 @@ import play.api.libs.json.{__, JsPath}
 import pages.nonsipp.common._
 import models.IdentitySubject.SharesSeller
 
-package object shares {
+object Paths {
+  val shares: JsPath = __ \ "shares"
+  val sharesProgress: JsPath = __ \ "sharesProgress"
+  val shareTransactions: JsPath = shares \ "shareTransactions"
+  val heldSharesTransaction: JsPath = shareTransactions \ "heldSharesTransaction"
+  val shareIdentification: JsPath = shareTransactions \ "shareIdentification"
 
-  object Paths {
-    val shares: JsPath = __ \ "shares"
-    val sharesProgress: JsPath = __ \ "sharesProgress"
-    val shareTransactions: JsPath = shares \ "shareTransactions"
-    val heldSharesTransaction: JsPath = shareTransactions \ "heldSharesTransaction"
-    val shareIdentification: JsPath = shareTransactions \ "shareIdentification"
+}
 
-  }
-
-  def sharesPages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[QuestionPage[?]] = {
-    val list = List(
-      ClassOfSharesPage(srn, index),
-      CompanyNameOfSharesSellerPage(srn, index),
-      CompanyNameRelatedSharesPage(srn, index),
-      CostOfSharesPage(srn, index),
-      HowManySharesPage(srn, index),
-      IndividualNameOfSharesSellerPage(srn, index),
-      PartnershipShareSellerNamePage(srn, index),
-      RemoveSharesPage(srn, index),
-      SharesCompanyCrnPage(srn, index),
-      SharesFromConnectedPartyPage(srn, index),
-      SharesIndependentValuationPage(srn, index),
-      SharesIndividualSellerNINumberPage(srn, index),
-      SharesTotalIncomePage(srn, index),
-      TotalAssetValuePage(srn, index),
-      TypeOfSharesHeldPage(srn, index),
-      WhenDidSchemeAcquireSharesPage(srn, index),
-      WhyDoesSchemeHoldSharesPage(srn, index),
-      SharesCompleted(srn, index),
-      IdentityTypePage(srn, index, SharesSeller),
-      CompanyRecipientCrnPage(srn, index, SharesSeller),
-      OtherRecipientDetailsPage(srn, index, SharesSeller),
-      PartnershipRecipientUtrPage(srn, index, SharesSeller),
-      SharesProgress(srn, index)
-    )
-    if (isLastRecord) list :+ DidSchemeHoldAnySharesPage(srn) else list
-  }
+def sharesPages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[QuestionPage[?]] = {
+  val list = List(
+    ClassOfSharesPage(srn, index),
+    CompanyNameOfSharesSellerPage(srn, index),
+    CompanyNameRelatedSharesPage(srn, index),
+    CostOfSharesPage(srn, index),
+    HowManySharesPage(srn, index),
+    IndividualNameOfSharesSellerPage(srn, index),
+    PartnershipShareSellerNamePage(srn, index),
+    RemoveSharesPage(srn, index),
+    SharesCompanyCrnPage(srn, index),
+    SharesFromConnectedPartyPage(srn, index),
+    SharesIndependentValuationPage(srn, index),
+    SharesIndividualSellerNINumberPage(srn, index),
+    SharesTotalIncomePage(srn, index),
+    TotalAssetValuePage(srn, index),
+    TypeOfSharesHeldPage(srn, index),
+    WhenDidSchemeAcquireSharesPage(srn, index),
+    WhyDoesSchemeHoldSharesPage(srn, index),
+    SharesCompleted(srn, index),
+    IdentityTypePage(srn, index, SharesSeller),
+    CompanyRecipientCrnPage(srn, index, SharesSeller),
+    OtherRecipientDetailsPage(srn, index, SharesSeller),
+    PartnershipRecipientUtrPage(srn, index, SharesSeller),
+    SharesProgress(srn, index)
+  )
+  if (isLastRecord) list :+ DidSchemeHoldAnySharesPage(srn) else list
 }
