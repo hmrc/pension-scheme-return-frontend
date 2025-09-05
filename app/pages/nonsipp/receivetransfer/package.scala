@@ -14,29 +14,26 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.receivetransfer
 
 import pages.QuestionPage
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
 
-package object receivetransfer {
-
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberTransfersIn: JsPath = memberDetails \ "memberTransfersIn"
-  }
-
-  def transferInPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[?]] = List(
-    DidTransferIncludeAssetPage(srn, index, secondaryIndex),
-    ReportAnotherTransferInPage(srn, index, secondaryIndex),
-    TotalValueTransferPage(srn, index, secondaryIndex),
-    TransferringSchemeNamePage(srn, index, secondaryIndex),
-    TransferringSchemeTypePage(srn, index, secondaryIndex),
-    TransfersInSectionCompleted(srn, index, secondaryIndex),
-    WhenWasTransferReceivedPage(srn, index, secondaryIndex),
-    ReceiveTransferProgress(srn, index, secondaryIndex)
-  )
+object Paths {
+  val membersPayments: JsPath = __ \ "membersPayments"
+  val memberDetails: JsPath = membersPayments \ "memberDetails"
+  val memberTransfersIn: JsPath = memberDetails \ "memberTransfersIn"
 }
+
+def transferInPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[?]] = List(
+  DidTransferIncludeAssetPage(srn, index, secondaryIndex),
+  ReportAnotherTransferInPage(srn, index, secondaryIndex),
+  TotalValueTransferPage(srn, index, secondaryIndex),
+  TransferringSchemeNamePage(srn, index, secondaryIndex),
+  TransferringSchemeTypePage(srn, index, secondaryIndex),
+  TransfersInSectionCompleted(srn, index, secondaryIndex),
+  WhenWasTransferReceivedPage(srn, index, secondaryIndex),
+  ReceiveTransferProgress(srn, index, secondaryIndex)
+)

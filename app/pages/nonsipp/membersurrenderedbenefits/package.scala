@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membersurrenderedbenefits
 
 import pages.QuestionPage
 import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
 
-package object membersurrenderedbenefits {
-
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberPensionSurrender: JsPath = memberDetails \ "memberPensionSurrender"
-  }
-
-  def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[?]] = List(
-    SurrenderedBenefitsAmountPage(srn, index),
-    WhenDidMemberSurrenderBenefitsPage(srn, index),
-    WhyDidMemberSurrenderBenefitsPage(srn, index),
-    SurrenderedBenefitsCompletedPage(srn, index),
-    MemberSurrenderedBenefitsProgress(srn, index)
-  )
+object Paths {
+  val membersPayments: JsPath = __ \ "membersPayments"
+  val memberDetails: JsPath = membersPayments \ "memberDetails"
+  val memberPensionSurrender: JsPath = memberDetails \ "memberPensionSurrender"
 }
+
+def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[?]] = List(
+  SurrenderedBenefitsAmountPage(srn, index),
+  WhenDidMemberSurrenderBenefitsPage(srn, index),
+  WhyDidMemberSurrenderBenefitsPage(srn, index),
+  SurrenderedBenefitsCompletedPage(srn, index),
+  MemberSurrenderedBenefitsProgress(srn, index)
+)

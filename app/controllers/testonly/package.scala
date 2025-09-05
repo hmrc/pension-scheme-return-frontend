@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.testonly
 
 import models.NameDOB
 
@@ -22,36 +22,34 @@ import scala.util.Random
 
 import java.time.LocalDate
 
-package object testonly {
-  private val firstNames = List(
-    "Nathalia",
-    "Kyro",
-    "Jesse",
-    "Mia",
-    "Bradley",
-    "Bonnie",
-    "Wesley",
-    "Alistair",
-    "Fiona",
-    "Victor"
-  )
+private val firstNames = List(
+  "Nathalia",
+  "Kyro",
+  "Jesse",
+  "Mia",
+  "Bradley",
+  "Bonnie",
+  "Wesley",
+  "Alistair",
+  "Fiona",
+  "Victor"
+)
 
-  private val lastNames = List(
-    "Vazquez",
-    "McMahon",
-    "Davis",
-    "Howell",
-    "Willis",
-    "Benjamin",
-    "Mathews",
-    "Sawyer",
-    "Payne",
-    "Gonzales"
-  )
+private val lastNames = List(
+  "Vazquez",
+  "McMahon",
+  "Davis",
+  "Howell",
+  "Willis",
+  "Benjamin",
+  "Mathews",
+  "Sawyer",
+  "Payne",
+  "Gonzales"
+)
 
-  def buildRandomNameDOB(): NameDOB = NameDOB(
-    firstNames(Random.nextInt(firstNames.size)),
-    lastNames(Random.nextInt(lastNames.size)),
-    LocalDate.of(1990, 12, 12)
-  )
-}
+def buildRandomNameDOB(): NameDOB = NameDOB(
+  firstNames(Random.nextInt(firstNames.size)),
+  lastNames(Random.nextInt(lastNames.size)),
+  LocalDate.of(1990, 12, 12)
+)

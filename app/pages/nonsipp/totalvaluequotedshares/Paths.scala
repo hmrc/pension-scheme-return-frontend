@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.totalvaluequotedshares
 
 import play.api.libs.json.{__, JsPath}
 
-package object schemedesignatory {
-  object Paths {
-    val schemeDesignatory: JsPath = __ \ "schemeDesignatory"
-  }
+object Paths {
+  val quotedShares: JsPath = __ \ "quotedShares"
 }

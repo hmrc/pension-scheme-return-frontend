@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.otherassetsheld
 
 import play.api.mvc.Call
 import pages.nonsipp.otherassetsheld.OtherAssetsProgress
@@ -26,38 +26,35 @@ import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object otherassetsheld {
+implicit class CallOps(call: Call) {
 
-  implicit class CallOps(call: Call) {
+  val isCyaPage: Boolean = {
+    val pattern =
+      s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-asset|check-answers-other-assets)(?!.*\\/\\d+\\/\\d+$$).*"
 
-    val isCyaPage: Boolean = {
-      val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-asset|check-answers-other-assets)(?!.*\\/\\d+\\/\\d+$$).*"
-
-      call.url.matches(pattern)
-    }
+    call.url.matches(pattern)
   }
-
-  def saveProgress(
-    srn: Srn,
-    index: Max5000,
-    userAnswers: UserAnswers,
-    nextPage: Call,
-    alwaysCompleted: Boolean = false
-  ): Future[UserAnswers] =
-    if (nextPage.isCyaPage) {
-      userAnswers
-        .set(
-          OtherAssetsProgress(srn, index),
-          SectionJourneyStatus.Completed
-        )
-        .mapK[Future]
-    } else {
-      userAnswers
-        .set(
-          OtherAssetsProgress(srn, index),
-          if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
-        )
-        .mapK[Future]
-    }
 }
+
+def saveProgress(
+  srn: Srn,
+  index: Max5000,
+  userAnswers: UserAnswers,
+  nextPage: Call,
+  alwaysCompleted: Boolean = false
+): Future[UserAnswers] =
+  if (nextPage.isCyaPage) {
+    userAnswers
+      .set(
+        OtherAssetsProgress(srn, index),
+        SectionJourneyStatus.Completed
+      )
+      .mapK[Future]
+  } else {
+    userAnswers
+      .set(
+        OtherAssetsProgress(srn, index),
+        if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
+      )
+      .mapK[Future]
+  }

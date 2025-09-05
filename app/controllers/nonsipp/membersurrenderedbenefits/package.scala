@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.membersurrenderedbenefits
 
 import play.api.mvc.Call
 import config.RefinedTypes.Max300
@@ -26,39 +26,35 @@ import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object membersurrenderedbenefits {
+implicit class CallOps(call: Call) {
 
-  implicit class CallOps(call: Call) {
+  val isCyaPage: Boolean = {
+    val pattern =
+      s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-check-answers|check-answers)-surrender-benefits\\/(?!.*\\/\\d+\\/\\d+$$).*"
 
-    val isCyaPage: Boolean = {
-      val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change-check-answers|check-answers)-surrender-benefits\\/(?!.*\\/\\d+\\/\\d+$$).*"
-
-      call.url.matches(pattern)
-    }
+    call.url.matches(pattern)
   }
-
-  def saveProgress(
-    srn: Srn,
-    index: Max300,
-    userAnswers: UserAnswers,
-    nextPage: Call,
-    alwaysCompleted: Boolean = false
-  ): Future[UserAnswers] =
-    if (nextPage.isCyaPage) {
-      userAnswers
-        .set(
-          MemberSurrenderedBenefitsProgress(srn, index),
-          SectionJourneyStatus.Completed
-        )
-        .mapK[Future]
-    } else {
-      userAnswers
-        .set(
-          MemberSurrenderedBenefitsProgress(srn, index),
-          if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
-        )
-        .mapK[Future]
-    }
-
 }
+
+def saveProgress(
+  srn: Srn,
+  index: Max300,
+  userAnswers: UserAnswers,
+  nextPage: Call,
+  alwaysCompleted: Boolean = false
+): Future[UserAnswers] =
+  if (nextPage.isCyaPage) {
+    userAnswers
+      .set(
+        MemberSurrenderedBenefitsProgress(srn, index),
+        SectionJourneyStatus.Completed
+      )
+      .mapK[Future]
+  } else {
+    userAnswers
+      .set(
+        MemberSurrenderedBenefitsProgress(srn, index),
+        if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
+      )
+      .mapK[Future]
+  }

@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.accountingperiod
 
 import play.api.libs.json.{__, JsPath}
 
-package object employercontributions {
-
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberEmpContribution: JsPath = memberDetails \ "memberEmpContribution"
-  }
+object Paths {
+  val accountingPeriodDetails: JsPath = __ \ "accountingPeriodDetails"
 }

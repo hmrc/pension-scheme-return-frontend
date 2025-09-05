@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.schemedesignatory
 
 import play.api.libs.json.{__, JsPath}
 
-package object accountingperiod {
-  object Paths {
-    val accountingPeriodDetails: JsPath = __ \ "accountingPeriodDetails"
-  }
+object Paths {
+  val schemeDesignatory: JsPath = __ \ "schemeDesignatory"
 }

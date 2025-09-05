@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorpropertydisposal
 
 import play.api.libs.json.{__, JsPath}
 
-package object sharesdisposal {
-
-  object Paths {
-    val shares: JsPath = __ \ "shares"
-    val shareTransactions: JsPath = shares \ "shareTransactions"
-    val disposedSharesTransaction: JsPath = shareTransactions \ "disposedSharesTransaction"
-    val salesQuestions: JsPath = disposedSharesTransaction \ "salesQuestions"
-    val redemptionQuestions: JsPath = disposedSharesTransaction \ "redemptionQuestions"
-  }
-
+object Paths {
+  val assets: JsPath = __ \ "assets"
+  val landOrProperty: JsPath = assets \ "landOrProperty"
+  val landOrPropertyDisposalProgress: JsPath = __ \ "landOrPropertyDisposalProgress"
+  val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
+  val disposalPropertyTransaction: JsPath = landOrPropertyTransactions \ "disposedPropertyTransaction"
 }

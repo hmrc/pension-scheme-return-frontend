@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.bondsdisposal
 
 import play.api.libs.json.{__, JsPath}
 
-package object totalvaluequotedshares {
-
-  object Paths {
-    val quotedShares: JsPath = __ \ "quotedShares"
-  }
+object Paths {
+  val assets: JsPath = __ \ "assets"
+  val bonds: JsPath = assets \ "bonds"
+  val bondTransactions: JsPath = bonds \ "bondTransactions"
+  val bondsDisposed: JsPath = bondTransactions \ "bondsDisposed"
 }

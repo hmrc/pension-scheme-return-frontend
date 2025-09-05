@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
 import play.api.libs.json._
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrProperty: JsPath = assets \ "landOrProperty"
-    val landOrPropertyProgress: JsPath = __ \ "landOrPropertyProgress"
-    val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
-  }
+object Paths {
+  val assets: JsPath = __ \ "assets"
+  val landOrProperty: JsPath = assets \ "landOrProperty"
+  val landOrPropertyProgress: JsPath = __ \ "landOrPropertyProgress"
+  val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
+  val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
 }
