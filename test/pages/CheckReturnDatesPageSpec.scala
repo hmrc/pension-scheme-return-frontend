@@ -16,6 +16,7 @@
 
 package pages
 
+import models.SchemeId.Srn
 import utils.IntUtils.given
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import utils.UserAnswersUtils.UserAnswersOps
@@ -25,7 +26,7 @@ import pages.behaviours.PageBehaviours
 
 class CheckReturnDatesPageSpec extends PageBehaviours {
 
-  val srn = srnGen.sample.value
+  val srn: Srn = srnGen.sample.value
 
   "CheckReturnDatesPage" - {
 

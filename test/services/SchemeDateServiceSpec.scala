@@ -20,12 +20,13 @@ import play.api.test.FakeRequest
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
 import play.api.mvc.AnyContentAsEmpty
-import cats.data.NonEmptyList
 import utils.IntUtils.given
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.WhichTaxYearPage
 import models.{DateRange, NormalMode, UserAnswers}
 import models.requests.{AllowedAccessRequest, DataRequest}
+import cats.data.NonEmptyList
+import models.SchemeId.Srn
 import utils.UserAnswersUtils._
 import org.scalacheck.Gen
 
@@ -38,7 +39,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
   val service = new SchemeDateServiceImpl()
 
   val defaultUserAnswers: UserAnswers = UserAnswers("id")
-  val srn = srnGen.sample.value
+  val srn: Srn = srnGen.sample.value
   val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
   ).sample.value

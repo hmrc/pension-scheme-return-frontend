@@ -23,9 +23,9 @@ case class Security(security: String) extends TaxIdentifier with SimpleName {
 
   require(Security.isValid(security), s"$security is not a valid security.")
 
-  override def toString = security
+  override def toString: String = security
 
-  def value = security
+  def value: String = security
 
   val name = "security"
 }

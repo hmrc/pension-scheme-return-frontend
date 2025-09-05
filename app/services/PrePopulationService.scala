@@ -64,10 +64,9 @@ class PrePopulationService @Inject() (
       )
       .flatten
 
-  private def isSubmitted(psrVersionsResponse: PsrVersionsResponse): Boolean = (
+  private def isSubmitted(psrVersionsResponse: PsrVersionsResponse): Boolean =
     psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
       || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
-  )
 
   def buildPrePopulatedUserAnswers(baseReturnUA: UserAnswers, userAnswers: UserAnswers)(srn: Srn): Try[UserAnswers] =
     if (config.prePopulationEnabled) {

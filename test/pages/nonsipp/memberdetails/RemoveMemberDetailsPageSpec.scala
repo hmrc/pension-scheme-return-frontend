@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails;
+package pages.nonsipp.memberdetails
 
-import pages.behaviours.PageBehaviours;
+import models.SchemeId.Srn
+import pages.behaviours.PageBehaviours
 
 class RemoveMemberDetailsPageSpec extends PageBehaviours {
 
-  val srn = srnGen.sample.value
+  val srn: Srn = srnGen.sample.value
 
   "RemoveMemberDetailsPage" - {
 

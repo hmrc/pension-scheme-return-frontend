@@ -16,6 +16,7 @@
 
 package pages
 
+import models.SchemeId.Srn
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import models.{DateRange, UserAnswers}
@@ -23,7 +24,7 @@ import pages.behaviours.PageBehaviours
 
 class WhichTaxYearPageSpec extends PageBehaviours {
 
-  val srn = srnGen.sample.value
+  val srn: Srn = srnGen.sample.value
 
   "WhichTaxYearPage" - {
 

@@ -48,7 +48,6 @@ lazy val root = Project(appName, file("."))
     PlayKeys.playDefaultPort := 10701,
     scalacOptions ++= Seq(
       "-feature",
-      "-deprecation",
       "-Wconf:msg=Flag.*repeatedly:s",
       "-Wconf:msg=unused import&src=.*views/.*:s",
       "-Wconf:msg=unused&src=.*Routes\\.scala:s",

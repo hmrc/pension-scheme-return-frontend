@@ -235,7 +235,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec with Controller
         ).before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .after {
             MockSaveService.capture(userAnswersCaptor)
-            userAnswersCaptor.getValue.get(LandOrPropertyHeldPage(srn)) mustEqual Some(true)
+            userAnswersCaptor.getValue.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           }
           .withName(s"set LandOrPropertyHeldPage to true when submitting in $mode")
       )

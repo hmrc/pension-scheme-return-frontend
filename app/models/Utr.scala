@@ -22,7 +22,7 @@ case class Utr(utr: String) extends TaxIdentifier with SimpleName {
 
   require(Utr.isValid(utr), s"$utr is not a valid utr.")
 
-  override def toString = utr
+  override def toString: String = utr
 
   def value: String = utr.filterNot(_.isWhitespace)
 

@@ -119,6 +119,7 @@ final case class UserAnswers(
   /**
    * Removes multiple pages without cleanup
    * @param pages
+   *   Pages to remove
    * @return
    */
   def removeOnly(pages: List[Removable[?]]): Try[UserAnswers] =
@@ -128,6 +129,7 @@ final case class UserAnswers(
    * Removes multiple pages with cleanup. For each page calls cleanup and then removes the page.
    *
    * @param pages
+   *   Pages to remove
    * @return
    */
   def remove(pages: List[Removable[?]]): Try[UserAnswers] =
