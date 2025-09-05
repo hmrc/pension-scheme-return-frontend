@@ -46,8 +46,10 @@ class AddressServiceSpec extends BaseSpec with TestValues {
   }
 
   def readJsonFromFile(filePath: String): JsValue = {
-    val path = Source.fromURL(getClass.getResource(filePath)).mkString
-    Json.parse(path)
+    val resource = Source.fromURL(getClass.getResource(filePath))
+    val json = Json.parse(resource.mkString)
+    resource.close()
+    json
   }
 
   "AddressService" - {
