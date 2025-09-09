@@ -125,7 +125,7 @@ object TotalAssetValueController {
       ),
       SingleQuestion(
         form,
-        QuestionField.currency(Empty)
+        QuestionField.currency(Empty, Some("shares.totalAssetValue.hint"))
       ),
       routes.TotalAssetValueController
         .onSubmit(srn, index, mode)
