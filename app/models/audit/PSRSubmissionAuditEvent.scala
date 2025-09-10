@@ -45,7 +45,8 @@ case class PSRSubmissionAuditEvent(
       "credentialRolePsaPsp" -> credentialRole,
       "taxYear" -> taxYear.toYearFormat,
       "date" -> LocalDate.now(ZoneId.of("Europe/London")).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
-      "payload" -> Json.toJson(psrSubmission)
+      "payload" -> Json.toJson(psrSubmission),
+      "submissionAmendment" -> psrSubmission.minimalRequiredSubmission.reportDetails.fbVersion.exists(_.toInt > 1)
     )
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ submissionDetails
   }
