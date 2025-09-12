@@ -392,11 +392,11 @@ class SummaryControllerSpec
 
         // member payments
         content should include("<h2 class=\"govuk-heading-xl\">Employer contributions</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Unallocated contributions</h2>")
+        content should include("<h2 class=\"govuk-heading-xl\">Unallocated employer contributions</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Member contributions</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Transfers in</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Transfers out</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">PCLS</h2>")
+        content should include("<h2 class=\"govuk-heading-xl\">Pension commencement lump sum</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Pension payments</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Surrendered benefits</h2>")
 
@@ -417,7 +417,7 @@ class SummaryControllerSpec
         content should include("<h2 class=\"govuk-heading-xl\">Disposal of bonds</h2>")
 
         // other assets
-        content should include("<h2 class=\"govuk-heading-xl\">Total value of quoted shares</h2>")
+        content should include("<h2 class=\"govuk-heading-xl\">Quoted shares and managed funds</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Other assets</h2>")
         content should include("<h2 class=\"govuk-heading-xl\">Disposal of other assets</h2>")
       }
