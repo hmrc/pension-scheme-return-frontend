@@ -26,19 +26,12 @@ import pages.nonsipp.WhichTaxYearPage
 import forms.DateRangeFormProvider
 import models.{DateRange, NormalMode}
 
-import java.time.LocalDate
-
 class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
   private val mockTaxYearService = mock[TaxYearService]
-  private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), allowedDateRange)
+  private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
   override def beforeEach(): Unit = reset(mockTaxYearService)
-
-  lazy val allowedDateRange: DateRange = DateRange(
-    from = LocalDate.of(2021, 4, 6),
-    to = LocalDate.of(2022, 4, 5)
-  )
 
   "AccountingPeriodController" - {
 
@@ -46,12 +39,11 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerB
       new DateRangeFormProvider(),
       defaultTaxYear,
       List(),
-      LocalDate.of(2021, 4, 6),
       1
     )
     lazy val viewModel = AccountingPeriodController.viewModel(srn, 1, NormalMode)
 
-    val rangeGen = dateRangeWithinRangeGen(allowedDateRange)
+    val rangeGen = dateRangeWithinRangeGen(dateRange)
     val dateRangeData = rangeGen.sample.value
     val otherDateRangeData = rangeGen.sample.value
 
