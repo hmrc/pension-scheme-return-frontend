@@ -86,8 +86,8 @@ object SharesDisposalCheckAnswersUtils
     request.userAnswers
       .map(SharesDisposalProgress.all())
       .flatMap { case (index, disposals) =>
-        disposals.map { case (dIndex, progress) =>
-          ((index, dIndex), progress)
+        disposals.collect { case (dIndex, SectionJourneyStatus.Completed) =>
+          ((index, dIndex), SectionJourneyStatus.Completed)
         }
       }
       .keys
