@@ -31,6 +31,7 @@ object Constants {
   val SRN = "SRN"
   val SUBMISSION_VIEWED_FLAG = "SUBMISSION_VIEWED_FLAG"
   val PREPOPULATION_FLAG = "prePopulationFlag"
+  val CIP_START_EVENT_FLAG = "CIPStartEventFlag"
 
   val psaIdKey = "PSAID"
   val pspIdKey = "PSPID"
