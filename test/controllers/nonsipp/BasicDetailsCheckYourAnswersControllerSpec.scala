@@ -23,6 +23,7 @@ import utils.nonsipp.summary.BasicDetailsCheckAnswersUtils
 import play.api.inject.bind
 import utils.IntUtils.given
 import cats.implicits.toShow
+import config.Constants.CIP_START_EVENT_FLAG
 import pages.nonsipp._
 import models.backend.responses.PsrVersionsResponse
 import org.mockito.stubbing.OngoingStubbing
@@ -80,6 +81,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
     reset(mockPsrSubmissionService)
     reset(mockSchemeDateService)
     reset(mockPsrVersionsService)
+    reset(mockAuditService)
   }
   private lazy val onPreviousViewOnly = routes.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(
     srn,
@@ -92,12 +94,14 @@ class BasicDetailsCheckYourAnswersControllerSpec
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
+  private implicit val mockAuditService: AuditService = mock[AuditService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService),
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService),
     bind[PsrVersionsService].toInstance(mockPsrVersionsService),
-    bind[PsrRetrievalService].toInstance(mockPsrRetrievalService)
+    bind[PsrRetrievalService].toInstance(mockPsrRetrievalService),
+    bind[AuditService].toInstance(mockAuditService)
   )
 
   "BasicDetailsCheckYourAnswersController" - {
@@ -347,6 +351,30 @@ class BasicDetailsCheckYourAnswersControllerSpec
             verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
+      }
+    }
+
+    "audit event" - {
+      "should only send audit event when CIP_START_EVENT_FLAG is true" in {
+        val userAnswers = currentTaxYearUserAnswersWithFewMembers
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        running(application) {
+          mockTaxYear(currentReturnTaxYear)
+          MockPsrSubmissionService.submitPsrDetails()
+
+          val request = FakeRequest(GET, onSubmit.url).withSession(CIP_START_EVENT_FLAG -> "true")
+          val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          verify(mockAuditService, times(1)).sendEvent(any())(using any(), any())
+          reset(mockAuditService)
+
+          val requestWithoutFlag = FakeRequest(GET, onSubmit.url)
+          val resultWithoutFlag = route(application, requestWithoutFlag).value
+          status(resultWithoutFlag) mustEqual SEE_OTHER
+          verify(mockAuditService, never).sendEvent(any())(using any(), any())
+          reset(mockAuditService)
+        }
       }
     }
 
