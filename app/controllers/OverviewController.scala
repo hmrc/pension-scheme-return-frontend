@@ -288,10 +288,12 @@ class OverviewController @Inject() (
               if (lastSubmittedPsrFbInPreviousYears.isDefined) {
                 Redirect(controllers.routes.CheckUpdateInformationController.onPageLoad(srn))
                   .addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(true))
+                  .addingToSession(Constants.CIP_START_EVENT_FLAG -> String.valueOf(true))
               } else {
                 Redirect(
                   controllers.routes.WhatYouWillNeedController.onPageLoad(srn)
                 ).addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false))
+                  .addingToSession(Constants.CIP_START_EVENT_FLAG -> String.valueOf(true))
               }
           }
     }
@@ -336,7 +338,9 @@ class OverviewController @Inject() (
         identifyAndRequireData(srn, taxYear, version).async { implicit request =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
+              .removingFromSession(Constants.CIP_START_EVENT_FLAG)
           val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+            .removingFromSession(Constants.CIP_START_EVENT_FLAG)
           isJourneyBypassed(srn).map { res =>
             val result = if (res.getOrElse(false)) byPassedJourney else regularJourney
             result.addingToSession(
@@ -366,7 +370,9 @@ class OverviewController @Inject() (
         identifyAndRequireData(srn, fbNumber).async { implicit request =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
+              .removingFromSession(Constants.CIP_START_EVENT_FLAG)
           val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+            .removingFromSession(Constants.CIP_START_EVENT_FLAG)
           isJourneyBypassed(srn)
             .map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
             .map(_.addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false)))

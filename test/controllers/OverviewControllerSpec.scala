@@ -22,6 +22,7 @@ import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import views.html.OverviewView
 import utils.IntUtils.given
+import config.Constants.CIP_START_EVENT_FLAG
 import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses._
 import models.CheckMode
@@ -283,6 +284,17 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         redirectLocation(result).value mustEqual sippStartUrl
     }
 
+    "onSelectContinue removes CIP_START_EVENT_FLAG when it has been set to true" in runningApplication { implicit app =>
+      val request = FakeRequest(GET, onSelectContinue("002"))
+        .withSession(CIP_START_EVENT_FLAG -> "true")
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+      session(result).get(CIP_START_EVENT_FLAG) mustBe None
+    }
+
     List(commonVersion, "002").foreach { version =>
       s"onSelectContinue redirects to task list page with version $version" in runningApplication { implicit app =>
         val request = FakeRequest(GET, onSelectContinue(version))
@@ -336,6 +348,18 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
           .onPageLoad(srn, CheckMode)
           .url
       }
+    }
+
+    "onSelectViewAndChange removes CIP_START_EVENT_FLAG when it has been set to true" in runningApplication {
+      implicit app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+          .withSession(CIP_START_EVENT_FLAG -> "true")
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+        session(result).get(CIP_START_EVENT_FLAG) mustBe None
     }
 
     "onSelectViewAndChange redirects to the task list page when members empty" in runningApplication { implicit app =>
