@@ -103,7 +103,7 @@ private[mappings] class DateRangeFormatter(
       Left(List(FormError(s"$key.startDate", errorStartAfter, List(taxYear.starts.show))))
     } else if (range.from.isAfter(taxYear.finishes)) {
       logger.info(s"[verifyTaxYear] provided start date ${range.from.show} is after the end of the tax year")
-      Left(List(FormError(s"$key.startDate", errorStartBefore, List(taxYear.finishes.plusDays(1).show))))
+      Left(List(FormError(s"$key.startDate", errorStartBefore, List(taxYear.finishes.show))))
     } else if (range.to.isBefore(taxYear.starts)) {
       logger.info(s"[verifyTaxYear] provided end date ${range.to.show} is before the start of the tax year")
       Left(
