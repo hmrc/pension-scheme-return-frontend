@@ -79,43 +79,44 @@ class SummaryControllerSpec
   private val dateSold = Some(localDate)
   private val considerationAssetSold = Some(money)
 
+  private val baseUserAnswers = defaultUserAnswers
+    .unsafeSet(FbVersionPage(srn), version)
+    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
+
+    // basic details
+    .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)
+    .unsafeSet(CheckReturnDatesPage(srn), true)
+    .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), currentReturnTaxYear)
+    .unsafeSet(AccountingPeriodRecordVersionPage(srn), recordVersion)
+    .unsafeSet(ActiveBankAccountPage(srn), true)
+    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+    .unsafeSet(SchemeDesignatoryRecordVersionPage(srn), recordVersion)
+    .unsafeSet(FbVersionPage(srn), recordVersion)
+    .unsafeSet(FbStatus(srn), Submitted)
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), currentReturnTaxYearSubmissionDate)
+    .unsafeSet(PensionSchemeDeclarationPage(srn), declarationData)
+    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
+    .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
+    .unsafeSet(MemberStatus(srn, index1of300), New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
+
+    // financial details
+    .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
+    .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
+    .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
+
+    // member details
+    .unsafeSet(PensionSchemeMembersPage(srn), Manual)
+    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), true)
+    .unsafeSet(MemberDetailsNinoPage(srn, index1of300), nino)
+    .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
+    .unsafeSet(MemberDetailsManualProgress(srn, index1of300), SectionJourneyStatus.Completed)
+
   private val populatedUserAnswers =
-    defaultUserAnswers
-      .unsafeSet(FbVersionPage(srn), version)
-      .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
-
-      // basic details
-      .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)
-      .unsafeSet(CheckReturnDatesPage(srn), true)
-      .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), currentReturnTaxYear)
-      .unsafeSet(AccountingPeriodRecordVersionPage(srn), recordVersion)
-      .unsafeSet(ActiveBankAccountPage(srn), true)
-      .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-      .unsafeSet(SchemeDesignatoryRecordVersionPage(srn), recordVersion)
-      .unsafeSet(FbVersionPage(srn), recordVersion)
-      .unsafeSet(FbStatus(srn), Submitted)
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), currentReturnTaxYearSubmissionDate)
-      .unsafeSet(PensionSchemeDeclarationPage(srn), declarationData)
-      .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
-      .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
-      .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
-      .unsafeSet(MemberStatus(srn, index1of300), New)
-      .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
-
-      // financial details
-      .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
-      .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
-      .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
-
-      // member details
-      .unsafeSet(PensionSchemeMembersPage(srn), Manual)
-      .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
-      .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), true)
-      .unsafeSet(MemberDetailsNinoPage(srn, index1of300), nino)
-      .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
-      .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
-      .unsafeSet(MemberDetailsManualProgress(srn, index1of300), SectionJourneyStatus.Completed)
-
+    baseUserAnswers
       // employer contributions
       .unsafeSet(EmployerContributionsPage(srn), true)
       .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
@@ -146,7 +147,6 @@ class SummaryControllerSpec
       .unsafeSet(DidTransferIncludeAssetPage(srn, index1of300, index1of5), true)
 
       // transfers out
-      .unsafeSet(SchemeTransferOutPage(srn), true)
       .unsafeSet(SchemeTransferOutPage(srn), true)
       .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
       .unsafeSet(TransfersOutSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
@@ -354,6 +354,49 @@ class SummaryControllerSpec
         SectionJourneyStatus.Completed
       )
 
+  val inProgressUserAnswers = populatedUserAnswers
+    .unsafeSet(BondsDisposalProgress(srn, index, index2of50), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(MemberDetailsManualProgress(srn, index2of300), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(EmployerContributionsProgress(srn, index2of300, index1of50), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(ReceiveTransferProgress(srn, index2of300, index1of5), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(MemberTransferOutProgress(srn, index2of300, index1of5), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(MemberSurrenderedBenefitsProgress(srn, index2of300), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(LoansProgress(srn, index2of5000), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(MoneyBorrowedProgress(srn, index2of5000), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(SharesProgress(srn, index2of5000), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(SharesDisposalProgress(srn, index, index2of50), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(LandOrPropertyProgress(srn, index2of5000), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, index, index2of50), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(BondsProgress(srn, index2of5000), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(BondsDisposalProgress(srn, index, index2of50), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(OtherAssetsProgress(srn, index2of5000), SectionJourneyStatus.InProgress("/"))
+    .unsafeSet(
+      pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalProgress(srn, index, index2of50),
+      SectionJourneyStatus.InProgress("/")
+    )
+
+  val minimalUserAnswers = baseUserAnswers
+    .unsafeSet(EmployerContributionsPage(srn), false)
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), false)
+    .unsafeSet(MemberContributionsPage(srn), false)
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
+    .unsafeSet(SchemeTransferOutPage(srn), false)
+    .unsafeSet(PensionCommencementLumpSumPage(srn), false)
+    .unsafeSet(PensionPaymentsReceivedPage(srn), false)
+    .unsafeSet(SurrenderedBenefitsPage(srn), false)
+    .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
+    .unsafeSet(MoneyBorrowedPage(srn), false)
+    .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
+    .unsafeSet(SharesDisposalPage(srn), false)
+    .unsafeSet(LandOrPropertyHeldPage(srn), false)
+    .unsafeSet(LandOrPropertyDisposalPage(srn), false)
+    .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
+    .unsafeSet(BondsDisposalPage(srn), false)
+    .unsafeSet(OtherAssetsHeldPage(srn), false)
+    .unsafeSet(OtherAssetsDisposalPage(srn), false)
+    .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
 
@@ -372,55 +415,64 @@ class SummaryControllerSpec
 
   "PreSubmissionSummaryController" - {
 
-    "summary page should display correct content" in {
-      running(_ => applicationBuilder(userAnswers = Some(populatedUserAnswers))) { implicit app =>
-        val request = FakeRequest(GET, onPageLoad.url)
-        val result = route(app, request).value
+    val scenarios = List(
+      "complete journey with all sections" -> populatedUserAnswers,
+      "in progress journeys all sections" -> inProgressUserAnswers,
+      "empty complete journey" -> minimalUserAnswers
+    )
 
-        withClue(if (status(result) == SEE_OTHER) s"Expected 200 but got 303 to ${redirectLocation(result)}") {
-          status(result) mustEqual OK
+    scenarios.foreach { (scenarioName, answers) =>
+      s"summary page should display correct content for $scenarioName" in {
+        running(_ => applicationBuilder(userAnswers = Some(answers))) { implicit app =>
+          val request = FakeRequest(GET, onPageLoad.url)
+          val result = route(app, request).value
+
+          withClue(if (status(result) == SEE_OTHER) s"Expected 200 but got 303 to ${redirectLocation(result)}") {
+            status(result) mustEqual OK
+          }
+
+          val content = contentAsString(result)
+
+          // scheme details
+          content should include("<h2 class=\"govuk-heading-xl\">Basic details</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Financial details</h2>")
+
+          // members
+          content should include("<h2 class=\"govuk-heading-xl\">1 Member</h2>")
+
+          // member payments
+          content should include("<h2 class=\"govuk-heading-xl\">Employer contributions</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Unallocated employer contributions</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Member contributions</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Transfers in</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Transfers out</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Pension commencement lump sum</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Pension payments</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Surrendered benefits</h2>")
+
+          // loans
+          content should include("<h2 class=\"govuk-heading-xl\">Loans</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Money borrowed</h2>")
+
+          // shares
+          content should include("<h2 class=\"govuk-heading-xl\">Shares</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Disposal of shares</h2>")
+
+          // land or property
+          content should include("<h2 class=\"govuk-heading-xl\">Land or property</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Disposal of land or property</h2>")
+
+          // bonds
+          content should include("<h2 class=\"govuk-heading-xl\">Bonds</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Disposal of bonds</h2>")
+
+          // other assets
+          content should include("<h2 class=\"govuk-heading-xl\">Quoted shares and managed funds</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Other assets</h2>")
+          content should include("<h2 class=\"govuk-heading-xl\">Disposal of other assets</h2>")
         }
-
-        val content = contentAsString(result)
-
-        // scheme details
-        content should include("<h2 class=\"govuk-heading-xl\">Basic details</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Financial details</h2>")
-
-        // members
-        content should include("<h2 class=\"govuk-heading-xl\">1 Member</h2>")
-
-        // member payments
-        content should include("<h2 class=\"govuk-heading-xl\">Employer contributions</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Unallocated employer contributions</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Member contributions</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Transfers in</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Transfers out</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Pension commencement lump sum</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Pension payments</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Surrendered benefits</h2>")
-
-        // loans
-        content should include("<h2 class=\"govuk-heading-xl\">Loans</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Money borrowed</h2>")
-
-        // shares
-        content should include("<h2 class=\"govuk-heading-xl\">Shares</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Disposal of shares</h2>")
-
-        // land or property
-        content should include("<h2 class=\"govuk-heading-xl\">Land or property</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Disposal of land or property</h2>")
-
-        // bonds
-        content should include("<h2 class=\"govuk-heading-xl\">Bonds</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Disposal of bonds</h2>")
-
-        // other assets
-        content should include("<h2 class=\"govuk-heading-xl\">Quoted shares and managed funds</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Other assets</h2>")
-        content should include("<h2 class=\"govuk-heading-xl\">Disposal of other assets</h2>")
       }
     }
+
   }
 }

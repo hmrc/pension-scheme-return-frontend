@@ -206,7 +206,9 @@ trait TestValues extends OptionValues {
   val index1of3: Max3 = 1
   val index1of5: Max5 = 1
   val index1of50: Max50 = 1
+  val index2of50: Max50 = 2
   val index1of300: Max300 = 1
+  val index2of300: Max300 = 2
   val index1of5000: Max5000 = 1
   val index2of5000: Max5000 = 2
   val index3of5000: Max5000 = 3
