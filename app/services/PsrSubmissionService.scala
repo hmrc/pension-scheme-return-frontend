@@ -30,7 +30,7 @@ import models.SchemeId.Srn
 import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import config.Constants._
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.Logging
 import utils.nonsipp.TaskListUtils.getSectionList
 import play.api.libs.json.Json
@@ -80,11 +80,12 @@ class PsrSubmissionService @Inject() (
       .flatMap(
         _.flatMap { initialUA =>
           val isAnyUpdated = initialUA.data != currentUA.data
+          val taxYear = request.userAnswers.get(WhichTaxYearPage(srn))
           if (isSubmitted || isAnyUpdated) {
             (
               minimalRequiredSubmissionTransformer.transformToEtmp(srn, initialUA, isSubmitted),
               currentUA.get(CheckReturnDatesPage(srn)),
-              schemeDateService.schemeDate(srn)
+              taxYear
             ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
               val submissionRequest: PsrSubmission = PsrSubmission(
                 minimalRequiredSubmission = minimalRequiredSubmission,
