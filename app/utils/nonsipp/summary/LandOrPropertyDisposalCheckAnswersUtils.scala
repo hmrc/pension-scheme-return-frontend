@@ -218,8 +218,8 @@ class LandOrPropertyDisposalCheckAnswersUtils(saveService: SaveService)
     request.userAnswers
       .map(LandOrPropertyDisposalProgress.all())
       .flatMap { case (lpIndex, disposals) =>
-        disposals.map { case (dIndex, progress) =>
-          ((lpIndex, dIndex), progress)
+        disposals.collect { case (dIndex, SectionJourneyStatus.Completed) =>
+          ((lpIndex, dIndex), SectionJourneyStatus.Completed)
         }
       }
       .keys
