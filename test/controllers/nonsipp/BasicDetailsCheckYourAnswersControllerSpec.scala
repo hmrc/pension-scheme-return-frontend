@@ -230,7 +230,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             mockTaxYear(currentReturnTaxYear)
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
@@ -248,7 +248,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             mockTaxYear(currentReturnTaxYear)
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
@@ -268,7 +268,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
             verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
@@ -288,7 +288,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
             verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
@@ -308,7 +308,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
             verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
@@ -326,7 +326,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             mockTaxYear(currentReturnTaxYear)
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )
@@ -347,7 +347,7 @@ class BasicDetailsCheckYourAnswersControllerSpec
             MockPsrSubmissionService.submitPsrDetails()
           }.after {
             verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(using any(), any(), any())
-            verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(using any())
+            verify(mockSchemeDateService, times(0)).taxYearOrAccountingPeriods(any())(using any())
             verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(using any(), any(), any())
           }
         )

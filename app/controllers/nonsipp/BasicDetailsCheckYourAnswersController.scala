@@ -158,7 +158,7 @@ class BasicDetailsCheckYourAnswersController @Inject() (
   private def auditAndRedirect(srn: Srn)(implicit request: DataRequest[AnyContent]): Future[Result] = {
     val eitherResultOrFutureResult: Either[Result, Future[Result]] =
       for {
-        taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+        taxYear <- request.userAnswers.get(WhichTaxYearPage(srn)).getOrRecoverJourney
         schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
         userName <- loggedInUserNameOrRedirect
         _ = if (isCIPStartEvent) auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))

@@ -36,7 +36,7 @@ import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import models.requests.psr._
 import config.Constants.{PREPOPULATION_FLAG, PSP, UNCHANGED_SESSION_PREFIX}
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.libs.json.{JsArray, JsValue}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -162,6 +162,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     List(true, false).foreach(checkReturnDatesAnswer =>
       s"should submitPsrDetails request when only minimalRequiredSubmission object is exist and checkReturnDates is $checkReturnDatesAnswer" in {
         val userAnswers = defaultUserAnswers
+          .unsafeSet(WhichTaxYearPage(srn), DateRange(LocalDate.of(2021, 4, 6), LocalDate.of(2022, 4, 5)))
           .unsafeSet(CheckReturnDatesPage(srn), checkReturnDatesAnswer)
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -203,6 +204,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
     s"submitPsrDetails request successfully when optional fields are not None" in {
       val userAnswers = defaultUserAnswers
+        .unsafeSet(WhichTaxYearPage(srn), DateRange(LocalDate.of(2021, 4, 6), LocalDate.of(2022, 4, 5)))
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -249,6 +251,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
     s"submitPrePopulatedDetails request successfully" in {
       val userAnswers = defaultUserAnswers
+        .unsafeSet(WhichTaxYearPage(srn), DateRange(LocalDate.of(2021, 4, 6), LocalDate.of(2022, 4, 5)))
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
@@ -295,6 +298,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
     s"submitPsrDetails request successfully with PsrDeclaration when isSubmitted is true and (initial UA current UA) are same" in {
       val userAnswers = defaultUserAnswers
+        .unsafeSet(WhichTaxYearPage(srn), DateRange(LocalDate.of(2021, 4, 6), LocalDate.of(2022, 4, 5)))
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
@@ -345,6 +349,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
     "should submit PsrDetails request when initial UA and current UA are same but isSubmitted true" in {
       val userAnswers = defaultUserAnswers
+        .unsafeSet(WhichTaxYearPage(srn), DateRange(LocalDate.of(2021, 4, 6), LocalDate.of(2022, 4, 5)))
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
