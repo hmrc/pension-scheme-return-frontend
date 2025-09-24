@@ -21,7 +21,6 @@ import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import play.api.mvc._
 import utils.nonsipp.summary.BasicDetailsCheckAnswersUtils
 import controllers.{nonsipp, PSRController}
-import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
 import cats.implicits.toTraverseOps
 import controllers.actions._
 import _root_.config.Constants._
@@ -31,6 +30,8 @@ import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
+import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
+import config.Constants
 import cats.data.EitherT
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -151,13 +152,16 @@ class BasicDetailsCheckYourAnswersController @Inject() (
     }
   }
 
+  private def isCIPStartEvent(implicit request: DataRequest[?]): Boolean =
+    request.session.get(CIP_START_EVENT_FLAG).fold(false)(_.toBoolean)
+
   private def auditAndRedirect(srn: Srn)(implicit request: DataRequest[AnyContent]): Future[Result] = {
     val eitherResultOrFutureResult: Either[Result, Future[Result]] =
       for {
         taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
         schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
         userName <- loggedInUserNameOrRedirect
-        _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
+        _ = if (isCIPStartEvent) auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
       } yield {
         // Determine next page in case of Declaration redirect
         val byPassedJourney = if (request.pensionSchemeId.isPSP) {
@@ -168,7 +172,16 @@ class BasicDetailsCheckYourAnswersController @Inject() (
         val regularJourney = navigator
           .nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)
         isJourneyBypassed(srn)
-          .map(res => res.map(if (_) Redirect(byPassedJourney) else Redirect(regularJourney)).merge)
+          .map(res =>
+            res
+              .map(
+                if (_)
+                  Redirect(byPassedJourney)
+                    .removingFromSession(Constants.CIP_START_EVENT_FLAG)
+                else Redirect(regularJourney).removingFromSession(Constants.CIP_START_EVENT_FLAG)
+              )
+              .merge
+          )
       }
 
     // Transform Either[Result, Future[Result]] into a Future[Result]
