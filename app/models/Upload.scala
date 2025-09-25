@@ -57,7 +57,7 @@ object ValidationError {
     Json.format[NonEmptyList[ValidationError]]
 
   def fromCell(cell: String, row: Int, errorType: ValidationErrorType, errorMessage: String): ValidationError =
-    ValidationError(cell + (row + 1), errorType: ValidationErrorType, errorMessage)
+    ValidationError(cell + (row + 2), errorType: ValidationErrorType, errorMessage)
 }
 
 // Used to track the state of the upload user journey. This is separate from the actual Upload payload state

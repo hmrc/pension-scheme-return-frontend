@@ -110,8 +110,8 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
       val actual = validator.validateCSV(source, Option(localDate)).futureValue
       actual._1 mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("F2", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.upload.error.invalid.date"),
-          ValidationError("F3", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.upload.error.format")
+          ValidationError("F3", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.upload.error.invalid.date"),
+          ValidationError("F4", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.upload.error.format")
         )
       )
       actual._2 mustBe 3
@@ -132,8 +132,8 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
       val actual = validator.validateCSV(source, None).futureValue
       actual._1 mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("C3", ValidationErrorType.LastName, "memberDetails.lastName.upload.error.required"),
-          ValidationError("B4", ValidationErrorType.FirstName, "memberDetails.firstName.upload.error.required")
+          ValidationError("C4", ValidationErrorType.LastName, "memberDetails.lastName.upload.error.required"),
+          ValidationError("B5", ValidationErrorType.FirstName, "memberDetails.firstName.upload.error.required")
         )
       )
       actual._2 mustBe 4
@@ -153,8 +153,8 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
       val actual = validator.validateCSV(source, Option(localDate)).futureValue
       actual._1 mustBe UploadErrors(
         NonEmptyList(
-          ValidationError("F3", DateOfBirth, "memberDetails.dateOfBirth.upload.error.future"),
-          List(ValidationError("D3", NinoFormat, "memberDetailsNino.upload.error.duplicate"))
+          ValidationError("F4", DateOfBirth, "memberDetails.dateOfBirth.upload.error.future"),
+          List(ValidationError("D4", NinoFormat, "memberDetailsNino.upload.error.duplicate"))
         )
       )
       actual._2 mustBe 3
@@ -174,7 +174,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
       val actual = validator.validateCSV(source, None).futureValue
       actual._1 mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("D3", ValidationErrorType.NinoFormat, "memberDetailsNino.upload.error.invalid")
+          ValidationError("D4", ValidationErrorType.NinoFormat, "memberDetailsNino.upload.error.invalid")
         )
       )
       actual._2 mustBe 3
@@ -247,14 +247,14 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
       val actual = validator.validateCSV(source, Option(localDate)).futureValue
       actual._1 mustBe UploadErrors(
         NonEmptyList(
-          ValidationError("B3", FirstName, "memberDetails.firstName.upload.error.invalid"),
+          ValidationError("B4", FirstName, "memberDetails.firstName.upload.error.invalid"),
           List(
-            ValidationError("F3", DateOfBirth, "memberDetails.dateOfBirth.upload.error.future"),
-            ValidationError("C4", LastName, "memberDetails.lastName.upload.error.invalid"),
-            ValidationError("F5", DateOfBirth, "memberDetails.dateOfBirth.upload.error.future"),
-            ValidationError("E5", NoNinoReason, "noNINO.upload.upload.error.invalid"),
-            ValidationError("C6", LastName, "memberDetails.lastName.upload.error.required"),
-            ValidationError("D7", NinoFormat, "memberDetailsNino.upload.error.invalid")
+            ValidationError("F4", DateOfBirth, "memberDetails.dateOfBirth.upload.error.future"),
+            ValidationError("C5", LastName, "memberDetails.lastName.upload.error.invalid"),
+            ValidationError("F6", DateOfBirth, "memberDetails.dateOfBirth.upload.error.future"),
+            ValidationError("E6", NoNinoReason, "noNINO.upload.upload.error.invalid"),
+            ValidationError("C7", LastName, "memberDetails.lastName.upload.error.required"),
+            ValidationError("D8", NinoFormat, "memberDetailsNino.upload.error.invalid")
           )
         )
       )
