@@ -39,9 +39,8 @@ import javax.inject.Inject
 class MinimalRequiredSubmissionTransformer @Inject() (schemeDateService: SchemeDateService) {
   def getVersionAndStatus(srn: Srn, currentUA: UserAnswers, isSubmitted: Boolean): (Option[String], PSRStatus) = {
     val fbVersion = currentUA.get(FbVersionPage(srn)).getOrElse(defaultFbVersion)
-    val fbStatus = currentUA.get(FbStatus(srn)).getOrElse(Compiled)
     (
-      if (fbVersion.toInt == 1 && fbStatus.isSubmitted) None else Some(fbVersion),
+      Some(fbVersion),
       if (isSubmitted) Submitted else Compiled
     )
   }
