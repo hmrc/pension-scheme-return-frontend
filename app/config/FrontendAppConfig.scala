@@ -24,6 +24,7 @@ import play.api.i18n.Lang
 
 import scala.concurrent.duration.Duration
 
+import java.time.LocalDate
 import java.net.URLEncoder
 
 @Singleton
@@ -67,6 +68,7 @@ class FrontendAppConfig @Inject() (config: Configuration) { self =>
   val emailApiUrl: String = emailService.baseUrl
   val emailSendForce: Boolean = config.getOptional[Boolean]("email.force").getOrElse(false)
   val fileReturnTemplateId: String = config.get[String]("email.fileReturnTemplateId")
+  val allowedStartDateRange: LocalDate = LocalDate.parse(config.get[String]("schemeStartDate"))
   val prePopulationEnabled: Boolean = config.getOptional[Boolean]("prePopulationEnabled").getOrElse(false)
   val lockingEnabled: Boolean = config.getOptional[Boolean]("lockingEnabled").getOrElse(false)
   val ifsTimeout: Duration = config.get[Duration]("ifs.timeout")
