@@ -369,13 +369,13 @@ class MinimalRequiredSubmissionTransformerSpec
         result mustBe (Some("001"), Submitted)
       }
     }
-    "should return (001, Compiled)" - {
+    "should return (None, Compiled)" - {
       "when fbVersion is 001 and fbStatus is submitted" in {
         val userAnswers = emptyUserAnswers
           .unsafeSet(FbVersionPage(srn), "001")
           .unsafeSet(FbStatus(srn), Submitted)
         val result = transformer.getVersionAndStatus(srn, userAnswers, isSubmitted = false)
-        result mustBe (Some("001"), Compiled)
+        result mustBe (None, Compiled)
       }
     }
     "should return (002, Compiled)" - {
