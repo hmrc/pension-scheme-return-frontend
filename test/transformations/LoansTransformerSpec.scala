@@ -605,7 +605,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None))
+        loans(
+          name = individualRecipientName,
+          recipientIdentityType = RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
+          connectedPartyStatus = false
+        )
       )
       result.fold(
         ex => fail(ex.getMessage),
@@ -617,7 +621,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           )
           userAnswers.get(IndividualRecipientNamePage(srn, 1)) mustBe Some(individualRecipientName)
           userAnswers.get(IndividualRecipientNinoPage(srn, 1)) mustBe Some(ConditionalYesNo.yes(nino))
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe Some(true)
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, 1)) mustBe Some(false)
           userAnswers.get(DatePeriodLoanPage(srn, 1)) mustBe Some(
             (localDate, Money(Double.MinPositiveValue), Int.MaxValue)
           )

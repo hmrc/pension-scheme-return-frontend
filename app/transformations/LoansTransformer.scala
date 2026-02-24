@@ -329,7 +329,9 @@ class LoansTransformer @Inject() extends Transformer {
         .filter { index =>
           loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.Individual
         }
-        .map(index => IsIndividualRecipientConnectedPartyPage(srn, index) -> true)
+        .map(index =>
+          IsIndividualRecipientConnectedPartyPage(srn, index) -> loanTransactions(index.value - 1).connectedPartyStatus
+        )
       sponsoringEmployer = indexes
         .filter { index =>
           loanTransactions(index.value - 1).recipientIdentityType.identityType != IdentityType.Individual
