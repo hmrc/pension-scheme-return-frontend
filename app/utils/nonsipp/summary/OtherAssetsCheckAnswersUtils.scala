@@ -112,17 +112,25 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
         .get(WhyDoesSchemeHoldAssetsPage(srn, index))
         .getOrRecoverJourney
 
-      acquisitionOrContributionDate = Option.when(whyHeld != Transfer)(
-        request.userAnswers
-          .get(WhenDidSchemeAcquireAssetsPage(srn, index))
-          .get
-      )
+      acquisitionOrContributionDate <-
+        if (whyHeld != Transfer) {
+          request.userAnswers
+            .get(WhenDidSchemeAcquireAssetsPage(srn, index))
+            .getOrRecoverJourney
+            .map(Some(_))
+        } else {
+          Right(None)
+        }
 
-      sellerIdentityType = Option.when(whyHeld == Acquisition)(
-        request.userAnswers
-          .get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller))
-          .get
-      )
+      sellerIdentityType <-
+        if (whyHeld == Acquisition) {
+          request.userAnswers
+            .get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller))
+            .getOrRecoverJourney
+            .map(Some(_))
+        } else {
+          Right(None)
+        }
 
       sellerName = Option.when(whyHeld == Acquisition)(
         List(
@@ -166,21 +174,29 @@ object OtherAssetsCheckAnswersUtils extends PsrControllerHelpers with CheckAnswe
         ).flatten.headOption
       )
 
-      isSellerConnectedParty = Option.when(whyHeld == Acquisition)(
-        request.userAnswers
-          .get(OtherAssetSellerConnectedPartyPage(srn, index))
-          .get
-      )
+      isSellerConnectedParty <-
+        if (whyHeld == Acquisition) {
+          request.userAnswers
+            .get(OtherAssetSellerConnectedPartyPage(srn, index))
+            .getOrRecoverJourney
+            .map(Some(_))
+        } else {
+          Right(None)
+        }
 
       totalCost <- request.userAnswers
         .get(CostOfOtherAssetPage(srn, index))
         .getOrRecoverJourney
 
-      isIndependentValuation = Option.when(whyHeld != Transfer)(
-        request.userAnswers
-          .get(IndependentValuationPage(srn, index))
-          .get
-      )
+      isIndependentValuation <-
+        if (whyHeld != Transfer) {
+          request.userAnswers
+            .get(IndependentValuationPage(srn, index))
+            .getOrRecoverJourney
+            .map(Some(_))
+        } else {
+          Right(None)
+        }
 
       totalIncome = request.userAnswers
         .get(IncomeFromAssetPage(srn, index))
