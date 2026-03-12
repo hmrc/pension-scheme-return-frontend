@@ -22,7 +22,7 @@ import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import views.html.OverviewView
 import utils.IntUtils.given
-import config.Constants.CIP_START_EVENT_FLAG
+import config.Constants.{CIP_START_EVENT_FLAG, PREPOPULATION_FLAG}
 import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses._
 import models.CheckMode
@@ -330,6 +330,30 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
       redirectLocation(result).value mustEqual controllers.routes.UnauthorisedController.onPageLoad().url
     }
 
+    "onSelectContinue removes PREPOPULATION_FLAG when on a byPassedJourney" in {
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
+        Future.successful(Seq())
+      )
+
+      val currentUA = emptyUserAnswers
+        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+
+      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+        val request = FakeRequest(GET, onSelectContinue("001"))
+          .withSession(PREPOPULATION_FLAG -> "true")
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+            .onPageLoad(srn, CheckMode)
+            .url
+        session(result).get(PREPOPULATION_FLAG) mustBe None
+      }
+    }
+
     "onSelectViewAndChange redirects to the BasicDetailsCYA page when members over threshold" in {
       when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any())).thenReturn(
         Future.successful(Seq())
@@ -344,9 +368,10 @@ class OverviewControllerSpec extends ControllerBaseSpec with ControllerBehaviour
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-          .onPageLoad(srn, CheckMode)
-          .url
+        redirectLocation(result).value mustEqual
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+            .onPageLoad(srn, CheckMode)
+            .url
       }
     }
 
