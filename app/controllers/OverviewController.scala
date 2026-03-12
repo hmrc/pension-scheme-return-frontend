@@ -342,10 +342,13 @@ class OverviewController @Inject() (
           val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
             .removingFromSession(Constants.CIP_START_EVENT_FLAG)
           isJourneyBypassed(srn).map { res =>
-            val result = if (res.getOrElse(false)) byPassedJourney else regularJourney
-            result.addingToSession(
-              Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
-            )
+            if (res.getOrElse(false)) {
+              byPassedJourney.removingFromSession(Constants.PREPOPULATION_FLAG)
+            } else {
+              regularJourney.addingToSession(
+                Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
+              )
+            }
           }
         }
     }
