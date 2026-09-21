@@ -114,6 +114,64 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       result mustBe Some(minimalSubmissionData)
     }
 
+    "return standard PSR when username contains whitespace at the start/end" in runningApplication { implicit app =>
+      stubGet(
+        getStandardPsrDetailsUrl,
+        Map(
+          "periodStartDate" -> commonStartDate,
+          "psrVersion" -> commonVersion
+        ),
+        ok(Json.stringify(minimalSubmissionJson))
+          .withHeader("Content-Type", "application/json")
+          .withHeader("srn", "S0000000042")
+      )
+
+      val result =
+        connector
+          .getStandardPsrDetails(
+            pstr = commonPstr,
+            optFbNumber = None,
+            optPeriodStartDate = Some(commonStartDate),
+            optPsrVersion = Some(commonVersion),
+            fallBackCall = commonFallbackCall,
+            userName = " usernameWithSpaces ",
+            schemeName = commonSchemeName,
+            srn = Srn(commonSrn).get
+          )
+          .futureValue
+
+      result mustBe Some(minimalSubmissionData)
+    }
+
+    "return standard PSR when scheme name contains whitespace at the start/end" in runningApplication { implicit app =>
+      stubGet(
+        getStandardPsrDetailsUrl,
+        Map(
+          "periodStartDate" -> commonStartDate,
+          "psrVersion" -> commonVersion
+        ),
+        ok(Json.stringify(minimalSubmissionJson))
+          .withHeader("Content-Type", "application/json")
+          .withHeader("srn", "S0000000042")
+      )
+
+      val result =
+        connector
+          .getStandardPsrDetails(
+            pstr = commonPstr,
+            optFbNumber = None,
+            optPeriodStartDate = Some(commonStartDate),
+            optPsrVersion = Some(commonVersion),
+            fallBackCall = commonFallbackCall,
+            userName = commonUserName,
+            schemeName = " schemeNameWithSpaces ",
+            srn = Srn(commonSrn).get
+          )
+          .futureValue
+
+      result mustBe Some(minimalSubmissionData)
+    }
+
     "return standard Psr for fb number" in runningApplication { implicit app =>
       stubGet(
         getStandardPsrDetailsUrl,

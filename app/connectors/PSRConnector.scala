@@ -287,8 +287,8 @@ class PSRConnector @Inject() (appConfig: FrontendAppConfig, http: HttpClientV2) 
   ): WSRequest =
     wsRequest.addHttpHeaders(
       "Content-Type" -> "application/json",
-      "userName" -> userName,
-      "schemeName" -> schemeName,
+      "userName" -> userName.trim,
+      "schemeName" -> schemeName.trim,
       "srn" -> srn.value,
       "requestRole" -> requestRole
     )
