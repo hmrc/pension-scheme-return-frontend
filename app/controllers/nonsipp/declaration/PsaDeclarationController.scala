@@ -114,14 +114,7 @@ class PsaDeclarationController @Inject() (
             journeyByPassed <- isJourneyBypassed(srn)
             bypassed = journeyByPassed.getOrElse(false)
             _ <-
-              if (
-                bypassed && hasMemberNumbersChangedToOver99(
-                  request.userAnswers,
-                  srn,
-                  request.pensionSchemeId,
-                  isPrePopulation
-                )
-              ) {
+              if (bypassed) {
                 psrSubmissionService.submitPsrDetailsBypassed(
                   srn = srn,
                   fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)

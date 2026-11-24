@@ -50,19 +50,19 @@ class MemberPrePopulationProcessor @Inject() () {
           )
         )
       ) match {
-      case JsSuccess(value, _) =>
-        Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
-      case _ => Try(currentUA)
+      case JsSuccess(value, _) if baseUA.get(MembersDetailsPages(srn)).exists(_.nonEmpty) =>
+        currentUA
+          .copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
+          .set(MembersDetailsChecked(srn), false)
+      case _ => Success(currentUA)
     }
-
-    val transformedResultWithCheckedFlag = transformedResult.flatMap(_.set(MembersDetailsChecked(srn), false))
 
     val memberStatusOptMap =
       (baseUaJson \ "membersPayments" \ "memberDetails" \ "personalDetails" \ MemberStatus.key)
         .asOpt[Map[String, String]]
 
-    memberStatusOptMap.fold(transformedResultWithCheckedFlag)(memberStatusMap =>
-      memberStatusMap.foldLeft(transformedResultWithCheckedFlag) { (uaResult, memberStatusEntry) =>
+    memberStatusOptMap.fold(transformedResult)(memberStatusMap =>
+      memberStatusMap.foldLeft(transformedResult) { (uaResult, memberStatusEntry) =>
         memberStatusEntry._1.toIntOption.flatMap(i => refineV[OneTo300](i + 1).toOption) match {
           case None => uaResult
           case Some(index) =>
