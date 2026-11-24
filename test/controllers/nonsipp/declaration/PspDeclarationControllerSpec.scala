@@ -105,37 +105,41 @@ class PspDeclarationControllerSpec
         .withName("agree and continue should submit PSR details, send email and audit")
     )
 
-    act.like(
-      agreeAndContinue(
-        onSubmit,
-        currentTaxYearUserAnswersWithManyMembers
-          .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-          .unsafeSet(LoansMadeOrOutstandingPage(srn), false),
-        emptyUserAnswers,
-        "value" -> psaId.value
-      ).before {
-        when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(Some(schemeDatePeriod))
-        when(mockSchemeDateService.returnPeriodsAsJsonString(any())(using any())).thenReturn("")
-        when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
-        when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
-        when(
-          mockPsrRetrievalService
-            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
-        ).thenReturn(Future.successful(emptyUserAnswers))
-          .thenReturn(Future.successful(emptyUserAnswers))
-        when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
-          .thenReturn(Future.successful(versionsResponse))
-        MockPsrSubmissionService.submitPsrDetailsBypassed()
-        MockEmailConnector.sendEmail(email, templateId)
-      }.after {
-        verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(using any(), any(), any())
-        verify(mockPsrSubmissionService, times(1)).submitPsrDetailsBypassed(any(), any())(using any(), any(), any())
-        verify(mockEmailConnector, times(1))
-          .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(using any(), any())
-      }.withName(
-        "when there are no members in the previous returns, agree and continue should submit PSR details bypassed, send email and audit "
+    Seq(
+      "Basic Details only" -> currentTaxYearUserAnswersWithManyMembers,
+      "answers from the long journey" -> currentTaxYearUserAnswersWithManyMembers
+        .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
+    ).foreach { case (scenario, userAnswers) =>
+      act.like(
+        agreeAndContinue(
+          onSubmit,
+          userAnswers,
+          emptyUserAnswers,
+          "value" -> psaId.value
+        ).before {
+          when(mockSchemeDateService.schemeDate(any())(using any())).thenReturn(Some(schemeDatePeriod))
+          when(mockSchemeDateService.returnPeriodsAsJsonString(any())(using any())).thenReturn("")
+          when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
+          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+          when(
+            mockPsrRetrievalService
+              .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(using any(), any(), any())
+          ).thenReturn(Future.successful(emptyUserAnswers))
+            .thenReturn(Future.successful(emptyUserAnswers))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(using any(), any(), any()))
+            .thenReturn(Future.successful(versionsResponse))
+          MockPsrSubmissionService.submitPsrDetailsBypassed()
+          MockEmailConnector.sendEmail(email, templateId)
+        }.after {
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(using any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsBypassed(any(), any())(using any(), any(), any())
+          verify(mockEmailConnector, times(1))
+            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(using any(), any())
+        }.withName(
+          s"submit a short return with $scenario"
+        )
       )
-    )
+    }
 
     act.like(
       agreeAndContinue(
